@@ -1,0 +1,1 @@
+export default function Reports(){return <><p className="eyebrow">MANAGEMENT REPORTING</p><h1>Reports</h1><section className="panel"><p className="muted">Actual campaign metrics and exports will be available after call ingestion is connected.</p></section></>}
