@@ -1,5 +1,25 @@
 # Frontier AI Voice CRM
 
+## Current development status
+
+**Next.js + Supabase authentication foundation is being built on a feature branch.** The root `src/` app uses real Supabase email/password authentication, dealership memberships, real database reads, campaign drafts and server-validated manager decisions. Review [docs/PRODUCTION_FOUNDATION.md](docs/PRODUCTION_FOUNDATION.md) for setup and limitations.
+
+This app is **not live**: a new dedicated Supabase project is not connected, a package lockfile has not been generated, no CI/build has run, and Sarvam launching is disabled. The prior static prototype remains under [web/](web/).
+
+### Local Next.js setup
+
+1. Copy `.env.example` to `.env.local` and supply only dedicated Supabase project URL and publishable key.
+2. Review and apply `db/production-foundation.sql` to a **new dedicated database**, not the old prototype schema and not InsureIT.
+3. Provision Supabase Auth users and dealership membership records using admin-only tooling.
+4. Install dependencies and generate/commit a lockfile: `npm install`; then `npm run lint && npm test && npm run build`.
+5. Start locally with `npm run dev` and verify tenant authorization with separate dealership accounts.
+
+Never use real customer records until RLS and security tests are verified. Do not enable live calls until immutable cohorts and Sarvam integration are implemented.
+
+---
+
+# Frontier AI Voice CRM
+
 Standalone multi-dealership AI calling CRM for **Frontier Group dealerships**. Sarvam Samvaad powers calls; this portal handles imports, campaign preparation, manager approval, follow-up work and reporting.
 
 ## Current status
