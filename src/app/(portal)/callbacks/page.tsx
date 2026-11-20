@@ -1,0 +1,1 @@
+export default function Callbacks(){return <><p className="eyebrow">SERVICE CRM</p><h1>Callbacks</h1><section className="panel"><p className="muted">Callback request management coming in the operational CRM milestone.</p></section></>}

@@ -81,3 +81,35 @@ Earlier training drafts described spelling full registrations and speaking ALL n
 - Introduce typed source contracts; real Supabase Auth and tenant RLS; manager approval enforced transactionally server-side.
 - Safe retries, idempotent Sarvam webhook ingestion, no cross-tenant leaks, audit log for each relevant state transition.
 - Verify build/test/security before opening PR. Stop before merge/deploy unless separately approved.
+
+
+## L. Verified implementation status — 20 November 2026
+
+These are operational reference points, not blanket permission to deploy, call customers, or change external services.
+
+### Repository and deployments
+- GitHub repository: `antnish1/AI-Voice-Agent`.
+- Main currently contains the original static demonstration and this instruction file. The Next.js production foundation is on draft PR #2, branch `feature/nextjs-auth-dealership-foundation`; do not assume it has been merged.
+- A **production Vercel deployment has already been explicitly authorized and created** for the login foundation, separate from InsureIT. Canonical login URL: `https://frontier-ai-voice-crm.vercel.app/login`. Vercel project ID: `prj_51k5pHkUt6ZRbcaf2kS798fT2KL9`, team `antnish1s-projects` (Pro). Last verified deployment: `dpl_CF7NftbPGmJ5L43artLkDwGFGhEN`, READY, from commit `41b927c3cee7213c31b530793bc61c65fdb308c4` on the feature branch.
+- Next.js 15.5.0 was rejected by Vercel as vulnerable; patched 15.5.29 was deployed after CI passed. Recheck security advisories before subsequent releases; don't downgrade.
+- Production `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` were set using Vercel project environment variables. `ENABLE_LIVE_CALLS=false` was set for production, preview and development. **Do not enable live calling without new explicit permission.**
+- Vercel production deployment does **not** mean the website's full CRM workflows, invitation redirects or end-to-end login have been tested with real passwords. Initial `/login` HTTP 200 and unauthenticated dashboard-to-login behavior were verified.
+- The stable public login route is `/login`; it must authenticate staff through Supabase, with no public registration. The project exposes a login page, not an unrestricted customer-data portal.
+
+### Separate Supabase environment
+- Supabase project: **AI VOICE AGENT**, reference `kagzuxkeabiuswccxjme`, URL `https://kagzuxkeabiuswccxjme.supabase.co`, **Shahdolho Account** connection. This is a distinct Free-plan database and is **not** the InsureIT or Parts Connect production database.
+- Initial production tables: `public.dealerships`, `public.memberships`, `public.customers`, `public.campaigns`; all RLS-enabled. `Frontier MG Noida` dealership is registered. Private `internal.staff_invitation_requests` tracks onboarding requests; do not expose that schema to `anon` or `authenticated`.
+- Database campaign transition trigger validates the manager approval workflow; policy and tenant tests passed using temporary rolled-back fixtures. Currently only the foundation schema exists; real calling, uploads, callbacks, recording storage and complete workflow implementation remain future work.
+- Two invited staff accounts have had their **current Auth IDs** matched and membership roles restored: one `super_admin` and one `dealership_manager`, both scoped to Frontier MG Noida. Auth users can be deleted and recreated; reassociate membership to the **new verified Auth ID** rather than relying on stale role-request status. Avoid committing or logging staff email addresses or password material to public GitHub.
+- `super_admin` currently has a dealership membership, not automatically global rights; design and test all-dealership access separately before promising it.
+- Supabase security advisor previously warned that **leaked-password protection was disabled**; it may be a plan-restricted feature. Do not upgrade a plan or incur paid charges without explicit permission. Recheck current advisor findings rather than assuming they remain unchanged.
+
+### Invitation and authentication
+- Earlier invitation links redirected to `localhost:3000` on the user's device, which failed. The project now includes `/auth/confirm` and `/set-password` routes in the feature branch, but this alone does not repair existing email links or Supabase Auth URL configuration.
+- The Supabase Site URL and allowed redirects must point to the verified HTTPS Vercel site and appropriate callbacks, and the email template/token flow must be tested before claiming mobile invitation onboarding is fixed. Do not modify the shared InsureIT domain.
+- Do not claim real sign-in or password-reset flow passes without testing via the authenticated app and actual user-controlled credentials. Never ask users to share passwords.
+
+### Delivery safeguards
+- Review `docs/ACTIVE_INFRASTRUCTURE.md`, `docs/AUTH_INVITATION_REDIRECT.md`, and `docs/ADMIN_ACCOUNT_SETUP.md` alongside this file. Some notes were written before deployment and may be outdated; the current verified state and newer documentation win.
+- All changes must be reviewed against strict multi-tenancy, least-privilege RLS, stable agent-version approvals, data privacy and explicit calling consent. Do not commit production secrets, recordings or identifiable customer data.
+- The connected Vercel account is shared with InsureIT, but the Frontier project must remain isolated. Never modify InsureIT settings, deployments or domains while working on Frontier.

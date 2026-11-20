@@ -1,0 +1,1 @@
+export default function PickupDrop(){return <><p className="eyebrow">SERVICE CRM</p><h1>Pickup & drop</h1><section className="panel"><p className="muted">Pickup requests are never treated as confirmed bookings until address and availability are verified.</p></section></>}

@@ -1,0 +1,1 @@
+export default function CallLogs(){return <><p className="eyebrow">CALL INTELLIGENCE</p><h1>Call logs</h1><section className="panel"><p className="muted">Call logs, transcripts, recordings and output variables will appear after Sarvam API connection. No fabricated call data.</p></section></>}

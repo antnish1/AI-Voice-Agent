@@ -1,0 +1,1 @@
+export default function Appointments(){return <><p className="eyebrow">SERVICE CRM</p><h1>Appointments</h1><section className="panel"><p className="muted">Appointment task workflow will be connected to verified call outcomes.</p></section></>}
