@@ -57,6 +57,15 @@ create table if not exists public.voice_agent_links (
  created_at timestamptz not null default now(),
  unique(dealership_id,sarvam_agent_id)
 );
+create table if not exists public.voice_campaign_links (
+ id uuid primary key default gen_random_uuid(),
+ dealership_id uuid not null references public.dealerships(id) on delete cascade,
+ campaign_id uuid not null references public.campaigns(id) on delete cascade,
+ sarvam_campaign_id text not null unique check(char_length(sarvam_campaign_id) between 3 and 200),
+ agent_id text not null check(char_length(agent_id) between 3 and 200),
+ created_at timestamptz not null default now(),
+ unique(campaign_id)
+);
 create table if not exists public.voice_call_records (
  id uuid primary key default gen_random_uuid(),
  dealership_id uuid not null references public.dealerships(id) on delete cascade,
@@ -75,6 +84,16 @@ create table if not exists public.voice_call_records (
  last_synced_at timestamptz not null default now(),
  unique(dealership_id,sarvam_attempt_id)
 );
+create or replace function public.frontier_voice_campaign_scope()
+returns trigger language plpgsql security invoker set search_path='' as $
+begin
+ if not exists(select 1 from public.campaigns c where c.id=new.campaign_id and c.dealership_id=new.dealership_id)
+ then raise exception 'Campaign belongs to another dealership'; end if;
+ return new;
+end $;
+drop trigger if exists voice_campaign_scope on public.voice_campaign_links;
+create trigger voice_campaign_scope before insert or update on public.voice_campaign_links
+ for each row execute function public.frontier_voice_campaign_scope();
 -- Avoid storing unverified webhook deliveries as genuine calls. Ingestion to
 -- voice_call_records must go through a separately verified Sarvam signature handler.
 create table if not exists public.voice_webhook_receipts (
@@ -116,13 +135,13 @@ drop trigger if exists crm_pickup_drop_updated on public.crm_pickup_drop;
 create trigger crm_pickup_drop_updated before update on public.crm_pickup_drop for each row execute function public.frontier_crm_set_updated_at();
 
 do $$ declare tab text; begin
- foreach tab in array array['crm_callbacks','crm_appointments','crm_pickup_drop','voice_agent_links','voice_call_records','voice_webhook_receipts'] loop
+ foreach tab in array array['crm_callbacks','crm_appointments','crm_pickup_drop','voice_agent_links','voice_campaign_links','voice_call_records','voice_webhook_receipts'] loop
   execute format('alter table public.%I enable row level security',tab);
   execute format('drop policy if exists %I on public.%I',tab||'_read',tab);
   execute format('create policy %I on public.%I for select to authenticated using (public.frontier_password_setup_complete() and ((select auth.uid()) = ''5bd78ada-44f5-4045-a9fb-75c9dad69893''::uuid or exists (select 1 from public.memberships m where m.user_id=(select auth.uid()) and m.dealership_id=%I.dealership_id)))',tab||'_read',tab,tab);
  end loop; end $$;
 do $$ declare tab text; begin
- foreach tab in array array['crm_callbacks','crm_appointments','crm_pickup_drop','voice_agent_links'] loop
+ foreach tab in array array['crm_callbacks','crm_appointments','crm_pickup_drop','voice_agent_links','voice_campaign_links'] loop
   execute format('drop policy if exists %I on public.%I',tab||'_create',tab);
   execute format('create policy %I on public.%I for insert to authenticated with check (public.frontier_it_can_write(dealership_id)%s)',tab||'_create',tab,case when tab like 'crm_%' then ' and created_by=(select auth.uid())' else '' end);
   execute format('drop policy if exists %I on public.%I',tab||'_edit',tab);
