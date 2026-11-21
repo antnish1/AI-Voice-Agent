@@ -145,3 +145,13 @@
 @keyframes fm-shimmer{from{background-position:120% 0}to{background-position:-120% 0}}
 @media(max-width:900px){.frontier-skeleton-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.frontier-skeleton-panels{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.frontier-page-skeleton *{animation:none!important}}
+
+/* Chart uses actual campaign creation counts; tooltip never invents call metrics. */
+.frontier-chart-column{outline:0;isolation:isolate}
+.frontier-chart-column .ref-chart-bar{animation:none!important}
+.frontier-chart-column:focus-visible{outline:2px solid rgba(23,162,173,.55);outline-offset:4px;border-radius:7px}
+.frontier-chart-tooltip{position:absolute;z-index:10;bottom:calc(100% - 4px);left:50%;transform:translateX(-50%);min-width:100px;pointer-events:none;
+ display:grid;gap:3px;justify-items:center;padding:9px 12px;border-radius:10px;background:#112b40;color:white;
+ box-shadow:0 10px 28px rgba(14,36,49,.18);white-space:nowrap;font-size:11px}
+.frontier-chart-tooltip strong{font-size:16px;line-height:1.1;font-variant-numeric:tabular-nums}
+.frontier-chart-tooltip span{color:#bcdfeb;font-size:10px}
