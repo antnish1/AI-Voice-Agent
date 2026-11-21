@@ -12,6 +12,7 @@ import {ProfileMenu} from "@/components/profile-menu";
 import {PortalBreadcrumbs} from "@/components/portal-breadcrumbs";
 import {SidebarIcon,type SidebarIconName} from "@/components/sidebar-icons";
 import {useNavigationLayout} from "@/components/navigation-layout-preference";
+import {TopMenuNavigation} from "@/components/top-menu-navigation";
 
 const navigation:Array<{name:string;url:string;icon:SidebarIconName}>=[
  {name:"Dashboard",url:"/dashboard",icon:"home"},
@@ -105,34 +106,15 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     {isTopMenu&&<span className="frontier-topbar-brand" aria-label="Frontier AI Voice CRM"><span className="frontier-topbar-brand-mark">F</span><span>FRONTIER<small>AI VOICE CRM</small></span></span>}
     <div className="ref-header-breadcrumbs"><PortalBreadcrumbs/></div>
     <div className="ref-topbar-right">
-     {isItAdmin&&availableDealerships.length>0&&<label className="frontier-dealer-switch"><span>Dealership</span><select aria-label="Select dealership" value={membership.dealership_id} onChange={async e=>{const id=e.target.value;const r=await fetch("/api/dealership/select",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({dealershipId:id})});if(r.ok)window.location.reload();else alert("Unable to switch dealership.");}}>{availableDealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></label>}
+
      <span className="ref-notification" title="Notifications will be enabled when event ingestion is ready" aria-label="Notifications not connected">♧</span>
      <ProfileMenu userId={userId} email={userEmail} role={membership.role} dealershipName={membership.dealerships?.name??"Dealership"} initialName={displayName} initialAvatarPath={avatarPath}/>
     </div>
    </header>
 
-   {isTopMenu&&<nav className="frontier-top-navigation" aria-label="Main navigation">
-    <div className="frontier-top-navigation-scroll">
-     {[...navigation,...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
-      const active=path===item.url||(item.url==="/campaigns"&&campaignActive);
-      return <div key={item.url} className={`frontier-top-nav-entry ${active?"active":""}`}>
-       <Link href={item.url} onClick={()=>setCampaignsExpanded(false)} className="frontier-top-nav-link" aria-current={active?"page":undefined}>
-        <SidebarIcon name={item.icon} size={17}/><span>{item.name}</span>
-        {item.url==="/approvals"&&pendingApprovals>0&&<span className="frontier-top-approval-badge">{pendingApprovals>99?"99+":pendingApprovals}</span>}
-       </Link>
-       {item.url==="/campaigns"&&<button type="button" className="frontier-top-campaign-toggle"
-         aria-label={campaignsExpanded?"Close campaign menu":"Open campaign menu"}
-         aria-expanded={campaignsExpanded}
-         aria-controls="frontier-top-campaign-menu"
-         onClick={()=>setCampaignsExpanded(value=>!value)}><SidebarIcon name="chevron-down" size={15}/></button>}
-       {item.url==="/campaigns"&&campaignsExpanded&&<div className="frontier-top-campaign-menu" id="frontier-top-campaign-menu">
-        <Link href="/campaigns" onClick={()=>setCampaignsExpanded(false)}>All Campaigns</Link>
-        <Link href="/campaigns/new" onClick={()=>setCampaignsExpanded(false)}>Create Campaign</Link>
-       </div>}
-      </div>;
-     })}
-    </div>
-   </nav>}
+   {isTopMenu&&<TopMenuNavigation
+    items={[...navigation,...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])]}
+    pendingApprovals={pendingApprovals} isItAdmin={isItAdmin}/>}
    <main className="main crm-main ref-main"><MotionRoute>{children}</MotionRoute></main>
   </div>
  </div>;
