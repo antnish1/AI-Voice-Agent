@@ -405,3 +405,24 @@ a.portal-crumb-pill:hover{background:#e5ecf6}
 .ref-topbar-right{margin-left:0;flex-shrink:0}
 @media(max-width:900px){.ref-header-breadcrumbs{justify-content:flex-start}.ref-topbar{gap:8px}.ref-header-breadcrumbs .portal-crumb-compass{display:none}}
 @media(max-width:760px){.ref-topbar{padding:9px 10px}.ref-header-breadcrumbs .portal-breadcrumbs{gap:5px}.ref-header-breadcrumbs .portal-crumb-back{width:27px;height:27px;flex-basis:27px}.ref-header-breadcrumbs .portal-crumb-pill{font-size:10px;padding:5px 8px;min-height:28px}.ref-header-breadcrumbs .portal-crumb-pill.active{padding-left:7px}.ref-header-breadcrumbs .portal-crumb-chevron{width:16px;height:16px;font-size:12px}}
+
+
+/* Compact icon-only hover profile — scoped to the shared header. */
+.ref-topbar-right{gap:10px}
+.ref-topbar .portal-profile{display:flex;align-items:center;justify-content:center}
+.ref-topbar .portal-profile-trigger{width:42px;height:42px;min-width:42px;padding:2px;justify-content:center;border-radius:50%;background:transparent;border:1px solid transparent}
+.ref-topbar .portal-profile-trigger:hover,.ref-topbar .portal-profile-trigger:focus-visible{background:#eef4f8;border-color:#d8e7f0;outline-offset:2px}
+.ref-topbar .portal-profile-trigger .portal-profile-avatar{width:36px;height:36px}
+.ref-topbar .portal-profile-panel{width:248px;max-width:calc(100vw - 24px);top:100%;right:0;border-radius:14px;box-shadow:0 12px 32px #1c385126}
+.ref-topbar .portal-profile-identity{padding:12px 13px;gap:10px}
+.ref-topbar .portal-profile-avatar.large{width:42px;height:42px;font-size:15px}
+.ref-topbar .portal-profile-camera{width:19px;height:19px;font-size:11px;right:-3px;bottom:-2px}
+.ref-topbar .portal-profile-identity-copy strong{font-size:13px;line-height:1.2}
+.ref-topbar .portal-profile-identity-copy button{font-size:10px;margin-top:4px}
+.ref-topbar .portal-profile-facts{padding:8px 13px}
+.ref-topbar .portal-profile-facts div{grid-template-columns:45px minmax(0,1fr);font-size:10px;gap:5px;padding:5px 0}
+.ref-topbar .portal-profile-actions{padding:3px 0}
+.ref-topbar .portal-profile-actions button,.ref-topbar .portal-profile-actions>a{padding:10px 13px;font-size:11px}
+.ref-topbar .portal-profile-actions span{font-size:14px}
+.ref-topbar .portal-profile-success,.ref-topbar .portal-profile-error{font-size:10px;margin:5px 12px;padding:7px}
+@media(max-width:760px){.ref-topbar .portal-profile-panel{right:-2px;width:238px}.ref-topbar .portal-profile-trigger{width:36px;height:36px;min-width:36px}.ref-topbar .portal-profile-trigger .portal-profile-avatar{width:33px;height:33px}}
