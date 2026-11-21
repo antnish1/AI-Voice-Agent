@@ -47,9 +47,11 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
  return <div className={`app crm-app reference-app ${collapsed?"nav-collapsed":""} ${mobile?"nav-open":""}`}>
   <motion.aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar" animate={{width:narrowScreen?224:collapsed?68:224}} transition={reducedMotion?{duration:0}:motionTokens.spring}>
    <div className="brand crm-brand ref-brand frontier-sidebar-brand">
-    <div className="brand-icon frontier-sidebar-logo" aria-label="FRONTIER logo">F</div>
+    {collapsed&&!narrowScreen?
+     <button type="button" className="brand-icon frontier-sidebar-logo frontier-logo-expand" onClick={()=>setCollapsed(false)} title="Expand sidebar" aria-label="Expand sidebar">F</button>:
+     <div className="brand-icon frontier-sidebar-logo" aria-label="FRONTIER logo">F</div>}
     <span className="brand-words frontier-brand-text">FRONTIER<small>AI VOICE CRM</small></span>
-    <button type="button" className="collapse-control frontier-sidebar-collapse" onClick={()=>setCollapsed(!collapsed)} title={collapsed?"Expand sidebar":"Collapse sidebar"} aria-label={collapsed?"Expand sidebar":"Collapse sidebar"}><SidebarIcon name={collapsed?"chevrons-right":"chevrons-left"} size={19}/></button>
+    {!collapsed&&!narrowScreen&&<button type="button" className="collapse-control frontier-sidebar-collapse" onClick={()=>setCollapsed(true)} title="Collapse sidebar" aria-label="Collapse sidebar"><SidebarIcon name="chevrons-left" size={19}/></button>}
    </div>
    <nav className="frontier-sidebar-nav" aria-label="Main navigation">
     {[...navigation,...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
