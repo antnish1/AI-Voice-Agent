@@ -5,10 +5,11 @@ import {useEffect,useRef,useState} from "react";
 import type {Membership} from "@/lib/auth";
 import {signOut} from "@/app/login/actions";
 
-const sections=[
+const sections: Array<{title:string;items:Array<[string,string,string]>}>=[
  {title:"",items:[["⌂","Dashboard","/dashboard"],["◫","Campaigns","/campaigns"],["◎","AI Voice Agents","/agents"],["♙","Customers","/customers"],["☑","Approvals","/approvals"]]},
  {title:"",items:[["◷","Call Logs","/call-logs"],["▣","Appointments","/appointments"],["↺","Callbacks","/callbacks"],["⇄","Pickup & Drop","/pickup-drop"],["▤","Documents","/documents"],["▥","Reports","/reports"],["⚙","Settings","/settings"]]}
-] as const;
+];
+
 const allPages=sections.flatMap(s=>s.items);
 export function Shell({children,membership,userEmail}:{children:React.ReactNode,membership:Membership,userEmail:string}){
  const path=usePathname(),router=useRouter();
