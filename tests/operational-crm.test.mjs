@@ -47,3 +47,14 @@ test("Call pages never invent call records",()=>{
  assert.match(page,/from\("voice_call_records"\)/);
  assert.match(page,/eq\("dealership_id",membership\.dealership_id\)/);
 });
+
+test("IT dealership switcher is server-authorized and cannot be forged by dealership users",()=>{
+ const api=source("../src/app/api/dealership/select/route.ts");
+ const auth=source("../src/lib/auth.ts");
+ assert.match(api,/isItSuperUser/);
+ assert.match(api,/httpOnly:true/);
+ assert.match(api,/sameSite:"lax"/);
+ assert.match(auth,/superRole/);
+ assert.match(auth,/user\.email\?\.toLowerCase\(\)==="it@insureit.in"/);
+ assert.match(auth,/supabase\.from\("dealerships"\)/);
+});
