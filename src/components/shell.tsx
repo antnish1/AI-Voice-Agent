@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import {usePathname,useRouter} from "next/navigation";
-import {useState} from "react";
+import {useEffect,useRef,useState} from "react";
 import type {Membership} from "@/lib/auth";
 import {signOut} from "@/app/login/actions";
 
@@ -12,6 +12,8 @@ const sections=[
 const allPages=sections.flatMap(s=>s.items);
 export function Shell({children,membership,userEmail}:{children:React.ReactNode,membership:Membership,userEmail:string}){
  const path=usePathname(),router=useRouter();
+ const searchInput=useRef<HTMLInputElement>(null);
+ useEffect(()=>{const onKey=(event:KeyboardEvent)=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){event.preventDefault();searchInput.current?.focus();}if(event.key==="Escape"){setShowSearch(false);searchInput.current?.blur();}};document.addEventListener("keydown",onKey);return ()=>document.removeEventListener("keydown",onKey);},[]);
  const [collapsed,setCollapsed]=useState(false),[mobile,setMobile]=useState(false),[search,setSearch]=useState(""),[showSearch,setShowSearch]=useState(false);
  const suggestions=search.trim()?allPages.filter(item=>item[1].toLowerCase().includes(search.trim().toLowerCase())).slice(0,5):[];
  const navigate=(href:string)=>{setSearch("");setShowSearch(false);setMobile(false);router.push(href);};
@@ -27,7 +29,7 @@ export function Shell({children,membership,userEmail}:{children:React.ReactNode,
     <button type="button" className="ref-menu-toggle" onClick={()=>{if(window.innerWidth<=760)setMobile(!mobile);else setCollapsed(!collapsed);}} aria-label="Toggle navigation">☰</button>
     <div className="ref-global-search">
      <form role="search" onSubmit={e=>{e.preventDefault();if(suggestions.length)navigate(suggestions[0][2]);}}>
-      <span aria-hidden="true">⌕</span><input aria-label="Search portal pages" value={search} onFocus={()=>setShowSearch(true)} onBlur={()=>setTimeout(()=>setShowSearch(false),150)} onChange={e=>setSearch(e.target.value)} placeholder="Search campaigns, customers, or call logs..."/><kbd>Ctrl + K</kbd>
+      <span aria-hidden="true">⌕</span><input ref={searchInput} aria-label="Search portal pages" value={search} onFocus={()=>setShowSearch(true)} onBlur={()=>setShowSearch(false)} onChange={e=>setSearch(e.target.value)} placeholder="Search portal pages..."/><kbd>Ctrl + K</kbd>
      </form>
      {showSearch&&search.trim()&&<div className="ref-search-suggestions">{suggestions.length?suggestions.map(([glyph,label,href])=><button type="button" key={href} onMouseDown={e=>e.preventDefault()} onClick={()=>navigate(href)}><span>{glyph}</span>{label}</button>):<p>No matching pages. Search matches navigation pages only.</p>}</div>}
     </div>
