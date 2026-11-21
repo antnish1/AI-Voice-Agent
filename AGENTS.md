@@ -2,6 +2,62 @@
 
 > Maintainer instructions for future coding/voice-agent assistants. Current agreed requirements take priority over old experimental drafts. **This repository is PUBLIC**: never commit customer lists, phone numbers, call recordings, transcripts containing private data, API keys or production credentials.
 
+
+## Current operational handoff — 21 November 2026 (authoritative over historical notes below)
+
+This section records the **latest verified source-code and deployment state**. Older sections L, \`README.md\`, \`docs/PRODUCTION_FOUNDATION.md\`, and \`docs/ACTIVE_INFRASTRUCTURE.md\` describe earlier phases; **do not treat their undeployed/prototype claims as current facts**. Preserve the detailed Kajal rules in sections C–J, but do not infer that Kajal or any agent is already deployed or synchronized through the CRM.
+
+### Product, branding, repository and infrastructure
+- Product: dealership-focused AI voice CRM for Frontier Group. **Current UI product brand: AutoReach AI** (formerly shown as Frontier AI Voice CRM). On 21 Nov 2026, \`main\` received an approved logo, sign-in/sidebar/topbar branding, metadata and favicon change in commit \`e67e655800fb8466bb42f0cf3ab920601ddc7f7e\`. Keep the existing selected branding and assets; do not silently revert to old Frontier sidebar branding or substitute a newly generated icon without explicit instruction.
+- Repository: \`antnish1/AI-Voice-Agent\`, main branch; legacy static \`web/\` prototype is not the authenticated app. Current production stack: Next.js 15.5.29, React 19, TypeScript, Supabase SSR/Auth/Postgres/RLS/Storage, Vercel. \`package.json\` defines \`npm run lint\` (TypeScript no-emit), \`npm test\` (Node security/contract tests), and \`npm run build\`.
+- Production URL remains \`https://frontier-ai-voice-crm.vercel.app\` despite the AutoReach AI UI name. Vercel project \`frontier-ai-voice-crm\`, ID \`prj_51k5pHkUt6ZRbcaf2kS798fT2KL9\`, team ID \`team_DsOUqnF8Pbd7YGNt8RCE8NgA\`. Latest independently checked production alias reported **READY** with main SHA \`e67e655800fb8466bb42f0cf3ab920601ddc7f7e\` (deployment \`dpl_6pqRSw94FSybswttiq8iqxtS1AMR\`). Recheck before future claims, as deployment state may change.
+- Dedicated Supabase **AI VOICE AGENT** project ID \`kagzuxkeabiuswccxjme\`, distinct from InsureIT and Parts Connect. **Never** apply Frontier migrations or privileged credentials to either unrelated project.
+- The current source of truth is checked-in code, production env-var names (not secret values), Supabase schema/RLS and actual service checks. The static web prototype, placeholder screens and successfully built frontend **do not prove** any external provider workflow works.
+
+### Security and account authorization (current requirement supersedes older planned roles)
+- **IT Super User** is the only user authorized to create/manage dealership accounts and perform CRM writes/approvals under the currently deployed rules. The system uses a protected exact user identity plus verified \`super_admin\` membership; do not weaken this or publish the identifying account details in docs.
+- **Dealership users are view-only** and must see only their own dealership's data. Earlier proposed CRM Executive/Dealership Manager write/approve permissions in sections A, B, K and the frontend blueprint are *historical plans*; do not re-enable them without a new approved authorization model and thorough database/tenant regression tests.
+- IT-only \`/users\`: create user, select or create dealership, issue activation invitation, reset user password. Edge Function: \`supabase/functions/it-user-management/index.ts\` (deployed with JWT checks); initial temporary password \`12345678\` requires a **mandatory first-login change**. Keep activation credentials out of communications and logs. Actual invitation delivery and fresh-user login were **not proven** by live end-to-end test; do not claim otherwise. Review the shared temporary-password approach for future hardening.
+- Global IT dealership switcher lives in the shared shell and \`POST /api/dealership/select\`; uses an HttpOnly cookie with server-side IT identity checks. Dealer-controlled cookies must never grant cross-dealership access. Database read RLS permits verified IT access across dealerships and restricts dealership viewers to their own records.
+- Account, tenant and document safeguards are enforced in Supabase policies (see \`db/dealership-readonly.sql\` and \`db/20261121_crm_operations_and_voice_schema.sql\`), not just disabled UI buttons. Preserve first-login password gating and private Storage policies. \`voice_call_records\` and \`voice_webhook_receipts\` are **not browser-writable**, including from ordinary authenticated dealer sessions.
+- Other provider/UI permissions, billing and live calling remain separate; granting a user a UI role never automatically grants Sarvam organization/workspace access.
+
+### Implemented CRM modules and important limitations
+- **Customer directory:** real Supabase-scoped customer reads, search and CSV import infrastructure. No claim that Excel, consent/DNC enforcement, immutable real campaign cohorts or actual imports have all passed end-to-end testing.
+- **Campaigns and approvals:** stored local campaign drafts/configuration and database-backed approval states. The wizard **does not** launch a Sarvam campaign, enforce a verified immutable recipient cohort/version snapshot, or create real calling campaigns. Never equate an approved CRM draft with authorization to dial.
+- **Appointments, callbacks and pickup/drop:** real tenant-scoped Supabase tables, server actions and UI; only IT can create/change under current read-only-dealer policy. Requests are not automatically workshop-confirmed or generated from calls; status transitions require workshop confirmation for bookings. Relevant files: \`src/app/(portal)/workflow-actions.ts\`, \`workflow-manager.tsx\`, and corresponding pages.
+- **Documents:** authenticated private Storage upload, preview/download/delete workflows. Do not equate uploaded documents with Sarvam knowledge-base synchronization or automatic agent ingestion.
+- **Call Logs:** display of *stored verified* call attempts, transcript text and CSV export, with dealership filter. Call records cannot legitimately appear until actual signed Sarvam webhook ingestion occurs and campaign IDs are explicitly mapped. Recording download/playback and call-reconciliation services are not implemented. Never display fabricated call volumes, transcripts, durations or phone numbers.
+- **Agents:** the five cards under \`src/app/(portal)/agents/agents-directory.tsx\` are **hardcoded illustrative previews**, not fetched from Sarvam, even if styled as Active/Inactive. Real agent enumeration/creation/voice/prompts/versions/testing/knowledge bases have not been connected.
+- **Reports/dashboard:** real local CRM counts plus partial/static presentation. No functioning Sarvam campaign performance synchronization, call-analytics reconciliation, scheduled analytics delivery or full provider-backed reporting.
+- **Settings:** profile/avatar/password functions, integrated protected Sarvam **Test Connection**, and local presentation options. Notification switches, two-factor setup, billing, privacy exports and some settings are still deliberately disabled/incomplete. The Settings hero banner was removed in PR #9; do not restore it without request.
+- **Navigation/UI:** white compact sidebar, animated navigation, breadcrumbs, tooltips, option for **Sidebar / Top Menu Bar** (see \`src/components/navigation-layout-preference.ts\` and \`src/components/top-menu-navigation.tsx\`). The layout preference is stored **locally in the browser, per authenticated user**; it is not a synchronized account-wide database setting. A newer commit refined topbar hover menus, and the callback page's old hero/banner was removed. Preserve the current AutoReach AI branding and selected 3D-style asset from the committed repo rather than a separate generated preview.
+
+### Sarvam connectivity: connected API test ≠ complete service
+- Server-only credentials in Vercel Production (names only; **never** print/copy actual values): \`SARVAM_API_KEY\`, \`SARVAM_ORG_ID\`, \`SARVAM_WORKSPACE_ID\`, \`SARVAM_WEBHOOK_SIGNING_SECRET\`, and backend-only \`SUPABASE_SERVICE_ROLE_KEY\`. \`ENABLE_LIVE_CALLS\` remains disabled; never enable it or initiate chargeable calls without explicit release approval.
+- The protected \`GET /api/sarvam/connection\` calls a **read-only** Sarvam deployment-list endpoint using \`X-API-Key\`, with validation and actionable HTTP 401/403/404/422/429 errors. An earlier incorrect ID-regex rejection was corrected in merged PR #18. A later authenticated **user screenshot displayed “Connected — Sarvam API connection verified”**. This establishes that the configured test succeeded in the user's logged-in session at that time, **not** that production agent authoring, campaign launching, telephony or webhook delivery have been demonstrated.
+- \`POST /api/webhooks/sarvam\` verifies \`Sarvam-Signature\`, \`Sarvam-Timestamp\`, timestamp freshness and HMAC against raw bytes, fails closed if the signing secret/backend key is missing, requires an exact \`public.voice_campaign_links\` Sarvam campaign + agent mapping, and upserts \`voice_call_records\` idempotently. Endpoint: \`https://frontier-ai-voice-crm.vercel.app/api/webhooks/sarvam\`. **Not yet validated with a real signed provider delivery**; never infer live sync merely because the route exists. Keep keys and logs private.
+- Sarvam also documents a **Voice Agents MCP** remote endpoint (\`https://mcp.sarvam.ai/voice-agents\`) with OAuth. This is an optional AI-assistant management path, **not the production website's API/webhook connection**. ChatGPT's custom MCP connection was *not established* in the observed account/Plugins UI. Do not claim MCP is connected, or that installing it is mandatory to finish FRONTIER; the server-side API integration can proceed independently.
+- Read \`docs/SARVAM_INTEGRATION_STATUS.md\` (21 Nov foundation snapshot) but override its outdated “credentials still required” wording with the verified environment-variable presence and successful UI connection-test observation above.
+
+### High-priority unfinished work / required live verification
+1. Implement real Sarvam agent list/detail/create/edit/versions, voice/language configuration, tool and knowledge-base operations, with server-only authorization and safe approval.
+2. Integrate telephony/number resources, authenticated contact cohort upload, dynamic variables, consent/DNC compliance, immutable approval snapshots, scheduling, test calls and approved campaign launch/pause/resume/cancel; distinguish side-effecting operations clearly.
+3. Verify stored signed Sarvam webhook subscription, idempotent processing, actual call outcomes, transcripts, authorized recording retrieval/playback and recovery for missed events; run provider-backed validation before saying sync works.
+4. Map verified calling outcomes to correctly scoped follow-up requests, preserving customer intent, callback time and workshop confirmation. Never auto-confirm appointments or pickup/drop from a transcript alone.
+5. Replace illustrative agent, metric and analytics UI with genuine provider-backed data; handle permissions, errors, no-results and rate limits without placeholders masquerading as live activity.
+6. Run real authorized login/activation, cross-dealership isolation, browser workflow and Sarvam integration tests with test-only contacts; report individual passing/failing results. Do **not** place test calls, send paid traffic or launch campaigns without user approval.
+7. Periodically re-run Supabase security advisor; leaked-password protection was reported disabled previously. Never silently upgrade paid plans or change production credentials.
+
+### Engineering release checklist for follow-on assistants
+- Inspect \`AGENTS.md\`, current \`main\`, \`docs/SARVAM_INTEGRATION_STATUS.md\`, authoritative Supabase tables/RLS, current Vercel production alias/commit and recent relevant PRs **before** new changes. Earlier planning docs may be stale.
+- Use Git feature branch → reviewable PR → automated typecheck, Node tests, Next.js production build; add regression tests for every changed security/workflow constraint. **Merge/deploy only when explicitly authorized**, keeping secrets out of commits. For SQL migrations, verify policies after applying and distinguish “migration applied” from “full live workflow tested.”
+- Protect the current branding, existing user experience, IT-only writes, dealership scoping, verified webhook trust, and live-calling disabled state. No mock external results presented as production.
+- Keep the server-side API key and OAuth MCP authentication separate. Never assume an API connection test proves scope for every paid/action API.
+- Source-of-truth priority: **latest user requirements + verified current production behavior > this current operational handoff > older instructions in this file > legacy blueprint/prototype documents**.
+
+---
+
 ## A. Purpose and confirmed product requirements
 Build a new standalone AI Voice CRM exclusively for Frontier Group dealerships. The app is an operational frontend; Sarvam Samvaad continues as the underlying voice/telephony platform. Staff must upload CSV/Excel customer lists, create and schedule campaigns, get Dealership Manager approval, monitor calls, listen to permitted recordings, review transcripts, process callbacks/appointments/pickup-drop/complaints, and export reports without using the Sarvam website. Central admin manages both shared agents and dealership-specific agents. Pilot dealership: **Frontier MG Noida**, dedicated agent: **Kajal**.
 
@@ -12,7 +68,7 @@ Build a new standalone AI Voice CRM exclusively for Frontier Group dealerships. 
 - Roles: Super Admin, Dealership Manager, CRM Executive, Service Team, read-only Management. Strict dealership scoping at data and API levels.
 - Sarvam keys and Supabase service role key are server-side only. Signed webhooks must be verified, deduplicated and reconciled.
 - Real contact imports require consent, applicable calling restrictions, do-not-call suppression, secure storage and audit trail.
-- Current static preview is NOT authenticating users; do not use with real customer data.
+- The **legacy static `web/` preview** does not authenticate; the production `src/` Next.js application **does** use Supabase Auth. Never use the legacy preview with real customer data.
 - Do not invent Sarvam API capabilities: confirm current access, endpoint behavior, campaign scheduling, call logs and recording permissions.
 - No secrets or actual customer spreadsheets in GitHub.
 
@@ -83,7 +139,7 @@ Earlier training drafts described spelling full registrations and speaking ALL n
 - Verify build/test/security before opening PR. Stop before merge/deploy unless separately approved.
 
 
-## L. Verified implementation status — 20 November 2026
+## L. Historical implementation snapshot — 20 November 2026 (superseded by current operational handoff above)
 
 These are operational reference points, not blanket permission to deploy, call customers, or change external services.
 
