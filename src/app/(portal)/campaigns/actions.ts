@@ -47,6 +47,9 @@ export async function submitCampaign(form:FormData){
  const dealershipId=String(form.get("dealership_id")??""),id=String(form.get("campaign_id")??"");
  const {supabase,membership}=await requireMembership(dealershipId);
  if(!membership||!canPrepare(membership.role))throw new Error("Not authorized.");
+ const {data:config,error:configError}=await supabase.from("campaign_draft_configs").select("configuration").eq("campaign_id",id).eq("dealership_id",dealershipId).maybeSingle();
+ if(configError)throw new Error("Could not verify campaign setup.");
+ if(config&&(config.configuration as {recipient_preview?:{preview_only?:boolean}})?.recipient_preview?.preview_only)throw new Error("Recipients are only previewed, not imported. Import and lock recipient records before requesting manager approval.");
  const {data,error}=await supabase.from("campaigns").update({status:"PENDING_MANAGER_APPROVAL"}).eq("id",id).eq("dealership_id",dealershipId).eq("status","DRAFT").select("id");
  if(error||!data?.length)throw new Error("Could not submit campaign.");
  revalidatePath("/campaigns");revalidatePath("/approvals");
