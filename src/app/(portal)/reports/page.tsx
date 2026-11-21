@@ -1,2 +1,15 @@
 import {requireMembership} from "@/lib/auth";
-export default async function Reports(){const {supabase,membership}=await requireMembership();if(!membership)return null;const id=membership.dealership_id;const [customers,campaigns,imports,pending]=await Promise.all([supabase.from("customers").select("*",{count:"exact",head:true}).eq("dealership_id",id),supabase.from("campaigns").select("*",{count:"exact",head:true}).eq("dealership_id",id),supabase.from("customer_import_batches").select("*",{count:"exact",head:true}).eq("dealership_id",id),supabase.from("campaigns").select("*",{count:"exact",head:true}).eq("dealership_id",id).eq("status","PENDING_MANAGER_APPROVAL")]);if(customers.error||campaigns.error||imports.error||pending.error)throw new Error("Could not load report totals.");const metrics=[{label:"Customers",count:customers.count??0},{label:"Campaigns",count:campaigns.count??0},{label:"CSV imports",count:imports.count??0},{label:"Awaiting approval",count:pending.count??0}];return <><div className="page-head"><div><p className="eyebrow">MANAGEMENT INSIGHTS</p><h1>Reports</h1><p>Verified dealership operational metrics, with call reporting after integration.</p></div></div><div className="metric-grid">{metrics.map(m=><article className="metric-card" key={m.label}><span className="metric-label">{m.label}</span><div className="metric-value">{m.count}</div><div className="metric-note">Actual dealership records</div></article>)}</div><section className="crm-panel"><div className="panel-title"><h2>Call performance</h2><span>Pending Sarvam API</span></div><div className="empty-state"><span className="empty-glyph">▥</span><strong>Calling analytics are not connected</strong><p>Answer rate, call outcomes, duration, campaign comparisons and transcript exports will appear only after verified call data is received.</p></div></section></>}
+import {ReportsDirectory} from "./reports-directory";
+export default async function Reports(){
+ const {supabase,membership}=await requireMembership();if(!membership)return null;
+ const id=membership.dealership_id;
+ const [customers,campaigns,imports,pending,listed]=await Promise.all([
+  supabase.from("customers").select("id",{count:"exact",head:true}).eq("dealership_id",id),
+  supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id),
+  supabase.from("customer_import_batches").select("id",{count:"exact",head:true}).eq("dealership_id",id),
+  supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id).eq("status","PENDING_MANAGER_APPROVAL"),
+  supabase.from("campaigns").select("id,name,status,created_at").eq("dealership_id",id).order("created_at",{ascending:false}).limit(250)
+ ]);
+ if([customers,campaigns,imports,pending,listed].some(x=>x.error))throw new Error("Could not load dealership report records.");
+ return <ReportsDirectory metrics={{customers:customers.count??0,campaigns:campaigns.count??0,imports:imports.count??0,pending:pending.count??0}} campaigns={listed.data??[]}/>;
+}
