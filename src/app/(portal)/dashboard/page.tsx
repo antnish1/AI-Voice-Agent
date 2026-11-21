@@ -1,23 +1,62 @@
 import Link from "next/link";
-import {requireMembership} from "@/lib/auth";
-export default async function Dashboard(){
+import {requireMembership,canPrepare} from "@/lib/auth";
+
+type Campaign={id:string;name:string;status:string;created_at:string};
+type ImportBatch={id:string;filename:string;imported_rows:number;rejected_rows:number;created_at:string};
+const localDate=(date:string|Date)=>new Date(date).toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"});
+const formatted=(date:string)=>new Date(date).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Kolkata"});
+export default async function Dashboard({searchParams}:{searchParams:Promise<{days?:string}>}){
  const {supabase,membership}=await requireMembership();if(!membership)return null;
  const id=membership.dealership_id;
- const [customers,campaigns,pending,latest,drafts,approved,rejected]=await Promise.all([
- supabase.from("customers").select("*",{count:"exact",head:true}).eq("dealership_id",id),
- supabase.from("campaigns").select("*",{count:"exact",head:true}).eq("dealership_id",id),
- supabase.from("campaigns").select("*",{count:"exact",head:true}).eq("dealership_id",id).eq("status","PENDING_MANAGER_APPROVAL"),
- supabase.from("campaigns").select("id,name,status,created_at").eq("dealership_id",id).order("created_at",{ascending:false}).limit(6),
- supabase.from("campaigns").select("*",{count:"exact",head:true}).eq("dealership_id",id).eq("status","DRAFT"),
- supabase.from("campaigns").select("*",{count:"exact",head:true}).eq("dealership_id",id).eq("status","APPROVED"),
- supabase.from("campaigns").select("*",{count:"exact",head:true}).eq("dealership_id",id).eq("status","REJECTED")
+ const {days:rangeInput}=await searchParams;
+ const days=rangeInput==="30"?30:rangeInput==="14"?14:7;
+ const start=new Date();start.setDate(start.getDate()-days+1);start.setHours(0,0,0,0);
+ const [customerCount,campaignCount,approvalCount,approvedCount,recentCampaigns,periodCampaigns,recentImports]=await Promise.all([
+  supabase.from("customers").select("id",{count:"exact",head:true}).eq("dealership_id",id),
+  supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id),
+  supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id).eq("status","PENDING_MANAGER_APPROVAL"),
+  supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id).eq("status","APPROVED"),
+  supabase.from("campaigns").select("id,name,status,created_at").eq("dealership_id",id).order("created_at",{ascending:false}).limit(7),
+  supabase.from("campaigns").select("id,created_at").eq("dealership_id",id).gte("created_at",start.toISOString()).order("created_at",{ascending:false}).limit(1000),
+  supabase.from("customer_import_batches").select("id,filename,imported_rows,rejected_rows,created_at").eq("dealership_id",id).order("created_at",{ascending:false}).limit(6)
  ]);
- if(customers.error||campaigns.error||pending.error||latest.error||drafts.error||approved.error||rejected.error)throw new Error("Could not load dashboard data.");
- const pipeline=[{label:"Draft",count:drafts.count??0},{label:"Pending manager approval",count:pending.count??0},{label:"Approved",count:approved.count??0},{label:"Rejected",count:rejected.count??0}];
- const metrics=[{label:"Total Customers",value:customers.count??0,icon:"♙",note:"Records in your dealership"},{label:"Total Campaigns",value:campaigns.count??0,icon:"◫",note:"All draft and reviewed campaigns"},{label:"Pending Approvals",value:pending.count??0,icon:"✓",note:"Awaiting manager review"},{label:"Live Calling",value:"OFF",icon:"◷",note:"Sarvam integration not connected"}];
- return <><div className="page-head"><div><p className="eyebrow">DEALERSHIP OVERVIEW</p><h1>Good to see you again</h1><p>Manage campaigns, customers and approvals from one workspace.</p></div><div className="head-actions"><Link href="/customers" className="btn-outline">View customers</Link><Link href="/campaigns/new" className="btn-primary">＋ New Campaign</Link></div></div>
- <div className="helper-banner">● Safe development mode — campaign launches and test calls are disabled until Sarvam integration is explicitly authorized. All figures below come from your dealership's Supabase records.</div>
- <div className="metric-grid">{metrics.map(m=><article className="metric-card" key={m.label}><div className="metric-top"><span className="metric-label">{m.label}</span><span className="metric-icon">{m.icon}</span></div><div className="metric-value">{m.value}</div><div className="metric-note">{m.note}</div></article>)}</div>
- <div className="content-grid"><section className="crm-panel"><div className="panel-title"><h2>Recent campaigns</h2><Link href="/campaigns" className="muted">View all →</Link></div>{latest.data?.length?<div className="tablewrap"><table className="crm-table"><thead><tr><th>Campaign</th><th>Status</th><th>Created</th></tr></thead><tbody>{latest.data.map(c=><tr key={c.id}><td><strong>{c.name}</strong></td><td><span className={`status-pill ${c.status==="APPROVED"?"approved":c.status==="REJECTED"?"rejected":c.status==="PENDING_MANAGER_APPROVAL"?"pending":""}`}>{c.status.replaceAll("_"," ")}</span></td><td>{new Date(c.created_at).toLocaleDateString("en-IN")}</td></tr>)}</tbody></table></div>:<div className="empty-state"><div className="empty-glyph">◫</div><strong>No campaigns yet</strong><p>Prepare your first campaign in the guided four-step builder.</p><Link className="primary-link" href="/campaigns/new">Create campaign</Link></div>}</section>
- <section className="crm-panel"><div className="panel-title"><h2>Getting started</h2><span>Setup checklist</span></div><div className="review-row"><span>01 · Dealership access</span><strong>Connected</strong></div><div className="review-row"><span>02 · Customers & documents</span><Link href="/customers">Manage →</Link></div><div className="review-row"><span>03 · Campaign preparation</span><Link href="/campaigns/new">Create draft →</Link></div><div className="review-row"><span>04 · Sarvam API</span><strong>Not connected</strong></div><p className="muted" style={{marginTop:19,lineHeight:1.7}}>Customer and campaign data remain dealership-specific. Live calling features will appear only after secure API integration.</p></section></div><section className="crm-panel" style={{marginTop:17}}><div className="panel-title"><h2>Campaign pipeline</h2><span>Real campaign status distribution</span></div>{pipeline.map(p=><div key={p.label} className="pipeline-row"><span>{p.label}</span><div className="pipeline-track"><div style={{width:`${campaigns.count?Math.round(p.count/campaigns.count*100):0}%`}}/></div><strong>{p.count}</strong></div>)}<div className="helper-banner" style={{marginTop:18}}>Call performance charts will become available only after real Sarvam call events and outcomes are synchronized.</div></section></>;
+ if([customerCount,campaignCount,approvalCount,approvedCount,recentCampaigns,periodCampaigns,recentImports].some(x=>x.error))throw new Error("Could not load dealership dashboard.");
+ const recent=(recentCampaigns.data??[]) as Campaign[];
+ const imports=(recentImports.data??[]) as ImportBatch[];
+ const daily=Array.from({length:days},(_,i)=>{const date=new Date(start);date.setDate(start.getDate()+i);const key=localDate(date);return {key,label:date.toLocaleDateString("en-IN",{month:"short",day:"numeric",timeZone:"Asia/Kolkata"}),count:(periodCampaigns.data??[]).filter(c=>localDate(c.created_at)===key).length};});
+ const max=Math.max(1,...daily.map(d=>d.count));
+ const actions=[{icon:"+",label:"Create New Campaign",href:"/campaigns/new",tone:"mint"},{icon:"⇧",label:"Upload Customers",href:"/customers",tone:"blue"},{icon:"▤",label:"Upload Documents",href:"/documents",tone:"violet"},{icon:"◎",label:"Manage AI Agents",href:"/agents",tone:"green"}];
+ const activity=[...recent.map(c=>({key:"c-"+c.id,title:c.status==="APPROVED"?"Campaign approved":c.status==="REJECTED"?"Campaign rejected":c.status==="PENDING_MANAGER_APPROVAL"?"Campaign submitted for approval":"Campaign draft created",detail:c.name,at:c.created_at,icon:"◫",tone:"mint"})),...imports.map(x=>({key:"i-"+x.id,title:"Customer list imported",detail:x.filename+" · "+x.imported_rows+" new",at:x.created_at,icon:"⇧",tone:"blue"}))].sort((a,b)=>Date.parse(b.at)-Date.parse(a.at)).slice(0,5);
+ const hour=Number(new Intl.DateTimeFormat("en-GB",{hour:"numeric",hour12:false,timeZone:"Asia/Kolkata"}).format(new Date()));
+ const greeting=hour<12?"Good Morning":hour<17?"Good Afternoon":"Good Evening";
+ const metrics=[{name:"Total Customers",value:String(customerCount.count??0),note:"Dealership records",icon:"♙",tone:"blue"},
+ {name:"Total Campaigns",value:String(campaignCount.count??0),note:"All campaign states",icon:"◫",tone:"mint"},
+ {name:"Active Campaigns",value:"0",note:"Live calling disabled",icon:"▶",tone:"violet"},
+ {name:"Pending Approvals",value:String(approvalCount.count??0),note:"Awaiting manager review",icon:"◷",tone:"amber"},
+ {name:"Total Calls",value:"—",note:"Sarvam not connected",icon:"◕",tone:"blue"}];
+ return <div className="ref-dashboard">
+ <div className="ref-dashboard-heading"><div><h1>{greeting}, Dealer! <span aria-hidden="true">👋</span></h1><p>Here’s what’s happening with your AI voice campaigns today.</p></div><div className="ref-dashboard-heading-actions"><span className="ref-today-pill">▣ &nbsp; Today</span>{canPrepare(membership.role)&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div>
+ <div className="ref-kpi-grid">{metrics.map(m=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}>{m.icon}</div><div><span className="ref-kpi-label">{m.name}</span><strong className="ref-kpi-value">{m.value}</strong><small className="ref-kpi-note">{m.note}</small></div></article>)}</div>
+ <div className="ref-dashboard-columns">
+ <div className="ref-dashboard-left">
+  <section className="ref-dashboard-panel ref-performance"><div className="ref-panel-header"><div><h2><span className="ref-heading-icon">▥</span> Campaign Performance</h2><p>Campaigns created during this period; call outcomes are not connected yet.</p></div><div className="ref-date-filters"><span className="ref-selected-period">Last {days} days</span><div className="ref-range-links"><Link aria-current={days===7?"true":undefined} href="/dashboard?days=7">7D</Link><Link aria-current={days===14?"true":undefined} href="/dashboard?days=14">14D</Link><Link aria-current={days===30?"true":undefined} href="/dashboard?days=30">30D</Link></div></div></div>
+   <div className="ref-chart-area" role="img" aria-label={"Campaigns created by day over "+days+" days"}>
+    <div className="ref-chart-grid" aria-hidden="true"><span/><span/><span/><span/></div>
+    <div className="ref-chart-bars">{daily.map((d,i)=><div className="ref-chart-column" key={d.key} title={d.label+": "+d.count+" campaigns"}><div className="ref-chart-bar" style={{height:d.count?Math.max(4,(d.count/max)*100)+"%":"0%"}}/><small>{days===30?(i%5===0?d.label:""):days===14?(i%2===0?d.label:""):d.label}</small></div>)}</div>
+   </div>
+   <div className="ref-chart-footer"><span><i/> Campaign drafts created</span><span>{(periodCampaigns.data??[]).length} records in selected period</span></div>
+   {(periodCampaigns.data??[]).length===0&&<p className="ref-chart-empty">No campaigns created in this period. Charts will update with real data.</p>}
+  </section>
+  <section className="ref-dashboard-panel ref-recent-campaigns"><div className="ref-panel-header"><h2><span className="ref-heading-icon">◫</span> Recent Campaigns</h2><Link href="/campaigns">View All</Link></div>
+   <div className="tablewrap"><table className="ref-campaign-table"><thead><tr><th>Campaign Name</th><th>Agent</th><th>Type</th><th>Contacts</th><th>Status</th><th>Calls</th><th>Success Rate</th><th>Actions</th></tr></thead><tbody>{recent.length?recent.map(c=><tr key={c.id}><td><strong>{c.name}</strong><small>{formatted(c.created_at)}</small></td><td>—</td><td>Planned</td><td>—</td><td><span className={"ref-campaign-status status-"+c.status.toLowerCase()}>{c.status.replaceAll("_"," ")}</span></td><td>—</td><td>—</td><td><Link href="/campaigns" aria-label={"View campaign "+c.name}>•••</Link></td></tr>):<tr><td colSpan={8} className="ref-table-empty">No campaigns yet. Create a draft to see it here.</td></tr>}</tbody></table></div>
+   <p className="ref-table-footnote">Agent, recipient and call outcomes will appear once verified integrations are connected.</p>
+  </section>
+ </div>
+ <div className="ref-dashboard-right">
+  <section className="ref-dashboard-panel"><div className="ref-panel-header"><h2><span className="ref-heading-icon">ϟ</span> Quick Actions</h2></div><div className="ref-quick-grid">{actions.map(a=><Link className={"ref-quick-action tone-"+a.tone} key={a.href} href={a.href}><span className="ref-quick-icon">{a.icon}</span><strong>{a.label}</strong><span className="ref-quick-arrow">›</span></Link>)}</div></section>
+  <section className="ref-dashboard-panel ref-activity"><div className="ref-panel-header"><h2><span className="ref-heading-icon">◷</span> Recent Activity</h2><Link href="/campaigns">View All</Link></div><div className="ref-activity-list">{activity.length?activity.map(item=><div className="ref-activity-item" key={item.key}><span className={"ref-activity-icon tone-"+item.tone}>{item.icon}</span><div><strong>{item.title}</strong><p>{item.detail}</p></div><time dateTime={item.at}>{formatted(item.at)}</time></div>):<div className="ref-activity-empty">No recent campaign or import activity.</div>}</div></section>
+ </div>
+ </div>
+ <p className="ref-dashboard-safety">FRONTIER CRM setup mode · Campaign launching and test calls remain disabled until Sarvam integration is explicitly authorized.</p>
+ </div>;
 }
