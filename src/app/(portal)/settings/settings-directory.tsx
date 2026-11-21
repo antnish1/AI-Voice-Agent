@@ -86,19 +86,18 @@ export function SettingsDirectory({userId,email,role,dealership,displayName,phon
       <div className="settings-ref-profile-identity"><div className="settings-ref-avatar-wrap"><span className="settings-ref-avatar">{avatarUrl?<img src={avatarUrl} alt="Profile picture" referrerPolicy="no-referrer"/>:initials}</span><button type="button" className="settings-ref-avatar-edit" title="Change profile picture" aria-label="Change profile picture" disabled={busy} onClick={()=>uploadInput.current?.click()}><Icon name="edit" size={15}/></button><input className="sr-only" type="file" ref={uploadInput} accept="image/png,image/jpeg,image/webp" onChange={e=>void upload(e.target.files?.[0])}/></div><div><strong>{name}</strong><p><Icon name="building" size={13}/>{dealership}</p><span className="settings-ref-plan-indicator"><Icon name="check" size={12}/> Active account</span></div></div>
       <form className="settings-ref-profile-form" onSubmit={e=>{e.preventDefault();void save();}}><label>Full Name <span><Icon name="user" size={15}/><input value={name} maxLength={80} required onChange={e=>setName(e.target.value)}/></span></label><label>Email Address <span><Icon name="mail" size={15}/><input value={email} readOnly title="Account email cannot be changed here"/></span></label><label>Phone Number <span><Icon name="phone" size={15}/><input type="tel" value={mobile} onChange={e=>setMobile(e.target.value)} placeholder="Optional phone number"/></span></label><div className="settings-ref-save-row"><button type="submit" disabled={busy}><Icon name="save" size={15}/>{busy?"Saving…":"Save Changes"}</button></div></form>
      </div></section>
-     <section className="frontier-layout-settings" aria-labelledby="frontier-layout-title">
+     <section className="frontier-layout-settings frontier-layout-compact" aria-labelledby="frontier-layout-title">
       <div className="frontier-layout-title"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><h3 id="frontier-layout-title">Appearance &amp; Layout</h3></div>
-      <p>Choose your preferred Frontier AI Voice CRM navigation layout.</p>
       <div className="frontier-layout-options" role="radiogroup" aria-label="Navigation layout">
        <label className={`frontier-layout-option ${navigationLayout==="sidebar"?"selected":""}`}>
         <input type="radio" name="frontier-navigation-layout" value="sidebar" checked={navigationLayout==="sidebar"} onChange={()=>setNavigationLayout("sidebar")}/>
         <svg width="29" height="29" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2.5" y="3" width="19" height="18" rx="2"/><path d="M9 3v18"/></svg>
-        <span><strong>Sidebar (Default)</strong><small>Left navigation with comfortable content width</small></span>
+        <span><strong>Sidebar (Default)</strong></span>
        </label>
        <label className={`frontier-layout-option ${navigationLayout==="topbar"?"selected":""}`}>
         <input type="radio" name="frontier-navigation-layout" value="topbar" checked={navigationLayout==="topbar"} onChange={()=>setNavigationLayout("topbar")}/>
         <svg width="29" height="29" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2.5" y="3" width="19" height="18" rx="2"/><path d="M2.5 9h19"/></svg>
-        <span><strong>Top Menu Bar</strong><small>Horizontal navigation and full-width pages</small></span>
+        <span><strong>Top Menu Bar</strong></span>
        </label>
       </div>
      </section>
