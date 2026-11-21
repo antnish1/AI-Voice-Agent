@@ -11,6 +11,7 @@ import type {Membership} from "@/lib/auth";
 import {ProfileMenu} from "@/components/profile-menu";
 import {PortalBreadcrumbs} from "@/components/portal-breadcrumbs";
 import {SidebarIcon,type SidebarIconName} from "@/components/sidebar-icons";
+import {useNavigationLayout} from "@/components/navigation-layout-preference";
 
 const navigation:Array<{name:string;url:string;icon:SidebarIconName}>=[
  {name:"Dashboard",url:"/dashboard",icon:"home"},
@@ -28,6 +29,8 @@ const navigation:Array<{name:string;url:string;icon:SidebarIconName}>=[
 ];
 export function Shell({children,membership,userEmail,userId,displayName,avatarPath,pendingApprovals=0,isItAdmin=false,availableDealerships=[]}:{children:React.ReactNode;membership:Membership;userEmail:string;userId:string;displayName:string;avatarPath:string;pendingApprovals?:number;isItAdmin?:boolean;availableDealerships?:Array<{id:string;name:string}>}){
  const path=usePathname();
+ const [navigationLayout]=useNavigationLayout(userId);
+ const isTopMenu=navigationLayout==="topbar";
  const reducedMotion=useReducedMotion();
  const [narrowScreen,setNarrowScreen]=useState(false);
  useEffect(()=>{const query=window.matchMedia("(max-width:760px)");const update=()=>setNarrowScreen(query.matches);update();query.addEventListener("change",update);return ()=>query.removeEventListener("change",update);},[]);
@@ -44,8 +47,9 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
  useEffect(()=>{hideTooltip();},[collapsed,narrowScreen,path]);
  const campaignActive=path==="/campaigns"||path.startsWith("/campaigns/");
  const closeMobile=()=>setMobile(false);
- return <div className={`app crm-app reference-app ${collapsed?"nav-collapsed":""} ${mobile?"nav-open":""}`}>
-  <motion.aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar" animate={{width:narrowScreen?224:collapsed?68:224}} transition={reducedMotion?{duration:0}:motionTokens.spring}>
+ useEffect(()=>{setCampaignsExpanded(false);setMobile(false);},[path,navigationLayout]);
+ return <div className={`app crm-app reference-app ${collapsed?"nav-collapsed":""} ${mobile?"nav-open":""} ${isTopMenu?"frontier-top-layout":""}`}>
+  {!isTopMenu&&<motion.aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar" animate={{width:narrowScreen?224:collapsed?68:224}} transition={reducedMotion?{duration:0}:motionTokens.spring}>
    <div className="brand crm-brand ref-brand frontier-sidebar-brand">
     {collapsed&&!narrowScreen?
      <button type="button" className="brand-icon frontier-sidebar-logo frontier-logo-expand" onClick={()=>setCollapsed(false)} title="Expand sidebar" aria-label="Expand sidebar">F</button>:
@@ -81,9 +85,9 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     </button>
     {helpOpen&&!collapsed&&<div className="frontier-help-details" role="status">For support, contact your Frontier Group administrator.</div>}
    </div>
-  </motion.aside>
+  </motion.aside>}
   {hasMounted&&createPortal(<AnimatePresence>
-   {tooltip&&collapsed&&!narrowScreen&&<motion.div
+   {tooltip&&collapsed&&!narrowScreen&&!isTopMenu&&<motion.div
     key={tooltip.name}
     className="frontier-nav-tooltip" role="tooltip"
     style={{left:tooltip.left,top:tooltip.top}}
@@ -94,10 +98,11 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
      {tooltip.name}
     </motion.div>}
    </AnimatePresence>,document.body)}
-  {mobile&&<button className="mobile-backdrop" aria-label="Close menu" onClick={closeMobile}/>}
+  {!isTopMenu&&mobile&&<button className="mobile-backdrop" aria-label="Close menu" onClick={closeMobile}/>}
   <div className="workspace crm-workspace">
    <header className="topbar crm-topbar ref-topbar">
-    <button type="button" className="ref-menu-toggle" onClick={()=>{if(window.innerWidth<=760)setMobile(!mobile);else setCollapsed(!collapsed);}} aria-label="Toggle navigation">☰</button>
+    {!isTopMenu&&<button type="button" className="ref-menu-toggle" onClick={()=>{if(window.innerWidth<=760)setMobile(!mobile);else setCollapsed(!collapsed);}} aria-label="Toggle navigation">☰</button>}
+    {isTopMenu&&<span className="frontier-topbar-brand" aria-label="Frontier AI Voice CRM"><span className="frontier-topbar-brand-mark">F</span><span>FRONTIER<small>AI VOICE CRM</small></span></span>}
     <div className="ref-header-breadcrumbs"><PortalBreadcrumbs/></div>
     <div className="ref-topbar-right">
      {isItAdmin&&availableDealerships.length>0&&<label className="frontier-dealer-switch"><span>Dealership</span><select aria-label="Select dealership" value={membership.dealership_id} onChange={async e=>{const id=e.target.value;const r=await fetch("/api/dealership/select",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({dealershipId:id})});if(r.ok)window.location.reload();else alert("Unable to switch dealership.");}}>{availableDealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></label>}
@@ -105,6 +110,29 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
      <ProfileMenu userId={userId} email={userEmail} role={membership.role} dealershipName={membership.dealerships?.name??"Dealership"} initialName={displayName} initialAvatarPath={avatarPath}/>
     </div>
    </header>
+
+   {isTopMenu&&<nav className="frontier-top-navigation" aria-label="Main navigation">
+    <div className="frontier-top-navigation-scroll">
+     {[...navigation,...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
+      const active=path===item.url||(item.url==="/campaigns"&&campaignActive);
+      return <div key={item.url} className={`frontier-top-nav-entry ${active?"active":""}`}>
+       <Link href={item.url} onClick={()=>setCampaignsExpanded(false)} className="frontier-top-nav-link" aria-current={active?"page":undefined}>
+        <SidebarIcon name={item.icon} size={17}/><span>{item.name}</span>
+        {item.url==="/approvals"&&pendingApprovals>0&&<span className="frontier-top-approval-badge">{pendingApprovals>99?"99+":pendingApprovals}</span>}
+       </Link>
+       {item.url==="/campaigns"&&<button type="button" className="frontier-top-campaign-toggle"
+         aria-label={campaignsExpanded?"Close campaign menu":"Open campaign menu"}
+         aria-expanded={campaignsExpanded}
+         aria-controls="frontier-top-campaign-menu"
+         onClick={()=>setCampaignsExpanded(value=>!value)}><SidebarIcon name="chevron-down" size={15}/></button>}
+       {item.url==="/campaigns"&&campaignsExpanded&&<div className="frontier-top-campaign-menu" id="frontier-top-campaign-menu">
+        <Link href="/campaigns" onClick={()=>setCampaignsExpanded(false)}>All Campaigns</Link>
+        <Link href="/campaigns/new" onClick={()=>setCampaignsExpanded(false)}>Create Campaign</Link>
+       </div>}
+      </div>;
+     })}
+    </div>
+   </nav>}
    <main className="main crm-main ref-main"><MotionRoute>{children}</MotionRoute></main>
   </div>
  </div>;
