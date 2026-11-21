@@ -2,7 +2,9 @@
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {useState,useEffect} from "react";
-import {motion, useReducedMotion} from "motion/react";
+import {AnimatePresence,motion, useReducedMotion} from "motion/react";
+import {createPortal} from "react-dom";
+import type {FocusEvent,MouseEvent} from "react";
 import {MotionRoute} from "@/components/motion/motion-route";
 import {motionTokens} from "@/components/motion/motion-tokens";
 import type {Membership} from "@/lib/auth";
@@ -30,6 +32,16 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
  const [narrowScreen,setNarrowScreen]=useState(false);
  useEffect(()=>{const query=window.matchMedia("(max-width:760px)");const update=()=>setNarrowScreen(query.matches);update();query.addEventListener("change",update);return ()=>query.removeEventListener("change",update);},[]);
  const [collapsed,setCollapsed]=useState(false),[mobile,setMobile]=useState(false),[campaignsExpanded,setCampaignsExpanded]=useState(false),[helpOpen,setHelpOpen]=useState(false);
+ const [tooltip,setTooltip]=useState<{name:string;left:number;top:number}|null>(null);
+ const [hasMounted,setHasMounted]=useState(false);
+ useEffect(()=>{setHasMounted(true);},[]);
+ const showTooltip=(name:string,element:HTMLElement)=>{
+  if(!collapsed||narrowScreen)return;
+  const rect=element.getBoundingClientRect();
+  setTooltip({name,left:rect.right+12,top:rect.top+rect.height/2});
+ };
+ const hideTooltip=()=>setTooltip(null);
+ useEffect(()=>{hideTooltip();},[collapsed,narrowScreen,path]);
  const campaignActive=path==="/campaigns"||path.startsWith("/campaigns/");
  const closeMobile=()=>setMobile(false);
  return <div className={`app crm-app reference-app ${collapsed?"nav-collapsed":""} ${mobile?"nav-open":""}`}>
@@ -44,7 +56,12 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
      const active=path===item.url||(item.url==="/campaigns"&&campaignActive);
      return <div className="frontier-nav-entry" key={item.url}>
        <div className={`frontier-nav-row ${active?"selected":""} ${item.url==="/campaigns"?"frontier-campaign-row":""}`}>{active&&<motion.span layoutId="frontier-active-nav" className="frontier-motion-active-nav" transition={reducedMotion?{duration:0}:motionTokens.spring} aria-hidden="true"/>}
-        <Link href={item.url} onClick={closeMobile} title={item.name} aria-current={active?"page":undefined} className={`frontier-nav-link ${active?"active":""}`}>
+        <Link href={item.url} onClick={()=>{hideTooltip();closeMobile();}} title={!collapsed||narrowScreen?item.name:undefined} aria-label={item.name}
+         onMouseEnter={(e:MouseEvent<HTMLAnchorElement>)=>showTooltip(item.name,e.currentTarget)}
+         onMouseLeave={hideTooltip}
+         onFocus={(e:FocusEvent<HTMLAnchorElement>)=>showTooltip(item.name,e.currentTarget)}
+         onBlur={hideTooltip}
+         aria-current={active?"page":undefined} className={`frontier-nav-link ${active?"active":""}`}>
          <span className="nav-icon"><SidebarIcon name={item.icon} size={21}/></span>
          <span className="nav-label">{item.name}</span>
          {item.url==="/approvals"&&pendingApprovals>0&&<span className="frontier-approval-badge" title={`${pendingApprovals} campaigns awaiting approval`}>{pendingApprovals>99?"99+":pendingApprovals}</span>}
@@ -63,6 +80,18 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     {helpOpen&&!collapsed&&<div className="frontier-help-details" role="status">For support, contact your Frontier Group administrator.</div>}
    </div>
   </motion.aside>
+  {hasMounted&&createPortal(<AnimatePresence>
+   {tooltip&&collapsed&&!narrowScreen&&<motion.div
+    key={tooltip.name}
+    className="frontier-nav-tooltip" role="tooltip"
+    style={{left:tooltip.left,top:tooltip.top}}
+    initial={reducedMotion?false:{opacity:0,x:-7,scale:.96}}
+    animate={{opacity:1,x:0,scale:1}}
+    exit={reducedMotion?{opacity:0}:{opacity:0,x:-5,scale:.97}}
+    transition={{duration:reducedMotion?0:.16,ease:motionTokens.ease}}>
+     {tooltip.name}
+    </motion.div>}
+   </AnimatePresence>,document.body)}
   {mobile&&<button className="mobile-backdrop" aria-label="Close menu" onClick={closeMobile}/>}
   <div className="workspace crm-workspace">
    <header className="topbar crm-topbar ref-topbar">
