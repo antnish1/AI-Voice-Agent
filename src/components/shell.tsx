@@ -38,7 +38,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
  const showTooltip=(name:string,element:HTMLElement)=>{
   if(!collapsed||narrowScreen)return;
   const rect=element.getBoundingClientRect();
-  setTooltip({name,left:rect.right+12,top:rect.top+rect.height/2});
+  setTooltip({name,left:rect.right+12,top:rect.top+2});
  };
  const hideTooltip=()=>setTooltip(null);
  useEffect(()=>{hideTooltip();},[collapsed,narrowScreen,path]);
