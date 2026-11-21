@@ -79,8 +79,14 @@ export function TopMenuNavigation({items,pendingApprovals,isItAdmin}:{items:Item
         onClick={close}>
        <SidebarIcon name={item.icon} size={17}/><span>{item.name}</span>
        {item.url==="/approvals"&&pendingApprovals>0&&<span className="frontier-top-approval-badge">{pendingApprovals>99?"99+":pendingApprovals}</span>}
-       <SidebarIcon name="chevron-down" size={13}/>
       </Link>
+      <button type="button" className="frontier-top-mega-toggle"
+        aria-label={"Show "+item.name+" menu"} aria-expanded={open===item.url}
+        aria-controls="frontier-top-mega-panel"
+        onClick={()=>setOpen(current=>current===item.url?null:item.url)}
+        onFocus={()=>setOpen(item.url)}>
+        <SidebarIcon name="chevron-down" size={13}/>
+      </button>
      </div>;
    })}
   </div>
