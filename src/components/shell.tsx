@@ -53,8 +53,8 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
   {!isTopMenu&&<motion.aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar" animate={{width:narrowScreen?224:collapsed?68:224}} transition={reducedMotion?{duration:0}:motionTokens.spring}>
    <div className="brand crm-brand ref-brand frontier-sidebar-brand">
     {collapsed&&!narrowScreen?
-     <button type="button" className="brand-icon frontier-sidebar-logo frontier-logo-expand" onClick={()=>setCollapsed(false)} title="Expand sidebar" aria-label="Expand sidebar"><img src="/autoreach-icon.webp" alt="" width={42} height={42}/></button>:
-     <div className="brand-icon frontier-sidebar-logo" aria-label="AutoReach AI logo"><img src="/autoreach-icon.webp" alt="" width={42} height={42}/></div>}
+     <button type="button" className="brand-icon frontier-sidebar-logo frontier-logo-expand" onClick={()=>setCollapsed(false)} title="Expand sidebar" aria-label="Expand sidebar"><img src="/autoreach-logo.png" alt="" width={42} height={42}/></button>:
+     <div className="brand-icon frontier-sidebar-logo" aria-label="AutoReach AI logo"><img src="/autoreach-logo.png" alt="" width={42} height={42}/></div>}
     <span className="brand-words frontier-brand-text">AutoReach<small>AI</small></span>
     {!collapsed&&!narrowScreen&&<button type="button" className="collapse-control frontier-sidebar-collapse" onClick={()=>setCollapsed(true)} title="Collapse sidebar" aria-label="Collapse sidebar"><SidebarIcon name="chevrons-left" size={19}/></button>}
    </div>
@@ -103,7 +103,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
   <div className="workspace crm-workspace">
    <header className="topbar crm-topbar ref-topbar">
     {!isTopMenu&&<button type="button" className="ref-menu-toggle" onClick={()=>{if(window.innerWidth<=760)setMobile(!mobile);else setCollapsed(!collapsed);}} aria-label="Toggle navigation">☰</button>}
-    {isTopMenu&&<span className="frontier-topbar-brand" aria-label="AutoReach AI"><span className="frontier-topbar-brand-mark"><img src="/autoreach-icon.webp" alt="" width={34} height={34}/></span><span>AutoReach<small>AI</small></span></span>}
+    {isTopMenu&&<span className="frontier-topbar-brand" aria-label="AutoReach AI"><span className="frontier-topbar-brand-mark"><img src="/autoreach-logo.png" alt="" width={34} height={34}/></span><span>AutoReach<small>AI</small></span></span>}
     <div className="ref-header-breadcrumbs"><PortalBreadcrumbs/></div>
     <div className="ref-topbar-right">
 
