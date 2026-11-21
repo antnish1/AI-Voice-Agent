@@ -74,7 +74,7 @@ export function SettingsDirectory({userId,email,role,dealership,displayName,phon
  const changePassword=async()=>{setError("");setNotice("");if(newPassword.length<10){setError("Use at least 10 characters.");return;}if(newPassword!==confirmPassword){setError("Passwords do not match.");return;}setBusy(true);const {error:e}=await supabase.auth.updateUser({password:newPassword});setBusy(false);if(e){setError(e.message);return;}setPasswordOpen(false);setNewPassword("");setConfirmPassword("");flash("Password updated successfully.");};
  const initials=name.trim().split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase()||"U";
  return <div className="settings-ref">
-  <header className="settings-ref-hero"><div className="settings-ref-hero-title"><span className="settings-ref-gear"><Icon name="gear" size={30}/></span><div><h1>Settings</h1><p>Manage your profile, preferences and application settings</p></div></div><div className="settings-ref-wave" aria-hidden="true"><svg viewBox="0 0 540 100" preserveAspectRatio="none"><path d="M0 95Q90-10 175 59T355 34T540 4V100H0Z" fill="#84d9de" opacity=".35"/><path d="M0 100Q110 70 184 83T382 27T540 42V100Z" fill="#31bfcb" opacity=".30"/><path d="M140 100Q255 11 358 77T540 24V100Z" fill="#0595aa" opacity=".20"/></svg></div></header>
+
   <div className="settings-ref-layout">
    <nav className="settings-ref-sidebar" aria-label="Settings sections">{sections.map(item=><button key={item.id} type="button" className={section===item.id?"active":""} aria-current={section===item.id?"page":undefined} onClick={()=>{setSection(item.id);setError("");setNotice("");}}><Icon name={item.icon} size={17}/>{item.label}</button>)}</nav>
    <div className="settings-ref-main">
