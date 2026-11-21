@@ -119,7 +119,7 @@ do $$ declare tab text; begin
  foreach tab in array array['crm_callbacks','crm_appointments','crm_pickup_drop','voice_agent_links','voice_call_records','voice_webhook_receipts'] loop
   execute format('alter table public.%I enable row level security',tab);
   execute format('drop policy if exists %I on public.%I',tab||'_read',tab);
-  execute format('create policy %I on public.%I for select to authenticated using (public.frontier_password_setup_complete() and ((select auth.uid()) = ''5bd78ada-44f5-4045-a9fb-75c9dad69893''::uuid or exists (select 1 from public.memberships m where m.user_id=(select auth.uid()) and m.dealership_id=dealership_id)))',tab||'_read',tab);
+  execute format('create policy %I on public.%I for select to authenticated using (public.frontier_password_setup_complete() and ((select auth.uid()) = ''5bd78ada-44f5-4045-a9fb-75c9dad69893''::uuid or exists (select 1 from public.memberships m where m.user_id=(select auth.uid()) and m.dealership_id=%I.dealership_id)))',tab||'_read',tab,tab);
  end loop; end $$;
 do $$ declare tab text; begin
  foreach tab in array array['crm_callbacks','crm_appointments','crm_pickup_drop','voice_agent_links'] loop
