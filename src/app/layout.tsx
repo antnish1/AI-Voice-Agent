@@ -5,5 +5,6 @@ import "./sidebar-compact.css";
 import "./sidebar-tooltips.css";
 import "./sidebar-white.css";
 import "./navigation-layout.css";
-export const metadata: Metadata = { title: "Frontier AI Voice CRM", description: "Frontier Group dealership campaign management" };
+import "./autoreach-brand.css";
+export const metadata: Metadata = { title: "AutoReach AI", description: "AI-powered dealership voice CRM by Frontier Group", icons: { icon: "/autoreach-logo.png", shortcut: "/autoreach-logo.png", apple: "/autoreach-logo.png" } };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en"><body>{children}</body></html>; }

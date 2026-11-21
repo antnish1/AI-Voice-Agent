@@ -1,0 +1,62 @@
+/* AutoReach AI — navigation and sign-in brand assets.
+ * The icon is a scalable vector adaptation of the user-selected car/voice/orbit mark.
+ * Replaces the F placeholders without changing sidebar expand/collapse behavior.
+ */
+.frontier-reference-sidebar .frontier-sidebar-logo,
+.nav-collapsed .frontier-reference-sidebar .frontier-logo-expand,
+.frontier-top-layout .frontier-topbar-brand-mark{
+ background:transparent!important;
+ box-shadow:none!important;
+ border:0;
+ padding:0;
+ overflow:visible;
+}
+.frontier-reference-sidebar .frontier-sidebar-logo img,
+.frontier-topbar-brand-mark img{
+ display:block;
+ width:100%;
+ height:100%;
+ object-fit:contain;
+ border-radius:10px;
+}
+.frontier-reference-sidebar .frontier-sidebar-logo{
+ width:42px;
+ height:42px;
+ flex-basis:42px;
+}
+.nav-collapsed .frontier-reference-sidebar .frontier-logo-expand{
+ cursor:pointer;
+}
+.frontier-reference-sidebar .frontier-brand-text,
+.frontier-topbar-brand>span:last-child{
+ letter-spacing:-.02em;
+}
+.frontier-reference-sidebar .frontier-brand-text small,
+.frontier-topbar-brand small{
+ letter-spacing:.13em;
+}
+.frontier-topbar-brand-mark{
+ display:block;
+ width:36px;
+ height:36px;
+}
+.login-card .autoreach-login-logo{
+ width:70px;
+ height:70px;
+ display:inline-grid;
+ place-items:center;
+ margin-bottom:16px;
+ background:transparent;
+ border:0;
+ box-shadow:none;
+ padding:0;
+}
+.autoreach-login-logo img{
+ display:block;
+ width:68px;
+ height:68px;
+ border-radius:16px;
+}
+@media (prefers-reduced-motion:reduce){
+ .frontier-sidebar-logo,.frontier-topbar-brand-mark{transition:none!important}
+}
