@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
-import {useState} from "react";
+import {useState,useEffect} from "react";
 import {motion, useReducedMotion} from "motion/react";
 import {MotionRoute} from "@/components/motion/motion-route";
 import {motionTokens} from "@/components/motion/motion-tokens";
@@ -27,11 +27,13 @@ const navigation:Array<{name:string;url:string;icon:SidebarIconName}>=[
 export function Shell({children,membership,userEmail,userId,displayName,avatarPath,pendingApprovals=0,isItAdmin=false}:{children:React.ReactNode;membership:Membership;userEmail:string;userId:string;displayName:string;avatarPath:string;pendingApprovals?:number;isItAdmin?:boolean}){
  const path=usePathname();
  const reducedMotion=useReducedMotion();
+ const [narrowScreen,setNarrowScreen]=useState(false);
+ useEffect(()=>{const query=window.matchMedia("(max-width:760px)");const update=()=>setNarrowScreen(query.matches);update();query.addEventListener("change",update);return ()=>query.removeEventListener("change",update);},[]);
  const [collapsed,setCollapsed]=useState(false),[mobile,setMobile]=useState(false),[campaignsExpanded,setCampaignsExpanded]=useState(false),[helpOpen,setHelpOpen]=useState(false);
  const campaignActive=path==="/campaigns"||path.startsWith("/campaigns/");
  const closeMobile=()=>setMobile(false);
  return <div className={`app crm-app reference-app ${collapsed?"nav-collapsed":""} ${mobile?"nav-open":""}`}>
-  <motion.aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar" animate={{width:collapsed?79:255}} transition={reducedMotion?{duration:0}:motionTokens.spring}>
+  <motion.aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar" animate={{width:narrowScreen?255:collapsed?79:255}} transition={reducedMotion?{duration:0}:motionTokens.spring}>
    <div className="brand crm-brand ref-brand frontier-sidebar-brand">
     <div className="brand-icon frontier-sidebar-logo" aria-label="FRONTIER logo">F</div>
     <span className="brand-words frontier-brand-text">FRONTIER<small>AI VOICE CRM</small></span>
