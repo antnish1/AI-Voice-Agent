@@ -638,3 +638,90 @@ a.portal-crumb-pill:hover{background:#e5ecf6}
 .approvals-modal-done{display:block;margin:17px 0 0 auto}
 @media(max-width:1100px){.approvals-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.approvals-controls{align-items:flex-start}.approvals-filters{flex:1 1 100%}.approvals-search{flex:1;max-width:none}}
 @media(max-width:700px){.approvals-reference{margin:0}.approvals-hero{min-height:100px;padding:12px}.approvals-hero-title{gap:10px}.approvals-hero-shield{width:51px;height:51px;border-width:7px}.approvals-hero h1{font-size:22px}.approvals-hero p{font-size:10px;max-width:170px}.approvals-banner-art{width:150px;right:-18px;opacity:.65}.approvals-stat{min-height:80px;padding:11px;gap:8px}.approvals-stat-icon{width:34px;height:34px;flex-basis:34px}.approvals-stat div>span{font-size:10px}.approvals-stat strong{font-size:21px}.approvals-stat small{font-size:8px}.approvals-stat>svg{width:35px}.approvals-tabs{width:100%;justify-content:space-between}.approvals-tabs button{padding:12px 8px;font-size:10px}.approvals-range{flex:1}.approvals-search{flex:1 1 160px}.approvals-table-footer{flex-wrap:wrap}.approvals-table-footer nav{margin-left:auto}}
+
+
+/* Call Logs reference UI — no fabricated operational data */
+.calllogs-reference{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#173754;margin:-4px -7px 0}
+.calllogs-ref-heading{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:1px 0 16px}
+.calllogs-heading-left{display:flex;align-items:center;gap:18px;min-width:0}
+.calllogs-main-icon{width:62px;height:62px;flex:none;display:grid;place-items:center;position:relative;border-radius:50%;background:linear-gradient(145deg,#2bdfd5,#0084a9 68%,#113e81);box-shadow:0 6px 15px #1481a828;color:#fff}
+.calllogs-main-icon>span{position:absolute;top:9px;right:8px;font-size:9px;font-weight:800;transform:rotate(90deg);color:#c0fdff}
+.calllogs-heading-left h1{font-size:27px;font-weight:800;letter-spacing:-.8px;margin:0 0 6px;color:#133154}
+.calllogs-heading-left p{margin:0;font-size:11px;color:#6b8099}
+.calllogs-header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.calllogs-dropdown{display:flex;align-items:center;gap:7px;min-height:36px;padding:0 10px;border:1px solid #e4eaf2;border-radius:8px;background:#fff;color:#486688}
+.calllogs-dropdown select{border:0;background:transparent;min-height:34px;max-width:135px;font-size:10px;font-weight:600;color:#355573;outline:0}
+.calllogs-export{display:flex;align-items:center;justify-content:center;gap:8px;min-height:36px;border-radius:7px;padding:8px 16px;background:#078b9d;color:#fff;font-size:11px;white-space:nowrap}
+.calllogs-export:disabled{opacity:.58;cursor:not-allowed}
+.calllogs-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:15px}
+.calllogs-stat{min-width:0;position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;min-height:89px;padding:14px 13px;background:#fff;border:1px solid #e3ebf3;border-radius:11px;box-shadow:0 2px 9px #173d5f0b}
+.calllogs-stat.tone-blue{background:linear-gradient(105deg,#eff7ff,#fff);color:#2589d9}
+.calllogs-stat.tone-green{background:linear-gradient(105deg,#ebfcf8,#fff);color:#1caa85}
+.calllogs-stat.tone-rose{background:linear-gradient(105deg,#fff1f5,#fff);color:#e85c7a}
+.calllogs-stat.tone-amber{background:linear-gradient(105deg,#fff6ed,#fff);color:#db9638}
+.calllogs-stat-icon{display:grid;place-items:center;width:42px;height:42px;flex:0 0 42px;background:#ffffffbd;border-radius:50%}
+.calllogs-stat>div{position:relative;z-index:1;min-width:0}
+.calllogs-stat div>span{display:block;font-size:11px;color:#3c5974;white-space:nowrap}
+.calllogs-stat strong{display:block;font-size:25px;line-height:1.12;margin-top:5px;color:#173653}
+.calllogs-stat small{display:block;margin-top:5px;font-size:9px;color:#889eb0}
+.calllogs-stat>svg{position:absolute;right:7px;bottom:15px;width:62px;height:29px;opacity:.55}
+.calllogs-charts{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(270px,1fr);gap:12px;margin-bottom:15px}
+.calllogs-chart-card{min-width:0;background:#fff;border:1px solid #e4ecf4;border-radius:11px;padding:15px 17px;box-shadow:0 2px 8px #173d5f09}
+.calllogs-panel-title{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.calllogs-panel-title h2{font-size:12px;font-weight:750;color:#213c5e;margin:0}
+.calllogs-legend{display:flex;gap:11px;align-items:center;flex-wrap:wrap}
+.calllogs-legend span{display:flex;align-items:center;gap:5px;font-size:9px;color:#4a6380}
+.calllogs-legend i,.calllogs-distribution-legend i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#75a7e9}
+.calllogs-legend .answered,.calllogs-distribution-legend .answered{background:#0e9e9d}
+.calllogs-legend .failed,.calllogs-distribution-legend .failed{background:#ff5982}
+.calllogs-legend .total,.calllogs-distribution-legend .busy{background:#77b0ff}
+.calllogs-distribution-legend .noanswer{background:#9567e5}
+.calllogs-chart-plot{position:relative;height:155px;margin-top:17px}
+.calllogs-plot-grid{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between}
+.calllogs-plot-grid span{border-top:1px solid #e8edf3;height:1px;width:100%}
+.calllogs-chart-empty{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;background:#ffffffe0;padding:9px 13px;white-space:nowrap;border-radius:8px;font-size:10px;color:#8ca0b1;text-align:center}
+.calllogs-chart-axis{display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:9px;color:#9baaba}
+.calllogs-distribution-content{display:flex;gap:18px;justify-content:space-evenly;align-items:center;margin-top:20px;min-height:142px}
+.calllogs-donut{height:136px;width:136px;flex:0 0 136px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#e4eaf1 0 100%);position:relative}
+.calllogs-donut:before{content:"";width:84px;height:84px;border-radius:50%;background:#fff;position:absolute}
+.calllogs-donut div{position:relative;text-align:center;display:grid;gap:2px}
+.calllogs-donut strong{font-size:25px;color:#143459}
+.calllogs-donut small{font-size:10px;color:#8799ad}
+.calllogs-distribution-legend{flex:1;display:grid;gap:12px;max-width:155px;min-width:110px}
+.calllogs-distribution-legend>div{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:10px;color:#415d78}
+.calllogs-distribution-legend span{display:flex;align-items:center;gap:7px}
+.calllogs-distribution-legend strong{color:#7890a5}
+.calllogs-distribution-note{text-align:center;font-size:9px;color:#97a9b8;margin:9px 0 0}
+.calllogs-table-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 9px}
+.calllogs-tabs{display:flex;gap:0;border-bottom:2px solid #e1e9f0}
+.calllogs-tabs button{padding:11px 17px;position:relative;background:transparent;border-radius:0;color:#415f7d;font-size:11px;white-space:nowrap}
+.calllogs-tabs button:hover{background:#edf7fa}
+.calllogs-tabs button.active{color:#058d9a;font-weight:750}
+.calllogs-tabs button.active:after{content:"";position:absolute;bottom:-2px;left:0;right:0;background:#058b9b;height:3px}
+.calllogs-search-controls{display:flex;gap:8px;align-items:center}
+.calllogs-search{height:35px;display:flex;gap:8px;align-items:center;color:#8196a9;background:#fff;border:1px solid #e1e9f1;padding:0 10px;border-radius:8px;min-width:210px}
+.calllogs-search input{font-size:10px;border:0;outline:0;color:#2b4a68;min-width:0;width:100%}
+.calllogs-search input::placeholder{color:#a0afbc}
+.calllogs-filter{height:35px;display:flex;gap:8px;align-items:center;padding:7px 12px;background:#fff;border:1px solid #e3eaf1;color:#385e7e;font-size:11px}
+.calllogs-filter:hover{background:#f2f7fa}
+.calllogs-filter-panel{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 10px;background:#eaf4f8;padding:10px 12px;border-radius:8px;color:#65829a;font-size:10px}
+.calllogs-filter-panel button{display:flex;align-items:center;gap:5px;padding:6px 9px;font-size:10px}
+.calllogs-table-card{overflow:hidden;border:1px solid #e3eaf2;border-radius:11px;background:white;box-shadow:0 2px 8px #143f5d09}
+.calllogs-table{border-collapse:collapse;width:100%;font-size:10px}
+.calllogs-table th{background:#eef3fa;color:#314d6e;padding:11px 9px;text-align:left;white-space:nowrap;font-weight:750}
+.calllogs-table th:first-child{width:34px;text-align:center}
+.calllogs-table td{border-bottom:1px solid #edf1f6;padding:11px 9px}
+.calllogs-table .calllogs-empty-row{padding:26px 12px!important;text-align:center}
+.calllogs-empty-state{min-height:176px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+.calllogs-empty-state>span{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#e2f5f3;color:#0c929b}
+.calllogs-empty-state strong{font-size:13px;color:#2a4966}
+.calllogs-empty-state p{font-size:10px;color:#8299ad;max-width:420px;line-height:1.6;margin:0}
+.calllogs-empty-state small{font-size:9px;color:#839aaf}
+.calllogs-table-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;color:#59708b;font-size:10px}
+.calllogs-paginator{display:flex;gap:5px}
+.calllogs-paginator button{height:26px;min-width:26px;padding:3px 8px;background:#ecf2f8;color:#547595;font-size:11px}
+.calllogs-paginator button.active{background:#0d919b;color:#fff}
+.calllogs-paginator button:disabled{opacity:.44;cursor:not-allowed}
+.calllogs-safety-note{display:flex;align-items:center;gap:6px;color:#7e96aa;font-size:10px;margin:13px 2px 0}
+@media(max-width:1100px){.calllogs-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.calllogs-charts{grid-template-columns:1fr}.calllogs-table-top{align-items:stretch}.calllogs-search-controls{margin-left:auto}}
+@media(max-width:700px){.calllogs-reference{margin:0}.calllogs-ref-heading{align-items:flex-start;flex-direction:column}.calllogs-heading-left{gap:12px}.calllogs-main-icon{height:49px;width:49px}.calllogs-heading-left h1{font-size:24px}.calllogs-header-actions{width:100%}.calllogs-header-actions .calllogs-dropdown{flex:1}.calllogs-header-actions .calllogs-export{flex:1}.calllogs-stats{gap:8px}.calllogs-stat{gap:8px;min-height:83px;padding:10px}.calllogs-stat-icon{width:35px;height:35px;flex-basis:35px}.calllogs-stat strong{font-size:21px}.calllogs-stat div>span{font-size:10px}.calllogs-stat small{font-size:8px}.calllogs-stat>svg{width:33px}.calllogs-tabs{width:100%;justify-content:space-between}.calllogs-tabs button{font-size:10px;padding:11px 6px}.calllogs-search-controls{width:100%}.calllogs-search{flex:1;min-width:0}.calllogs-distribution-content{gap:12px}.calllogs-donut{height:116px;width:116px;flex-basis:116px}.calllogs-donut:before{width:72px;height:72px}}
