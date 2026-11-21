@@ -1,0 +1,113 @@
+/* Compact Frontier sidebar. Overrides legacy reference sidebar without changing navigation semantics. */
+:root { --frontier-rail-width:224px; --frontier-rail-collapsed:68px; }
+.frontier-reference-sidebar.ref-sidebar{
+  width:var(--frontier-rail-width); min-width:0; flex:0 0 auto;
+  padding:13px 9px 12px; overflow-x:hidden;
+  scrollbar-width:thin; scrollbar-color:rgba(100,167,184,.32) transparent;
+}
+.frontier-reference-sidebar .frontier-sidebar-brand.ref-brand{
+  min-height:52px; margin:0 0 12px; padding:0 7px; gap:9px;
+}
+.frontier-reference-sidebar .frontier-sidebar-logo{
+  width:42px; height:42px; flex:0 0 42px;
+}
+.frontier-reference-sidebar .frontier-brand-text{
+  font-size:15px; line-height:1.13; letter-spacing:.2px;
+}
+.frontier-reference-sidebar .frontier-brand-text small{font-size:9px;letter-spacing:1.35px;margin-top:3px}
+.frontier-reference-sidebar .frontier-sidebar-collapse{
+  margin-left:auto; flex-shrink:0;
+  padding:4px; min-width:24px; height:28px;
+}
+.frontier-reference-sidebar .frontier-sidebar-nav{
+  margin:5px 0 0; gap:1px;
+}
+.frontier-reference-sidebar .frontier-nav-entry{margin:0}
+.frontier-reference-sidebar .frontier-nav-row{
+  min-height:38px; margin:0; border-radius:9px;
+  justify-content:flex-start; gap:0;
+}
+.frontier-reference-sidebar .frontier-nav-link{
+  min-height:38px; width:100%; flex:1 1 auto;
+  padding:7px 9px; margin:0; gap:10px;
+  font-size:12px; line-height:1.15;
+  white-space:nowrap; display:flex; align-items:center;
+}
+.frontier-reference-sidebar .frontier-nav-link .nav-icon{
+  width:19px; min-width:19px; display:inline-grid; place-items:center;
+}
+.frontier-reference-sidebar .frontier-nav-link .nav-icon svg{width:19px;height:19px}
+.frontier-reference-sidebar .frontier-nav-link .nav-label{font-size:12px;flex:0 1 auto}
+.frontier-reference-sidebar .frontier-motion-active-nav{inset:1px 1px}
+.frontier-reference-sidebar .frontier-campaign-row{justify-content:flex-start}
+.frontier-reference-sidebar .frontier-campaign-row .frontier-nav-link{
+  flex:0 1 auto; width:auto; padding-right:2px;
+}
+.frontier-reference-sidebar .frontier-campaign-row .frontier-campaign-toggle{
+  display:grid; flex:0 0 26px; width:26px; height:30px; min-width:26px;
+  margin-left:0; padding:0; z-index:2; position:relative;
+  align-self:center; background:transparent;
+}
+.frontier-reference-sidebar .frontier-campaign-row .frontier-campaign-toggle:hover{background:rgba(255,255,255,.1)}
+.frontier-reference-sidebar .frontier-campaign-subnav{
+  margin:0 4px 3px 36px; padding:1px 0 1px 11px;
+}
+.frontier-reference-sidebar .frontier-campaign-subnav a{
+  min-height:25px; padding:5px 4px; font-size:11px; line-height:1.3;
+}
+.frontier-reference-sidebar .frontier-approval-badge{
+  margin-left:auto; font-size:10px; min-width:18px; height:18px;
+}
+.frontier-reference-sidebar .frontier-sidebar-bottom{
+  min-height:75px; padding:9px 0 0; margin-top:auto;
+}
+.frontier-reference-sidebar .frontier-sidebar-wave{
+  height:100px; bottom:28px; opacity:.62;
+}
+.frontier-reference-sidebar .frontier-help-card{
+  padding:7px 8px; min-height:49px; border-radius:10px;
+}
+.frontier-reference-sidebar .frontier-help-icon{
+  width:30px;height:30px;flex-basis:30px;
+}
+.frontier-reference-sidebar .frontier-help-text strong{font-size:11px}
+.frontier-reference-sidebar .frontier-help-text small{font-size:9px}
+.nav-collapsed .frontier-reference-sidebar .frontier-sidebar-brand.ref-brand{
+  justify-content:center; padding:0; margin-bottom:11px;
+}
+.nav-collapsed .frontier-reference-sidebar .frontier-nav-link{
+  justify-content:center; padding:6px; width:100%;
+}
+.nav-collapsed .frontier-reference-sidebar .frontier-nav-row{
+  justify-content:center;
+}
+.nav-collapsed .frontier-reference-sidebar .frontier-campaign-row .frontier-nav-link{
+  flex:1 1 auto;
+}
+.nav-collapsed .frontier-reference-sidebar .frontier-campaign-row .frontier-campaign-toggle{display:none}
+.nav-collapsed .frontier-reference-sidebar .frontier-sidebar-bottom{min-height:62px}
+@media(max-width:760px){
+ .frontier-reference-sidebar.ref-sidebar,
+ .nav-collapsed .frontier-reference-sidebar.ref-sidebar{
+   width:224px; min-width:224px; padding:13px 9px 12px;
+ }
+ .nav-collapsed .frontier-reference-sidebar .frontier-campaign-row .frontier-nav-link{
+   flex:0 1 auto; width:auto; justify-content:flex-start;
+ }
+ .nav-collapsed .frontier-reference-sidebar .frontier-campaign-row .frontier-campaign-toggle{display:grid}
+ .nav-collapsed .frontier-reference-sidebar .frontier-sidebar-brand.ref-brand{
+   justify-content:flex-start; padding:0 7px;
+ }
+}
+@media(max-height:780px) and (min-width:761px){
+ .frontier-reference-sidebar .frontier-sidebar-brand.ref-brand{min-height:44px;margin-bottom:6px}
+ .frontier-reference-sidebar .frontier-nav-row,
+ .frontier-reference-sidebar .frontier-nav-link{min-height:34px}
+ .frontier-reference-sidebar .frontier-nav-link{padding-top:5px;padding-bottom:5px}
+ .frontier-reference-sidebar .frontier-sidebar-bottom{padding-top:5px;min-height:61px}
+ .frontier-reference-sidebar .frontier-help-card{min-height:42px}
+ .frontier-reference-sidebar .frontier-sidebar-wave{height:72px}
+}
+@media(prefers-reduced-motion:reduce){
+ .frontier-reference-sidebar *{transition:none!important}
+}
