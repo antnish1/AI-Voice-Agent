@@ -27,3 +27,8 @@ test("RLS migration restricts write access and retains dealership read scopes",(
  assert.match(sql,/m\.role='super_admin'/);
  assert.doesNotMatch(sql,/role in \('super_admin','dealership_manager'/);
 });
+test("new users cannot bypass first-login password setup using direct database reads",()=>{
+ assert.match(sql,/frontier_password_setup_complete/);
+ for(const policy of ["memberships_self_read","customers_membership_read","campaigns_membership_read","frontier_crm_documents_read"])assert.match(sql,new RegExp("alter policy "+policy,"i"));
+ assert.match(access,/must_change_password === true/);
+});
