@@ -1,9 +1,41 @@
 import {requireMembership,canPrepare} from "@/lib/auth";
-import {CustomerImport} from "./customer-import";
-export default async function Customers(){const {supabase,membership}=await requireMembership();if(!membership)return null;
- const [customers,imports]=await Promise.all([supabase.from("customers").select("id,name,mobile,consent_status,do_not_call,created_at").eq("dealership_id",membership.dealership_id).order("created_at",{ascending:false}).limit(100),supabase.from("customer_import_batches").select("id,filename,total_rows,imported_rows,matched_rows,rejected_rows,created_at").eq("dealership_id",membership.dealership_id).order("created_at",{ascending:false}).limit(5)]);
- if(customers.error||imports.error)throw new Error("Could not load dealership customers.");
- return <><div className="page-head"><div><p className="eyebrow">CUSTOMER DATA</p><h1>Customers</h1><p>Manage dealership records and validate new imports.</p></div><span className="status-pill">{customers.data?.length??0} latest customers shown</span></div>{canPrepare(membership.role)&&<CustomerImport dealershipId={membership.dealership_id}/>}
- <section className="crm-panel"><div className="panel-title"><h2>Customer directory</h2><span>100 most recent records</span></div>{customers.data?.length?<div className="tablewrap"><table className="crm-table"><thead><tr><th>Customer</th><th>Mobile</th><th>Calling consent</th><th>Do not call</th><th>Added</th></tr></thead><tbody>{customers.data.map(c=><tr key={c.id}><td><strong>{c.name}</strong></td><td>{c.mobile??"—"}</td><td><span className="status-pill">{c.consent_status}</span></td><td>{c.do_not_call?"Yes":"No"}</td><td>{new Date(c.created_at).toLocaleDateString("en-IN")}</td></tr>)}</tbody></table></div>:<div className="empty-state"><span className="empty-glyph">♙</span><strong>No customers yet</strong><p>Import a CSV list to begin building your dealership customer database.</p></div>}</section>
- <section className="crm-panel" style={{marginTop:17}}><div className="panel-title"><h2>Recent import history</h2><span>Latest 5 uploads</span></div>{imports.data?.length?<div className="tablewrap"><table className="crm-table"><thead><tr><th>File</th><th>Imported</th><th>Matched</th><th>Rejected</th><th>Date</th></tr></thead><tbody>{imports.data.map(x=><tr key={x.id}><td>{x.filename}</td><td>{x.imported_rows}</td><td>{x.matched_rows}</td><td>{x.rejected_rows}</td><td>{new Date(x.created_at).toLocaleDateString("en-IN")}</td></tr>)}</tbody></table></div>:<div className="empty-state"><strong>No imports recorded</strong><p>Your dealership import batches will appear here.</p></div>}</section></>;
+import {CustomersDirectory,type CustomerRow,type ImportRow} from "./customers-directory";
+const PAGE_SIZE=12;
+export default async function Customers({searchParams}:{searchParams:Promise<{q?:string;page?:string;status?:string;period?:string}>}){
+ const {supabase,membership}=await requireMembership();if(!membership)return null;
+ const params=await searchParams;
+ const query=String(params.q??"").trim().replace(/[%,()"'\\]/g,"").slice(0,80);
+ const status=["unverified","verified","declined"].includes(String(params.status))?String(params.status):"all";
+ const period=["7","30","90"].includes(String(params.period))?String(params.period):"all";
+ const requested=Math.max(1,Math.min(100000,Number.parseInt(String(params.page??"1"),10)||1));
+ const id=membership.dealership_id;
+ const makeQuery=()=>{let q=supabase.from("customers").select("id,name,mobile,consent_status,do_not_call,created_at",{count:"exact"}).eq("dealership_id",id);
+  if(query)q=q.or(`name.ilike.%${query}%,mobile.ilike.%${query}%`);
+  if(status!=="all")q=q.eq("consent_status",status);
+  if(period!=="all"){const date=new Date();date.setUTCDate(date.getUTCDate()-Number(period));q=q.gte("created_at",date.toISOString());}
+  return q;
+ };
+ const [countResult,imports]=await Promise.all([
+  makeQuery().range(0,0),
+  supabase.from("customer_import_batches").select("id,filename,imported_rows,matched_rows,rejected_rows,created_at").eq("dealership_id",id).order("created_at",{ascending:false}).limit(5)
+ ]);
+ if(countResult.error||imports.error)throw new Error("Unable to load dealership customer records.");
+ const count=countResult.count??0;
+ const page=Math.min(requested,Math.max(1,Math.ceil(count/PAGE_SIZE)));
+ const {data,error}=await makeQuery().order("created_at",{ascending:false}).range((page-1)*PAGE_SIZE,page*PAGE_SIZE-1);
+ if(error)throw new Error("Unable to load customer directory.");
+ const customers=(data??[]) as CustomerRow[];
+ const customerIds=customers.map(c=>c.id);
+ const sourceById=new Map<string,string>();
+ if(customerIds.length){
+  const {data:history}=await supabase.from("customer_import_rows").select("customer_id,source_data,customer_import_batches(filename)").eq("dealership_id",id).in("customer_id",customerIds).limit(250);
+  for(const row of history??[]){
+   if(!row.customer_id||sourceById.has(row.customer_id))continue;
+   const batch=row.customer_import_batches as unknown as {filename:string}|null;
+   const source=row.source_data as {entry_type?:string}|null;
+   sourceById.set(row.customer_id,source?.entry_type==="Manual"||batch?.filename==="manual-entry.csv"?"Manual":"CSV Upload");
+  }
+ }
+ const records=customers.map(c=>({...c,source:sourceById.get(c.id)??"Unknown"}));
+ return <CustomersDirectory customers={records} count={count} page={page} pageSize={PAGE_SIZE} query={query} status={status} period={period} dealershipId={id} canManage={canPrepare(membership.role)} imports={(imports.data??[]) as ImportRow[]}/>;
 }

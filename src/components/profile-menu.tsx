@@ -64,11 +64,11 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
   setPassword("");setConfirm("");setPasswordOpen(false);setMessage("Password changed successfully.");
  };
  const avatar=(className:string)=><span className={className}>{avatarUrl?<img src={avatarUrl} alt="Your profile photo" referrerPolicy="no-referrer"/>:initials}</span>;
- return <div className="portal-profile" ref={wrapper}>
-  <button type="button" className="portal-profile-trigger" aria-haspopup="menu" aria-expanded={open} onClick={()=>setOpen(v=>!v)}>
-   {avatar("portal-profile-avatar")}<span className="portal-profile-trigger-text"><strong>{dealershipName}</strong><small>{role.replaceAll("_"," ")}</small></span><span className="portal-profile-chevron">⌄</span>
+ return <div className="portal-profile" ref={wrapper} onPointerEnter={e=>{if(e.pointerType==="mouse"&&!(passwordOpen||editOpen))setOpen(true);}} onPointerLeave={e=>{if(e.pointerType==="mouse"&&!(passwordOpen||editOpen))setOpen(false);}}>
+  <button type="button" className="portal-profile-trigger" aria-label="Open profile menu" title="Profile and account options" aria-haspopup="menu" aria-expanded={open} onClick={()=>setOpen(true)} onFocus={()=>setOpen(true)}>
+   {avatar("portal-profile-avatar")}
   </button>
-  {open&&<div className="portal-profile-panel" role="menu">
+  {open&&<div className="portal-profile-panel" role="menu" aria-label="Account menu">
    <div className="portal-profile-identity"><div className="portal-profile-picture">
     {avatar("portal-profile-avatar large")}
     <button type="button" className="portal-profile-camera" title="Upload profile picture" aria-label="Add or change profile photo" disabled={busy} onClick={()=>fileInput.current?.click()}>📷</button>

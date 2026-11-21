@@ -1,0 +1,40 @@
+"use client";
+import {useState} from "react";
+
+type IconName="phone"|"answered"|"failed"|"clock"|"download"|"calendar"|"chevron"|"search"|"filter"|"play"|"info"|"refresh";
+function Icon({name,size=18}:{name:IconName;size?:number}){
+ const paths:Record<IconName,React.ReactNode>={
+ phone:<><path d="M5.2 3.2h3.5l1.5 5-2.3 2a17 17 0 0 0 6.2 6.2l2-2.3 4.7 1.5v3.5c0 1.6-1.1 2.2-2.6 2C10.8 20 4 13.3 3.3 5.6c-.1-1.1.5-2.4 1.9-2.4Z"/></>,
+ answered:<><circle cx="12" cy="12" r="9"/><path d="m7.5 12 3 3 6-6"/></>,
+ failed:<><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6m0-6-6 6"/></>,
+ clock:<><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></>,
+ download:<><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></>,
+ calendar:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 10h18"/></>,
+ chevron:<path d="m8 10 4 4 4-4"/>,
+ search:<><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></>,
+ filter:<><path d="M3 5h18l-7 8v6l-4 2v-8Z"/></>,
+ play:<path d="m9 6 10 6-10 6z"/>,
+ info:<><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></>,
+ refresh:<><path d="M20 8a8 8 0 0 0-14-3L4 7V3m0 4h4M4 16a8 8 0 0 0 14 3l2-2v4m0-4h-4"/></>
+ };
+ return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
+}
+const cards=[{label:"Total Calls",icon:"phone" as const,tone:"blue"},{label:"Answered Calls",icon:"answered" as const,tone:"green"},{label:"Failed Calls",icon:"failed" as const,tone:"rose"},{label:"Avg. Call Duration",icon:"clock" as const,tone:"amber"}];
+const tabs=[["all","All Calls"],["answered","Answered"],["failed","Failed"],["other","Other"]] as const;
+export function CallLogsDirectory(){
+ const [period,setPeriod]=useState("30"),[campaign,setCampaign]=useState("all"),[tab,setTab]=useState<(typeof tabs)[number][0]>("all"),[search,setSearch]=useState(""),[filterOpen,setFilterOpen]=useState(false);
+ return <div className="calllogs-reference">
+  <header className="calllogs-ref-heading"><div className="calllogs-heading-left"><span className="calllogs-main-icon"><Icon name="phone" size={26}/><span aria-hidden="true">Ⅲ</span></span><div><h1>Call Logs</h1><p>Track and analyze all campaign calls</p></div></div>
+   <div className="calllogs-header-actions"><label className="calllogs-dropdown"><Icon name="calendar" size={15}/><select value={period} onChange={e=>setPeriod(e.target.value)} aria-label="Reporting period"><option value="7">Last 7 Days</option><option value="30">Last 30 Days</option><option value="90">Last 90 Days</option></select></label><label className="calllogs-dropdown"><select value={campaign} onChange={e=>setCampaign(e.target.value)} aria-label="Campaign filter"><option value="all">All Campaigns</option></select></label><button type="button" className="calllogs-export" disabled title="Report export will be available after Sarvam call synchronization"><Icon name="download" size={16}/> Export Report</button></div>
+  </header>
+  <div className="calllogs-stats">{cards.map(card=><article className={"calllogs-stat tone-"+card.tone} key={card.label}><span className="calllogs-stat-icon"><Icon name={card.icon} size={23}/></span><div><span>{card.label}</span><strong>—</strong><small>Sarvam integration pending</small></div><svg viewBox="0 0 86 38" aria-hidden="true"><path d="M1 27Q14 6 26 19T47 14T67 21T85 6" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M1 27Q14 6 26 19T47 14T67 21T85 6V38H1Z" fill="currentColor" opacity=".07"/></svg></article>)}</div>
+  <div className="calllogs-charts">
+   <section className="calllogs-chart-card"><div className="calllogs-panel-title"><h2>Call Overview</h2><div className="calllogs-legend"><span><i className="answered"/>Answered</span><span><i className="failed"/>Failed</span><span><i className="total"/>Total</span></div></div><div className="calllogs-chart-plot"><div className="calllogs-plot-grid"><span/><span/><span/><span/><span/></div><p className="calllogs-chart-empty">No synced call activity for this period</p></div><div className="calllogs-chart-axis"><span>Time series</span><span>Data unavailable</span></div></section>
+   <section className="calllogs-chart-card calllogs-distribution"><div className="calllogs-panel-title"><h2>Call Status Distribution</h2></div><div className="calllogs-distribution-content"><div className="calllogs-donut"><div><strong>—</strong><small>Answered</small></div></div><div className="calllogs-distribution-legend">{[{name:"Answered",tone:"answered"},{name:"Failed",tone:"failed"},{name:"Busy",tone:"busy"},{name:"No Answer",tone:"noanswer"}].map(x=><div key={x.name}><span><i className={x.tone}/>{x.name}</span><strong>—</strong></div>)}</div></div><p className="calllogs-distribution-note">Awaiting verified call outcomes from Sarvam</p></section>
+  </div>
+  <div className="calllogs-table-top"><nav className="calllogs-tabs" aria-label="Call status">{tabs.map(([key,title])=><button key={key} type="button" className={tab===key?"active":""} aria-current={tab===key?"page":undefined} onClick={()=>setTab(key)}>{title} (—)</button>)}</nav><div className="calllogs-search-controls"><label className="calllogs-search"><Icon name="search" size={16}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by phone number..." aria-label="Search calls by phone or customer"/></label><button type="button" className="calllogs-filter" aria-expanded={filterOpen} onClick={()=>setFilterOpen(x=>!x)}><Icon name="filter" size={15}/> Filters <Icon name="chevron" size={12}/></button></div></div>
+  {filterOpen&&<div className="calllogs-filter-panel"><span>Additional filters will become available with real call data.</span><button type="button" onClick={()=>{setPeriod("30");setCampaign("all");setTab("all");setSearch("");setFilterOpen(false);}}><Icon name="refresh" size={14}/> Clear filters</button></div>}
+  <section className="calllogs-table-card"><div className="tablewrap"><table className="calllogs-table"><thead><tr><th>#</th><th>Customer Name</th><th>Phone Number</th><th>Campaign Name</th><th>Call Status</th><th>Duration</th><th>Call Time</th><th>Actions</th></tr></thead><tbody><tr><td colSpan={8} className="calllogs-empty-row"><div className="calllogs-empty-state"><span><Icon name="phone" size={24}/></span><strong>No call logs available</strong><p>Once Sarvam is connected, genuine calls, durations, statuses and authorized recordings will appear here.</p>{search&&<small>Your search “{search}” cannot be evaluated until call records are synced.</small>}</div></td></tr></tbody></table></div><footer className="calllogs-table-footer"><span>Showing 0 call logs</span><div className="calllogs-paginator"><button type="button" aria-label="Previous page" disabled>‹</button><button type="button" className="active" aria-current="page">1</button><button type="button" aria-label="Next page" disabled>›</button></div></footer></section>
+  <p className="calllogs-safety-note"><Icon name="info" size={13}/> No mock call results, transcripts, recordings, analytics or phone numbers are presented as production data. Live calling remains disabled.</p>
+ </div>;
+}
