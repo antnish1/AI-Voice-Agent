@@ -44,24 +44,24 @@ alter policy frontier_crm_documents_add on storage.objects
  with check (
   bucket_id='frontier-crm-private' and name like '%/%'
   and exists(select 1 from public.dealerships d
-    where d.id::text=split_part(name,'/',1) and public.frontier_it_can_write(d.id))
+    where d.id::text=split_part(objects.name,'/',1) and public.frontier_it_can_write(d.id))
  );
 alter policy frontier_crm_documents_delete on storage.objects
  using (
   bucket_id='frontier-crm-private'
   and exists(select 1 from public.dealerships d
-    where d.id::text=split_part(name,'/',1) and public.frontier_it_can_write(d.id))
+    where d.id::text=split_part(objects.name,'/',1) and public.frontier_it_can_write(d.id))
  );
 alter policy frontier_crm_documents_update on storage.objects
  using (
   bucket_id='frontier-crm-private'
   and exists(select 1 from public.dealerships d
-    where d.id::text=split_part(name,'/',1) and public.frontier_it_can_write(d.id))
+    where d.id::text=split_part(objects.name,'/',1) and public.frontier_it_can_write(d.id))
  )
  with check (
   bucket_id='frontier-crm-private'
   and exists(select 1 from public.dealerships d
-    where d.id::text=split_part(name,'/',1) and public.frontier_it_can_write(d.id))
+    where d.id::text=split_part(objects.name,'/',1) and public.frontier_it_can_write(d.id))
  );
 -- The existing import_dealership_customers RPC is SECURITY INVOKER and its
 -- database INSERT operations remain subject to the above RLS restrictions.
@@ -107,8 +107,8 @@ alter policy frontier_crm_documents_read on storage.objects
   bucket_id='frontier-crm-private' and public.frontier_password_setup_complete()
   and (
    ((select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid and exists(
-    select 1 from public.dealerships d where d.id::text=split_part(name,'/',1)))
+    select 1 from public.dealerships d where d.id::text=split_part(objects.name,'/',1)))
    or exists(select 1 from public.memberships m
-      where m.user_id=(select auth.uid()) and m.dealership_id::text=split_part(name,'/',1))
+      where m.user_id=(select auth.uid()) and m.dealership_id::text=split_part(objects.name,'/',1))
   )
  );
