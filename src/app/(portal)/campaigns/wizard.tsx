@@ -2,7 +2,7 @@
 import {useState,useTransition} from "react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
-import {saveWizardDraft} from "../actions";
+import {saveWizardDraft} from "./actions";
 type Draft={name:string;description:string;agent:string;version:string;telephony:string;outgoing:string;start:string;end:string;days:string[];from:string;to:string;cps:string;retries:string;interval:string;mapping:string};
 const steps=["Agent & Setup","Recipients","Schedule","Review & Save"];
 const initial:Draft={name:"",description:"",agent:"",version:"",telephony:"",outgoing:"",start:"",end:"",days:["Mon","Tue","Wed","Thu","Fri","Sat"],from:"10:00",to:"18:00",cps:"1",retries:"0",interval:"60",mapping:""};
