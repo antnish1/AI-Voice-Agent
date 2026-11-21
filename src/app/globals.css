@@ -1220,3 +1220,60 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 @media(max-width:1160px){.docs-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.docs-search{margin-left:0;max-width:none}}
 @media(max-width:720px){.docs-ref{margin:0}.docs-hero h1{font-size:23px}.docs-hero-icon{width:51px;height:51px;flex-basis:51px;font-size:28px}.docs-hero-art{width:145px;opacity:.53}.docs-hero p{max-width:205px}.docs-upload-panel{grid-template-columns:1fr}.docs-upload-quick{border-left:0;border-top:1px solid #e4ebf3;padding:10px 0 0;flex-direction:row;align-items:center;flex-wrap:wrap}.docs-upload-quick>strong{width:100%}.docs-toolbar select{flex:1 1 30%;max-width:none}.docs-search{flex-basis:100%;max-width:none}.docs-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:470px){.docs-stats{gap:8px}.docs-stat{padding:10px;gap:7px;min-height:81px}.docs-stat-icon{width:33px;height:33px;flex-basis:33px;font-size:19px}.docs-stat div>span{font-size:10px}.docs-stat strong{font-size:21px}.docs-stat small{font-size:8px;white-space:normal}.docs-stat>svg{width:37px}.docs-pagination{flex-wrap:wrap}.docs-grid{grid-template-columns:1fr}}
+
+
+/* Global FRONTIER sidebar — reference-matched, shared by all authenticated pages */
+.frontier-reference-sidebar.ref-sidebar{width:208px;min-width:208px;background:#062747;padding:13px 11px 14px;overflow-x:hidden;overflow-y:auto;position:sticky;top:0;isolation:isolate}
+.frontier-reference-sidebar.ref-sidebar::after{display:none}
+.frontier-sidebar-brand.ref-brand{display:flex;align-items:center;gap:10px;padding:0 4px;min-height:54px;margin-bottom:15px;position:relative}
+.frontier-sidebar-logo.ref-brand .brand-icon,.frontier-sidebar-brand .frontier-sidebar-logo{height:43px;width:43px;flex:0 0 43px;border-radius:8px;background:linear-gradient(145deg,#23d5cc 0%,#04a9b8 47%,#037e96 100%);box-shadow:0 3px 13px #11c5d32a;font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:24px;letter-spacing:0;font-weight:850}
+.frontier-sidebar-brand .frontier-brand-text{display:block;color:#fff;font-size:16px;font-weight:850;letter-spacing:.15px;line-height:1.1;white-space:nowrap}
+.frontier-sidebar-brand .frontier-brand-text small{display:block;color:#6de4e6;font-size:9px;letter-spacing:1.5px;font-weight:750;margin-top:5px}
+.frontier-sidebar-brand .frontier-sidebar-collapse{position:static;margin-left:auto;flex-shrink:0;display:grid;place-items:center;width:19px;height:30px;padding:0;background:transparent;border:0;color:#afccde}
+.frontier-sidebar-brand .frontier-sidebar-collapse:hover{color:white;background:transparent}
+.frontier-reference-sidebar .frontier-sidebar-nav{margin:7px 0 0;display:flex;flex-direction:column;gap:1px;position:relative;z-index:2}
+.frontier-reference-sidebar .frontier-nav-entry{min-width:0}
+.frontier-reference-sidebar .frontier-nav-row{display:flex;align-items:center;border-radius:8px;margin:1px 0;min-height:38px;transition:background-color .15s}
+.frontier-reference-sidebar .frontier-nav-row.selected{background:linear-gradient(110deg,#0e8d9f,#086d84);box-shadow:0 1px 8px #018fa11b}
+.frontier-reference-sidebar .frontier-nav-row:not(.selected):hover{background:#133c5b}
+.frontier-reference-sidebar .frontier-nav-link{display:flex;align-items:center;min-width:0;gap:12px;flex:1;margin:0;padding:8px 10px;color:#dceaf5;font-weight:550;font-size:12px;line-height:1.2;min-height:38px;border-radius:8px;background:transparent;box-shadow:none;white-space:nowrap}
+.frontier-reference-sidebar .frontier-nav-link.active{background:transparent;box-shadow:none;color:white;font-weight:750}
+.frontier-reference-sidebar .frontier-nav-link:hover{background:transparent;color:white}
+.frontier-reference-sidebar .frontier-nav-link .nav-icon{display:flex;align-items:center;justify-content:center;flex:0 0 22px;width:22px;height:22px;font-size:unset;color:#d9eaf7}
+.frontier-reference-sidebar .frontier-nav-link .nav-icon svg{width:21px;height:21px;stroke-width:1.85;display:block}
+.frontier-reference-sidebar .frontier-nav-link .nav-label{overflow:hidden;text-overflow:ellipsis}
+.frontier-reference-sidebar .frontier-approval-badge{margin-left:auto;flex:0 0 auto;display:grid;place-items:center;min-width:21px;height:21px;border-radius:99px;background:linear-gradient(130deg,#1bd5ce,#10aabc);box-shadow:0 0 12px #15d9d29e;color:#fff;font-size:11px;font-weight:800;padding:0 5px}
+.frontier-reference-sidebar .frontier-campaign-toggle{display:grid;place-items:center;flex:0 0 30px;width:30px;height:32px;margin-left:-5px;padding:0;border:0;background:transparent;color:#cbe6f1;border-radius:7px}
+.frontier-reference-sidebar .frontier-campaign-toggle:hover{background:#20546c}
+.frontier-reference-sidebar .frontier-campaign-toggle[aria-expanded=true] svg{transform:rotate(180deg)}
+.frontier-reference-sidebar .frontier-campaign-subnav{display:flex;flex-direction:column;margin:0 4px 4px 45px;padding-left:9px;border-left:1px solid #3b7390}
+.frontier-reference-sidebar .frontier-campaign-subnav a{font-size:10px;min-height:29px;padding:7px 5px;color:#b6d6e8;border-radius:5px;margin:0}
+.frontier-reference-sidebar .frontier-campaign-subnav a:hover{background:#194661;color:#fff}
+.frontier-reference-sidebar .frontier-sidebar-bottom{position:relative;isolation:isolate;margin-top:auto;padding:120px 0 0;z-index:1;min-height:190px}
+.frontier-reference-sidebar .frontier-sidebar-wave{position:absolute;z-index:-1;left:-14px;bottom:36px;width:calc(100% + 30px);height:174px;pointer-events:none}
+.frontier-reference-sidebar .frontier-help-card{width:100%;display:flex;align-items:center;gap:9px;text-align:left;border-radius:10px;border:1px solid #23618a;background:linear-gradient(115deg,#07365b,#06335a);color:#fff;padding:9px 9px;min-height:61px;box-shadow:0 3px 16px #04162d77;font-weight:500}
+.frontier-reference-sidebar .frontier-help-card:hover{background:#104468;border-color:#3f8aa8}
+.frontier-reference-sidebar .frontier-help-icon{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;background:linear-gradient(145deg,#0c819e,#03516e);border-radius:50%;color:#d8feff}
+.frontier-reference-sidebar .frontier-help-text{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.frontier-reference-sidebar .frontier-help-text strong{font-size:11px;font-weight:750;white-space:nowrap}
+.frontier-reference-sidebar .frontier-help-text small{font-size:10px;color:#bdd7e4;white-space:nowrap}
+.frontier-reference-sidebar .frontier-help-card>svg{flex:none}
+.frontier-reference-sidebar .frontier-help-details{border:1px solid #256380;background:#082c49;color:#d6edf7;padding:9px;border-radius:8px;font-size:10px;line-height:1.5;margin-top:7px}
+.nav-collapsed .frontier-reference-sidebar.ref-sidebar{width:70px;min-width:70px;padding:13px 8px}
+.nav-collapsed .frontier-sidebar-brand.ref-brand{padding:0;justify-content:center;margin-bottom:17px;min-height:82px}
+.nav-collapsed .frontier-sidebar-brand .frontier-sidebar-collapse{position:absolute;top:48px;right:16px}
+.nav-collapsed .frontier-reference-sidebar .frontier-nav-link{justify-content:center;padding:9px 6px}
+.nav-collapsed .frontier-reference-sidebar .frontier-nav-link .nav-label,.nav-collapsed .frontier-sidebar-brand .frontier-brand-text,.nav-collapsed .frontier-reference-sidebar .frontier-approval-badge,.nav-collapsed .frontier-reference-sidebar .frontier-campaign-toggle,.nav-collapsed .frontier-reference-sidebar .frontier-help-text,.nav-collapsed .frontier-reference-sidebar .frontier-help-card>svg{display:none}
+.nav-collapsed .frontier-reference-sidebar .frontier-help-card{justify-content:center;padding:8px 4px}
+.nav-collapsed .frontier-reference-sidebar .frontier-help-icon{flex-basis:35px}
+@media(max-width:760px){
+ .frontier-reference-sidebar.ref-sidebar,.nav-collapsed .frontier-reference-sidebar.ref-sidebar{position:fixed;z-index:35;left:0;top:0;transform:translateX(-110%);width:208px;min-width:208px;padding:13px 11px 14px}
+ .nav-open .frontier-reference-sidebar.ref-sidebar{transform:translateX(0)}
+ .nav-collapsed .frontier-reference-sidebar .frontier-nav-link .nav-label,.nav-collapsed .frontier-sidebar-brand .frontier-brand-text,.nav-collapsed .frontier-reference-sidebar .frontier-approval-badge,.nav-collapsed .frontier-reference-sidebar .frontier-help-text,.nav-collapsed .frontier-reference-sidebar .frontier-help-card>svg{display:flex}
+ .nav-collapsed .frontier-sidebar-brand.ref-brand{min-height:54px;margin-bottom:15px;justify-content:flex-start;padding:0 4px}
+ .nav-collapsed .frontier-sidebar-brand .frontier-sidebar-collapse{position:static}
+ .nav-collapsed .frontier-reference-sidebar .frontier-nav-link{justify-content:flex-start;padding:8px 10px}
+ .nav-collapsed .frontier-reference-sidebar .frontier-campaign-toggle{display:grid}
+ .nav-collapsed .frontier-reference-sidebar .frontier-help-card{justify-content:flex-start;padding:9px}
+}
+@media(prefers-reduced-motion:reduce){.frontier-reference-sidebar .frontier-nav-row{transition:none}}
