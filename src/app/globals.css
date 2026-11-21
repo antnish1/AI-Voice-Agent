@@ -387,3 +387,21 @@ a.portal-crumb-pill:hover{background:#e5ecf6}
 @media(max-width:860px){.agent-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.agent-hero-heading h1{font-size:24px}}
 @media(max-width:600px){.agent-directory{margin:0}.agent-hero-heading{gap:10px}.agent-hero-icon{width:46px;height:46px;flex-basis:46px}.agent-hero-heading h1{font-size:23px}.agent-page-hero{gap:13px}.agent-hero-banner{padding-left:17px}.agent-banner-robot{right:-8px}.agent-hero-banner strong{font-size:13px}.agent-hero-banner p{max-width:160px}.agent-stats-grid{gap:7px}.agent-stat-card{padding:10px 9px;gap:6px;min-height:74px}.agent-stat-icon{height:32px;width:32px;flex-basis:32px}.agent-stat-card div>span{font-size:9px}.agent-stat-card strong{font-size:20px}.agent-stat-card small{font-size:8px}.agent-stat-card>svg{width:35px}.agent-card-grid{grid-template-columns:1fr}.agent-page-controls{gap:6px}.agent-page-controls select{flex:1 1 27%;font-size:10px;min-width:100px}.agent-list-search{max-width:none;flex-basis:100%}.agent-preview-card{min-height:170px}.agent-card-content{margin-top:-9px}.agent-card-copy h3{font-size:13px}.agent-card-copy p{font-size:11px}.agent-card-actions button{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.agent-preview-card{transition:none}}
+
+
+/* Compact breadcrumb path replaces top-header search on every portal page. */
+.ref-topbar{gap:14px;min-height:62px;height:auto;padding:8px 18px}
+.ref-header-breadcrumbs{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ref-header-breadcrumbs .portal-breadcrumbs{background:transparent;border:0;padding:0;min-height:0;gap:8px;max-width:100%;width:auto;overflow-x:auto}
+.ref-header-breadcrumbs .portal-crumb-back{width:31px;height:31px;flex-basis:31px;background:#edf3f8;border:1px solid #e3eaf2;color:#365c7d;font-size:21px;border-radius:9px}
+.ref-header-breadcrumbs .portal-crumb-back:hover{background:#dfeaf4}
+.ref-header-breadcrumbs .portal-crumb-compass{width:29px;height:29px;flex-basis:29px;background:#f2f6fa;border:1px solid #e3ebf3;color:#52799e;font-size:15px}
+.ref-header-breadcrumbs .portal-breadcrumbs ol{gap:5px}
+.ref-header-breadcrumbs .portal-breadcrumbs li{gap:5px}
+.ref-header-breadcrumbs .portal-crumb-chevron{width:19px;height:19px;font-size:14px;background:#edf4fa;color:#6082a9;border-color:#dfe8f2}
+.ref-header-breadcrumbs .portal-crumb-pill{min-height:30px;padding:5px 12px;background:#f3f7fb;border:1px solid #e1eaf4;color:#3c6589;border-radius:20px;font-size:11px}
+.ref-header-breadcrumbs .portal-crumb-pill.active{background:#e7f3fb;border-color:#c6e2f3;border-left:3px solid #0c93bd;color:#164467;padding-left:10px}
+.ref-header-breadcrumbs a.portal-crumb-pill:hover{background:#e1eff9}
+.ref-topbar-right{margin-left:0;flex-shrink:0}
+@media(max-width:900px){.ref-header-breadcrumbs{justify-content:flex-start}.ref-topbar{gap:8px}.ref-header-breadcrumbs .portal-crumb-compass{display:none}}
+@media(max-width:760px){.ref-topbar{padding:9px 10px}.ref-header-breadcrumbs .portal-breadcrumbs{gap:5px}.ref-header-breadcrumbs .portal-crumb-back{width:27px;height:27px;flex-basis:27px}.ref-header-breadcrumbs .portal-crumb-pill{font-size:10px;padding:5px 8px;min-height:28px}.ref-header-breadcrumbs .portal-crumb-pill.active{padding-left:7px}.ref-header-breadcrumbs .portal-crumb-chevron{width:16px;height:16px;font-size:12px}}
