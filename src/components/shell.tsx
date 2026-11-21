@@ -21,7 +21,7 @@ const navigation:Array<{name:string;url:string;icon:SidebarIconName}>=[
  {name:"Reports",url:"/reports",icon:"chart"},
  {name:"Settings",url:"/settings",icon:"settings"}
 ];
-export function Shell({children,membership,userEmail,userId,displayName,avatarPath,pendingApprovals=0}:{children:React.ReactNode;membership:Membership;userEmail:string;userId:string;displayName:string;avatarPath:string;pendingApprovals?:number}){
+export function Shell({children,membership,userEmail,userId,displayName,avatarPath,pendingApprovals=0,isItAdmin=false}:{children:React.ReactNode;membership:Membership;userEmail:string;userId:string;displayName:string;avatarPath:string;pendingApprovals?:number;isItAdmin?:boolean}){
  const path=usePathname();
  const [collapsed,setCollapsed]=useState(false),[mobile,setMobile]=useState(false),[campaignsExpanded,setCampaignsExpanded]=useState(false),[helpOpen,setHelpOpen]=useState(false);
  const campaignActive=path==="/campaigns"||path.startsWith("/campaigns/");
@@ -34,7 +34,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     <button type="button" className="collapse-control frontier-sidebar-collapse" onClick={()=>setCollapsed(!collapsed)} title={collapsed?"Expand sidebar":"Collapse sidebar"} aria-label={collapsed?"Expand sidebar":"Collapse sidebar"}><SidebarIcon name={collapsed?"chevrons-right":"chevrons-left"} size={19}/></button>
    </div>
    <nav className="frontier-sidebar-nav" aria-label="Main navigation">
-    {navigation.map(item=>{
+    {[...navigation,...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
      const active=path===item.url||(item.url==="/campaigns"&&campaignActive);
      return <div className="frontier-nav-entry" key={item.url}>
        <div className={`frontier-nav-row ${active?"selected":""}`}>
