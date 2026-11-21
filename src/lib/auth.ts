@@ -10,6 +10,7 @@ export async function requireUser() {
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) redirect("/login");
+  if(user.app_metadata?.must_change_password === true) redirect("/change-password");
   return { supabase, user };
 }
 
@@ -23,5 +24,5 @@ export async function requireMembership(dealershipId?: string) {
   return { supabase, user, membership, memberships };
 }
 
-export function canPrepare(role: Role) { return ["super_admin","dealership_manager","crm_executive"].includes(role); }
-export function canApprove(role: Role) { return ["super_admin","dealership_manager"].includes(role); }
+export function canPrepare(role: Role) { return role === "super_admin"; }
+export function canApprove(role: Role) { return role === "super_admin"; }
