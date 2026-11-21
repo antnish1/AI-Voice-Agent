@@ -33,7 +33,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
  const campaignActive=path==="/campaigns"||path.startsWith("/campaigns/");
  const closeMobile=()=>setMobile(false);
  return <div className={`app crm-app reference-app ${collapsed?"nav-collapsed":""} ${mobile?"nav-open":""}`}>
-  <motion.aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar" animate={{width:narrowScreen?255:collapsed?79:255}} transition={reducedMotion?{duration:0}:motionTokens.spring}>
+  <motion.aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar" animate={{width:narrowScreen?224:collapsed?68:224}} transition={reducedMotion?{duration:0}:motionTokens.spring}>
    <div className="brand crm-brand ref-brand frontier-sidebar-brand">
     <div className="brand-icon frontier-sidebar-logo" aria-label="FRONTIER logo">F</div>
     <span className="brand-words frontier-brand-text">FRONTIER<small>AI VOICE CRM</small></span>
@@ -43,7 +43,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     {[...navigation,...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
      const active=path===item.url||(item.url==="/campaigns"&&campaignActive);
      return <div className="frontier-nav-entry" key={item.url}>
-       <div className={`frontier-nav-row ${active?"selected":""}`}>{active&&<motion.span layoutId="frontier-active-nav" className="frontier-motion-active-nav" transition={reducedMotion?{duration:0}:motionTokens.spring} aria-hidden="true"/>}
+       <div className={`frontier-nav-row ${active?"selected":""} ${item.url==="/campaigns"?"frontier-campaign-row":""}`}>{active&&<motion.span layoutId="frontier-active-nav" className="frontier-motion-active-nav" transition={reducedMotion?{duration:0}:motionTokens.spring} aria-hidden="true"/>}
         <Link href={item.url} onClick={closeMobile} title={item.name} aria-current={active?"page":undefined} className={`frontier-nav-link ${active?"active":""}`}>
          <span className="nav-icon"><SidebarIcon name={item.icon} size={21}/></span>
          <span className="nav-label">{item.name}</span>
