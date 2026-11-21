@@ -1,4 +1,5 @@
 import Link from "next/link";
+import {CountUp} from "@/components/motion/count-up";
 import {requireMembership,canPrepare} from "@/lib/auth";
 
 type Campaign={id:string;name:string;status:string;created_at:string};
@@ -36,7 +37,7 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  {name:"Total Calls",value:"—",note:"Sarvam not connected",icon:"◕",tone:"blue"}];
  return <div className="ref-dashboard">
  <div className="ref-dashboard-heading"><div><h1>{greeting}, Dealer! <span aria-hidden="true">👋</span></h1><p>Here’s what’s happening with your AI voice campaigns today.</p></div><div className="ref-dashboard-heading-actions"><span className="ref-today-pill">▣ &nbsp; Today</span>{canPrepare(membership.role)&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div>
- <div className="ref-kpi-grid">{metrics.map(m=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}>{m.icon}</div><div><span className="ref-kpi-label">{m.name}</span><strong className="ref-kpi-value">{m.value}</strong><small className="ref-kpi-note">{m.note}</small></div></article>)}</div>
+ <div className="ref-kpi-grid">{metrics.map(m=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}>{m.icon}</div><div><span className="ref-kpi-label">{m.name}</span><CountUp className="ref-kpi-value" value={m.value}/><small className="ref-kpi-note">{m.note}</small></div></article>)}</div>
  <div className="ref-dashboard-columns">
  <div className="ref-dashboard-left">
   <section className="ref-dashboard-panel ref-performance"><div className="ref-panel-header"><div><h2><span className="ref-heading-icon">▥</span> Campaign Performance</h2><p>Campaigns created during this period; call outcomes are not connected yet.</p></div><div className="ref-date-filters"><span className="ref-selected-period">Last {days} days</span><div className="ref-range-links"><Link aria-current={days===7?"true":undefined} href="/dashboard?days=7">7D</Link><Link aria-current={days===14?"true":undefined} href="/dashboard?days=14">14D</Link><Link aria-current={days===30?"true":undefined} href="/dashboard?days=30">30D</Link></div></div></div>
