@@ -8,7 +8,7 @@ returns boolean language sql stable security invoker set search_path='' as $$
   where m.user_id=(select auth.uid())
     and m.user_id='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
     and m.role='super_admin'
- );
+ ) and exists(select 1 from public.dealerships d where d.id=p_dealership_id);
 $$;
 revoke all on function public.frontier_it_can_write(uuid) from public,anon;
 grant execute on function public.frontier_it_can_write(uuid) to authenticated;
@@ -43,29 +43,25 @@ alter policy customer_import_rows_add on public.customer_import_rows
 alter policy frontier_crm_documents_add on storage.objects
  with check (
   bucket_id='frontier-crm-private' and name like '%/%'
-  and exists(select 1 from public.memberships m
-    where m.user_id=(select auth.uid()) and m.user_id='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
-      and m.role='super_admin' and public.frontier_it_can_write(m.dealership_id))
+  and exists(select 1 from public.dealerships d
+    where d.id::text=split_part(name,'/',1) and public.frontier_it_can_write(d.id))
  );
 alter policy frontier_crm_documents_delete on storage.objects
  using (
   bucket_id='frontier-crm-private'
-  and exists(select 1 from public.memberships m
-    where m.user_id=(select auth.uid()) and m.user_id='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
-      and m.role='super_admin' and public.frontier_it_can_write(m.dealership_id))
+  and exists(select 1 from public.dealerships d
+    where d.id::text=split_part(name,'/',1) and public.frontier_it_can_write(d.id))
  );
 alter policy frontier_crm_documents_update on storage.objects
  using (
   bucket_id='frontier-crm-private'
-  and exists(select 1 from public.memberships m
-    where m.user_id=(select auth.uid()) and m.user_id='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
-      and m.role='super_admin' and public.frontier_it_can_write(m.dealership_id))
+  and exists(select 1 from public.dealerships d
+    where d.id::text=split_part(name,'/',1) and public.frontier_it_can_write(d.id))
  )
  with check (
   bucket_id='frontier-crm-private'
-  and exists(select 1 from public.memberships m
-    where m.user_id=(select auth.uid()) and m.user_id='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
-      and m.role='super_admin' and public.frontier_it_can_write(m.dealership_id))
+  and exists(select 1 from public.dealerships d
+    where d.id::text=split_part(name,'/',1) and public.frontier_it_can_write(d.id))
  );
 -- The existing import_dealership_customers RPC is SECURITY INVOKER and its
 -- database INSERT operations remain subject to the above RLS restrictions.
