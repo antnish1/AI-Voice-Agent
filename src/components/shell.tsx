@@ -3,7 +3,8 @@ import Link from "next/link";
 import {usePathname,useRouter} from "next/navigation";
 import {useEffect,useRef,useState} from "react";
 import type {Membership} from "@/lib/auth";
-import {signOut} from "@/app/login/actions";
+import {ProfileMenu} from "@/components/profile-menu";
+import {PortalBreadcrumbs} from "@/components/portal-breadcrumbs";
 
 const sections: Array<{title:string;items:Array<[string,string,string]>}>=[
  {title:"",items:[["⌂","Dashboard","/dashboard"],["◫","Campaigns","/campaigns"],["◎","AI Voice Agents","/agents"],["♙","Customers","/customers"],["☑","Approvals","/approvals"]]},
@@ -11,7 +12,7 @@ const sections: Array<{title:string;items:Array<[string,string,string]>}>=[
 ];
 
 const allPages=sections.flatMap(s=>s.items);
-export function Shell({children,membership,userEmail}:{children:React.ReactNode,membership:Membership,userEmail:string}){
+export function Shell({children,membership,userEmail,userId,displayName,avatarPath}:{children:React.ReactNode,membership:Membership,userEmail:string,userId:string,displayName:string,avatarPath:string}){
  const path=usePathname(),router=useRouter();
  const searchInput=useRef<HTMLInputElement>(null);
  useEffect(()=>{const onKey=(event:KeyboardEvent)=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){event.preventDefault();searchInput.current?.focus();}if(event.key==="Escape"){setShowSearch(false);searchInput.current?.blur();}};document.addEventListener("keydown",onKey);return ()=>document.removeEventListener("keydown",onKey);},[]);
@@ -36,11 +37,10 @@ export function Shell({children,membership,userEmail}:{children:React.ReactNode,
     </div>
     <div className="ref-topbar-right">
      <span className="ref-notification" title="Notifications will be enabled when event ingestion is ready" aria-label="Notifications not connected">♧</span>
-     <span className="ref-user-avatar">{(userEmail[0]??"D").toUpperCase()}</span>
-     <div className="ref-user-meta"><strong>{membership.dealerships?.name??"Dealership"}</strong><small>{membership.role.replaceAll("_"," ")}</small></div>
-     <details className="ref-user-menu"><summary aria-label="Profile actions">⌄</summary><div><p>{userEmail}</p><Link href="/settings">Settings</Link><form action={signOut}><button type="submit">Sign out</button></form></div></details>
+     <ProfileMenu userId={userId} email={userEmail} role={membership.role} dealershipName={membership.dealerships?.name??"Dealership"} initialName={displayName} initialAvatarPath={avatarPath}/>
     </div>
    </header>
+   <PortalBreadcrumbs/>
    <main className="main crm-main ref-main">{children}</main>
   </div>
  </div>;
