@@ -2,7 +2,9 @@
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {useState,useEffect} from "react";
-import {motion, useReducedMotion} from "motion/react";
+import {AnimatePresence,motion, useReducedMotion} from "motion/react";
+import {createPortal} from "react-dom";
+import type {FocusEvent,MouseEvent} from "react";
 import {MotionRoute} from "@/components/motion/motion-route";
 import {motionTokens} from "@/components/motion/motion-tokens";
 import type {Membership} from "@/lib/auth";
@@ -30,21 +32,38 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
  const [narrowScreen,setNarrowScreen]=useState(false);
  useEffect(()=>{const query=window.matchMedia("(max-width:760px)");const update=()=>setNarrowScreen(query.matches);update();query.addEventListener("change",update);return ()=>query.removeEventListener("change",update);},[]);
  const [collapsed,setCollapsed]=useState(false),[mobile,setMobile]=useState(false),[campaignsExpanded,setCampaignsExpanded]=useState(false),[helpOpen,setHelpOpen]=useState(false);
+ const [tooltip,setTooltip]=useState<{name:string;left:number;top:number}|null>(null);
+ const [hasMounted,setHasMounted]=useState(false);
+ useEffect(()=>{setHasMounted(true);},[]);
+ const showTooltip=(name:string,element:HTMLElement)=>{
+  if(!collapsed||narrowScreen)return;
+  const rect=element.getBoundingClientRect();
+  setTooltip({name,left:rect.right+12,top:rect.top+2});
+ };
+ const hideTooltip=()=>setTooltip(null);
+ useEffect(()=>{hideTooltip();},[collapsed,narrowScreen,path]);
  const campaignActive=path==="/campaigns"||path.startsWith("/campaigns/");
  const closeMobile=()=>setMobile(false);
  return <div className={`app crm-app reference-app ${collapsed?"nav-collapsed":""} ${mobile?"nav-open":""}`}>
   <motion.aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar" animate={{width:narrowScreen?224:collapsed?68:224}} transition={reducedMotion?{duration:0}:motionTokens.spring}>
    <div className="brand crm-brand ref-brand frontier-sidebar-brand">
-    <div className="brand-icon frontier-sidebar-logo" aria-label="FRONTIER logo">F</div>
+    {collapsed&&!narrowScreen?
+     <button type="button" className="brand-icon frontier-sidebar-logo frontier-logo-expand" onClick={()=>setCollapsed(false)} title="Expand sidebar" aria-label="Expand sidebar">F</button>:
+     <div className="brand-icon frontier-sidebar-logo" aria-label="FRONTIER logo">F</div>}
     <span className="brand-words frontier-brand-text">FRONTIER<small>AI VOICE CRM</small></span>
-    <button type="button" className="collapse-control frontier-sidebar-collapse" onClick={()=>setCollapsed(!collapsed)} title={collapsed?"Expand sidebar":"Collapse sidebar"} aria-label={collapsed?"Expand sidebar":"Collapse sidebar"}><SidebarIcon name={collapsed?"chevrons-right":"chevrons-left"} size={19}/></button>
+    {!collapsed&&!narrowScreen&&<button type="button" className="collapse-control frontier-sidebar-collapse" onClick={()=>setCollapsed(true)} title="Collapse sidebar" aria-label="Collapse sidebar"><SidebarIcon name="chevrons-left" size={19}/></button>}
    </div>
    <nav className="frontier-sidebar-nav" aria-label="Main navigation">
     {[...navigation,...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
      const active=path===item.url||(item.url==="/campaigns"&&campaignActive);
      return <div className="frontier-nav-entry" key={item.url}>
        <div className={`frontier-nav-row ${active?"selected":""} ${item.url==="/campaigns"?"frontier-campaign-row":""}`}>{active&&<motion.span layoutId="frontier-active-nav" className="frontier-motion-active-nav" transition={reducedMotion?{duration:0}:motionTokens.spring} aria-hidden="true"/>}
-        <Link href={item.url} onClick={closeMobile} title={item.name} aria-current={active?"page":undefined} className={`frontier-nav-link ${active?"active":""}`}>
+        <Link href={item.url} onClick={()=>{hideTooltip();closeMobile();}} title={!collapsed||narrowScreen?item.name:undefined} aria-label={item.name}
+         onMouseEnter={(e:MouseEvent<HTMLAnchorElement>)=>showTooltip(item.name,e.currentTarget)}
+         onMouseLeave={hideTooltip}
+         onFocus={(e:FocusEvent<HTMLAnchorElement>)=>showTooltip(item.name,e.currentTarget)}
+         onBlur={hideTooltip}
+         aria-current={active?"page":undefined} className={`frontier-nav-link ${active?"active":""}`}>
          <span className="nav-icon"><SidebarIcon name={item.icon} size={21}/></span>
          <span className="nav-label">{item.name}</span>
          {item.url==="/approvals"&&pendingApprovals>0&&<span className="frontier-approval-badge" title={`${pendingApprovals} campaigns awaiting approval`}>{pendingApprovals>99?"99+":pendingApprovals}</span>}
@@ -63,6 +82,18 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     {helpOpen&&!collapsed&&<div className="frontier-help-details" role="status">For support, contact your Frontier Group administrator.</div>}
    </div>
   </motion.aside>
+  {hasMounted&&createPortal(<AnimatePresence>
+   {tooltip&&collapsed&&!narrowScreen&&<motion.div
+    key={tooltip.name}
+    className="frontier-nav-tooltip" role="tooltip"
+    style={{left:tooltip.left,top:tooltip.top}}
+    initial={reducedMotion?false:{opacity:0,x:-7,scale:.96}}
+    animate={{opacity:1,x:0,scale:1}}
+    exit={reducedMotion?{opacity:0}:{opacity:0,x:-5,scale:.97}}
+    transition={{duration:reducedMotion?0:.16,ease:motionTokens.ease}}>
+     {tooltip.name}
+    </motion.div>}
+   </AnimatePresence>,document.body)}
   {mobile&&<button className="mobile-backdrop" aria-label="Close menu" onClick={closeMobile}/>}
   <div className="workspace crm-workspace">
    <header className="topbar crm-topbar ref-topbar">

@@ -1,0 +1,31 @@
+/* Tooltip is portal-mounted so the collapsed sidebar's scroll container cannot clip it. */
+.frontier-nav-tooltip{
+ position:fixed; z-index:1200;
+ padding:9px 13px; border-radius:10px; pointer-events:none;
+ background:#102b45; color:#f5fcff; border:1px solid rgba(140,206,225,.3);
+ box-shadow:0 10px 26px rgba(4,25,43,.24); white-space:nowrap;
+ font-size:12px; font-weight:650; letter-spacing:.01em;
+ line-height:1.25; isolation:isolate;
+}
+.frontier-nav-tooltip::before{
+ content:"";position:absolute;left:-4px;top:50%;width:8px;height:8px;
+ background:#102b45;border-left:1px solid rgba(140,206,225,.3);
+ border-bottom:1px solid rgba(140,206,225,.3);transform:translateY(-50%) rotate(45deg);
+}
+@media(prefers-reduced-motion:reduce){.frontier-nav-tooltip{animation:none;transition:none}}
+
+/* The collapsed F brand is the only expand control; accessible by mouse and keyboard. */
+.nav-collapsed .frontier-reference-sidebar .frontier-logo-expand{
+ display:grid;place-items:center;cursor:pointer;border:0;padding:0;
+ color:#fff;font-weight:800;line-height:1;
+ transition:transform 180ms ease,box-shadow 180ms ease;
+}
+.nav-collapsed .frontier-reference-sidebar .frontier-logo-expand:hover{
+ transform:scale(1.045);box-shadow:0 0 0 3px rgba(62,206,217,.18);
+}
+.nav-collapsed .frontier-reference-sidebar .frontier-logo-expand:focus-visible{
+ outline:2px solid #8bf4f1;outline-offset:4px;
+}
+@media(prefers-reduced-motion:reduce){
+ .nav-collapsed .frontier-reference-sidebar .frontier-logo-expand{transition:none}
+}
