@@ -9,13 +9,13 @@ type Props={userId:string;email:string;role:string;dealershipName:string;initial
 const bucket="frontier-profile-avatars";
 export function ProfileMenu({userId,email,role,dealershipName,initialName,initialAvatarPath}:Props){
  const router=useRouter(),supabase=useMemo(()=>createBrowserSupabase(),[]);
- const [open,setOpen]=useState(false),[passwordOpen,setPasswordOpen]=useState(false),[editOpen,setEditOpen]=useState(false);
+ const [open,setOpen]=useState(false),[detailsExpanded,setDetailsExpanded]=useState(false),[passwordOpen,setPasswordOpen]=useState(false),[editOpen,setEditOpen]=useState(false);
  const [displayName,setDisplayName]=useState(initialName||email.split("@")[0]),[editName,setEditName]=useState(initialName||email.split("@")[0]);
  const [avatarPath,setAvatarPath]=useState(initialAvatarPath),[avatarUrl,setAvatarUrl]=useState("");
  const [busy,setBusy]=useState(false),[error,setError]=useState(""),[message,setMessage]=useState("");
  const [password,setPassword]=useState(""),[confirm,setConfirm]=useState("");
  const wrapper=useRef<HTMLDivElement>(null),fileInput=useRef<HTMLInputElement>(null);
- useEffect(()=>{const close=(e:PointerEvent)=>{if(wrapper.current&&!wrapper.current.contains(e.target as Node))setOpen(false);};const escape=(e:KeyboardEvent)=>{if(e.key==="Escape"){setOpen(false);setPasswordOpen(false);setEditOpen(false);}};document.addEventListener("pointerdown",close);document.addEventListener("keydown",escape);return()=>{document.removeEventListener("pointerdown",close);document.removeEventListener("keydown",escape);};},[]);
+ useEffect(()=>{const close=(e:PointerEvent)=>{if(wrapper.current&&!wrapper.current.contains(e.target as Node)){setOpen(false);setDetailsExpanded(false);}};const escape=(e:KeyboardEvent)=>{if(e.key==="Escape"){setOpen(false);setDetailsExpanded(false);setPasswordOpen(false);setEditOpen(false);}};document.addEventListener("pointerdown",close);document.addEventListener("keydown",escape);return()=>{document.removeEventListener("pointerdown",close);document.removeEventListener("keydown",escape);};},[]);
  useEffect(()=>{let active=true;if(!avatarPath||!avatarPath.startsWith(userId+"/")){setAvatarUrl("");return;}void supabase.storage.from(bucket).createSignedUrl(avatarPath,3600).then(({data,error})=>{if(active)setAvatarUrl(!error&&data?.signedUrl?data.signedUrl:"");});return()=>{active=false;};},[avatarPath,userId,supabase]);
  const initials=displayName.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase()||"U";
  const showError=(text:string)=>{setError(text);setMessage("");};
@@ -64,8 +64,8 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
   setPassword("");setConfirm("");setPasswordOpen(false);setMessage("Password changed successfully.");
  };
  const avatar=(className:string)=><span className={className}>{avatarUrl?<img src={avatarUrl} alt="Your profile photo" referrerPolicy="no-referrer"/>:initials}</span>;
- return <div className="portal-profile" ref={wrapper} onPointerEnter={e=>{if(e.pointerType==="mouse"&&!(passwordOpen||editOpen))setOpen(true);}} onPointerLeave={e=>{if(e.pointerType==="mouse"&&!(passwordOpen||editOpen))setOpen(false);}}>
-  <button type="button" className="portal-profile-trigger" aria-label="Open profile menu" title="Profile and account options" aria-haspopup="menu" aria-expanded={open} onClick={()=>setOpen(true)} onFocus={()=>setOpen(true)}>
+ return <div className="portal-profile" ref={wrapper} onPointerEnter={e=>{if(e.pointerType==="mouse"&&!(passwordOpen||editOpen))setOpen(true);}} onPointerLeave={e=>{if(e.pointerType==="mouse"&&!(passwordOpen||editOpen)){setOpen(false);setDetailsExpanded(false);}}}>
+  <button type="button" className="portal-profile-trigger" aria-label="Open profile menu" title="Profile and account options" aria-haspopup="menu" aria-expanded={open} onClick={()=>{setOpen(true);}} onFocus={()=>setOpen(true)}>
    {avatar("portal-profile-avatar")}
   </button>
   {open&&<div className="portal-profile-panel" role="menu" aria-label="Account menu">
@@ -73,8 +73,8 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
     {avatar("portal-profile-avatar large")}
     <button type="button" className="portal-profile-camera" title="Upload profile picture" aria-label="Add or change profile photo" disabled={busy} onClick={()=>fileInput.current?.click()}>📷</button>
     <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={e=>void upload(e.target.files?.[0])}/>
-   </div><div className="portal-profile-identity-copy"><strong>{displayName}</strong><button type="button" onClick={()=>{setEditName(displayName);setError("");setEditOpen(true);}}>View / edit user details</button></div></div>
-   <dl className="portal-profile-facts"><div><dt>Email</dt><dd title={email}>{email}</dd></div><div><dt>Role</dt><dd>{role.replaceAll("_"," ")}</dd></div><div><dt>Status</dt><dd>Active</dd></div></dl>
+   </div><div className="portal-profile-identity-copy"><strong>{displayName}</strong><button type="button" className="portal-profile-details-toggle" aria-expanded={detailsExpanded} aria-controls="portal-profile-expanded-details" onClick={()=>setDetailsExpanded(v=>!v)}>{detailsExpanded?"Hide user details":"View user details"}</button></div></div>
+   {detailsExpanded&&<div id="portal-profile-expanded-details" className="portal-profile-expanded"><dl className="portal-profile-facts"><div><dt>Email</dt><dd title={email}>{email}</dd></div><div><dt>Role</dt><dd>{role.replaceAll("_"," ")}</dd></div><div><dt>Status</dt><dd>Active</dd></div></dl><button type="button" className="portal-profile-edit-details" onClick={()=>{setEditName(displayName);setError("");setEditOpen(true);}}>Edit profile name <span aria-hidden="true">→</span></button></div>}
    {message&&<p role="status" className="portal-profile-success">{message}</p>}
    {error&&!passwordOpen&&!editOpen&&<p role="alert" className="portal-profile-error">{error}</p>}
    <div className="portal-profile-actions"><button role="menuitem" type="button" onClick={()=>{setError("");setPassword("");setConfirm("");setPasswordOpen(true);}}>Reset Password <span>→</span></button><Link role="menuitem" href="/settings" onClick={()=>setOpen(false)}>Account Settings <span>→</span></Link><form action={signOut}><button role="menuitem" type="submit" className="portal-logout">Logout <span>↗</span></button></form></div>
