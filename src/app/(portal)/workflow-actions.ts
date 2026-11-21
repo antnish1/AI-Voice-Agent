@@ -20,7 +20,8 @@ export async function createWorkflow(data:FormData):Promise<{error?:string;ok?:b
   if(!(kind in TABLES))return {error:"Invalid workflow."};
   const dealerId=value(data,"dealership_id",36),name=value(data,"customer_name",150),mobile=value(data,"mobile",20);
   const note=value(data,"notes",2000),time=value(data,"scheduled_at",50);
-  const timestamp=new Date(time);
+  // HTML datetime-local values are interpreted in the dealership's India timezone.
+  const timestamp=new Date(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(time)?time+":00+05:30":"invalid");
   if(!uuid.test(dealerId)||name.length<2||name.length>150||!phone.test(mobile)||note.length>2000||!time||!Number.isFinite(timestamp.getTime()))return {error:"Check customer, phone and date/time."};
   const {supabase,membership,user}=await requireMembership(dealerId);
   if(!membership||!canPrepare(membership.role))return {error:"Only the IT Super User may manage records."};
