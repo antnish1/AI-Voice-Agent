@@ -1,2 +1,6 @@
 import {requireMembership} from "@/lib/auth";
-export default async function Agents(){const {membership}=await requireMembership();if(!membership)return null;return <><div className="page-head"><div><p className="eyebrow">AI INFRASTRUCTURE</p><h1>AI Voice Agents</h1><p>Manage the agents made available to your dealership.</p></div></div><section className="crm-panel"><div className="helper-banner">Sarvam is not connected. No agent list or published versions can be verified or selected yet.</div><div className="empty-state"><span className="empty-glyph">◎</span><strong>Agent directory will appear here</strong><p>After API integration, authorized versions of Kajal and other agents will be synced automatically. No example agents are shown as real.</p></div></section></>}
+import {AgentsDirectory} from "./agents-directory";
+export default async function Agents(){
+ const {membership}=await requireMembership();if(!membership)return null;
+ return <AgentsDirectory/>;
+}
