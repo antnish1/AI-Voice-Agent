@@ -391,7 +391,7 @@ a.portal-crumb-pill:hover{background:#e5ecf6}
 
 /* Compact breadcrumb path replaces top-header search on every portal page. */
 .ref-topbar{gap:14px;min-height:62px;height:auto;padding:8px 18px}
-.ref-header-breadcrumbs{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ref-header-breadcrumbs{flex:1;min-width:0;display:flex;align-items:center;justify-content:flex-start;overflow:hidden}
 .ref-header-breadcrumbs .portal-breadcrumbs{background:transparent;border:0;padding:0;min-height:0;gap:8px;max-width:100%;width:auto;overflow-x:auto}
 .ref-header-breadcrumbs .portal-crumb-back{width:31px;height:31px;flex-basis:31px;background:#edf3f8;border:1px solid #e3eaf2;color:#365c7d;font-size:21px;border-radius:9px}
 .ref-header-breadcrumbs .portal-crumb-back:hover{background:#dfeaf4}
