@@ -8,7 +8,10 @@ type ImportBatch={id:string;filename:string;imported_rows:number;rejected_rows:n
 const localDate=(date:string|Date)=>new Date(date).toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"});
 const formatted=(date:string)=>new Date(date).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Kolkata"});
 export default async function Dashboard({searchParams}:{searchParams:Promise<{days?:string}>}){
- const {supabase,membership}=await requireMembership();if(!membership)return null;
+ const {supabase,user,membership}=await requireMembership();if(!membership)return null;
+ const profileName=typeof user.user_metadata?.display_name==="string"?user.user_metadata.display_name.trim():"";
+ const fallbackName=(user.email??"").split("@")[0]?.trim()||"there";
+ const userName=(profileName||fallbackName).slice(0,80);
  const id=membership.dealership_id;
  const {days:rangeInput}=await searchParams;
  const days=rangeInput==="30"?30:rangeInput==="14"?14:7;
@@ -36,7 +39,7 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  {name:"Pending Approvals",value:String(approvalCount.count??0),note:"Awaiting manager review",icon:"◷",tone:"amber"},
  {name:"Total Calls",value:"—",note:"Sarvam not connected",icon:"◕",tone:"blue"}];
  return <div className="ref-dashboard">
- <div className="ref-dashboard-heading"><div><h1>{greeting}, Dealer! <span aria-hidden="true">👋</span></h1><p>Here’s what’s happening with your AI voice campaigns today.</p></div><div className="ref-dashboard-heading-actions"><span className="ref-today-pill">▣ &nbsp; Today</span>{canPrepare(membership.role)&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div>
+ <div className="ref-dashboard-heading"><div><h1>{greeting}, {userName}! <span aria-hidden="true">👋</span></h1><p>Here’s what’s happening with your AI voice campaigns today.</p></div><div className="ref-dashboard-heading-actions"><span className="ref-today-pill">▣ &nbsp; Today</span>{canPrepare(membership.role)&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div>
  <div className="ref-kpi-grid">{metrics.map(m=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}>{m.icon}</div><div><span className="ref-kpi-label">{m.name}</span><CountUp className="ref-kpi-value" value={m.value}/><small className="ref-kpi-note">{m.note}</small></div></article>)}</div>
  <div className="ref-dashboard-columns">
  <div className="ref-dashboard-left">
