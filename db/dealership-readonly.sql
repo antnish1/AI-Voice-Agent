@@ -70,3 +70,44 @@ alter policy frontier_crm_documents_update on storage.objects
  );
 -- The existing import_dealership_customers RPC is SECURITY INVOKER and its
 -- database INSERT operations remain subject to the above RLS restrictions.
+
+
+-- Block direct Data API reads until a newly invited user changes their temporary
+-- password. This is based on signed app_metadata (never user_metadata).
+create or replace function public.frontier_password_setup_complete()
+returns boolean language sql stable security invoker set search_path='' as $$
+ select coalesce((auth.jwt()->'app_metadata'->>'must_change_password')::boolean,false)=false;
+$$;
+revoke all on function public.frontier_password_setup_complete() from public,anon;
+grant execute on function public.frontier_password_setup_complete() to authenticated;
+
+alter policy memberships_self_read on public.memberships
+ using (user_id=(select auth.uid()) and public.frontier_password_setup_complete());
+alter policy dealerships_membership_read on public.dealerships
+ using (public.frontier_password_setup_complete() and exists(
+  select 1 from public.memberships m where m.dealership_id=dealerships.id and m.user_id=(select auth.uid())
+ ));
+alter policy customers_membership_read on public.customers
+ using (public.frontier_password_setup_complete() and exists(
+  select 1 from public.memberships m where m.dealership_id=customers.dealership_id and m.user_id=(select auth.uid())
+ ));
+alter policy campaigns_membership_read on public.campaigns
+ using (public.frontier_password_setup_complete() and exists(
+  select 1 from public.memberships m where m.dealership_id=campaigns.dealership_id and m.user_id=(select auth.uid())
+ ));
+alter policy campaign_draft_configs_read on public.campaign_draft_configs
+ using (public.frontier_password_setup_complete() and exists(
+  select 1 from public.memberships m where m.dealership_id=campaign_draft_configs.dealership_id and m.user_id=(select auth.uid())
+ ));
+alter policy customer_import_batches_read on public.customer_import_batches
+ using (public.frontier_password_setup_complete() and exists(
+  select 1 from public.memberships m where m.dealership_id=customer_import_batches.dealership_id and m.user_id=(select auth.uid())
+ ));
+alter policy customer_import_rows_read on public.customer_import_rows
+ using (public.frontier_password_setup_complete() and exists(
+  select 1 from public.memberships m where m.dealership_id=customer_import_rows.dealership_id and m.user_id=(select auth.uid())
+ ));
+alter policy frontier_crm_documents_read on storage.objects
+ using (bucket_id='frontier-crm-private' and public.frontier_password_setup_complete()
+ and exists(select 1 from public.memberships m
+  where m.user_id=(select auth.uid()) and m.dealership_id::text=split_part(name,'/',1)));
