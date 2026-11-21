@@ -1,6 +1,6 @@
 -- Frontier CRM: dealerships are read-only; only the verified IT Super User can write.
 -- Deploy this migration BEFORE the updated frontend and user-management Edge Function.
--- Existing SELECT policies remain dealership-scoped and unchanged.
+-- Dealer SELECT remains dealership-scoped. IT Super User may manage all dealerships.
 create or replace function public.frontier_it_can_write(p_dealership_id uuid)
 returns boolean language sql stable security invoker set search_path='' as $$
  select exists(
@@ -8,7 +8,6 @@ returns boolean language sql stable security invoker set search_path='' as $$
   where m.user_id=(select auth.uid())
     and m.user_id='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
     and m.role='super_admin'
-    and m.dealership_id=p_dealership_id
  );
 $$;
 revoke all on function public.frontier_it_can_write(uuid) from public,anon;
@@ -46,27 +45,27 @@ alter policy frontier_crm_documents_add on storage.objects
   bucket_id='frontier-crm-private' and name like '%/%'
   and exists(select 1 from public.memberships m
     where m.user_id=(select auth.uid()) and m.user_id='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
-      and m.role='super_admin' and m.dealership_id::text=split_part(name,'/',1))
+      and m.role='super_admin' and public.frontier_it_can_write(m.dealership_id))
  );
 alter policy frontier_crm_documents_delete on storage.objects
  using (
   bucket_id='frontier-crm-private'
   and exists(select 1 from public.memberships m
     where m.user_id=(select auth.uid()) and m.user_id='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
-      and m.role='super_admin' and m.dealership_id::text=split_part(name,'/',1))
+      and m.role='super_admin' and public.frontier_it_can_write(m.dealership_id))
  );
 alter policy frontier_crm_documents_update on storage.objects
  using (
   bucket_id='frontier-crm-private'
   and exists(select 1 from public.memberships m
     where m.user_id=(select auth.uid()) and m.user_id='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
-      and m.role='super_admin' and m.dealership_id::text=split_part(name,'/',1))
+      and m.role='super_admin' and public.frontier_it_can_write(m.dealership_id))
  )
  with check (
   bucket_id='frontier-crm-private'
   and exists(select 1 from public.memberships m
     where m.user_id=(select auth.uid()) and m.user_id='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
-      and m.role='super_admin' and m.dealership_id::text=split_part(name,'/',1))
+      and m.role='super_admin' and public.frontier_it_can_write(m.dealership_id))
  );
 -- The existing import_dealership_customers RPC is SECURITY INVOKER and its
 -- database INSERT operations remain subject to the above RLS restrictions.
@@ -82,32 +81,32 @@ revoke all on function public.frontier_password_setup_complete() from public,ano
 grant execute on function public.frontier_password_setup_complete() to authenticated;
 
 alter policy memberships_self_read on public.memberships
- using (user_id=(select auth.uid()) and public.frontier_password_setup_complete());
+ using (public.frontier_password_setup_complete() and (user_id=(select auth.uid()) or (select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid));
 alter policy dealerships_membership_read on public.dealerships
- using (public.frontier_password_setup_complete() and exists(
+ using (public.frontier_password_setup_complete() and ((select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid or exists(
   select 1 from public.memberships m where m.dealership_id=dealerships.id and m.user_id=(select auth.uid())
- ));
+ )));
 alter policy customers_membership_read on public.customers
- using (public.frontier_password_setup_complete() and exists(
+ using (public.frontier_password_setup_complete() and ((select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid or exists(
   select 1 from public.memberships m where m.dealership_id=customers.dealership_id and m.user_id=(select auth.uid())
- ));
+ )));
 alter policy campaigns_membership_read on public.campaigns
- using (public.frontier_password_setup_complete() and exists(
+ using (public.frontier_password_setup_complete() and ((select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid or exists(
   select 1 from public.memberships m where m.dealership_id=campaigns.dealership_id and m.user_id=(select auth.uid())
- ));
+ )));
 alter policy campaign_draft_configs_read on public.campaign_draft_configs
- using (public.frontier_password_setup_complete() and exists(
+ using (public.frontier_password_setup_complete() and ((select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid or exists(
   select 1 from public.memberships m where m.dealership_id=campaign_draft_configs.dealership_id and m.user_id=(select auth.uid())
- ));
+ )));
 alter policy customer_import_batches_read on public.customer_import_batches
- using (public.frontier_password_setup_complete() and exists(
+ using (public.frontier_password_setup_complete() and ((select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid or exists(
   select 1 from public.memberships m where m.dealership_id=customer_import_batches.dealership_id and m.user_id=(select auth.uid())
- ));
+ )));
 alter policy customer_import_rows_read on public.customer_import_rows
- using (public.frontier_password_setup_complete() and exists(
+ using (public.frontier_password_setup_complete() and ((select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid or exists(
   select 1 from public.memberships m where m.dealership_id=customer_import_rows.dealership_id and m.user_id=(select auth.uid())
- ));
+ )));
 alter policy frontier_crm_documents_read on storage.objects
  using (bucket_id='frontier-crm-private' and public.frontier_password_setup_complete()
  and exists(select 1 from public.memberships m
-  where m.user_id=(select auth.uid()) and m.dealership_id::text=split_part(name,'/',1)));
+  where m.user_id=(select auth.uid()) and public.frontier_it_can_write(m.dealership_id)));
