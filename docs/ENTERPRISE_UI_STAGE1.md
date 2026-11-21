@@ -9,17 +9,18 @@ Date: 2026-11-21
 - Draft campaign configuration saved to Supabase via atomic, RLS-guarded RPC.
 - UI shells for AI Voice Agents, Documents and Settings.
 - No changes to Sarvam voice, TTS, agent settings, or API connection.
+- Private Supabase Storage for documents, with create, signed preview, replace and delete controls.
 - No call launch, test calls or production deployment.
 
 ## Existing Supabase project changes
-Migration: `frontier_crm_stage1_campaign_draft_configs`
+Migrations: `frontier_crm_stage1_campaign_draft_configs` and `frontier_crm_stage1_private_dealership_documents`
 New `public.campaign_draft_configs` table, RLS policies and `public.create_campaign_draft_with_config` function.
-Existing customer/campaign records and manager-approval trigger left intact.
+Storage bucket: `frontier-crm-private`, private, 10 MB per file, policies restricted by authenticated user's dealership membership. Existing customer/campaign records and manager-approval trigger left intact.
 
 ## Known incomplete features
 - CSV is only previewed in browser. The recipient contents are **not** imported.
 - Excel parsing, recipient persistence, suppression/consent checks and detailed mapping are pending.
-- Documents are not uploaded or persisted. Private storage and file policies are pending.
+- Dealership documents now have a private Supabase Storage bucket, tenant-scoped upload/list/replace/delete policies and a working UI. End-to-end browser auth and Storage tests with multiple dealership accounts are still pending.
 - Agent, version, phone and telephony labels are manual draft inputs, not verified Sarvam references.
 - Manager approvals still represent draft-state decisions only, not approval of an immutable contact cohort.
 - Full Super Admin multi-dealership switching, additional operations modules, and analytics are pending.
