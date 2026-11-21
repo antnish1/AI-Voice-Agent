@@ -58,3 +58,13 @@ test("IT dealership switcher is server-authorized and cannot be forged by dealer
  assert.match(auth,/user\.email\?\.toLowerCase\(\)==="it@insureit.in"/);
  assert.match(auth,/supabase\.from\("dealerships"\)/);
 });
+
+test("Sarvam connection accepts documented string IDs and reports provider diagnostics",()=>{
+ assert.match(health,/function validateId/);
+ assert.doesNotMatch(health,/const slug=\/\^\[A-Za-z0-9\]/);
+ assert.match(health,/encodeURIComponent\(org\.id!\)/);
+ assert.match(health,/encodeURIComponent\(workspace\.id!\)/);
+ for(const status of ["401","403","404","422","429"])assert.match(health,new RegExp("response.status==="+status));
+ assert.match(health,/method:"GET"/);
+ assert.doesNotMatch(health,/JSON\.stringify\(\{.*key/);
+});
