@@ -126,3 +126,22 @@
  .frontier-voice-waveform span{transform:scaleY(.35)!important}
  .frontier-motion-route:before{display:none}
 }
+
+/* Skeletons appear only during genuine route loading. */
+.frontier-page-skeleton{padding:18px 0 45px;min-height:50vh;display:grid;gap:22px;align-content:start}
+.frontier-skeleton-breadcrumb,.frontier-skeleton-heading,.frontier-skeleton-card i,.frontier-skeleton-card b,.frontier-skeleton-card span,.frontier-skeleton-panels>div{
+ background:linear-gradient(105deg,#e9f0f3 14%,#f8fbfc 30%,#e9f0f3 47%);background-size:260% 100%;
+ animation:fm-shimmer 1.75s ease-in-out infinite;border-radius:12px}
+.frontier-skeleton-breadcrumb{width:170px;height:13px}
+.frontier-skeleton-heading{width:min(320px,65%);height:32px}
+.frontier-skeleton-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.frontier-skeleton-card{height:140px;padding:20px;background:#fff;border:1px solid #ebf0f3;border-radius:15px;display:grid;gap:15px;align-content:center}
+.frontier-skeleton-card i{height:32px;width:32px}
+.frontier-skeleton-card b{height:22px;width:68%}
+.frontier-skeleton-card span{height:11px;width:80%}
+.frontier-skeleton-panels{display:grid;grid-template-columns:1.6fr 1fr;gap:17px}
+.frontier-skeleton-panels>div{height:250px}
+.frontier-motion-route [data-motion-ready="true"].frontier-motion-lift{transition:opacity .38s ease,transform .48s var(--fm-ease),box-shadow 260ms ease,border-color 220ms ease!important}
+@keyframes fm-shimmer{from{background-position:120% 0}to{background-position:-120% 0}}
+@media(max-width:900px){.frontier-skeleton-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.frontier-skeleton-panels{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.frontier-page-skeleton *{animation:none!important}}
