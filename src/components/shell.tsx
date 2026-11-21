@@ -26,7 +26,7 @@ const navigation:Array<{name:string;url:string;icon:SidebarIconName}>=[
  {name:"Reports",url:"/reports",icon:"chart"},
  {name:"Settings",url:"/settings",icon:"settings"}
 ];
-export function Shell({children,membership,userEmail,userId,displayName,avatarPath,pendingApprovals=0,isItAdmin=false}:{children:React.ReactNode;membership:Membership;userEmail:string;userId:string;displayName:string;avatarPath:string;pendingApprovals?:number;isItAdmin?:boolean}){
+export function Shell({children,membership,userEmail,userId,displayName,avatarPath,pendingApprovals=0,isItAdmin=false,availableDealerships=[]}:{children:React.ReactNode;membership:Membership;userEmail:string;userId:string;displayName:string;avatarPath:string;pendingApprovals?:number;isItAdmin?:boolean;availableDealerships?:Array<{id:string;name:string}>}){
  const path=usePathname();
  const reducedMotion=useReducedMotion();
  const [narrowScreen,setNarrowScreen]=useState(false);
@@ -100,6 +100,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     <button type="button" className="ref-menu-toggle" onClick={()=>{if(window.innerWidth<=760)setMobile(!mobile);else setCollapsed(!collapsed);}} aria-label="Toggle navigation">☰</button>
     <div className="ref-header-breadcrumbs"><PortalBreadcrumbs/></div>
     <div className="ref-topbar-right">
+     {isItAdmin&&availableDealerships.length>0&&<label className="frontier-dealer-switch"><span>Dealership</span><select aria-label="Select dealership" value={membership.dealership_id} onChange={async e=>{const id=e.target.value;const r=await fetch("/api/dealership/select",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({dealershipId:id})});if(r.ok)window.location.reload();else alert("Unable to switch dealership.");}}>{availableDealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></label>}
      <span className="ref-notification" title="Notifications will be enabled when event ingestion is ready" aria-label="Notifications not connected">♧</span>
      <ProfileMenu userId={userId} email={userEmail} role={membership.role} dealershipName={membership.dealerships?.name??"Dealership"} initialName={displayName} initialAvatarPath={avatarPath}/>
     </div>

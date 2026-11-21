@@ -1333,3 +1333,46 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 .it-user-footnote{color:#8a9caf;font-size:10px;margin:14px 1px;line-height:1.5}
 @media(max-width:1100px){.it-user-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.it-user-grid{grid-template-columns:1fr}}
 @media(max-width:580px){.it-user-heading h1{font-size:24px}.it-user-stats{gap:8px}.it-user-card{padding:13px}}
+
+
+/* Real CRM operations: reuse FRONTIER card/typography palette without altering shell. */
+.crm-operations{background:#fff;border:1px solid #e2eaf1;border-radius:13px;padding:20px;box-shadow:0 3px 12px #092c4909;color:#294662;margin-top:18px;font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+.crm-ops-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.crm-ops-heading h2{font-size:17px;margin:0 0 7px;color:#173e61}
+.crm-ops-heading p{font-size:11px;color:#8296a9;line-height:1.5;margin:0}
+.crm-ops-heading button,.crm-ops-form>button,.crm-ops-update>button[type=submit]{border:0;border-radius:8px;background:#0a8f9c;color:#fff;font-weight:700;font-size:11px;padding:11px 15px}
+.crm-ops-readonly{color:#187a77;background:#e2f7f3;padding:8px 12px;border-radius:20px;font-size:11px;font-weight:700}
+.crm-ops-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:18px 0}
+.crm-ops-stats>div{border:1px solid #e5edf4;border-radius:9px;padding:13px 16px;display:grid;gap:7px;background:#f9fcfe}
+.crm-ops-stats span{color:#8297a9;font-size:11px}.crm-ops-stats strong{font-size:23px;font-weight:750;color:#0c3a5b}
+.crm-ops-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;border:1px solid #d0e8ed;border-radius:10px;padding:16px;margin:18px 0;background:#f7fcfd}
+.crm-ops-form label,.crm-ops-update label{display:grid;gap:7px;font-size:11px;font-weight:650;color:#385573;min-width:0}
+.crm-ops-form input,.crm-ops-form textarea,.crm-ops-form select,.crm-ops-update select,.crm-ops-toolbar input,.crm-ops-toolbar select{border:1px solid #dae7ee;border-radius:7px;padding:10px;min-width:0;background:white;color:#294762;font-size:12px;font-family:inherit}
+.crm-ops-form input:focus,.crm-ops-form textarea:focus,.crm-ops-update select:focus{outline:2px solid #20afbb60}
+.crm-ops-notes{grid-column:span 3}
+.crm-ops-form-hint{grid-column:span 2;color:#7793a5;font-size:10px;line-height:1.5}
+.crm-ops-toolbar{display:flex;gap:9px;margin:18px 0 10px;align-items:center;flex-wrap:wrap}
+.crm-ops-toolbar input{flex:1;min-width:180px}
+.crm-ops-toolbar select{min-width:135px}
+.crm-ops-toolbar button,.crm-ops-update>button[type=button]{border:1px solid #d8e6ed;padding:10px 13px;border-radius:7px;background:#f3f8fb;color:#426980;font-size:11px}
+.crm-ops-table{width:100%;border-collapse:collapse;font-size:11px}
+.crm-ops-table th{background:#eff5fa;color:#52718b;text-align:left;font-size:10px;padding:12px 10px;white-space:nowrap}
+.crm-ops-table td{padding:13px 10px;color:#3c5872;border-bottom:1px solid #e9eef3;vertical-align:top}
+.crm-ops-table td strong{display:block}.crm-ops-table td small{display:block;color:#879eae;margin-top:5px;font-size:10px}
+.crm-ops-table td button{background:#eaf6fa;color:#0a7f92;border-radius:6px;padding:8px 10px;white-space:nowrap;font-size:10px}
+.crm-ops-status{font-size:10px;color:#167d7a;background:#e5f8f5;border-radius:20px;padding:5px 9px;white-space:nowrap;text-transform:capitalize}
+.crm-ops-empty{text-align:center;padding:35px 14px!important;color:#8ca0b1!important}
+.crm-ops-update{display:flex;align-items:end;flex-wrap:wrap;gap:12px;border-radius:9px;background:#f4fafb;padding:13px;margin-top:12px}
+.crm-ops-update>div{display:grid;gap:5px;min-width:145px}
+.crm-ops-update>div strong{font-size:11px}.crm-ops-update>div small{font-size:10px;color:#829cac}
+.crm-ops-update .crm-ops-verify{display:flex;align-items:center;gap:8px;max-width:250px;font-size:10px}
+.crm-ops-error,.crm-ops-success{padding:10px 13px;font-size:11px;background:#fff1f1;color:#b24747;border-radius:8px;margin:12px 0}
+.crm-ops-success{background:#e8f8ef;color:#158060}
+.crm-ops-bottom-note{margin:16px 0 0;color:#879cac;font-size:10px;line-height:1.5}
+@media(max-width:900px){.crm-ops-form{grid-template-columns:repeat(2,minmax(0,1fr))}.crm-ops-notes{grid-column:span 2}}
+@media(max-width:550px){.crm-operations{padding:12px}.crm-ops-form{grid-template-columns:1fr}.crm-ops-notes,.crm-ops-form-hint{grid-column:span 1}.crm-ops-stats{gap:6px}.crm-ops-stats>div{padding:10px}.crm-ops-stats strong{font-size:19px}}
+
+/* Verified IT account only: compact dealership chooser in shared header */
+.frontier-dealer-switch{display:flex;align-items:center;gap:7px;max-width:260px;font-size:10px;color:#52708b;font-weight:650;white-space:nowrap}
+.frontier-dealer-switch select{min-width:100px;max-width:165px;width:100%;background:#f5fafc;color:#234967;border:1px solid #d9e7ed;border-radius:7px;padding:7px 9px;font-size:11px}
+@media(max-width:850px){.frontier-dealer-switch span{display:none}.frontier-dealer-switch select{max-width:116px}}

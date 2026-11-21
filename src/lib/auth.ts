@@ -1,5 +1,6 @@
 import "server-only";
 import { redirect } from "next/navigation";
+import {cookies} from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 export const ROLES = ["super_admin", "dealership_manager", "crm_executive", "service_team", "management"] as const;
@@ -19,7 +20,17 @@ export async function requireMembership(dealershipId?: string) {
   const { data, error } = await supabase.from("memberships").select("dealership_id, role, dealerships(name)").eq("user_id", user.id);
   if (error) throw new Error("Unable to load dealership access.");
   const memberships = (data ?? []) as unknown as Membership[];
-  const membership = dealershipId ? memberships.find(m => m.dealership_id === dealershipId) : memberships[0];
+  const superRole=memberships.some(m=>m.role==="super_admin");
+  const isIt=user.id==="5bd78ada-44f5-4045-a9fb-75c9dad69893" && user.email?.toLowerCase()==="it@insureit.in" && superRole;
+  const cookieSelected=isIt?((await cookies()).get("frontier_active_dealership")?.value??""):"";
+  const requested=dealershipId||cookieSelected;
+  let membership=requested?memberships.find(m=>m.dealership_id===requested):memberships[0];
+  if(isIt&&requested&&!membership){
+    // Global IT access is verified by the account identity AND its super_admin membership.
+    // A dealership cookie alone never grants access to an ordinary dealership account.
+    const {data:dealer,error:dealerError}=await supabase.from("dealerships").select("id,name").eq("id",requested).maybeSingle();
+    if(!dealerError&&dealer)membership={dealership_id:dealer.id,role:"super_admin",dealerships:{name:dealer.name}};
+  }
   if (!membership) return { supabase, user, membership: null, memberships };
   return { supabase, user, membership, memberships };
 }
