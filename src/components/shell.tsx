@@ -1,7 +1,10 @@
 "use client";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
-import {useState} from "react";
+import {useState,useEffect} from "react";
+import {motion, useReducedMotion} from "motion/react";
+import {MotionRoute} from "@/components/motion/motion-route";
+import {motionTokens} from "@/components/motion/motion-tokens";
 import type {Membership} from "@/lib/auth";
 import {ProfileMenu} from "@/components/profile-menu";
 import {PortalBreadcrumbs} from "@/components/portal-breadcrumbs";
@@ -23,11 +26,14 @@ const navigation:Array<{name:string;url:string;icon:SidebarIconName}>=[
 ];
 export function Shell({children,membership,userEmail,userId,displayName,avatarPath,pendingApprovals=0,isItAdmin=false}:{children:React.ReactNode;membership:Membership;userEmail:string;userId:string;displayName:string;avatarPath:string;pendingApprovals?:number;isItAdmin?:boolean}){
  const path=usePathname();
+ const reducedMotion=useReducedMotion();
+ const [narrowScreen,setNarrowScreen]=useState(false);
+ useEffect(()=>{const query=window.matchMedia("(max-width:760px)");const update=()=>setNarrowScreen(query.matches);update();query.addEventListener("change",update);return ()=>query.removeEventListener("change",update);},[]);
  const [collapsed,setCollapsed]=useState(false),[mobile,setMobile]=useState(false),[campaignsExpanded,setCampaignsExpanded]=useState(false),[helpOpen,setHelpOpen]=useState(false);
  const campaignActive=path==="/campaigns"||path.startsWith("/campaigns/");
  const closeMobile=()=>setMobile(false);
  return <div className={`app crm-app reference-app ${collapsed?"nav-collapsed":""} ${mobile?"nav-open":""}`}>
-  <aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar">
+  <motion.aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar" animate={{width:narrowScreen?255:collapsed?79:255}} transition={reducedMotion?{duration:0}:motionTokens.spring}>
    <div className="brand crm-brand ref-brand frontier-sidebar-brand">
     <div className="brand-icon frontier-sidebar-logo" aria-label="FRONTIER logo">F</div>
     <span className="brand-words frontier-brand-text">FRONTIER<small>AI VOICE CRM</small></span>
@@ -37,7 +43,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     {[...navigation,...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
      const active=path===item.url||(item.url==="/campaigns"&&campaignActive);
      return <div className="frontier-nav-entry" key={item.url}>
-       <div className={`frontier-nav-row ${active?"selected":""}`}>
+       <div className={`frontier-nav-row ${active?"selected":""}`}>{active&&<motion.span layoutId="frontier-active-nav" className="frontier-motion-active-nav" transition={reducedMotion?{duration:0}:motionTokens.spring} aria-hidden="true"/>}
         <Link href={item.url} onClick={closeMobile} title={item.name} aria-current={active?"page":undefined} className={`frontier-nav-link ${active?"active":""}`}>
          <span className="nav-icon"><SidebarIcon name={item.icon} size={21}/></span>
          <span className="nav-label">{item.name}</span>
@@ -56,7 +62,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     </button>
     {helpOpen&&!collapsed&&<div className="frontier-help-details" role="status">For support, contact your Frontier Group administrator.</div>}
    </div>
-  </aside>
+  </motion.aside>
   {mobile&&<button className="mobile-backdrop" aria-label="Close menu" onClick={closeMobile}/>}
   <div className="workspace crm-workspace">
    <header className="topbar crm-topbar ref-topbar">
@@ -67,7 +73,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
      <ProfileMenu userId={userId} email={userEmail} role={membership.role} dealershipName={membership.dealerships?.name??"Dealership"} initialName={displayName} initialAvatarPath={avatarPath}/>
     </div>
    </header>
-   <main className="main crm-main ref-main">{children}</main>
+   <main className="main crm-main ref-main"><MotionRoute>{children}</MotionRoute></main>
   </div>
  </div>;
 }

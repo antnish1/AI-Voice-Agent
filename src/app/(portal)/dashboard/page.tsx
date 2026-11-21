@@ -1,4 +1,6 @@
 import Link from "next/link";
+import {CountUp} from "@/components/motion/count-up";
+import {CampaignActivityChart} from "@/components/motion/campaign-activity-chart";
 import {requireMembership,canPrepare} from "@/lib/auth";
 
 type Campaign={id:string;name:string;status:string;created_at:string};
@@ -24,7 +26,6 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  const recent=(recentCampaigns.data??[]) as Campaign[];
  const imports=(recentImports.data??[]) as ImportBatch[];
  const daily=Array.from({length:days},(_,i)=>{const date=new Date(start);date.setDate(start.getDate()+i);const key=localDate(date);return {key,label:date.toLocaleDateString("en-IN",{month:"short",day:"numeric",timeZone:"Asia/Kolkata"}),count:(periodCampaigns.data??[]).filter(c=>localDate(c.created_at)===key).length};});
- const max=Math.max(1,...daily.map(d=>d.count));
  const actions=[{icon:"+",label:"Create New Campaign",href:"/campaigns/new",tone:"mint"},{icon:"⇧",label:"Upload Customers",href:"/customers",tone:"blue"},{icon:"▤",label:"Upload Documents",href:"/documents",tone:"violet"},{icon:"◎",label:"Manage AI Agents",href:"/agents",tone:"green"}];
  const activity=[...recent.map(c=>({key:"c-"+c.id,title:c.status==="APPROVED"?"Campaign approved":c.status==="REJECTED"?"Campaign rejected":c.status==="PENDING_MANAGER_APPROVAL"?"Campaign submitted for approval":"Campaign draft created",detail:c.name,at:c.created_at,icon:"◫",tone:"mint"})),...imports.map(x=>({key:"i-"+x.id,title:"Customer list imported",detail:x.filename+" · "+x.imported_rows+" new",at:x.created_at,icon:"⇧",tone:"blue"}))].sort((a,b)=>Date.parse(b.at)-Date.parse(a.at)).slice(0,5);
  const hour=Number(new Intl.DateTimeFormat("en-GB",{hour:"numeric",hour12:false,timeZone:"Asia/Kolkata"}).format(new Date()));
@@ -36,14 +37,11 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  {name:"Total Calls",value:"—",note:"Sarvam not connected",icon:"◕",tone:"blue"}];
  return <div className="ref-dashboard">
  <div className="ref-dashboard-heading"><div><h1>{greeting}, Dealer! <span aria-hidden="true">👋</span></h1><p>Here’s what’s happening with your AI voice campaigns today.</p></div><div className="ref-dashboard-heading-actions"><span className="ref-today-pill">▣ &nbsp; Today</span>{canPrepare(membership.role)&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div>
- <div className="ref-kpi-grid">{metrics.map(m=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}>{m.icon}</div><div><span className="ref-kpi-label">{m.name}</span><strong className="ref-kpi-value">{m.value}</strong><small className="ref-kpi-note">{m.note}</small></div></article>)}</div>
+ <div className="ref-kpi-grid">{metrics.map(m=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}>{m.icon}</div><div><span className="ref-kpi-label">{m.name}</span><CountUp className="ref-kpi-value" value={m.value}/><small className="ref-kpi-note">{m.note}</small></div></article>)}</div>
  <div className="ref-dashboard-columns">
  <div className="ref-dashboard-left">
   <section className="ref-dashboard-panel ref-performance"><div className="ref-panel-header"><div><h2><span className="ref-heading-icon">▥</span> Campaign Performance</h2><p>Campaigns created during this period; call outcomes are not connected yet.</p></div><div className="ref-date-filters"><span className="ref-selected-period">Last {days} days</span><div className="ref-range-links"><Link aria-current={days===7?"true":undefined} href="/dashboard?days=7">7D</Link><Link aria-current={days===14?"true":undefined} href="/dashboard?days=14">14D</Link><Link aria-current={days===30?"true":undefined} href="/dashboard?days=30">30D</Link></div></div></div>
-   <div className="ref-chart-area" role="img" aria-label={"Campaigns created by day over "+days+" days"}>
-    <div className="ref-chart-grid" aria-hidden="true"><span/><span/><span/><span/></div>
-    <div className="ref-chart-bars">{daily.map((d,i)=><div className="ref-chart-column" key={d.key} title={d.label+": "+d.count+" campaigns"}><div className="ref-chart-bar" style={{height:d.count?Math.max(4,(d.count/max)*100)+"%":"0%"}}/><small>{days===30?(i%5===0?d.label:""):days===14?(i%2===0?d.label:""):d.label}</small></div>)}</div>
-   </div>
+   <CampaignActivityChart daily={daily} days={days}/>
    <div className="ref-chart-footer"><span><i/> Campaign drafts created</span><span>{(periodCampaigns.data??[]).length} records in selected period</span></div>
    {(periodCampaigns.data??[]).length===0&&<p className="ref-chart-empty">No campaigns created in this period. Charts will update with real data.</p>}
   </section>

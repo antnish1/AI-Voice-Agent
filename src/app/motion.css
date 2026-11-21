@@ -1,0 +1,157 @@
+/* Frontier Motion System — progressively enhanced, accessible and data-honest */
+:root{
+ --fm-ease:cubic-bezier(.22,1,.36,1);
+ --fm-spring:cubic-bezier(.16,1.24,.35,1);
+ --fm-speed:240ms; --fm-ink-shadow:rgba(20,53,75,.085);
+ --fm-ring:rgba(16,158,160,.19);
+}
+.frontier-motion-route{position:relative;isolation:isolate;min-width:0;transform-origin:50% 0;will-change:opacity,transform}
+.frontier-motion-route:before{content:"";position:absolute;z-index:-1;pointer-events:none;inset:-12px -10px auto;height:320px;
+ background:radial-gradient(ellipse 50% 54% at 12% -5%,rgba(17,170,167,.055),transparent 85%),
+ radial-gradient(ellipse 40% 75% at 87% -30%,rgba(66,125,228,.06),transparent 80%);}
+.frontier-motion-route [data-motion-ready="true"]{opacity:0;transform:translate3d(0,11px,0) scale(.993);transition:transform .48s var(--fm-ease),opacity .38s ease;
+ transition-delay:calc(var(--motion-order,0)*38ms);}
+.frontier-motion-route [data-motion-ready="true"][data-motion-visible="true"]{opacity:1;transform:translateZ(0) scale(1)}
+.frontier-motion-route [data-motion-ready="true"].frontier-motion-lift[data-motion-visible="true"]:hover{
+ transform:perspective(900px) translateY(-4px) rotateX(.5deg) scale(1.004)}
+.frontier-motion-lift{position:relative;backface-visibility:hidden;transition:transform 240ms var(--fm-ease),box-shadow 260ms ease,border-color 220ms ease!important}
+.frontier-motion-lift:hover{box-shadow:0 14px 40px rgba(10,52,75,.09),0 2px 8px rgba(10,52,75,.035)!important;border-color:rgba(34,149,154,.28)!important}
+.frontier-motion-lift:active{transform:translateY(-1px) scale(.998)}
+.frontier-motion-active-nav{position:absolute;inset:2px 4px;border-radius:11px;background:linear-gradient(104deg,rgba(13,145,155,.26),rgba(33,185,184,.12));
+ border:1px solid rgba(93,214,219,.23);box-shadow:inset 2px 0 0 #46d5d5,0 3px 14px rgba(0,0,0,.065);pointer-events:none;z-index:0}
+.frontier-nav-row{position:relative;isolation:isolate}
+.frontier-nav-row.selected{background:transparent!important}
+.frontier-sidebar-nav .frontier-nav-link{position:relative;z-index:1;transition:color 200ms ease,background 200ms ease,transform 220ms var(--fm-ease)}
+.frontier-sidebar-nav .frontier-nav-link.active{background:transparent!important;box-shadow:none!important}
+.frontier-sidebar-nav .frontier-nav-link:hover:not(.active){transform:translateX(2px)}
+.frontier-sidebar-nav .nav-icon{transition:transform 270ms var(--fm-spring),color 240ms}
+.frontier-sidebar-nav .frontier-nav-link:hover .nav-icon{transform:rotate(-5deg) scale(1.13)}
+.frontier-sidebar-nav .frontier-nav-link.active .nav-icon{transform:scale(1.05);color:#9af9ec}
+.frontier-sidebar-nav .nav-label{transition:opacity 200ms,transform 230ms var(--fm-ease)}
+.frontier-campaign-subnav{transform-origin:top;animation:fm-subnav-in 260ms var(--fm-spring) both}
+.frontier-campaign-toggle svg{transition:transform 240ms var(--fm-ease)}
+.frontier-campaign-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
+.frontier-help-details{animation:fm-pop-in 260ms var(--fm-spring) both}
+.frontier-sidebar-wave{pointer-events:none;will-change:auto}
+.crm-main{background-color:transparent}
+.ref-dashboard-heading h1,.page-head h1,.agent-heading h1,.settings-ref-hero h1{letter-spacing:-.045em}
+.ref-kpi-value{font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.ref-kpi-card,.metric-card,.reports-ref-kpi,.calllogs-stat{overflow:hidden;isolation:isolate}
+.ref-kpi-card:after,.metric-card:after,.calllogs-stat:after{content:"";position:absolute;inset:0;pointer-events:none;
+ background:radial-gradient(190px circle at 85% 0%,rgba(43,195,196,.12),transparent 72%);opacity:.4;transition:opacity .32s}
+.ref-kpi-card:hover:after,.metric-card:hover:after,.calllogs-stat:hover:after{opacity:1}
+.ref-chart-column{position:relative}
+.ref-chart-bar{transform-origin:center bottom;animation:fm-bar-grow .85s var(--fm-ease) both;animation-delay:calc(var(--motion-order,0)*20ms);
+ transition:height .55s var(--fm-ease),filter .2s ease,transform .2s ease!important}
+.ref-chart-column:nth-child(3n+1) .ref-chart-bar{animation-delay:80ms}
+.ref-chart-column:nth-child(3n+2) .ref-chart-bar{animation-delay:135ms}
+.ref-chart-column:nth-child(3n) .ref-chart-bar{animation-delay:185ms}
+.ref-chart-column:hover .ref-chart-bar{filter:brightness(1.12);transform:scaleX(1.08)}
+.ref-chart-grid{pointer-events:none}
+.ref-chart-area:focus-within .ref-chart-bar{animation-play-state:paused}
+.ref-quick-action .ref-quick-arrow{transition:transform 260ms var(--fm-spring)}
+.ref-quick-action:hover .ref-quick-arrow{transform:translateX(4px)}
+.ref-activity-icon,.ref-kpi-icon{transition:transform 270ms var(--fm-spring)}
+.ref-activity-item:hover .ref-activity-icon,.ref-kpi-card:hover .ref-kpi-icon{transform:rotate(-7deg) scale(1.08)}
+/* Campaign progress and stepper: state drives every visual transition */
+.campaign-progress-item,.step-item{transition:background-color 240ms ease,color 240ms ease,border-color 240ms ease}
+.campaign-step-circle,.step-item b{transition:background-color 240ms ease,transform 300ms var(--fm-spring),box-shadow 300ms ease!important}
+.campaign-step-circle.current{transform:scale(1.1);box-shadow:0 0 0 5px #fff,0 0 0 7px rgba(16,213,180,.18)!important}
+.campaign-step-circle.finished{transform:scale(1)}
+.campaign-modal-progress:before{transition:background 270ms}
+.campaign-modal-scroll > *{animation:fm-panel-in 300ms var(--fm-ease) both}
+.campaign-modal-overlay{animation:fm-backdrop-in 220ms ease both}
+.campaign-modal{animation:fm-dialog-in 370ms var(--fm-spring) both}
+.campaign-modal .campaign-modal-back,.campaign-modal .campaign-modal-next{transition:transform 180ms var(--fm-spring),box-shadow 200ms ease}
+.campaign-modal .campaign-modal-back:active,.campaign-modal .campaign-modal-next:active{transform:scale(.965)}
+.campaign-step-count{font-variant-numeric:tabular-nums}
+/* Data tables, pagination, filtering and sort controls */
+.frontier-motion-route table tbody tr{transition:background-color .2s ease,box-shadow .2s ease}
+.frontier-motion-route table tbody tr:hover td{background-color:rgba(21,144,151,.035)}
+.frontier-motion-route table tbody tr:focus-within td{background-color:rgba(21,144,151,.055)}
+.frontier-motion-route tbody tr td{transition:background-color 180ms ease}
+.frontier-motion-route .tablewrap{scroll-behavior:smooth}
+.frontier-motion-route select,.frontier-motion-route input,.frontier-motion-route textarea{transition:border-color 200ms ease,box-shadow 200ms ease,background-color 200ms ease}
+.frontier-motion-route :is(select,input,textarea):focus-visible{outline:2px solid var(--fm-ring);outline-offset:2px}
+.frontier-motion-route :is(button,[role="button"],a){-webkit-tap-highlight-color:transparent}
+.frontier-motion-route :is(button,a):not([disabled]){transition-property:background-color,color,box-shadow,border-color,opacity,transform;transition-duration:190ms;transition-timing-function:var(--fm-ease)}
+.frontier-motion-route button:not([disabled]):active,.frontier-motion-route a:not([aria-disabled="true"]):active{transform:scale(.974)}
+.frontier-motion-route :is(.ref-range-links,.reports-ref-tabs,.calllogs-tabs,.settings-ref-tabs) [aria-current="page"],
+.frontier-motion-route :is(.ref-range-links,.reports-ref-tabs,.calllogs-tabs,.settings-ref-tabs) .active{
+ box-shadow:0 0 0 1px rgba(35,180,178,.09);transition:background-color 210ms,color 210ms,box-shadow 210ms}
+.frontier-motion-route :is(.reports-ref-filter-expanded,.calllogs-filter-panel,.settings-ref-menu,.agent-no-results){
+ animation:fm-pop-in 250ms var(--fm-spring) both;transform-origin:top center}
+.frontier-motion-route :is(.agent-preview-modal-backdrop,.customers-modal-backdrop,.settings-ref-modal-backdrop,.reports-ref-modal-overlay,.document-modal-backdrop){
+ animation:fm-backdrop-in 210ms ease both}
+.frontier-motion-route :is(.agent-preview-modal,.customers-modal,.settings-ref-modal,.reports-ref-modal,.document-modal){
+ animation:fm-dialog-in 330ms var(--fm-spring) both}
+.frontier-motion-route :is(.agent-no-results,.ref-chart-empty,.ref-activity-empty,.ref-table-empty,.empty-state) {
+ animation:fm-soft-in 400ms ease both}
+/* Minimal ambient visual language; not an artificial activity indicator */
+.agent-hero-banner,.settings-ref-hero{isolation:isolate;position:relative;overflow:hidden}
+.agent-hero-banner:before,.settings-ref-hero:before{content:"";position:absolute;inset:-80% -35% auto auto;width:60%;aspect-ratio:1;
+ border-radius:50%;background:radial-gradient(circle,rgba(81,208,228,.19),transparent 70%);pointer-events:none;z-index:-1}
+.agent-card:focus-within,.ref-quick-action:focus-visible{outline:2px solid rgba(20,161,172,.55);outline-offset:3px}
+/* Future media integration: bars move ONLY when the actual media element plays */
+.frontier-voice-waveform{height:43px;display:flex;align-items:center;justify-content:center;gap:3px;min-width:118px}
+.frontier-voice-waveform span{height:calc(var(--wave-height)*34px);min-height:3px;width:3px;border-radius:99px;background:linear-gradient(180deg,#18bfd0,#087e9b);
+ transform:scaleY(.27);transform-origin:center;transition:transform 200ms ease}
+.frontier-voice-waveform.is-playing span{animation:fm-wave 680ms ease-in-out infinite alternate;
+ animation-delay:calc(var(--wave-index)*-55ms)}
+/* Cohesive transitions for live-auth shell overlays */
+.ref-topbar-right .profile-menu,.frontier-help-card{transition:transform 230ms var(--fm-ease),box-shadow 230ms}
+.frontier-help-card:hover{transform:translateY(-2px)}
+/* Keyframes: short-lived and composited. No perpetual page-wide effects. */
+@keyframes fm-bar-grow{from{transform:scaleY(.03);opacity:.45}to{transform:scaleY(1);opacity:1}}
+@keyframes fm-backdrop-in{from{opacity:0}to{opacity:1}}
+@keyframes fm-dialog-in{from{opacity:0;transform:translate3d(0,18px,0) scale(.965)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@keyframes fm-panel-in{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes fm-soft-in{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
+@keyframes fm-pop-in{from{opacity:0;transform:translate3d(0,-8px,0) scale(.98)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@keyframes fm-subnav-in{from{opacity:0;transform:scaleY(.93) translateY(-5px)}to{opacity:1;transform:scaleY(1) translateY(0)}}
+@keyframes fm-wave{from{transform:scaleY(.22)}to{transform:scaleY(1)}}
+@media (max-width:760px){
+ .frontier-motion-route [data-motion-ready="true"]{transition-delay:0ms}
+ .frontier-motion-lift:hover{transform:none!important}
+ .frontier-sidebar-nav .frontier-nav-link:hover{transform:none}
+ .ref-chart-column:hover .ref-chart-bar{transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+ .frontier-motion-route *, .frontier-motion-route *:before,.frontier-motion-route *:after,
+ .frontier-sidebar-nav *, .frontier-sidebar-nav *:before,.frontier-sidebar-nav *:after{
+ animation:none!important;scroll-behavior:auto!important;transition-duration:.01ms!important;transition-delay:0ms!important;
+ }
+ .frontier-motion-route [data-motion-ready="true"]{opacity:1!important;transform:none!important}
+ .frontier-motion-lift:hover,.ref-chart-column:hover .ref-chart-bar{transform:none!important}
+ .frontier-voice-waveform span{transform:scaleY(.35)!important}
+ .frontier-motion-route:before{display:none}
+}
+
+/* Skeletons appear only during genuine route loading. */
+.frontier-page-skeleton{padding:18px 0 45px;min-height:50vh;display:grid;gap:22px;align-content:start}
+.frontier-skeleton-breadcrumb,.frontier-skeleton-heading,.frontier-skeleton-card i,.frontier-skeleton-card b,.frontier-skeleton-card span,.frontier-skeleton-panels>div{
+ background:linear-gradient(105deg,#e9f0f3 14%,#f8fbfc 30%,#e9f0f3 47%);background-size:260% 100%;
+ animation:fm-shimmer 1.75s ease-in-out infinite;border-radius:12px}
+.frontier-skeleton-breadcrumb{width:170px;height:13px}
+.frontier-skeleton-heading{width:min(320px,65%);height:32px}
+.frontier-skeleton-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.frontier-skeleton-card{height:140px;padding:20px;background:#fff;border:1px solid #ebf0f3;border-radius:15px;display:grid;gap:15px;align-content:center}
+.frontier-skeleton-card i{height:32px;width:32px}
+.frontier-skeleton-card b{height:22px;width:68%}
+.frontier-skeleton-card span{height:11px;width:80%}
+.frontier-skeleton-panels{display:grid;grid-template-columns:1.6fr 1fr;gap:17px}
+.frontier-skeleton-panels>div{height:250px}
+.frontier-motion-route [data-motion-ready="true"].frontier-motion-lift{transition:opacity .38s ease,transform .48s var(--fm-ease),box-shadow 260ms ease,border-color 220ms ease!important}
+@keyframes fm-shimmer{from{background-position:120% 0}to{background-position:-120% 0}}
+@media(max-width:900px){.frontier-skeleton-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.frontier-skeleton-panels{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.frontier-page-skeleton *{animation:none!important}}
+
+/* Chart uses actual campaign creation counts; tooltip never invents call metrics. */
+.frontier-chart-column{outline:0;isolation:isolate}
+.frontier-chart-column .ref-chart-bar{animation:none!important}
+.frontier-chart-column:focus-visible{outline:2px solid rgba(23,162,173,.55);outline-offset:4px;border-radius:7px}
+.frontier-chart-tooltip{position:absolute;z-index:10;bottom:calc(100% - 4px);left:50%;transform:translateX(-50%);min-width:100px;pointer-events:none;
+ display:grid;gap:3px;justify-items:center;padding:9px 12px;border-radius:10px;background:#112b40;color:white;
+ box-shadow:0 10px 28px rgba(14,36,49,.18);white-space:nowrap;font-size:11px}
+.frontier-chart-tooltip strong{font-size:16px;line-height:1.1;font-variant-numeric:tabular-nums}
+.frontier-chart-tooltip span{color:#bcdfeb;font-size:10px}
