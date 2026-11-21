@@ -181,3 +181,32 @@
 .frontier-top-mega-toggle:hover,.frontier-top-mega-toggle[aria-expanded="true"]{color:#087e8b}
 .frontier-top-mega-toggle:focus-visible{outline:2px solid #0a9eaa;outline-offset:2px}
 .frontier-mega-navigation .frontier-top-nav-link{padding-right:3px}
+
+
+/* Compact layout controls alongside the heading; the section remains immediately after Profile. */
+.frontier-layout-settings.frontier-layout-compact{
+ display:flex;align-items:center;justify-content:space-between;gap:16px;
+ padding:14px 17px;margin:14px 0;min-height:82px;
+}
+.frontier-layout-compact .frontier-layout-title{flex:0 0 auto;min-width:0;gap:10px}
+.frontier-layout-compact .frontier-layout-title h3{white-space:nowrap;font-size:16px}
+.frontier-layout-compact .frontier-layout-options{
+ display:flex;align-items:center;justify-content:flex-end;
+ gap:10px;min-width:0;flex:1;
+}
+.frontier-layout-compact .frontier-layout-option{
+ min-height:48px;min-width:0;flex:0 1 210px;gap:9px;
+ border-radius:10px;padding:9px 11px;
+}
+.frontier-layout-compact .frontier-layout-option svg{width:21px;height:21px;flex-basis:21px}
+.frontier-layout-compact .frontier-layout-option span{gap:0}
+.frontier-layout-compact .frontier-layout-option strong{font-size:12px;white-space:nowrap}
+@media(max-width:760px){
+ .frontier-layout-settings.frontier-layout-compact{align-items:stretch;flex-direction:column;gap:12px}
+ .frontier-layout-compact .frontier-layout-options{justify-content:stretch;width:100%}
+ .frontier-layout-compact .frontier-layout-option{flex:1 1 0}
+}
+@media(max-width:390px){
+ .frontier-layout-compact .frontier-layout-options{flex-direction:column;align-items:stretch}
+ .frontier-layout-compact .frontier-layout-option{flex:0 0 auto}
+}
