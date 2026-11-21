@@ -65,7 +65,7 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
  };
  const avatar=(className:string)=><span className={className}>{avatarUrl?<img src={avatarUrl} alt="Your profile photo" referrerPolicy="no-referrer"/>:initials}</span>;
  return <div className="portal-profile" ref={wrapper} onPointerEnter={e=>{if(e.pointerType==="mouse"&&!(passwordOpen||editOpen))setOpen(true);}} onPointerLeave={e=>{if(e.pointerType==="mouse"&&!(passwordOpen||editOpen))setOpen(false);}}>
-  <button type="button" className="portal-profile-trigger" aria-label="Open profile menu" title="Profile and account options" aria-haspopup="menu" aria-expanded={open} onClick={()=>setOpen(v=>!v)} onFocus={()=>setOpen(true)}>
+  <button type="button" className="portal-profile-trigger" aria-label="Open profile menu" title="Profile and account options" aria-haspopup="menu" aria-expanded={open} onClick={()=>setOpen(true)} onFocus={()=>setOpen(true)}>
    {avatar("portal-profile-avatar")}
   </button>
   {open&&<div className="portal-profile-panel" role="menu" aria-label="Account menu">
