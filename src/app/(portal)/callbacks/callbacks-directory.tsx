@@ -1,30 +1,6 @@
-"use client";
-import {useState} from "react";
+import type {ReactNode} from "react";
 
-type SymbolName="phone"|"clock"|"check"|"calendar"|"search"|"refresh"|"plus"|"eye"|"edit"|"trash"|"bell";
-function Icon({name,size=18}:{name:SymbolName;size?:number}){
- const paths:Record<SymbolName,React.ReactNode>={
- phone:<><path d="M5 3h4l1 5-2.5 2a15 15 0 0 0 6.5 6.5l2-2.5 5 1v4c0 1.5-1.4 2-3 1.8C9.6 19.7 4.3 14.4 3.2 6 3 4.5 5 3Z"/><path d="m15 4 5 0v5m0-5-7 7"/></>,
- clock:<><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></>,
- check:<><circle cx="12" cy="12" r="9"/><path d="m7 12 3 3 7-7"/></>,
- calendar:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 10h18"/></>,
- search:<><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></>,
- refresh:<><path d="M20 8a8 8 0 0 0-14-3L4 7V3m0 4h4M4 16a8 8 0 0 0 14 3l2-2v4m0-4h-4"/></>,
- plus:<path d="M12 4v16M4 12h16"/>,
- eye:<><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></>,
- edit:<path d="m4 16 12-12 4 4-12 12-5 1z"/>,
- trash:<><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14"/></>,
- bell:<><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></>
- };
- return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
-}
-function BellArt(){return <svg className="cb-banner-art" viewBox="0 0 250 128" aria-hidden="true"><defs><linearGradient id="cbBell" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#42cbff"/><stop offset=".6" stopColor="#1689e5"/><stop offset="1" stopColor="#2144ab"/></linearGradient></defs><path d="M78 40Q137-15 190 34T242 50" stroke="#8eeafe" strokeWidth="16" opacity=".28" fill="none"/><g transform="rotate(19 157 60)"><path d="M117 26a11 11 0 0 1 22 0" fill="none" stroke="#1c80d3" strokeWidth="7"/><path d="M96 75c11-9 8-22 15-36 9-19 46-20 56 2 8 18 6 26 20 35l7 11H90Z" fill="url(#cbBell)" stroke="#c2f3ff" strokeWidth="3"/><ellipse cx="143" cy="87" rx="52" ry="13" fill="#1767c9" stroke="#76daff" strokeWidth="3"/><path d="M131 99q12 21 25 0" fill="#1669ba" stroke="#78ddff" strokeWidth="2"/></g><path d="m208 27 12-11M226 53l17-2M214 77l14 12M76 18l-8-14M60 53l-14 1" stroke="#1b83d5" strokeWidth="6" strokeLinecap="round"/></svg>;}
-const stats=[{label:"Total Callbacks",symbol:"phone" as const,tone:"blue"},{label:"Pending Callbacks",symbol:"clock" as const,tone:"green"},{label:"Completed",symbol:"check" as const,tone:"purple"},{label:"Overdue",symbol:"calendar" as const,tone:"orange"}];
-export function CallbacksDirectory({children}:{children:React.ReactNode}){
- const [query,setQuery]=useState(""),[status,setStatus]=useState("all"),[priority,setPriority]=useState("all"),[dateRange,setDateRange]=useState("30");
- const reset=()=>{setQuery("");setStatus("all");setPriority("all");setDateRange("30");};
- return <div className="cb-reference">
-  <header className="cb-hero"><div className="cb-heading"><span className="cb-heading-icon"><Icon name="phone" size={27}/></span><div><h1>Callbacks</h1><p>Manage customer callback requests</p></div></div><div className="cb-hero-banner"><div><strong>Never Miss a Follow-up!</strong><p>Track and manage all callback requests efficiently.</p></div><BellArt/></div></header>
-  {children}
- </div>;
+/** The callback management workspace starts immediately below the global CRM navigation. */
+export function CallbacksDirectory({children}:{children:ReactNode}){
+ return <div className="cb-reference">{children}</div>;
 }
