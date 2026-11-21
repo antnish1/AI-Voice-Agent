@@ -85,12 +85,12 @@ create table if not exists public.voice_call_records (
  unique(dealership_id,sarvam_attempt_id)
 );
 create or replace function public.frontier_voice_campaign_scope()
-returns trigger language plpgsql security invoker set search_path='' as $
+returns trigger language plpgsql security invoker set search_path='' as $voice$
 begin
  if not exists(select 1 from public.campaigns c where c.id=new.campaign_id and c.dealership_id=new.dealership_id)
  then raise exception 'Campaign belongs to another dealership'; end if;
  return new;
-end $;
+end $voice$;
 drop trigger if exists voice_campaign_scope on public.voice_campaign_links;
 create trigger voice_campaign_scope before insert or update on public.voice_campaign_links
  for each row execute function public.frontier_voice_campaign_scope();
