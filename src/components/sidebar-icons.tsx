@@ -1,6 +1,6 @@
 import type {ReactNode} from "react";
 
-export type SidebarIconName = "home"|"megaphone"|"wave"|"user-square"|"check-square"|"phone"|"calendar"|"callback"|"truck"|"documents"|"chart"|"settings"|"headset"|"chevron-down"|"chevrons-left"|"chevrons-right"|"arrow-right";
+export type SidebarIconName = "home"|"megaphone"|"wave"|"user-square"|"check-square"|"phone"|"calendar"|"callback"|"truck"|"documents"|"chart"|"settings"|"headset"|"users"|"chevron-down"|"chevrons-left"|"chevrons-right"|"arrow-right";
 export function SidebarIcon({name,size=20}:{name:SidebarIconName;size?:number}){
  const drawings:Record<SidebarIconName,ReactNode>={
  home:<><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></>,
@@ -15,6 +15,7 @@ export function SidebarIcon({name,size=20}:{name:SidebarIconName;size?:number}){
  documents:<><rect x="4" y="3" width="13" height="15" rx="2"/><rect x="8" y="7" width="13" height="14" rx="2"/><path d="M11 12h7M11 15h7"/></>,
  chart:<><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 17v-5M11 17V8M15 17v-7M19 17V6"/></>,
  settings:<><circle cx="12" cy="12" r="3"/><path d="m10 2-.7 3-2.2 1.2-3-.8-2 3.4 2.2 2.2v2l-2.2 2.2 2 3.4 3-.8 2.2 1.2.7 3h4l.7-3 2.2-1.2 3 .8 2-3.4-2.2-2.2v-2l2.2-2.2-2-3.4-3 .8-2.2-1.2-.7-3z"/></>,
+ users:<><circle cx="9" cy="8" r="3"/><path d="M3 21v-2c0-4 3-6 6-6s6 2 6 6v2M17 6a3 3 0 0 1 0 6m1 3c2 1 3 2.5 3 5"/></>,
  headset:<><path d="M3 13v-1a9 9 0 0 1 18 0v1M3 13h4v7H5a3 3 0 0 1-3-3v-1a3 3 0 0 1 3-3M21 13h-4v7h2a3 3 0 0 0 3-3v-1a3 3 0 0 0-3-3M17 20a5 5 0 0 1-5 2"/></>,
  "chevron-down":<path d="m5 9 7 7 7-7"/>,
  "chevrons-left":<path d="m11 6-6 6 6 6m8-12-6 6 6 6"/>,
