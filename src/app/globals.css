@@ -1371,3 +1371,8 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 .crm-ops-bottom-note{margin:16px 0 0;color:#879cac;font-size:10px;line-height:1.5}
 @media(max-width:900px){.crm-ops-form{grid-template-columns:repeat(2,minmax(0,1fr))}.crm-ops-notes{grid-column:span 2}}
 @media(max-width:550px){.crm-operations{padding:12px}.crm-ops-form{grid-template-columns:1fr}.crm-ops-notes,.crm-ops-form-hint{grid-column:span 1}.crm-ops-stats{gap:6px}.crm-ops-stats>div{padding:10px}.crm-ops-stats strong{font-size:19px}}
+
+/* Verified IT account only: compact dealership chooser in shared header */
+.frontier-dealer-switch{display:flex;align-items:center;gap:7px;max-width:260px;font-size:10px;color:#52708b;font-weight:650;white-space:nowrap}
+.frontier-dealer-switch select{min-width:100px;max-width:165px;width:100%;background:#f5fafc;color:#234967;border:1px solid #d9e7ed;border-radius:7px;padding:7px 9px;font-size:11px}
+@media(max-width:850px){.frontier-dealer-switch span{display:none}.frontier-dealer-switch select{max-width:116px}}
