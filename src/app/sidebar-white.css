@@ -1,0 +1,106 @@
+/* Frontier white sidebar palette — additive only; no navigation logic changes. */
+.frontier-reference-sidebar.ref-sidebar{
+  background:#ffffff;
+  color:#203b55;
+  border-right:1px solid #e1eaf1;
+  box-shadow:2px 0 17px rgba(28,69,91,.035);
+  scrollbar-color:#cbdde6 transparent;
+}
+.frontier-sidebar-brand .frontier-brand-text,
+.nav-collapsed .frontier-sidebar-brand .frontier-brand-text{
+  color:#173650;
+}
+.frontier-sidebar-brand .frontier-brand-text small{
+  color:#0b969e;
+}
+.frontier-sidebar-brand .frontier-sidebar-collapse{
+  color:#55738a;
+}
+.frontier-sidebar-brand .frontier-sidebar-collapse:hover{
+  color:#067b8b;
+  background:#e9f6f7;
+}
+.frontier-reference-sidebar .frontier-sidebar-nav .frontier-nav-link{
+  color:#314d64;
+}
+.frontier-reference-sidebar .frontier-sidebar-nav .frontier-nav-link .nav-icon{
+  color:#527087;
+}
+.frontier-reference-sidebar .frontier-sidebar-nav .frontier-nav-link.active,
+.frontier-reference-sidebar .frontier-sidebar-nav .frontier-nav-link:hover{
+  color:#087c89;
+}
+.frontier-reference-sidebar .frontier-sidebar-nav .frontier-nav-link.active .nav-icon,
+.frontier-sidebar-nav .frontier-nav-link.active .nav-icon{
+  color:#078d98;
+}
+.frontier-reference-sidebar .frontier-sidebar-nav .frontier-nav-link:hover .nav-icon{
+  color:#078c97;
+}
+.frontier-reference-sidebar .frontier-nav-row:not(.selected):hover{
+  background:#f3f9fb;
+}
+.frontier-reference-sidebar .frontier-motion-active-nav{
+  background:linear-gradient(105deg,#e5f7f7,#edfafa);
+  border:1px solid #bde8e7;
+  box-shadow:inset 3px 0 0 #0ba4ae,0 2px 10px rgba(11,117,128,.055);
+}
+.frontier-reference-sidebar .frontier-campaign-row .frontier-campaign-toggle{
+  color:#587489;
+}
+.frontier-reference-sidebar .frontier-campaign-row .frontier-campaign-toggle:hover{
+  color:#078894;
+  background:#e7f5f6;
+}
+.frontier-reference-sidebar .frontier-campaign-subnav{
+  border-left-color:#cbdfe6;
+}
+.frontier-reference-sidebar .frontier-campaign-subnav a{
+  color:#526e81;
+}
+.frontier-reference-sidebar .frontier-campaign-subnav a:hover{
+  background:#eaf6f8;
+  color:#087b88;
+}
+.frontier-reference-sidebar .frontier-approval-badge{
+  background:linear-gradient(135deg,#13b7b9,#0d8f9c);
+  box-shadow:0 2px 8px rgba(16,151,157,.13);
+  color:#fff;
+}
+.frontier-reference-sidebar .frontier-sidebar-bottom{
+  background:transparent;
+}
+.frontier-reference-sidebar .frontier-sidebar-wave{
+  opacity:.13;
+  filter:saturate(.48);
+}
+.frontier-reference-sidebar .frontier-help-card{
+  background:linear-gradient(135deg,#f1fbfc,#eaf7f9);
+  border:1px solid #d4e9ee;
+  color:#244c61;
+  box-shadow:0 2px 9px rgba(15,91,108,.045);
+}
+.frontier-reference-sidebar .frontier-help-card:hover{
+  background:#e4f5f8;
+  border-color:#acd9e0;
+  color:#087b89;
+}
+.frontier-reference-sidebar .frontier-help-icon{
+  background:linear-gradient(145deg,#0eafbb,#078a9c);
+  color:#fff;
+}
+.frontier-reference-sidebar .frontier-help-text small{
+  color:#708b9c;
+}
+.frontier-reference-sidebar .frontier-help-details{
+  border:1px solid #d4e9ee;
+  background:#f1f9fb;
+  color:#3b6175;
+}
+.nav-collapsed .frontier-reference-sidebar .frontier-logo-expand:focus-visible{
+  outline-color:#078e99;
+}
+@media (prefers-contrast:more){
+ .frontier-reference-sidebar .frontier-sidebar-nav .frontier-nav-link{color:#102d43}
+ .frontier-reference-sidebar .frontier-motion-active-nav{border-color:#087a87}
+}
