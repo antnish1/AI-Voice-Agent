@@ -15,7 +15,7 @@ export async function POST(request:Request){
   const {data:campaign,error:campaignError}=await supabase.from("campaigns").select("id,name,dealership_id,status,approved_by,approved_at").eq("id",id).maybeSingle();
   if(campaignError||!campaign||campaign.status!=="APPROVED"||!campaign.approved_by||!campaign.approved_at)
    return NextResponse.json({error:"A manager-approved local campaign is required before launching."},{status:403});
-  if(input.confirm!=="LAUNCH "+campaign.name)return NextResponse.json({error:"Type the exact campaign launch confirmation."},{status:400});
+  if(input.confirm!=="LAUNCH "+campaign.name||input.reviewedTestResult!==true)return NextResponse.json({error:"Exact campaign confirmation and explicit reviewed-test acknowledgment are required."},{status:400});
   const [{data:batch,error:batchError},{data:config,error:configError},{data:test,error:testError}]=await Promise.all([
    supabase.from("campaign_recipient_batches").select("*").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
    supabase.from("campaign_draft_configs").select("configuration").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
@@ -31,10 +31,15 @@ export async function POST(request:Request){
      setup.telephony_label!==connection||normalizePhone(setup.outgoing_number_label??"")!==sender)
    return NextResponse.json({error:"Agent, committed version, connection and caller number must exactly match the approved campaign draft."},{status:400});
   const start=new Date(String(input.startAt??"")),end=new Date(String(input.endAt??""));
+  const istDate=(date:Date)=>{
+   const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
+   const get=(part:string)=>parts.find(p=>p.type===part)?.value??"";
+   return get("year")+"-"+get("month")+"-"+get("day");
+  };
   if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime())||
      start.getTime()<Date.now()+3600000||end.getTime()<=start.getTime()||end.getTime()>start.getTime()+30*86400000||
-     start.toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"})!==setup.schedule?.start||
-     end.toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"})!==setup.schedule?.end)
+     istDate(start)!==setup.schedule?.start||
+     istDate(end)!==setup.schedule?.end)
    return NextResponse.json({error:"Use the approved IST campaign dates, starting at least one hour from now, with a maximum 30-day period."},{status:400});
   const schedule=setup.schedule;
   if(!schedule||!/^([01]\d|2[0-3]):[0-5]\d$/.test(schedule.from??"")||
@@ -87,7 +92,8 @@ export async function POST(request:Request){
     name:batch.cohort_name,users:prepared.users
    });
    if(typeof streamed.cohort_id!=="string"||!streamed.cohort_id)throw Error("Provider did not acknowledge cohort");
-   await supabase.from("voice_campaign_launches").update({state:"cohort_submitted",sarvam_cohort_id:streamed.cohort_id,updated_at:new Date().toISOString()}).eq("campaign_id",id);
+   const {error:statusError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitted",sarvam_cohort_id:streamed.cohort_id,updated_at:new Date().toISOString()}).eq("campaign_id",id);
+   if(statusError)throw Error("Could not persist cohort state");
    return NextResponse.json({ok:true,campaignId:providerId,cohortId:streamed.cohort_id,cohortStatus:streamed.status??"processing",message:"Sarvam accepted campaign and recipient cohort. Confirm processing status before the scheduled dialing window."});
   }catch{
    await supabase.from("voice_campaign_launches").update({state:"needs_reconciliation",updated_at:new Date().toISOString()}).eq("campaign_id",id);
