@@ -25,6 +25,10 @@ export default async function OutboundPage({params}:{params:Promise<{id:string}>
   "id,recipient_identifier,mobile,customer_name,registration_number,vehicle_model,service_type,service_due,readiness,queue_state,interest,call_summary,follow_up_at,next_action,retry_requested,attempt_number,customer_source"
  ).eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).order("created_at",{ascending:true}).limit(250);
  if(prospectError)throw Error("Could not load campaign customer index.");
+ const {data:retryReviews,error:retryError}=await supabase.from("campaign_retry_requests")
+  .select("prospect_id").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).eq("state","pending_review").limit(250);
+ if(retryError)throw Error("Could not read retry review requests.");
+ const pendingRetries=new Set((retryReviews??[]).map(r=>r.prospect_id));
  const latest=new Map<string,NonNullable<typeof callRecords>[number]>();
  for(const call of callRecords??[]){
   const phone=normalizePhone(call.dialed_number??"");
@@ -35,7 +39,7 @@ export default async function OutboundPage({params}:{params:Promise<{id:string}>
   return {...p,queue_state:call?.status??p.queue_state,
    connectivity:call?.status??null,duration_seconds:call?.duration_seconds??null,
    interest:p.interest??null,call_summary:p.call_summary??null,follow_up_at:p.follow_up_at??null,
-   next_action:p.next_action??null,retry_requested:p.retry_requested??false,
+   next_action:p.next_action??null,retry_requested:pendingRetries.has(p.id),
    customer_source:p.customer_source??"excel",
    registration_number:p.registration_number??null,vehicle_model:p.vehicle_model??null,
    service_type:p.service_type??null,service_due:p.service_due??null,
