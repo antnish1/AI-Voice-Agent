@@ -26,7 +26,13 @@ export async function POST(request:Request){
   if(prepared.users.some(u=>knownByPhone.get(u.user_phone_number)?.do_not_call))
    return NextResponse.json({error:"At least one uploaded number is marked Do Not Call in the dealership CRM. Remove those rows and upload again."},{status:409});
   if(form.get("certifyConsent")!=="yes")return NextResponse.json({error:"Confirm customer consent and DNC screening before staging."},{status:400});
+  if((known??[]).length===5000)return NextResponse.json({error:"CRM has more than 5,000 matching-scope customers. DNC screening cannot be guaranteed; contact IT to extend the verification process."},{status:409});
+  const {data:previous,error:previousError}=await supabase.from("campaign_recipient_batches")
+   .select("csv_sha256").eq("campaign_id",campaign.id).eq("dealership_id",campaign.dealership_id).maybeSingle();
+  if(previousError)return NextResponse.json({error:"Could not verify existing locked cohort."},{status:503});
   const digest=sha256(prepared.csv);
+  if(previous&&previous.csv_sha256!==digest)
+   return NextResponse.json({error:"A different recipient list is already staged. Create a new draft to prevent mixing campaign customers."},{status:409});
   const objectPath=campaign.dealership_id+"/"+campaign.id+"/"+digest+".csv";
   const {error:storeError}=await supabase.storage.from("frontvox-campaign-cohorts")
    .upload(objectPath,new Blob([prepared.csv],{type:"text/csv"}),{contentType:"text/csv",upsert:false});
