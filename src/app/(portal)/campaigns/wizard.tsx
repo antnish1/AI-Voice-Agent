@@ -94,7 +94,7 @@ export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:De
     <div className="campaign-upload-heading">
      <strong>Customer Excel</strong><button type="button" className="btn-outline small" onClick={()=>downloadBlob(makeRecipientTemplate(),"FrontVox_Recipient_Template.xlsx")}>↓ Download Template</button>
     </div>
-    <label className="upload-zone campaign-upload-compact"><span className="campaign-upload-icon" aria-hidden="true">⇧</span><span className="campaign-upload-copy"><strong>{reading?"Checking file…":"Choose or drop Customer Excel"}</strong><small>.xlsx or .csv · Max 5 MB · First worksheet only</small></span><input type="file" accept=".xlsx,.csv" disabled={busy||reading||!!existingDraft} style={{display:"none"}} onChange={e=>void chooseFile(e.target.files?.[0])}/></label>
+    <label className="upload-zone campaign-upload-compact"><span className="campaign-upload-icon" aria-hidden="true">⇧</span><span className="campaign-upload-copy"><strong>{reading?"Checking file…":"Select Customer Excel"}</strong><small>.xlsx or .csv · Max 5 MB · First worksheet only</small></span><input type="file" accept=".xlsx,.csv" disabled={busy||reading||!!existingDraft} style={{display:"none"}} onChange={e=>void chooseFile(e.target.files?.[0])}/></label>
     {preview&&<div className="crm-panel campaign-recipient-preview">
      <div className="panel-title"><h2>Recipient readiness</h2><span>{preview.filename}</span></div>
      <div className="wizard-grid">
