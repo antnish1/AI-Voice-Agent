@@ -41,8 +41,14 @@ test("provider calls are default-off with explicit server-only switches",()=>{
  assert.match(testRoute,/callingEnabled\("test"\)/);
  assert.match(testRoute,/TEST_CALL_ALLOWLIST/);
  assert.match(testRoute,/frontvox_reserve_test_call/);
+ assert.match(testRoute,/p_agent_version:version/);
+ assert.match(testRoute,/p_connection_id:connection/);
+ assert.match(testRoute,/p_caller_number:outgoing/);
  assert.match(launch,/callingEnabled\("campaign"\)/);
  assert.match(launch,/status!=="APPROVED"/);
  assert.match(launch,/csv_sha256/);
  assert.match(launch,/needs_reconciliation/);
+ assert.match(launch,/attempt.agent_version===version/);
+ assert.match(launch,/attempt.connection_id===connection/);
+ assert.match(launch,/attempt.caller_number===sender/);
 });
