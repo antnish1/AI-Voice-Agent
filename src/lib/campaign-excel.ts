@@ -126,3 +126,30 @@ export function rowsToCsv(rows:string[][]):string {
  const escape=(s:string)=>/[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
  return rows.map(row=>row.map(x=>escape(x??"")).join(",")).join("\r\n")+"\r\n";
 }
+
+/** An Excel report containing only recorded call-outcome fields; never exports transcript text. */
+export function makeCallOutcomeReport(rows:Array<{
+ dialed_number:string|null;status:string;duration_seconds:number|null;
+ started_at:string|null;ended_at:string|null;sarvam_attempt_id:string;
+ agent_id:string|null
+}>):Blob{
+ const headers=["Mobile","Connectivity","Duration (seconds)","Call started","Call ended","Sarvam attempt ID","Agent ID"];
+ const lines=[headers,...rows.map(r=>[
+  r.dialed_number??"",r.status,String(r.duration_seconds??""),
+  r.started_at??"",r.ended_at??"",r.sarvam_attempt_id,r.agent_id??""
+ ])];
+ const cell=(value:string,col:number,row:number)=>{
+  let letters="",n=col+1;while(n){n--;letters=String.fromCharCode(65+n%26)+letters;n=Math.floor(n/26);}
+  // Inline strings prevent Excel formula execution for untrusted customer/provider fields.
+  return '<c r="'+letters+row+'" t="inlineStr"><is><t>'+escapeXml(value)+'</t></is></c>';
+ };
+ const body=lines.map((line,i)=>'<row r="'+(i+1)+'">'+line.map((v,j)=>cell(v,j,i+1)).join("")+'</row>').join("");
+ const sheet='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'+body+'</sheetData></worksheet>';
+ return templateZip([
+  ["[Content_Types].xml",'<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'],
+  ["_rels/.rels",'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+  ["xl/workbook.xml",'<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Call Outcomes" sheetId="1" r:id="rId1"/></sheets></workbook>'],
+  ["xl/_rels/workbook.xml.rels",'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>'],
+  ["xl/worksheets/sheet1.xml",sheet]
+ ]);
+}
