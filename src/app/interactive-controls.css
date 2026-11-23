@@ -1,0 +1,53 @@
+/* Accessible, responsive interaction feedback. Visual design and business actions unchanged. */
+:where(button, a[href], [role="button"], input[type="submit"], input[type="button"]) {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+:where(button:not(:disabled), a[href], [role="button"]:not([aria-disabled="true"]), input[type="submit"]:not(:disabled), input[type="button"]:not(:disabled)) {
+  transition: filter .16s ease, box-shadow .16s ease, opacity .16s ease, transform .16s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  :where(button:not(:disabled), a[href][class], [role="button"]:not([aria-disabled="true"])):hover {
+    filter: brightness(1.045);
+  }
+}
+:where(button:not(:disabled), a[href][class], [role="button"]:not([aria-disabled="true"]), input[type="submit"]:not(:disabled), input[type="button"]:not(:disabled)):active {
+  filter: brightness(.94);
+  transform: scale(.985);
+}
+:where(button, a[href], [role="button"], input[type="submit"], input[type="button"]):focus-visible {
+  outline: 3px solid #16b8d8;
+  outline-offset: 3px;
+}
+:where(button:disabled, input[type="submit"]:disabled, input[type="button"]:disabled, [role="button"][aria-disabled="true"]) {
+  cursor: not-allowed;
+  opacity: .62;
+}
+:where(button[aria-busy="true"], input[type="submit"][aria-busy="true"]) {
+  cursor: progress;
+}
+@media (pointer: coarse) {
+  :where(button:not(.fv-password-eye), [role="button"], a.btn-primary, a.primary-link, a.ref-quick-action) {
+    min-height: 40px;
+  }
+  :where(.page-head, .head-actions, .customers-heading-actions, .customers-toolbar, .reports-ref-header-actions, .reports-ref-toolbar, .crm-ops-heading, .settings-ref-profile-form) {
+    max-width: 100%;
+  }
+}
+@media (max-width: 650px) {
+  :where(.page-head .head-actions, .customers-heading-actions, .reports-ref-header-actions, .campaign-modal-footer) {
+    flex-wrap: wrap;
+  }
+  :where(.page-head .head-actions > button, .page-head .head-actions > a, .customers-heading-actions > button) {
+    max-width: 100%;
+    white-space: normal;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :where(button, a[href], [role="button"], input[type="submit"], input[type="button"]) {
+    transition: none !important;
+  }
+  :where(button, a[href], [role="button"], input[type="submit"], input[type="button"]):active {
+    transform: none !important;
+  }
+}

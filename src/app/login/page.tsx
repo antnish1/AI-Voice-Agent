@@ -1,5 +1,6 @@
 import {signIn} from "./actions";
 import {PasswordField} from "./password-field";
+import {SignInButton} from "./sign-in-button";
 import "./login-design.css";
 
 function SoundWave(){
@@ -55,7 +56,7 @@ export default async function Login({searchParams}:{searchParams:Promise<{error?
      <div className="fv-input-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" fill="currentColor"/><path d="m4 8 8 6 8-6" fill="none" stroke="#dfe9fa" strokeWidth="1.8" strokeLinejoin="round"/></svg><input id="fv-email" name="email" type="email" placeholder="Email Address" autoComplete="username" required/></div>
      <label className="fv-visually-hidden" htmlFor="fv-password">Password</label>
      <PasswordField/>
-     <button className="fv-submit" type="submit">Sign In <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-7-7 7 7-7 7" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
+     <SignInButton/>
     </form>
     <div className="fv-or"><span/>OR<span/></div>
     <p className="fv-access-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 4v6c0 5.3-3.5 8.6-9 10-5.5-1.4-9-4.7-9-10V6z" fill="currentColor"/><path d="m9 12 2 2 4-5" stroke="white" strokeWidth="2" fill="none"/></svg><span>Accounts are provisioned by Frontier Group administration.<br/>No public sign-up.</span></p>
