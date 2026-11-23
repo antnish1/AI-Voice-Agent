@@ -333,3 +333,34 @@
   .fv-pills{margin-top:17px}
   .fv-signin-card{max-height:calc(100dvh - 35px)}
 }
+
+
+/* Screenshot-anchored geometry: source reference is 1280×720.
+   At desktop ratios the white surface occupies x=55.5–95.5%, y=8.3–90.2%;
+   the hero begins at x=5.3%, y=30.8%, with features near y=57%. */
+@media(min-width:801px) and (min-height:620px){
+  .fv-left{padding-left:4.7vw;padding-top:8.2vh}
+  .fv-left-content{left:5.3%;top:30.8%}
+  .fv-left-content h1{font-size:clamp(54px,8.75vh,79px)}
+  .fv-left-content h2{font-size:clamp(23px,3.7vh,30px)}
+  .fv-pills{margin-top:clamp(22px,3.9vh,30px);margin-left:-8px}
+  .fv-right{justify-content:center}
+  .fv-signin-card{
+    height:82dvh;
+    max-height:calc(100dvh - 46px);
+    min-height:0;
+    justify-content:space-between;
+    padding-top:clamp(19px,3.35vh,26px);
+    padding-bottom:clamp(19px,3.35vh,26px);
+  }
+  .fv-login-icon{margin-bottom:0}
+  .fv-overline{margin-bottom:0}
+  .fv-signin-card h2{margin-bottom:0}
+  .fv-signin-subtitle{margin-bottom:0}
+  .fv-or{margin-top:0;margin-bottom:0}
+  .fv-mic-ring{top:80.3%;left:23.9%}
+}
+@media(min-width:801px) and (max-height:619px){
+  /* Avoid forcing a tall card or clipping the controls at high browser zoom. */
+  .fv-signin-card{height:auto;justify-content:flex-start}
+}
