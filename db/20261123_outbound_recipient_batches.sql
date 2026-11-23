@@ -25,10 +25,13 @@ create index if not exists campaign_batches_dealership on public.campaign_recipi
 create or replace function public.frontvox_batch_campaign_scope()
 returns trigger language plpgsql security invoker set search_path='' as $$
 begin
+ if tg_op='UPDATE' and (old.campaign_id<>new.campaign_id or old.dealership_id<>new.dealership_id or
+  not exists(select 1 from public.campaigns c where c.id=old.campaign_id and c.status='DRAFT'))
+ then raise exception 'An approved batch is immutable and cannot be moved to another campaign'; end if;
  if not exists (select 1 from public.campaigns c where c.id=new.campaign_id and c.dealership_id=new.dealership_id and c.status='DRAFT')
  then raise exception 'Recipient batches can only be changed for draft campaigns in the same dealership'; end if;
  return new;
-end $$;
+end $;
 drop trigger if exists frontvox_batch_scope on public.campaign_recipient_batches;
 create trigger frontvox_batch_scope before insert or update on public.campaign_recipient_batches
  for each row execute function public.frontvox_batch_campaign_scope();
@@ -127,3 +130,28 @@ end $$;
 drop trigger if exists frontvox_lock_campaign_draft on public.campaign_draft_configs;
 create trigger frontvox_lock_campaign_draft before update or delete on public.campaign_draft_configs
  for each row execute function public.frontvox_lock_submitted_configuration();
+
+-- Atomic test-call reservation: enforce a hard 3/24h cap under concurrent requests.
+create or replace function public.frontvox_reserve_test_call(p_phone_hash text,p_phone_last4 text,p_agent_id text)
+returns uuid
+language plpgsql security invoker set search_path='' as $$
+declare v_id uuid;v_user uuid;
+begin
+ v_user=(select auth.uid());
+ if v_user is null or v_user<>'5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
+ or not public.frontier_password_setup_complete()
+ or not exists(select 1 from public.memberships m where m.user_id=v_user and m.role='super_admin')
+ then raise exception 'IT Super User access is required'; end if;
+ if p_phone_hash !~ '^[0-9a-f]{64}$' or p_phone_last4 !~ '^[0-9]{4}$'
+ or char_length(p_agent_id)<3 or char_length(p_agent_id)>200
+ then raise exception 'Invalid test call audit parameters'; end if;
+ perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtext(v_user::text)::bigint);
+ if (select count(*) from public.voice_test_call_requests where user_id=v_user and created_at>now()-interval '24 hours') >=3
+ then raise exception 'Test call limit of 3 per 24 hours reached'; end if;
+ insert into public.voice_test_call_requests(user_id,phone_hash,phone_last4,window_bucket,agent_id,status)
+ values(v_user,p_phone_hash,p_phone_last4,floor(extract(epoch from now())/600)::bigint,p_agent_id,'reserved')
+ returning id into v_id;
+ return v_id;
+end $$;
+revoke all on function public.frontvox_reserve_test_call(text,text,text) from public,anon;
+grant execute on function public.frontvox_reserve_test_call(text,text,text) to authenticated;
