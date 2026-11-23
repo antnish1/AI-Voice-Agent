@@ -1,0 +1,26 @@
+# FrontVox AI — outbound integration release checklist (23 November 2026)
+
+This branch implements three **server-side gated** operations; code availability **does not mean production has been enabled or that calls have been placed**. API contracts were checked against the Sarvam Voice Agents documentation. Existing logos/UI, authentication, dealership boundaries and unrelated products are unchanged.
+
+## Runbook before any production release
+1. Review and apply **only to Frontier's dedicated Supabase project** (`kagzuxkeabiuswccxjme`) the migration `db/20261123_outbound_recipient_batches.sql`. Verify RLS, the private storage bucket, locked batch metadata and the launch/test audit tables before deployment. This has **not** been applied as part of the PR.
+2. Confirm that `/campaigns/new` works for the verified IT Super User (dealership viewer accounts remain read-only). Create a CRM DRAFT; in Agent & telephony fields, use the **actual** Sarvam agent ID, committed numeric version, telephony connection ID and connected E.164 caller number. Set an IST schedule, with a start at least 1 hour in the future.
+3. Open the campaign's **Import / Test / Launch** page. Upload a CSV with unique headers, a phone column, a consent field and a `do_not_call` field. Map the exact column names and any verified agent variable names. Only positive consent and explicit non-DNC rows are retained, mobile values are normalized, duplicates removed, and at most 250 eligible rows staged. This screens **the uploaded file's DNC column**; it does not independently check TRAI/NDNC or a companywide suppression database. The IT operator must certify those checks too. Private file hash is locked with the local campaign.
+4. Submit for campaign approval, review eligible recipient count on Approvals, approve the immutable campaign. Submitting a preview-only file is forbidden. Changing agent, version, connection, schedule or recipients after approval requires a new draft and new approval.
+5. Before any real calling, configure a **stored signed Sarvam webhook** with secure provider-side signature secret, verify its actual signed delivery against `/api/webhooks/sarvam`, and configure Vercel Production `SARVAM_STORED_WEBHOOK_ID`. **Never** use an unsigned inline webhook as proof of call results.
+6. Test calls require a separate explicit rollout: `ENABLE_TEST_CALLS=true`, verified `TEST_CALL_ALLOWLIST` containing internal owned numbers only (comma-separated E.164), and a random secret `TEST_CALL_HASH_SALT`. Calls are blocked by default. Each test action demands human confirmation, has a 10-minute duplicate reservation and at most 3 attempts per IT admin over 24 hours. Test call endpoint uses `POST /api/outbounds/v1/orgs/{org}/workspaces/{workspace}/outbounds`; success means an **attempt was accepted**, not a successful conversation. Inspect the actual attempt and transcript in Sarvam before considering the agent tested. Calls consume credits.
+7. Campaign launch is independently blocked by default: `ENABLE_LIVE_CALLS=false`. **Do not enable** until user has explicitly approved live production calling, call caps, pricing, local opt-in compliance, telephony configuration, signed webhook verification, recipient list review, approval process and end-to-end dry run. Current implementation submits a single cohort of up to 250 eligible numbers, at 1 attempt per second, no retries, with a scheduled start >=1h in the future and <=30-day campaign period. Requires matching approved config, an accepted test attempt within 24h, and exact phrase `LAUNCH <campaign name>`.
+8. Each campaign has a unique database launch reservation. Provider timeouts can leave a **needs_reconciliation** state: **do not retry** until the provider record is manually checked. Cohort processing is asynchronous; a successful POST only means submitted/processing. Poll provider cohort status and verify counts; pause/cancel on the provider before the scheduled window if anything is incorrect. Automatic launch retry and automatic cohort requeue are deliberately omitted.
+
+## Provider integrations
+- Instant outbound test: https://docs.sarvam.ai/voice-agents/api/instant-outbound/create
+- Create scheduling campaign (schema also described here): https://docs.sarvam.ai/voice-agents/deploy/campaigns/create-campaign
+- Cohort stream: https://docs.sarvam.ai/voice-agents/api/campaigns/cohorts/stream
+- Cohort detail: https://docs.sarvam.ai/voice-agents/api/campaigns/cohorts/get
+- Signed campaign webhooks: https://docs.sarvam.ai/voice-agents/api/campaigns/webhooks/webhook-payload
+
+## Current limits (not yet demonstrated end-to-end)
+- No live provider test call, campaign, cohort or signed webhook has been executed from this PR.
+- There is no automatic provider reconciliation/polling service, full audit of cost/credits, automatic appointment creation, guaranteed agent-variable compatibility or integration with an external DNC database.
+- This PR must not be represented as proof that all three workflows are live or safe to enable at scale. Confirm in sandbox/test workspace with controlled, user-approved internal phone numbers before live launch.
+- Maintain the global `ENABLE_LIVE_CALLS=false` default; a successful Sarvam API Connection badge is only a read-only authentication test.
