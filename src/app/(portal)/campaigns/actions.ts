@@ -67,8 +67,9 @@ export async function createSimpleCampaign(dealershipId:string,filename:string,t
   const {data:dealer,error}=await supabase.from("dealerships").select("name").eq("id",dealershipId).maybeSingle();
   if(error||!dealer?.name)return {error:"Could not verify the selected dealership."};
   // The date is based on IST, not the staff member's device clock. Start no sooner than tomorrow.
-  const istToday=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-  const [year,month,day]=istToday.split("-").map(Number);
+  const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const get=(name:string)=>Number(parts.find(x=>x.type===name)?.value??"0");
+  const year=get("year"),month=get("month"),day=get("day");
   const startUtc=Date.UTC(year,month-1,day+1);
   const date=(value:number)=>new Date(value).toISOString().slice(0,10);
   const start=date(startUtc),end=date(startUtc+7*86400000);
