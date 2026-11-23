@@ -8,6 +8,7 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}){
  const [id,setId]=useState(dealerships[0]?.id??""),[busy,start]=useTransition(),[message,setMessage]=useState("");
  const dealer=dealerships.find(d=>d.id===id),p=dealer?.profile;
  const [revision,setRevision]=useState(0);
+ const [activateDefaults,setActivateDefaults]=useState(dealerships[0]?.profile?.active??false);
  const [options,setOptions]=useState<SarvamOption[]>([]);
  const [selectedDeployment,setSelectedDeployment]=useState("");
  const [verified,setVerified]=useState<VerifiedDetails|null>(null);
@@ -42,7 +43,7 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}){
  return <section className="crm-panel" style={{maxWidth:790}}>
   <h2>Dealership AI Calling Defaults</h2>
   <p className="muted">Configure a verified agent and outbound number once. Campaign creators only select their dealership and Excel file. Saving settings does not place calls or authorize campaign launch.</p>
-  <label className="wizard-field">Dealership<select value={id} onChange={e=>{setId(e.target.value);setRevision(v=>v+1);setMessage("");setVerified(null);setSelectedDeployment("");setOptions([]);setLookupError("");}}>
+  <label className="wizard-field">Dealership<select value={id} onChange={e=>{setId(e.target.value);setRevision(v=>v+1);setMessage("");setVerified(null);setSelectedDeployment("");setOptions([]);setLookupError("");setActivateDefaults(dealerships.find(d=>d.id===e.target.value)?.profile?.active??false);}}>
    {dealerships.map(d=><option value={d.id} key={d.id}>{d.name}</option>)}</select></label>
 
   <div className="crm-panel" style={{padding:13,marginTop:12,background:"#f7fbfd",borderRadius:12}}>
@@ -66,15 +67,15 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}){
    </div>}
    {lookupError&&<p role="alert" className="form-error" style={{margin:"8px 0 0"}}>{lookupError}</p>}
   </div>
-  <form key={id+"-"+revision} style={{display:"grid",gap:16,marginTop:18}} action={form=>start(async()=>{setMessage("");const r=await saveVoiceProfile(form);setMessage(r.error??r.message??"Profile saved.");})}>
+  <form key={id+"-"+revision} style={{display:"grid",gap:16,marginTop:18}} onChange={()=>setMessage("")} action={form=>start(async()=>{setMessage("");form.set("active",activateDefaults?"yes":"no");const r=await saveVoiceProfile(form);setMessage(r.error??r.message??"Profile saved.");})}>
    <input type="hidden" name="dealershipId" value={id}/>
    <label className="wizard-field">Sarvam Agent ID<input name="agentId" required defaultValue={verified?.agentId??p?.agent_id??""} placeholder="Copy verified agent ID from Sarvam"/></label>
    <label className="wizard-field">Committed Agent Version<input name="version" required type="number" min={1} defaultValue={verified?.version??p?.app_version??1}/></label>
    <label className="wizard-field">Telephony Connection ID or Name<input name="connectionId" required defaultValue={chosen?.connectionId??p?.connection_id??""} placeholder="e.g. Sarvam Managed (Vobiz)"/><small className="muted">Connection names can be saved as inactive drafts. Only actual connection IDs can be activated.</small></label>
    <label className="wizard-field">Connected Caller Number<input name="callerNumber" type="tel" required defaultValue={chosen?.callerNumber??p?.caller_number??""} placeholder="8064272200 or +918064272200"/><small className="muted">Indian 10-digit mobile numbers are saved automatically with +91.</small></label>
-   <label style={{display:"flex",gap:10,fontSize:14,alignItems:"center"}}><input type="checkbox" name="active" value="yes" defaultChecked={p?.active??false}/>Use these verified defaults for newly created drafts</label>
+   <label style={{display:"flex",gap:10,fontSize:14,alignItems:"center"}}><input type="checkbox" name="active" value="yes" checked={activateDefaults} onChange={e=>{setActivateDefaults(e.target.checked);setMessage("");}}/>Use these verified defaults for newly created drafts</label>
    <div className="helper-banner">A connection name is not a verified telephony ID. Save it with defaults unchecked until the actual ID is confirmed. Calls still require verified telephony, consent checks, approval and server launch permission.</div>
-   {message&&<p className={message.startsWith("Saved")?"helper-banner":"form-error"} role="status">{message}</p>}
+   {message&&<p className={!message.startsWith("Profile saved")?"form-error":"helper-banner"} role="status">{message}</p>}
    <button type="submit" className="btn-primary" disabled={busy}>{busy?"Saving…":"Save Verified Profile"}</button>
   </form>
  </section>;
