@@ -14,7 +14,7 @@ export function OutboundConsole({campaign,config,batch,launch,testEnabled,liveEn
  const [phone,setPhone]=useState("");
  const [startAt,setStartAt]=useState((config?.schedule?.start??"")+"T10:00");
  const [endAt,setEndAt]=useState((config?.schedule?.end??"")+"T18:00");
- const [confirmCall,setConfirmCall]=useState(false),[confirmLaunch,setConfirmLaunch]=useState(false);
+ const [confirmCall,setConfirmCall]=useState(false),[confirmLaunch,setConfirmLaunch]=useState(false),[reviewedTest,setReviewedTest]=useState(false);
  const send=async(url:string,payload:FormData|Record<string,unknown>)=>{
   setError("");setMessage("");setBusy(true);
   try{
@@ -25,6 +25,7 @@ export function OutboundConsole({campaign,config,batch,launch,testEnabled,liveEn
    router.refresh();
   }catch(e){setError(e instanceof Error?e.message:"Could not complete request.");}finally{setBusy(false);}
  };
+ const refreshCohort=async()=>{setBusy(true);setError("");setMessage("");try{const res=await fetch("/api/sarvam/cohort-status?campaignId="+encodeURIComponent(campaign.id),{cache:"no-store"});const data=await res.json();if(!res.ok)throw Error(data.error??"Status check failed");setMessage(data.message+" Provider status: "+data.providerStatus+". Valid: "+String(data.valid??"pending")+", rejected: "+String(data.rejected??"pending")+".");router.refresh();}catch(e){setError(e instanceof Error?e.message:"Could not check provider.");}finally{setBusy(false);}};
  return <div style={{display:"grid",gap:18}}>
   {message&&<p className="helper-banner" role="status">{message}</p>}
   {error&&<p className="error" role="alert">{error}</p>}
@@ -63,14 +64,15 @@ export function OutboundConsole({campaign,config,batch,launch,testEnabled,liveEn
   <section className="crm-panel">
    <h2>3. Launch approved campaign</h2>
    <p className="muted">Only an approved, immutable campaign with a locked consent-screened cohort, a test call in the last 24 hours, matching agent/version/connection, a signed Sarvam webhook and an explicit final confirmation can be submitted. Start time must be at least one hour in the future.</p>
-   {launch&&<div className="helper-banner">Provider operation: <strong>{launch.state}</strong>. Campaign ID: {launch.sarvam_campaign_id??"Pending / unknown"}. Cohort ID: {launch.sarvam_cohort_id??"Pending"}. Do not repeat a launch if the result is unknown.</div>}
-   <form style={style} onSubmit={e=>{e.preventDefault();if(!startAt||!endAt)return;void send("/api/sarvam/launch",{campaignId:campaign.id,agentId,appVersion:Number(version),connectionId:connection,callerNumber:caller,startAt:new Date(startAt).toISOString(),endAt:new Date(endAt).toISOString(),confirm:"LAUNCH "+campaign.name});}}>
+   {launch&&<div className="helper-banner">Provider operation: <strong>{launch.state}</strong>. Campaign ID: {launch.sarvam_campaign_id??"Pending / unknown"}. Cohort ID: {launch.sarvam_cohort_id??"Pending"}. Do not repeat a launch if the result is unknown.{launch.sarvam_cohort_id&&<div style={{marginTop:10}}><button type="button" className="btn-outline small" disabled={busy} onClick={()=>void refreshCohort()}>Verify Sarvam Cohort Processing</button></div>}</div>}
+   <form style={style} onSubmit={e=>{e.preventDefault();if(!startAt||!endAt)return;void send("/api/sarvam/launch",{campaignId:campaign.id,agentId,appVersion:Number(version),connectionId:connection,callerNumber:caller,startAt:new Date(startAt).toISOString(),endAt:new Date(endAt).toISOString(),confirm:"LAUNCH "+campaign.name,reviewedTestResult:reviewedTest});}}>
     <div className="wizard-grid">
      <label className="wizard-field">Campaign start (local time)<input type="datetime-local" value={startAt} onChange={e=>setStartAt(e.target.value)} required/></label>
      <label className="wizard-field">Campaign end (local time)<input type="datetime-local" value={endAt} onChange={e=>setEndAt(e.target.value)} required/></label>
     </div>
+    <label style={{display:"flex",gap:9,alignItems:"start",fontSize:13}}><input type="checkbox" checked={reviewedTest} onChange={e=>setReviewedTest(e.target.checked)}/> I checked the real Sarvam test-call result and verified the agent audio, telephony and intended customer experience.</label>
     <label style={{display:"flex",gap:9,alignItems:"start",fontSize:13}}><input type="checkbox" checked={confirmLaunch} onChange={e=>setConfirmLaunch(e.target.checked)}/> I reviewed the approved cohort and recognize that launching schedules real, chargeable calls to {batch?.eligible_records??0} eligible recipients.</label>
-    <button className="btn-primary" type="submit" disabled={busy||!liveEnabled||campaign.status!=="APPROVED"||!batch||!!launch||!confirmLaunch}>{!liveEnabled?"Live Campaign Launch Disabled":campaign.status!=="APPROVED"?"Requires Campaign Approval":launch?"Launch Already Reserved":"Confirm & Schedule Campaign"}</button>
+    <button className="btn-primary" type="submit" disabled={busy||!liveEnabled||campaign.status!=="APPROVED"||!batch||!!launch||!confirmLaunch||!reviewedTest}>{!liveEnabled?"Live Campaign Launch Disabled":campaign.status!=="APPROVED"?"Requires Campaign Approval":launch?"Launch Already Reserved":"Confirm & Schedule Campaign"}</button>
    </form>
   </section>
  </div>;
