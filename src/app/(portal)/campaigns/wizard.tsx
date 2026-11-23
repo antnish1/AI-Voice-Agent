@@ -1,66 +1,114 @@
 "use client";
 import {useState,useTransition,useEffect} from "react";
 import {useRouter} from "next/navigation";
-import {saveWizardDraft} from "./actions";
+import {createSimpleCampaign} from "./actions";
 import {excelToRows,makeRecipientTemplate,rowsToCsv} from "@/lib/campaign-excel";
-type Draft={name:string;description:string;agent:string;version:string;telephony:string;outgoing:string;start:string;end:string;days:string[];from:string;to:string;cps:string;retries:string;interval:string;mapping:string};
-const steps=["Campaign Basics","Recipients","Schedule","Review"];
-const initial:Draft={name:"",description:"",agent:"",version:"",telephony:"",outgoing:"",start:"",end:"",days:["Mon","Tue","Wed","Thu","Fri","Sat"],from:"10:00",to:"18:00",cps:"1",retries:"0",interval:"60",mapping:""};
-export function CampaignWizard({dealershipId}:{dealershipId:string}){
- const [step,setStep]=useState(0),[draft,setDraft]=useState<Draft>(initial),[file,setFile]=useState(""),[convertedCsv,setConvertedCsv]=useState(""),[loadingFile,setLoadingFile]=useState(false),[count,setCount]=useState(0),[headers,setHeaders]=useState<string[]>([]),[sample,setSample]=useState<string[][]>([]),[rows,setRows]=useState<string[][]>([]),[phoneColumn,setPhoneColumn]=useState(""),[error,setError]=useState(""),[busy,startTransition]=useTransition();
- const router=useRouter();
- const [duration,setDuration]=useState<"30"|"90"|"none"|"custom">("custom");
- const [showAgent,setShowAgent]=useState(false);
- useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==="Escape")router.push("/campaigns");};document.addEventListener("keydown",key);return ()=>document.removeEventListener("keydown",key);},[router]);
- const formatDate=(d:Date)=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");
- const applyDuration=(d:"30"|"90"|"none")=>{setDuration(d);if(d==="none"){setDraft(p=>({...p,end:""}));return;}const start=draft.start?new Date(draft.start+"T12:00:00"):new Date();const end=new Date(start);end.setDate(end.getDate()+Number(d));setDraft(p=>({...p,start:formatDate(start),end:formatDate(end)}));};
- const close=()=>router.push("/campaigns");
- const update=(key:keyof Draft,value:string)=>setDraft(prev=>({...prev,[key]:value}));
- const parseCSV=(s:string)=>{const records:string[][]=[];let cell="",row:string[]=[],quoted=false;for(let i=0;i<s.length;i++){const c=s[i];if(c==='"'){if(quoted&&s[i+1]==='"'){cell+='"';i++;}else quoted=!quoted;}else if(c===","&&!quoted){row.push(cell);cell="";}else if((c==="\n"||c==="\r")&&!quoted){if(c==="\r"&&s[i+1]==="\n")i++;row.push(cell);if(row.some(x=>x.trim()))records.push(row);row=[];cell="";}else cell+=c;}row.push(cell);if(row.some(x=>x.trim()))records.push(row);return records;};
- const downloadBlob=(blob:Blob,name:string)=>{const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
- const filePicked=async(f:File|undefined)=>{
-  if(!f)return;
-  setError("");setFile("");setHeaders([]);setRows([]);setSample([]);setCount(0);setPhoneColumn("");setConvertedCsv("");
-  if(!/\.(xlsx|csv)$/i.test(f.name)){setError("Upload an Excel .xlsx workbook or CSV file.");return;}
-  if(f.size>5*1024*1024||!f.size){setError("Upload a non-empty Excel or CSV file up to 5 MB.");return;}
-  setLoadingFile(true);
-  try{
-   const records=/\.xlsx$/i.test(f.name)?await excelToRows(f):parseCSV(await f.text());
-   if(records.length<2)throw Error("Add column headers and at least one recipient row.");
-   if(records.length>50001)throw Error("The preview supports up to 50,000 recipient rows.");
-   const h=records[0].map(x=>x.trim());
-   if(h.some(x=>!x)||new Set(h).size!==h.length)throw Error("Column headers must be unique and non-empty.");
-   if(records.some((r,i)=>i>0&&r.length>h.length))throw Error("Some rows contain more columns than the header.");
-   const normalized=[h,...records.slice(1).map(r=>h.map((_,i)=>r[i]??""))];
-   const csv=rowsToCsv(normalized);
-   if(new Blob([csv]).size>5*1024*1024)throw Error("The converted CSV exceeds 5 MB. Split the file into smaller batches.");
-   setHeaders(h);setSample(normalized.slice(1,6));setRows(normalized.slice(1));setCount(normalized.length-1);setFile(f.name);setConvertedCsv(csv);
-   const possible=h.find(x=>/^(mobile|phone|phone.number|customer.phone|contact)$/i.test(x));setPhoneColumn(possible??"");
-  }catch(e){setError(e instanceof Error?e.message:"Could not read this workbook.");}
-  finally{setLoadingFile(false);}
- };
 
- const validation=(()=>{if(!phoneColumn)return {valid:0,rejected:rows.length,problems:[{row:0,reason:"Select a phone number column"}]};const idx=headers.indexOf(phoneColumn);const seen=new Set<string>();const problems:{row:number;reason:string}[]=[];let valid=0;for(let i=0;i<rows.length;i++){const value=String(rows[i][idx]??"").trim().replace(/[() .-]/g,"");if(!/^\+?[1-9]\d{7,14}$/.test(value))problems.push({row:i+2,reason:"Invalid phone number"});else if(seen.has(value))problems.push({row:i+2,reason:"Duplicate phone in this upload"});else{seen.add(value);valid++;}}return {valid,rejected:problems.length,problems:problems.slice(0,8)};})();
- const next=()=>{setError("");if(step===1&&loadingFile){setError("Please finish reading the file first.");return;}if(step===0&&draft.name.trim().length<3){setError("Enter a campaign name of at least 3 characters.");return;}if(step===2&&draft.start&&draft.end&&draft.end<draft.start){setError("End date must be on or after start date.");return;}setStep(Math.min(step+1,3));};
- const save=()=>{setError("");startTransition(async()=>{const result=await saveWizardDraft({dealershipId,name:draft.name.trim(),configuration:{description:draft.description,agent_label:draft.agent,agent_version_label:draft.version,telephony_label:draft.telephony,outgoing_number_label:draft.outgoing,schedule:{start:draft.start,end:draft.end,days:draft.days,from:draft.from,to:draft.to,cps:Number(draft.cps),max_retries:Number(draft.retries),retry_interval_minutes:Number(draft.interval)},recipient_preview:{filename:file,total_rows:count,phone_column:phoneColumn,preview_only:true}}});if(result.error){setError(result.error);return;}router.push("/campaigns");router.refresh();});};
- return <div className="campaign-modal-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)close();}}>
- <section className="campaign-modal" role="dialog" aria-modal="true" aria-labelledby="campaign-dialog-title">
- <header className="campaign-modal-header"><div><h2 id="campaign-dialog-title">Create New Campaign</h2><p>Create a new AI voice campaign in just a few steps</p></div><button type="button" className="campaign-modal-close" aria-label="Close campaign wizard" onClick={close}>×</button></header>
- <div className="campaign-modal-progress">{steps.map((title,i)=><div className="campaign-progress-item" key={title}><div className={"campaign-step-circle "+(step===i?"current":i<step?"finished":"")}>{i<step?"✓":i+1}</div><span>{title}</span></div>)}</div>
- <div className="campaign-modal-scroll">
- {step===0&&<div className="campaign-basics">
- <label className="campaign-form-label">Campaign Name <span>*</span><span className="campaign-info" title="Name used to identify your campaign">ⓘ</span><input className="campaign-pill-input" value={draft.name} maxLength={120} onChange={e=>update("name",e.target.value)} placeholder="e.g. November Service Reminders"/></label>
- <label className="campaign-form-label">Description <span className="campaign-info" title="Campaign objective and details">ⓘ</span><textarea className="campaign-pill-input campaign-description" value={draft.description} maxLength={200} onChange={e=>update("description",e.target.value)} placeholder="Describe your campaign’s goals"/></label>
- <div className="campaign-form-label">Campaign Duration <span>*</span><span className="campaign-info" title="Choose a suggested campaign length">ⓘ</span></div>
- <div className="campaign-duration-options">{[["30","30 Days (Recommended)"],["90","90 Days (Seasonal)"],["none","No end date"]].map(([value,label])=><button type="button" key={value} className={"campaign-duration-chip "+(duration===value?"selected":"")} onClick={()=>applyDuration(value as "30"|"90"|"none")}>{label}<small>{value==="none"?"Ongoing draft":value==="30"?"One-month campaign":"Three-month campaign"}</small></button>)}</div>
- <div className="campaign-date-row"><label className="campaign-date-field"><span>▦</span><input aria-label="Campaign start date" type="date" value={draft.start} onChange={e=>{update("start",e.target.value);setDuration("custom");}}/></label><label className="campaign-date-field"><span>▦</span><input aria-label="Campaign end date" type="date" disabled={duration==="none"} value={draft.end} onChange={e=>{update("end",e.target.value);setDuration("custom");}}/></label></div>
- <div className="campaign-switch-row"><div><strong>Campaign Status <span>*</span></strong><small>Save as draft only. Live activation is not available.</small></div><div className="campaign-status-control"><span className="campaign-draft-tag">Draft only</span><span className="campaign-status-toggle" role="img" aria-label="Live campaign activation is unavailable"><span/></span></div></div>
- <div className="campaign-agent-expander"><button type="button" className="campaign-agent-expand-button" aria-expanded={showAgent} onClick={()=>setShowAgent(!showAgent)}>Agent & telephony details <span>{showAgent?"−":"+"}</span></button>{showAgent&&<div className="campaign-agent-fields"><label>AI Voice Agent<input value={draft.agent} onChange={e=>update("agent",e.target.value)} placeholder="Sarvam Agent ID (copy from Sarvam)"/></label><label>Agent Version<input value={draft.version} onChange={e=>update("version",e.target.value)} placeholder="Committed version number"/></label><label>Telephony Connection<input value={draft.telephony} onChange={e=>update("telephony",e.target.value)} placeholder="Telephony connection ID"/></label><label>Outgoing Number / Group<input value={draft.outgoing} onChange={e=>update("outgoing",e.target.value)} placeholder="Number/group label"/></label><p>Draft labels only; live Sarvam selections are not connected.</p></div>}</div>
- </div>}
- {step===1&&<><div className="panel-title"><h2>Recipient list</h2><span>Step 2 of 4</span></div><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap",marginBottom:14}}><p className="muted" style={{margin:0}}>Download the Excel template, fill in recipients, then upload the completed workbook.</p><button type="button" className="btn-outline small" onClick={()=>downloadBlob(makeRecipientTemplate(),"FrontVox_Recipient_Template.xlsx")}>↓ Download Excel Template</button></div><label className="upload-zone" style={{display:"block"}}><span style={{fontSize:24}}>⇧</span><strong>{loadingFile?"Reading workbook…":"Choose an Excel (.xlsx) or CSV file"}</strong><small>Maximum 5 MB · Excel is converted to CSV locally in your browser; no customer data is uploaded at this step.</small><input type="file" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" style={{display:"none"}} disabled={loadingFile} onChange={e=>void filePicked(e.target.files?.[0])}/></label>{file&&<><div className="review-row"><span>Selected file</span><strong>{file}</strong></div><div className="review-row"><span>Records previewed</span><strong>{count}</strong></div><div className="review-row"><span>Conversion</span><strong>{file.toLowerCase().endsWith(".xlsx")?"Excel → CSV ready":"CSV ready"}</strong></div><button type="button" className="btn-outline small" style={{margin:"12px 0"}} disabled={!convertedCsv} onClick={()=>downloadBlob(new Blob([convertedCsv],{type:"text/csv;charset=utf-8"}),file.replace(/\.(xlsx|csv)$/i,"")+"_converted.csv")}>↓ Download Converted CSV</button><label className="wizard-field" style={{margin:"17px 0"}}>Phone number column<select value={phoneColumn} onChange={e=>setPhoneColumn(e.target.value)}><option value="">Select a column</option>{headers.map((h,i)=><option key={i} value={h}>{h}</option>)}</select></label><div className="review-row"><span>Basic phone checks</span><strong>{validation.valid} valid · {validation.rejected} rejected</strong></div>{validation.problems.length>0&&<div className="helper-banner" style={{marginTop:12}}>{validation.problems.map((p,i)=><div key={i}>{p.row===0?"Mapping":`Row ${p.row}`}: {p.reason}</div>)}</div>}<div className="tablewrap"><table className="crm-table"><thead><tr>{headers.slice(0,7).map((h,i)=><th key={i}>{h}</th>)}</tr></thead><tbody>{sample.map((r,i)=><tr key={i}>{headers.slice(0,7).map((_,j)=><td key={j}>{r[j]??""}</td>)}</tr>)}</tbody></table></div><p className="muted">This is a local preview only. The phone checks above are preliminary and do not confirm customer consent or call eligibility. The Excel file has been converted to CSV for preview and download. This preview is not staged or approved for calling. After saving the draft, open Import / Test / Launch to securely stage the converted CSV with consent and DNC mapping.</p></>}</>}
- {step===2&&<><div className="panel-title"><h2>Calling schedule</h2><span>Step 3 of 4</span></div><div className="wizard-grid"><label className="wizard-field">Start date<input type="date" value={draft.start} onChange={e=>update("start",e.target.value)}/></label><label className="wizard-field">End date<input type="date" value={draft.end} onChange={e=>update("end",e.target.value)}/></label><label className="wizard-field">Daily start time<input type="time" value={draft.from} onChange={e=>update("from",e.target.value)}/></label><label className="wizard-field">Daily end time<input type="time" value={draft.to} onChange={e=>update("to",e.target.value)}/></label><label className="wizard-field">Attempts per second<input type="number" min="1" max="30" value={draft.cps} onChange={e=>update("cps",e.target.value)}/></label><label className="wizard-field">Maximum retries<input type="number" min="0" max="10" value={draft.retries} onChange={e=>update("retries",e.target.value)}/></label><label className="wizard-field">Retry interval (minutes)<input type="number" min="1" value={draft.interval} onChange={e=>update("interval",e.target.value)}/></label><div className="wizard-field">Calling days<div style={{display:"flex",gap:10,flexWrap:"wrap"}}>{["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=><label key={d} style={{fontWeight:400}}><input type="checkbox" checked={draft.days.includes(d)} onChange={e=>setDraft(p=>({...p,days:e.target.checked?[...p.days,d]:p.days.filter(x=>x!==d)}))}/> {d}</label>)}</div></div></div><p className="muted" style={{marginTop:15}}>These are draft preferences, not validated Sarvam dialing settings or a confirmed booking.</p></>}
- {step===3&&<><div className="panel-title"><h2>Review campaign draft</h2><span>Step 4 of 4</span></div>{[["Name",draft.name],["AI agent",draft.agent||"Not selected"],["Version",draft.version||"Not selected"],["Telephony",draft.telephony||"Not selected"],["Outgoing number",draft.outgoing||"Not selected"],["Recipients",file?`${count} previewed in ${file} (not imported)`:"No recipients imported"],["Start / end",`${draft.start||"Not set"} – ${draft.end||"Not set"}`],["Hours",`${draft.from} – ${draft.to}`],["Calling days",draft.days.join(", ")],["Max retries",draft.retries]].map(([k,v])=><div className="review-row" key={k}><span>{k}</span><strong>{v}</strong></div>)}<div className="helper-banner" style={{marginTop:18}}>Saving creates a DRAFT in Supabase. Next, download the converted CSV from Step 2, then open Import / Test / Launch on the Campaigns page to securely stage recipients with consent and DNC checks. Saving alone does not call customers or launch Sarvam.</div></>}
- {error&&<p className="form-error" role="alert">{error}</p>}
- </div><footer className="campaign-modal-footer"><button type="button" className="campaign-modal-back" onClick={()=>step===0?close():setStep(step-1)}>{step===0?"Back":"← Back"}</button><span className="campaign-step-count">Step {step+1} of 4</span>{step===3?<button type="button" disabled={busy} onClick={save} className="campaign-modal-next">{busy?"Saving…":"Save draft"}</button>:<button type="button" onClick={next} className="campaign-modal-next">Next →</button>}</footer>
- </section></div>;
+type Dealer={id:string;name:string};
+type Preview={filename:string;csv:string;total:number;eligible:number;excluded:number;invalid:number;duplicate:number;sample:string[][];headers:string[]};
+const consentYes=new Set(["yes","true","1","opted_in","consented"]);
+const dncNo=new Set(["no","false","0",""]);
+const phone=(s:string)=>{const v=s.trim().replace(/[\s().-]/g,"");return /^[6-9]\d{9}$/.test(v)?"+91"+v:/^91[6-9]\d{9}$/.test(v)?"+"+v:/^\+[1-9]\d{7,14}$/.test(v)?v:null;};
+function parseCsv(value:string):string[][] {
+ const rows:string[][]=[];let row:string[]=[],cell="",quoted=false;const data=value.replace(/^\uFEFF/,"");
+ for(let i=0;i<data.length;i++){const c=data[i];
+  if(c==='"'){if(quoted&&data[i+1]==='"'){cell+='"';i++;}else if(quoted){quoted=false;}else if(!cell){quoted=true;}else throw Error("Malformed CSV quotation.");}
+  else if(c===","&&!quoted){row.push(cell);cell="";}
+  else if((c==="\n"||c==="\r")&&!quoted){if(c==="\r"&&data[i+1]==="\n")i++;row.push(cell);if(row.some(x=>x.trim()))rows.push(row);row=[];cell="";}
+  else cell+=c;
+ }
+ if(quoted)throw Error("Unclosed CSV quotation.");
+ row.push(cell);if(row.some(x=>x.trim()))rows.push(row);return rows;
+}
+function downloadBlob(blob:Blob,name:string) {
+ const url=URL.createObjectURL(blob),anchor=document.createElement("a");anchor.href=url;anchor.download=name;anchor.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:Dealer[];initialDealershipId:string}){
+ const router=useRouter();
+ const [dealershipId,setDealershipId]=useState(initialDealershipId);
+ const [preview,setPreview]=useState<Preview|null>(null),[busy,startTransition]=useTransition(),[reading,setReading]=useState(false);
+ const [consentCertified,setConsentCertified]=useState(false),[error,setError]=useState(""),[existingDraft,setExistingDraft]=useState("");
+ useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==="Escape"&&!busy)router.push("/campaigns");};document.addEventListener("keydown",key);return ()=>document.removeEventListener("keydown",key);},[router,busy]);
+ async function chooseFile(file:File|undefined){
+  if(!file)return;setPreview(null);setExistingDraft("");setConsentCertified(false);setError("");
+  if(file.size>5*1024*1024||file.size<1||!/\.(xlsx|csv)$/i.test(file.name)){setError("Choose an Excel (.xlsx) or CSV file up to 5 MB.");return;}
+  setReading(true);
+  try{
+   const rows=/\.xlsx$/i.test(file.name)?await excelToRows(file):parseCsv(await file.text());
+   if(rows.length<2||rows.length>251)throw Error("Upload 1–250 recipient rows per campaign.");
+   const headers=rows[0].map(x=>x.trim());
+   if(headers.some(x=>!x)||new Set(headers).size!==headers.length)throw Error("Excel headers must be unique and non-empty.");
+   for(const required of ["Mobile","consent","do_not_call"])if(!headers.includes(required))throw Error("Missing required column: "+required+". Download the template.");
+   if(rows.some((r,i)=>i>0&&r.length!==headers.length))throw Error("Some rows have a different column count.");
+   const idx=headers.indexOf("Mobile"),ci=headers.indexOf("consent"),di=headers.indexOf("do_not_call");
+   let eligible=0,invalid=0,duplicate=0;const seen=new Set<string>();
+   for(const row of rows.slice(1)){
+    const value=phone(row[idx]);if(!value){invalid++;continue;}
+    if(seen.has(value)){duplicate++;continue;}
+    if(!consentYes.has(row[ci].trim().toLowerCase())||!dncNo.has(row[di].trim().toLowerCase()))continue;
+    seen.add(value);eligible++;
+   }
+   const csv=rowsToCsv(rows);
+   if(new Blob([csv]).size>5*1024*1024)throw Error("Converted CSV exceeds 5 MB.");
+   setPreview({filename:file.name,csv,total:rows.length-1,eligible,excluded:rows.length-1-eligible,invalid,duplicate,headers,sample:rows.slice(1,4)});
+  }catch(e){setError(e instanceof Error?e.message:"Unable to read customer Excel.");}
+  finally{setReading(false);}
+ }
+ function submit(){
+  if(!preview||!dealershipId||busy)return;
+  if(!consentCertified){setError("Confirm consent and DNC screening before creating the campaign.");return;}
+  if(!preview.eligible){setError("No eligible consented recipients. Check the Excel file.");return;}
+  setError("");
+  startTransition(async()=>{
+   let id=existingDraft;
+   if(!id){
+    const created=await createSimpleCampaign(dealershipId,preview.filename,preview.total);
+    if(!created.id){setError(created.error??"Could not create campaign.");return;}
+    id=created.id;setExistingDraft(id);
+   }
+   const form=new FormData();
+   form.set("campaignId",id);form.set("file",new File([preview.csv],"recipients.csv",{type:"text/csv"}));
+   form.set("cohortName","Service Reminders");form.set("phoneColumn","Mobile");
+   form.set("consentColumn","consent");form.set("dncColumn","do_not_call");
+   form.set("variableMapping","{}");form.set("certifyConsent","yes");
+   try{
+    const response=await fetch("/api/sarvam/recipients",{method:"POST",body:form,cache:"no-store"});
+    const data=await response.json();
+    if(!response.ok||!data.ok){setError((data.error??"Could not stage recipient file.")+" The draft was retained; retrying will not create another draft.");return;}
+    router.push("/campaigns/"+id+"/outbound");router.refresh();
+   }catch{setError("Upload failed. Your draft was retained; retry to securely stage the same file.");}
+  });
+ }
+ return <div className="campaign-modal-overlay" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)router.push("/campaigns");}}>
+  <section className="campaign-modal" role="dialog" aria-modal="true" aria-labelledby="campaign-dialog-title">
+   <header className="campaign-modal-header"><div><h2 id="campaign-dialog-title">Create AI Calling Campaign</h2><p>Select dealership, upload Excel, and review eligible recipients</p></div><button type="button" className="campaign-modal-close" aria-label="Close" onClick={()=>router.push("/campaigns")}>×</button></header>
+   <div className="campaign-modal-scroll" style={{display:"grid",gap:18}}>
+    <label className="campaign-form-label">Dealership <span>*</span>
+     <select className="campaign-pill-input" value={dealershipId} disabled={busy||!!existingDraft} onChange={e=>{setDealershipId(e.target.value);setPreview(null);setExistingDraft("");}}>
+      {dealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}
+     </select>
+    </label>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+     <strong>Customer Excel</strong><button type="button" className="btn-outline small" onClick={()=>downloadBlob(makeRecipientTemplate(),"FrontVox_Recipient_Template.xlsx")}>↓ Download Excel Template</button>
+    </div>
+    <label className="upload-zone" style={{display:"block"}}><span style={{fontSize:24}}>⇧</span><strong>{reading?"Checking file…":"Upload Customer Excel (.xlsx)"}</strong><small>Excel or CSV, up to 5 MB · The first worksheet is converted to CSV locally.</small><input type="file" accept=".xlsx,.csv" disabled={busy||reading||!!existingDraft} style={{display:"none"}} onChange={e=>void chooseFile(e.target.files?.[0])}/></label>
+    {preview&&<div className="crm-panel" style={{padding:16}}>
+     <div className="panel-title"><h2>Recipient readiness</h2><span>{preview.filename}</span></div>
+     <div className="wizard-grid">
+      <div className="review-row"><span>Total rows</span><strong>{preview.total}</strong></div>
+      <div className="review-row"><span>Eligible</span><strong>{preview.eligible}</strong></div>
+      <div className="review-row"><span>Held / excluded</span><strong>{preview.excluded}</strong></div>
+      <div className="review-row"><span>Invalid / duplicate</span><strong>{preview.invalid} / {preview.duplicate}</strong></div>
+     </div>
+     <div className="tablewrap" style={{marginTop:12}}><table className="crm-table"><thead><tr>{preview.headers.slice(0,4).map((h,i)=><th key={i}>{h}</th>)}</tr></thead><tbody>{preview.sample.map((row,i)=><tr key={i}>{row.slice(0,4).map((c,j)=><td key={j}>{c}</td>)}</tr>)}</tbody></table></div>
+     <small className="muted">Preliminary checks. Server validates and locks the actual cohort; rows without consent or on the DNC list are excluded. This is not an insurance/vehicle lookup.</small>
+    </div>}
+    <label style={{display:"flex",gap:10,alignItems:"start",fontSize:13}}><input type="checkbox" checked={consentCertified} disabled={busy} onChange={e=>setConsentCertified(e.target.checked)}/>I confirm these customers consented to this calling purpose and the list has been checked against our suppression/DNC records.</label>
+    <div className="helper-banner">Defaults: 10:00–18:00 IST, Monday–Saturday, 1 call attempt/second, no retries. Campaign is created as a draft. Agent and verified telephony are required before approval and calling.</div>
+    {error&&<p role="alert" className="form-error">{error}</p>}
+   </div>
+   <footer className="campaign-modal-footer"><button type="button" className="campaign-modal-back" onClick={()=>router.push("/campaigns")}>Cancel</button><span className="campaign-step-count">{preview?preview.eligible+" eligible recipients":"No file selected"}</span><button type="button" disabled={busy||reading||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next">{busy?"Creating…":"Create & Check Details"}</button></footer>
+  </section>
+ </div>;
 }
