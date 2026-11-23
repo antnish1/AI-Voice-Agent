@@ -67,7 +67,7 @@ create table if not exists public.voice_campaign_launches (
  config_sha256 text not null check(config_sha256 ~ '^[a-f0-9]{64}$'),
  sarvam_campaign_id text unique,
  sarvam_cohort_id text,
- state text not null check(state in ('creating','campaign_created','cohort_submitted','cohort_completed','needs_reconciliation','failed')),
+ state text not null check(state in ('creating','campaign_created','cohort_submitting','cohort_submitted','cohort_completed','needs_reconciliation','failed')),
  initiated_by uuid not null references auth.users(id),
  created_at timestamptz not null default now(),
  updated_at timestamptz not null default now()
@@ -115,3 +115,15 @@ create policy frontvox_test_call_update on public.voice_test_call_requests for u
  using(user_id=(select auth.uid()) and (select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid)
  with check(user_id=(select auth.uid()) and (select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid);
 grant select,insert,update on public.voice_test_call_requests to authenticated;
+
+-- Approved campaign content cannot be edited after being submitted for approval.
+create or replace function public.frontvox_lock_submitted_configuration()
+returns trigger language plpgsql security invoker set search_path='' as $$
+begin
+ if exists(select 1 from public.campaigns c where c.id=old.campaign_id and c.status<>'DRAFT')
+ then raise exception 'Submitted or approved campaign configuration is immutable'; end if;
+ return new;
+end $$;
+drop trigger if exists frontvox_lock_campaign_draft on public.campaign_draft_configs;
+create trigger frontvox_lock_campaign_draft before update or delete on public.campaign_draft_configs
+ for each row execute function public.frontvox_lock_submitted_configuration();
