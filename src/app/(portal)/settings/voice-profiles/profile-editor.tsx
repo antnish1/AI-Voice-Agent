@@ -66,14 +66,14 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}){
    </div>}
    {lookupError&&<p role="alert" className="form-error" style={{margin:"8px 0 0"}}>{lookupError}</p>}
   </div>
-  <form key={id+"-"+revision} style={{display:"grid",gap:16,marginTop:18}} action={form=>start(async()=>{setMessage("");const r=await saveVoiceProfile(form);setMessage(r.error??"Saved. Reload to view the latest profile.");})}>
+  <form key={id+"-"+revision} style={{display:"grid",gap:16,marginTop:18}} action={form=>start(async()=>{setMessage("");const r=await saveVoiceProfile(form);setMessage(r.error??r.message??"Profile saved.");})}>
    <input type="hidden" name="dealershipId" value={id}/>
    <label className="wizard-field">Sarvam Agent ID<input name="agentId" required defaultValue={verified?.agentId??p?.agent_id??""} placeholder="Copy verified agent ID from Sarvam"/></label>
    <label className="wizard-field">Committed Agent Version<input name="version" required type="number" min={1} defaultValue={verified?.version??p?.app_version??1}/></label>
-   <label className="wizard-field">Telephony Connection ID<input name="connectionId" required defaultValue={chosen?.connectionId??p?.connection_id??""} placeholder="Verified connection ID"/></label>
-   <label className="wizard-field">Connected Caller Number<input name="callerNumber" required defaultValue={chosen?.callerNumber??p?.caller_number??""} placeholder="+91XXXXXXXXXX"/></label>
+   <label className="wizard-field">Telephony Connection ID or Name<input name="connectionId" required defaultValue={chosen?.connectionId??p?.connection_id??""} placeholder="e.g. Sarvam Managed (Vobiz)"/><small className="muted">Connection names can be saved as inactive drafts. Only actual connection IDs can be activated.</small></label>
+   <label className="wizard-field">Connected Caller Number<input name="callerNumber" type="tel" required defaultValue={chosen?.callerNumber??p?.caller_number??""} placeholder="8064272200 or +918064272200"/><small className="muted">Indian 10-digit mobile numbers are saved automatically with +91.</small></label>
    <label style={{display:"flex",gap:10,fontSize:14,alignItems:"center"}}><input type="checkbox" name="active" value="yes" defaultChecked={p?.active??false}/>Use these verified defaults for newly created drafts</label>
-   <div className="helper-banner">These details must match the real Sarvam workspace. Enabling a profile only pre-fills drafts; test-call confirmation, consent screening, manager approval, signed webhook and server launch switch remain mandatory.</div>
+   <div className="helper-banner">A connection name is not a verified telephony ID. Save it with defaults unchecked until the actual ID is confirmed. Calls still require verified telephony, consent checks, approval and server launch permission.</div>
    {message&&<p className={message.startsWith("Saved")?"helper-banner":"form-error"} role="status">{message}</p>}
    <button type="submit" className="btn-primary" disabled={busy}>{busy?"Saving…":"Save Verified Profile"}</button>
   </form>
