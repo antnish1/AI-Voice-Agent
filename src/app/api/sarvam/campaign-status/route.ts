@@ -36,8 +36,10 @@ export async function POST(request:Request){
   try{
    const result=await sarvamPut(path+"/status",{action});
    const state=String(result.status??"").toLowerCase();
+   const expected=action==="pause"?"paused":"active";
+   if(state&&state!==expected)throw Error("Provider returned an unexpected campaign state.");
    const {error:logError}=await supabase.from("voice_campaign_control_events").update({
-    status:"confirmed",provider_status:state||action==="pause"?"paused":"active",updated_at:new Date().toISOString()
+    status:"confirmed",provider_status:expected,updated_at:new Date().toISOString()
    }).eq("id",reservation.id).eq("status","pending");
    if(logError)throw Error("Provider accepted action but audit update failed.");
    return NextResponse.json({ok:true,providerStatus:state||"accepted",message:"Sarvam accepted the campaign "+action+" request. Check the provider status to confirm no further calls are being queued."});
