@@ -5,6 +5,7 @@ import {makeCampaignDetailedReport,type CampaignProspectReportRow} from "@/lib/c
 export type ProspectView=CampaignProspectReportRow&{id:string;recipient_identifier:string;attempt_number:number};
 export function ProspectDashboard({campaignName,prospects,uploaded,eligible}:{campaignName:string;prospects:ProspectView[];uploaded:number;eligible:number}){
  const router=useRouter(),[busy,setBusy]=useState(""),[notice,setNotice]=useState(""),[error,setError]=useState("");
+ const [editing,setEditing]=useState(""),[interest,setInterest]=useState("interested"),[summary,setSummary]=useState(""),[nextAction,setNextAction]=useState(""),[followUp,setFollowUp]=useState("");
  const pending=prospects.filter(p=>p.queue_state==="pending"&&!p.connectivity).length;
  const connected=prospects.filter(p=>p.connectivity==="answered").length;
  const held=Math.max(0,uploaded-eligible)+prospects.filter(p=>p.readiness==="held").length;
@@ -17,6 +18,18 @@ export function ProspectDashboard({campaignName,prospects,uploaded,eligible}:{ca
    const data=await response.json();if(!response.ok||!data.ok)throw Error(data.error??"Request failed");
    setNotice(data.message);router.refresh();
   }catch(e){setError(e instanceof Error?e.message:"Could not request retry.");}
+  finally{setBusy("");}
+ };
+ const saveOutcome=async(id:string)=>{
+  if(!summary.trim())return setError("Enter a factual summary from the saved call.");
+  setBusy(id);setNotice("");setError("");
+  try{
+   const response=await fetch("/api/sarvam/review-outcome",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({prospectId:id,interest,summary,nextAction,followUpAt:followUp?new Date(followUp).toISOString():""}),cache:"no-store"});
+   const data=await response.json();
+   if(!response.ok||!data.ok)throw Error(data.error??"Review failed.");
+   setNotice(data.message);setEditing("");router.refresh();
+  }catch(e){setError(e instanceof Error?e.message:"Could not record reviewed call outcome.");}
   finally{setBusy("");}
  };
  const download=()=>{
@@ -48,10 +61,23 @@ export function ProspectDashboard({campaignName,prospects,uploaded,eligible}:{ca
    <td>{p.readiness==="held"?"Held":p.customer_source==="crm"?"CRM matched":"Excel only"}</td>
    <td>{p.connectivity?.replaceAll("_"," ")??p.queue_state.replaceAll("_"," ")}</td>
    <td>{p.interest?.replaceAll("_"," ")??"—"}</td><td>{p.follow_up_at?new Date(p.follow_up_at).toLocaleString("en-IN"):"—"}</td>
-   <td>{["busy","no_answer","failed"].includes(p.connectivity??p.queue_state)&&!p.retry_requested?
+   <td>{p.connectivity==="answered"?
+    <button className="btn-outline small" type="button" disabled={!!busy} onClick={()=>{setEditing(p.id);setInterest(p.interest??"interested");setSummary(p.call_summary??"");setNextAction(p.next_action??"");setFollowUp(p.follow_up_at?p.follow_up_at.slice(0,16):"");}}>Review outcome</button>
+    :["busy","no_answer","failed"].includes(p.connectivity??p.queue_state)&&!p.retry_requested?
     <button className="btn-outline small" type="button" disabled={busy===p.id||!!busy} onClick={()=>void requestRetry(p)}>{busy===p.id?"Requesting…":"Request Retry"}</button>
     :p.retry_requested?"Review pending":"—"}</td>
   </tr>)}</tbody></table></div>:<div className="helper-banner">No customer-wise records have been indexed. Upload and stage an eligible Excel list first.</div>}
+  {editing&&<div className="crm-panel" style={{marginTop:16,padding:16,display:"grid",gap:12}}>
+   <div className="panel-title"><h2>Review verified call outcome</h2><button type="button" className="btn-outline small" onClick={()=>setEditing("")}>Close</button></div>
+   <label className="wizard-field">Customer response<select value={interest} onChange={e=>setInterest(e.target.value)}>
+    <option value="interested">Interested</option><option value="not_interested">Not Interested</option><option value="follow_up">Follow-up Required</option><option value="human_assistance">Human Assistance</option>
+   </select></label>
+   <label className="wizard-field">Factual call summary<textarea rows={3} maxLength={2000} required value={summary} onChange={e=>setSummary(e.target.value)} placeholder="Record only information verified from the actual call"/></label>
+   <label className="wizard-field">Next action<input value={nextAction} maxLength={500} onChange={e=>setNextAction(e.target.value)} placeholder="e.g. Service advisor to call customer"/></label>
+   <label className="wizard-field">Follow-up date / time<input type="datetime-local" value={followUp} onChange={e=>setFollowUp(e.target.value)}/></label>
+   <button className="btn-primary" type="button" disabled={!!busy||!summary.trim()} onClick={()=>void saveOutcome(editing)}>{busy?"Saving…":"Save Reviewed Outcome"}</button>
+   <p className="muted">Reviewing a result does not place a call, send a quotation or automatically create an appointment.</p>
+  </div>}
   <p className="muted">Retry requests are audit-only pending review; they never initiate an automatic redial. Interest, summary and follow-up fields appear only if verified data has been saved.</p>
  </section>;
 }
