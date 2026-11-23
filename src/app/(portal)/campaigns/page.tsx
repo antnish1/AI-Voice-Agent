@@ -37,7 +37,7 @@ function CountsCard({kind,label,value}:{kind:"all"|"draft"|"pending";label:strin
  return <div className={`fc-count-card fc-count-${kind}`}><span className="fc-count-icon"><CampaignIcon kind={kind}/></span><span className="fc-count-content"><span>{label}</span><strong>{value}</strong></span><span className="fc-count-arrow" aria-hidden="true">➜</span><span className="fc-count-wave" aria-hidden="true"/></div>;
 }
 function normalizeDate(input?:string){return input&&/^\d{4}-\d{2}-\d{2}$/.test(input)?input:"";}
-export default async function Campaigns({searchParams}:{searchParams:Promise<Filters>}){
+export default async function Campaigns({searchParams}:{searchParams?:Promise<Filters>}={}){
  const {supabase,membership,user,memberships}=await requireMembership();if(!membership)return null;
  const {data,error}=await supabase.from("campaigns").select("id,name,status,created_at").eq("dealership_id",membership.dealership_id).order("created_at",{ascending:false}).limit(100);
  if(error)throw new Error("Could not read campaigns.");
@@ -46,7 +46,7 @@ export default async function Campaigns({searchParams}:{searchParams:Promise<Fil
  if(batchResult?.error)throw new Error("Could not read staged campaign recipients.");
  const staged=new Set((batchResult?.data??[]).filter(x=>x.eligible_records>0).map(x=>x.campaign_id));
  const total=campaigns.length,drafts=campaigns.filter(c=>c.status==="DRAFT").length,pending=campaigns.filter(c=>c.status==="PENDING_MANAGER_APPROVAL").length;
- const filters=await searchParams;const q=(filters.q??"").trim().slice(0,120),status=filters.status??"",from=normalizeDate(filters.from),to=normalizeDate(filters.to);
+ const filters=await (searchParams??Promise.resolve({} as Filters));const q=(filters.q??"").trim().slice(0,120),status=filters.status??"",from=normalizeDate(filters.from),to=normalizeDate(filters.to);
  const statuses=["DRAFT","PENDING_MANAGER_APPROVAL","APPROVED","REJECTED","ACTIVE","PAUSED","COMPLETED"];
  const selectedStatus=statuses.includes(status)?status:"";
  const shown=campaigns.filter(c=>(!q||c.name.toLowerCase().includes(q.toLowerCase())||c.id.toLowerCase().includes(q.toLowerCase()))&&(!selectedStatus||c.status===selectedStatus)&&(!from||c.created_at.slice(0,10)>=from)&&(!to||c.created_at.slice(0,10)<=to));
