@@ -1,6 +1,7 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { requireMembership, canPrepare } from "@/lib/auth";
+import {requireItSuperUser} from "@/lib/it-access";
 type WizardInput={dealershipId:string;name:string;configuration:{
  description:string;agent_label:string;agent_version_label:string;telephony_label:string;outgoing_number_label:string;
  schedule:{start:string;end:string;days:string[];from:string;to:string;cps:number;max_retries:number;retry_interval_minutes:number};
@@ -59,6 +60,7 @@ export async function submitCampaign(form:FormData){
 /** Minimal InsureIT-style creation. Settings are server-controlled, never inferred from an Excel sheet. */
 export async function createSimpleCampaign(dealershipId:string,filename:string,totalRows:number):Promise<{error?:string;id?:string}>{
  try {
+  await requireItSuperUser();
   const {supabase,membership}=await requireMembership(dealershipId);
   if(!membership||!canPrepare(membership.role)||membership.dealership_id!==dealershipId)return {error:"You cannot create campaigns for this dealership."};
   if(!Number.isInteger(totalRows)||totalRows<1||totalRows>250)return {error:"Select 1–250 customer records per campaign."};
