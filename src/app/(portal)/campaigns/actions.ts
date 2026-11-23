@@ -71,9 +71,14 @@ export async function createSimpleCampaign(dealershipId:string,filename:string,t
   const date=(value:number)=>new Date(value).toISOString().slice(0,10);
   const start=date(startUtc),end=date(startUtc+7*86400000);
   const name=(dealer.name+" Service Campaign "+start).slice(0,120);
+  const profileResult=await supabase.from("dealership_voice_profiles")
+   .select("agent_id,app_version,connection_id,caller_number,active")
+   .eq("dealership_id",dealershipId).maybeSingle();
+  if(profileResult.error)return {error:"Dealership voice settings are not available. Apply the reviewed profile migration first."};
+  const profile=profileResult.data?.active?profileResult.data:null;
   const draft=await saveWizardDraft({dealershipId,name,configuration:{
    description:"Service reminder calling; requires verified Sarvam agent, telephony and manager approval.",
-   agent_label:"",agent_version_label:"",telephony_label:"",outgoing_number_label:"",
+   agent_label:profile?.agent_id??"",agent_version_label:profile?String(profile.app_version):"",telephony_label:profile?.connection_id??"",outgoing_number_label:profile?.caller_number??"",
    schedule:{start,end,days:["Mon","Tue","Wed","Thu","Fri","Sat"],from:"10:00",to:"18:00",cps:1,max_retries:0,retry_interval_minutes:60},
    recipient_preview:{filename,total_rows:totalRows,phone_column:"Mobile",preview_only:true}
   }});
