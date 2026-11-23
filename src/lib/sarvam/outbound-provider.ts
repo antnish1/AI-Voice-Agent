@@ -17,6 +17,15 @@ export async function sarvamPost(path:string,data:unknown){
  if(!response.ok)throw Error("Sarvam rejected request (HTTP "+response.status+"). Check validated configuration and provider logs.");
  return result;
 }
+export async function sarvamGet(path:string){
+ const {key,base}=requireProviderConfig();
+ if(!path.startsWith("/api/")||path.includes("..")||path.startsWith("//"))throw Error("Unsafe provider path");
+ const response=await fetch(base+path,{method:"GET",headers:{"X-API-Key":key,"Accept":"application/json"},cache:"no-store",signal:AbortSignal.timeout(12000)});
+ let result:Record<string,unknown>={};
+ try{const body=await response.json();if(body&&typeof body==="object"&&!Array.isArray(body))result=body;}catch{}
+ if(!response.ok)throw Error("Sarvam returned HTTP "+response.status+" while checking cohort.");
+ return result;
+}
 export function sarvamPath(kind:"outbounds"|"campaigns",suffix=""){
  const {org,workspace}=requireProviderConfig();
  return kind==="outbounds"?`/api/outbounds/v1/orgs/${org}/workspaces/${workspace}/outbounds`:
