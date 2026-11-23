@@ -1,6 +1,7 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { requireMembership, canPrepare } from "@/lib/auth";
+import {requireItSuperUser} from "@/lib/it-access";
 type WizardInput={dealershipId:string;name:string;configuration:{
  description:string;agent_label:string;agent_version_label:string;telephony_label:string;outgoing_number_label:string;
  schedule:{start:string;end:string;days:string[];from:string;to:string;cps:number;max_retries:number;retry_interval_minutes:number};
@@ -54,4 +55,37 @@ export async function submitCampaign(form:FormData){
  const {data,error}=await supabase.from("campaigns").update({status:"PENDING_MANAGER_APPROVAL"}).eq("id",id).eq("dealership_id",dealershipId).eq("status","DRAFT").select("id");
  if(error||!data?.length)throw new Error("Could not submit campaign.");
  revalidatePath("/campaigns");revalidatePath("/approvals");
+}
+
+/** Minimal InsureIT-style creation. Settings are server-controlled, never inferred from an Excel sheet. */
+export async function createSimpleCampaign(dealershipId:string,filename:string,totalRows:number):Promise<{error?:string;id?:string}>{
+ try {
+  await requireItSuperUser();
+  const {supabase,membership}=await requireMembership(dealershipId);
+  if(!membership||!canPrepare(membership.role)||membership.dealership_id!==dealershipId)return {error:"You cannot create campaigns for this dealership."};
+  if(!Number.isInteger(totalRows)||totalRows<1||totalRows>250)return {error:"Select 1–250 customer records per campaign."};
+  const {data:dealer,error}=await supabase.from("dealerships").select("name").eq("id",dealershipId).maybeSingle();
+  if(error||!dealer?.name)return {error:"Could not verify the selected dealership."};
+  // The date is based on IST, not the staff member's device clock. Start no sooner than tomorrow.
+  const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const get=(name:string)=>Number(parts.find(x=>x.type===name)?.value??"0");
+  const year=get("year"),month=get("month"),day=get("day");
+  const startUtc=Date.UTC(year,month-1,day+1);
+  const date=(value:number)=>new Date(value).toISOString().slice(0,10);
+  const start=date(startUtc),end=date(startUtc+7*86400000);
+  const name=(dealer.name+" Service Campaign "+start).slice(0,120);
+  const profileResult=await supabase.from("dealership_voice_profiles")
+   .select("agent_id,app_version,connection_id,caller_number,active")
+   .eq("dealership_id",dealershipId).maybeSingle();
+  if(profileResult.error)return {error:"Dealership voice settings are not available. Apply the reviewed profile migration first."};
+  const profile=profileResult.data?.active?profileResult.data:null;
+  if(!profile)return {error:"This dealership needs a verified active Sarvam profile. Configure it in Voice Agent Defaults before creating a campaign."};
+  const draft=await saveWizardDraft({dealershipId,name,configuration:{
+   description:"Service reminder calling; requires verified Sarvam agent, telephony and manager approval.",
+   agent_label:profile?.agent_id??"",agent_version_label:profile?String(profile.app_version):"",telephony_label:profile?.connection_id??"",outgoing_number_label:profile?.caller_number??"",
+   schedule:{start,end,days:["Mon","Tue","Wed","Thu","Fri","Sat"],from:"10:00",to:"18:00",cps:1,max_retries:0,retry_interval_minutes:60},
+   recipient_preview:{filename,total_rows:totalRows,phone_column:"Mobile",preview_only:true}
+  }});
+  return draft;
+ }catch{return {error:"Could not create campaign draft."};}
 }

@@ -31,3 +31,13 @@ export function sarvamPath(kind:"outbounds"|"campaigns",suffix=""){
  return kind==="outbounds"?`/api/outbounds/v1/orgs/${org}/workspaces/${workspace}/outbounds`:
  `/api/scheduling/v1/orgs/${org}/workspaces/${workspace}/campaigns`+suffix;
 }
+
+export async function sarvamPut(path:string,data:unknown){
+ const {key,base}=requireProviderConfig();
+ if(!path.startsWith("/api/")||path.includes("..")||path.startsWith("//"))throw Error("Unsafe provider path");
+ const response=await fetch(base+path,{method:"PUT",headers:{"X-API-Key":key,"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(data),cache:"no-store",signal:AbortSignal.timeout(20000)});
+ let payload:Record<string,unknown>={};
+ try{const body=await response.json();if(body&&typeof body==="object"&&!Array.isArray(body))payload=body;}catch{}
+ if(!response.ok)throw Error("Sarvam rejected campaign lifecycle request (HTTP "+response.status+").");
+ return payload;
+}
