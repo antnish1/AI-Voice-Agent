@@ -16,28 +16,25 @@ export async function POST(request:Request){
   const version=Number(body.appVersion);
   if(!/^[\w.\-]{3,200}$/.test(agent)||!/^[\w.\-]{3,200}$/.test(connection)||!outgoing||!Number.isInteger(version)||version<1)
    return NextResponse.json({error:"Select a valid committed agent version and verified telephony connection."},{status:400});
-  const since=new Date(Date.now()-86400000).toISOString();
-  const {count,error:countError}=await supabase.from("voice_test_call_requests").select("id",{count:"exact",head:true}).eq("user_id",user.id).gte("created_at",since);
-  if(countError||count===null)return NextResponse.json({error:"Test-call audit access is unavailable."},{status:503});
-  if(count>=3)return NextResponse.json({error:"Three test calls in 24 hours is the safety limit."},{status:429});
-  const hash=sha256(number+"|"+String(process.env.TEST_CALL_HASH_SALT??""));
-  if(!process.env.TEST_CALL_HASH_SALT)return NextResponse.json({error:"Test-call audit salt has not been configured."},{status:503});
-  const bucket=Math.floor(Date.now()/600000);
-  const {data:reservation,error:reservationError}=await supabase.from("voice_test_call_requests").insert({
-   user_id:user.id,phone_hash:hash,phone_last4:number.slice(-4),window_bucket:bucket,agent_id:agent,status:"reserved"
-  }).select("id").single();
-  if(reservationError||!reservation)return NextResponse.json({error:"This number was already requested recently or audit reservation failed."},{status:409});
+  const salt=process.env.TEST_CALL_HASH_SALT;
+  if(!salt)return NextResponse.json({error:"Test-call audit salt has not been configured."},{status:503});
+  const hash=sha256(number+"|"+salt);
+  // Atomic PostgreSQL transaction applies the 3-in-24h limit and 10-minute duplicate restriction.
+  const {data:reservationId,error:reservationError}=await supabase.rpc("frontvox_reserve_test_call",{
+   p_phone_hash:hash,p_phone_last4:number.slice(-4),p_agent_id:agent
+  });
+  if(reservationError||typeof reservationId!=="string")return NextResponse.json({error:"Test call blocked by cooldown, daily limit or audit policy."},{status:409});
   try{
    const result=await sarvamPost(sarvamPath("outbounds"),{
     app_config:{app_id:agent,app_version:version,connection_config:{connection_id:connection,agent_phone_number:outgoing}},
     user_config:{user_phone_number:number}
    });
    if(typeof result.attempt_id!=="string"||!result.attempt_id)throw Error("Provider returned no attempt ID");
-   await supabase.from("voice_test_call_requests").update({status:"submitted",sarvam_attempt_id:result.attempt_id}).eq("id",reservation.id);
+   await supabase.from("voice_test_call_requests").update({status:"submitted",sarvam_attempt_id:result.attempt_id}).eq("id",reservationId);
    return NextResponse.json({ok:true,attemptId:result.attempt_id,status:"submitted",message:"Provider accepted the test call. This does not confirm it connected."},{headers:{"Cache-Control":"no-store"}});
   }catch{
    // A network error can leave an unknown provider-side outcome. Never automatically retry.
-   await supabase.from("voice_test_call_requests").update({status:"unknown"}).eq("id",reservation.id);
+   await supabase.from("voice_test_call_requests").update({status:"unknown"}).eq("id",reservationId);
    return NextResponse.json({error:"Provider result is unconfirmed. Check Sarvam attempts before trying again."},{status:502});
   }
  }catch{return NextResponse.json({error:"Could not authorize or validate the test call request."},{status:403});}
