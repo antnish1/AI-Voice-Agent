@@ -1376,3 +1376,49 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 .frontier-dealer-switch{display:flex;align-items:center;gap:7px;max-width:260px;font-size:10px;color:#52708b;font-weight:650;white-space:nowrap}
 .frontier-dealer-switch select{min-width:100px;max-width:165px;width:100%;background:#f5fafc;color:#234967;border:1px solid #d9e7ed;border-radius:7px;padding:7px 9px;font-size:11px}
 @media(max-width:850px){.frontier-dealer-switch span{display:none}.frontier-dealer-switch select{max-width:116px}}
+
+
+/* Compact Create AI Calling Campaign modal — keeps the existing upload and validation workflow. */
+.campaign-create-compact{width:min(550px,calc(100vw - 28px));max-height:min(88dvh,720px);border-radius:18px;box-shadow:0 24px 72px #17233c38}
+.campaign-create-compact .campaign-modal-header{padding:17px 20px 8px;gap:10px}
+.campaign-create-compact .campaign-modal-header h2{font-size:18px;line-height:1.25;letter-spacing:-.4px;margin-bottom:4px}
+.campaign-create-compact .campaign-modal-header p{font-size:11px;line-height:1.35}
+.campaign-create-compact .campaign-modal-close{font-size:21px;padding:1px 6px}
+.campaign-create-compact .campaign-create-fields{display:flex;flex-direction:column;gap:12px;padding:4px 20px 8px}
+.campaign-create-compact .campaign-form-label{font-size:11px;font-weight:650;line-height:1.25}
+.campaign-create-compact .campaign-form-label .campaign-pill-input{margin-top:6px;min-height:40px;padding:9px 14px;border-radius:12px}
+.campaign-create-compact .campaign-inline-warning{margin:-4px 0 1px;color:#93622b;font-size:11px;line-height:1.45}
+.campaign-create-compact .campaign-inline-warning a{font-weight:650;color:#346d80;text-decoration:underline;text-underline-offset:2px}
+.campaign-create-compact .campaign-upload-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.campaign-create-compact .campaign-upload-heading strong{font-size:12px;color:#38334b}
+.campaign-create-compact .campaign-upload-heading .btn-outline{font-size:10px;padding:6px 10px;min-height:30px;border-radius:9px}
+.campaign-create-compact .campaign-upload-compact{display:flex;align-items:center;justify-content:center;gap:13px;min-height:91px;padding:15px 18px;border:1.5px dashed #cbc6ed;border-radius:13px;background:#f8f7fd;text-align:left;transition:background .15s,border-color .15s}
+.campaign-create-compact .campaign-upload-compact:hover,.campaign-create-compact .campaign-upload-compact:focus-within{background:#f2effe;border-color:#8d83df}
+.campaign-create-compact .campaign-upload-icon{font-size:24px;line-height:1;color:#7066c7}
+.campaign-create-compact .campaign-upload-copy{min-width:0}
+.campaign-create-compact .campaign-upload-compact strong{margin:0 0 4px;font-size:12px;color:#3b3654;line-height:1.3}
+.campaign-create-compact .campaign-upload-compact small{display:block;font-size:10px;line-height:1.4}
+.campaign-create-compact .campaign-consent-row{display:flex;align-items:flex-start;gap:9px;font-size:11px;line-height:1.45;color:#4d4c60;cursor:pointer}
+.campaign-create-compact .campaign-consent-row input{flex:none;width:14px;height:14px;margin:1px 0 0;accent-color:#5449e8}
+.campaign-create-compact .campaign-defaults-note{font-size:10.5px;line-height:1.5;color:#687786;margin:0}
+.campaign-create-compact .campaign-defaults-note strong{color:#505c71}
+.campaign-create-compact .campaign-recipient-preview{padding:12px;border-radius:12px}
+.campaign-create-compact .campaign-recipient-preview .panel-title{margin-bottom:7px}
+.campaign-create-compact .campaign-recipient-preview .wizard-grid{gap:4px 12px}
+.campaign-create-compact .campaign-recipient-preview .review-row{padding:5px 0}
+.campaign-create-compact .campaign-recipient-preview .tablewrap{max-height:140px;overflow:auto}
+.campaign-create-compact .campaign-recipient-preview .muted{display:block;margin-top:7px;line-height:1.45}
+.campaign-create-compact .form-error{margin:0;font-size:11px;line-height:1.45}
+.campaign-create-compact .campaign-modal-footer{padding:11px 20px 15px;gap:10px;border-top:1px solid #f3f2f8}
+.campaign-create-compact .campaign-modal-back,.campaign-create-compact .campaign-modal-next{font-size:11px;padding:9px 14px;min-height:36px;border-radius:11px}
+.campaign-create-compact .campaign-step-count{margin-left:auto;text-align:right;font-size:10px}
+@media(max-width:600px){
+ .campaign-create-compact{width:100%;max-height:95dvh;border-radius:16px}
+ .campaign-create-compact .campaign-modal-header{padding:15px 15px 8px}
+ .campaign-create-compact .campaign-create-fields{padding:3px 15px 8px;gap:11px}
+ .campaign-create-compact .campaign-modal-footer{padding:10px 15px 13px;flex-wrap:wrap}
+ .campaign-create-compact .campaign-step-count{font-size:9px}
+ .campaign-create-compact .campaign-modal-next{white-space:normal}
+ .campaign-create-compact .campaign-upload-compact{min-height:84px;padding:12px}
+}
+@media(max-height:640px){.campaign-create-compact{max-height:96dvh}}
