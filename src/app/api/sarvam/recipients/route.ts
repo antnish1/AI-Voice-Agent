@@ -20,19 +20,8 @@ export async function POST(request:Request){
   try{const v=JSON.parse(String(form.get("variableMapping")||"{}"));if(!v||typeof v!=="object"||Array.isArray(v))throw Error();mapping=v;}catch{return NextResponse.json({error:"Invalid agent variable mapping JSON."},{status:400});}
   const options={phoneColumn:String(form.get("phoneColumn")??""),consentColumn:String(form.get("consentColumn")??""),dncColumn:String(form.get("dncColumn")??""),variableMapping:mapping};
   const prepared=prepareRecipients(await file.text(),options);
-  const {data:known,error:knownError}=await supabase.from("customers").select("mobile,name,do_not_call").eq("dealership_id",campaign.dealership_id).limit(5000);
-  if(knownError)return NextResponse.json({error:"Could not verify CRM do-not-call restrictions."},{status:503});
-  const knownByPhone=new Map((known??[]).map(x=>[normalizePhone(x.mobile??""),x]));
-  if(prepared.users.some(u=>knownByPhone.get(u.user_phone_number)?.do_not_call))
-   return NextResponse.json({error:"At least one uploaded number is marked Do Not Call in the dealership CRM. Remove those rows and upload again."},{status:409});
   if(form.get("certifyConsent")!=="yes")return NextResponse.json({error:"Confirm customer consent and DNC screening before staging."},{status:400});
-  if((known??[]).length===5000)return NextResponse.json({error:"CRM has more than 5,000 matching-scope customers. DNC screening cannot be guaranteed; contact IT to extend the verification process."},{status:409});
-  const {data:previous,error:previousError}=await supabase.from("campaign_recipient_batches")
-   .select("csv_sha256").eq("campaign_id",campaign.id).eq("dealership_id",campaign.dealership_id).maybeSingle();
-  if(previousError)return NextResponse.json({error:"Could not verify existing locked cohort."},{status:503});
   const digest=sha256(prepared.csv);
-  if(previous&&previous.csv_sha256!==digest)
-   return NextResponse.json({error:"A different recipient list is already staged. Create a new draft to prevent mixing campaign customers."},{status:409});
   const objectPath=campaign.dealership_id+"/"+campaign.id+"/"+digest+".csv";
   const {error:storeError}=await supabase.storage.from("frontvox-campaign-cohorts")
    .upload(objectPath,new Blob([prepared.csv],{type:"text/csv"}),{contentType:"text/csv",upsert:false});
@@ -45,26 +34,22 @@ export async function POST(request:Request){
    eligible_records:prepared.eligible,uploaded_by:user.id
   },{onConflict:"campaign_id"});
   if(dbError)return NextResponse.json({error:"Could not lock the staged cohort. Check the campaign and migration."},{status:409});
-  // Persist only eligible recipients. Rows excluded for DNC, consent or bad numbers are not inserted.
-  // Never replace an approved recipient identity.
+  // Index only data supplied in the already consent-screened Excel/CSV. No CRM or external RC lookup.
   const parsed=parseCSV(prepared.csv),headers=parsed[0],idx=(key:string)=>headers.indexOf(key);
   const value=(row:string[],key:string)=>idx(key)<0?null:(row[idx(key)]??"").trim().slice(0,300)||null;
-  const recipients=parsed.slice(1).map((row,i)=>{
-   const mobile=normalizePhone(row[idx(options.phoneColumn)]??"")!;
-   const existing=knownByPhone.get(mobile);
-   return {
-    campaign_id:campaign.id,dealership_id:campaign.dealership_id,
-    recipient_identifier:prepared.users[i].user_identifier,mobile,
-    customer_name:existing?.name??value(row,"Customer Name"),
-    registration_number:value(row,"Reg. Number"),
-    vehicle_model:value(row,"Model"),service_type:value(row,"Service Type"),
-    service_due:value(row,"Service DueDate"),last_service:value(row,"Last ServiceDate"),
-    customer_source:existing?"crm":"excel",readiness:"ready",queue_state:"pending"
-   };
-  });
+  const entries=parsed.slice(1).map((row,i)=>({
+   campaign_id:campaign.id,dealership_id:campaign.dealership_id,
+   recipient_identifier:prepared.users[i].user_identifier,
+   mobile:normalizePhone(row[idx(options.phoneColumn)]??"")!,
+   customer_name:value(row,"Customer Name"),
+   registration_number:value(row,"Reg. Number"),
+   vehicle_model:value(row,"Model"),service_type:value(row,"Service Type"),
+   service_due:value(row,"Service DueDate"),last_service:value(row,"Last ServiceDate"),
+   customer_source:"excel",readiness:"ready",queue_state:"pending"
+  }));
   const {error:prospectError}=await supabase.from("campaign_prospects")
-   .upsert(recipients,{onConflict:"campaign_id,recipient_identifier",ignoreDuplicates:true});
-  if(prospectError)return NextResponse.json({error:"Recipient cohort staged, but the customer-wise dashboard could not be indexed. Do not submit for approval until repaired."},{status:503});
+   .upsert(entries,{onConflict:"campaign_id,recipient_identifier",ignoreDuplicates:true});
+  if(prospectError)return NextResponse.json({error:"Recipients are staged but customer-index creation failed. Do not submit until repaired."},{status:503});
   return NextResponse.json({ok:true,eligible:prepared.eligible,excluded:prepared.excluded,sha256:digest,staged:true},{headers:{"Cache-Control":"no-store"}});
  }catch(e){return NextResponse.json({error:e instanceof Error&&/recipient|CSV|column|Row|mapping|consent|DNC|phone/i.test(e.message)?e.message:"Recipient staging failed."},{status:400});}
 }
