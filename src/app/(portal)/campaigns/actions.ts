@@ -55,3 +55,28 @@ export async function submitCampaign(form:FormData){
  if(error||!data?.length)throw new Error("Could not submit campaign.");
  revalidatePath("/campaigns");revalidatePath("/approvals");
 }
+
+/** Minimal InsureIT-style creation. Settings are server-controlled, never inferred from an Excel sheet. */
+export async function createSimpleCampaign(dealershipId:string,filename:string,totalRows:number):Promise<{error?:string;id?:string}>{
+ try {
+  const {supabase,membership}=await requireMembership(dealershipId);
+  if(!membership||!canPrepare(membership.role)||membership.dealership_id!==dealershipId)return {error:"You cannot create campaigns for this dealership."};
+  if(!Number.isInteger(totalRows)||totalRows<1||totalRows>250)return {error:"Select 1–250 customer records per campaign."};
+  const {data:dealer,error}=await supabase.from("dealerships").select("name").eq("id",dealershipId).maybeSingle();
+  if(error||!dealer?.name)return {error:"Could not verify the selected dealership."};
+  // The date is based on IST, not the staff member's device clock. Start no sooner than tomorrow.
+  const istToday=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+  const [year,month,day]=istToday.split("-").map(Number);
+  const startUtc=Date.UTC(year,month-1,day+1);
+  const date=(value:number)=>new Date(value).toISOString().slice(0,10);
+  const start=date(startUtc),end=date(startUtc+7*86400000);
+  const name=(dealer.name+" Service Campaign "+start).slice(0,120);
+  const draft=await saveWizardDraft({dealershipId,name,configuration:{
+   description:"Service reminder calling; requires verified Sarvam agent, telephony and manager approval.",
+   agent_label:"",agent_version_label:"",telephony_label:"",outgoing_number_label:"",
+   schedule:{start,end,days:["Mon","Tue","Wed","Thu","Fri","Sat"],from:"10:00",to:"18:00",cps:1,max_retries:0,retry_interval_minutes:60},
+   recipient_preview:{filename,total_rows:totalRows,phone_column:"Mobile",preview_only:true}
+  }});
+  return draft;
+ }catch{return {error:"Could not create campaign draft."};}
+}
