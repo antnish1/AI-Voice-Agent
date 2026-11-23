@@ -16,7 +16,7 @@ export function OutboundConsole({campaign,config,batch,launch,testEnabled,liveEn
  const [phone,setPhone]=useState("");
  const [startAt,setStartAt]=useState((config?.schedule?.start??"")+"T10:00");
  const [endAt,setEndAt]=useState((config?.schedule?.end??"")+"T18:00");
- const [confirmCall,setConfirmCall]=useState(false),[confirmLaunch,setConfirmLaunch]=useState(false),[reviewedTest,setReviewedTest]=useState(false);
+ const [confirmCall,setConfirmCall]=useState(false),[confirmLaunch,setConfirmLaunch]=useState(false),[reviewedTest,setReviewedTest]=useState(false),[confirmControl,setConfirmControl]=useState(false);
  const send=async(url:string,payload:FormData|Record<string,unknown>)=>{
   setError("");setMessage("");setBusy(true);
   try{
@@ -26,6 +26,15 @@ export function OutboundConsole({campaign,config,batch,launch,testEnabled,liveEn
    setMessage(data.message??(data.eligible!==undefined?`Staged ${data.eligible} eligible recipients. ${data.excluded} excluded by validation.`:"Operation accepted."));
    router.refresh();
   }catch(e){setError(e instanceof Error?e.message:"Could not complete request.");}finally{setBusy(false);}
+ };
+ const changeControl=async(action:"pause"|"resume")=>{
+  if(!confirmControl)return;setBusy(true);setMessage("");setError("");
+  try{
+   const response=await fetch("/api/sarvam/campaign-status",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({campaignId:campaign.id,action,confirm:action==="pause"?"PAUSE CAMPAIGN":"RESUME CAMPAIGN"}),cache:"no-store"});
+   const data=await response.json();if(!response.ok||!data.ok)throw Error(data.error??"Campaign action failed.");
+   setMessage(data.message??"Campaign status updated.");router.refresh();
+  }catch(e){setError(e instanceof Error?e.message:"Unable to update campaign.");}
+  finally{setBusy(false);setConfirmControl(false);}
  };
  const refreshCohort=async()=>{setBusy(true);setError("");setMessage("");try{const res=await fetch("/api/sarvam/cohort-status?campaignId="+encodeURIComponent(campaign.id),{cache:"no-store"});const data=await res.json();if(!res.ok)throw Error(data.error??"Status check failed");setMessage(data.message+" Provider status: "+data.providerStatus+". Valid: "+String(data.valid??"pending")+", rejected: "+String(data.rejected??"pending")+".");router.refresh();}catch(e){setError(e instanceof Error?e.message:"Could not check provider.");}finally{setBusy(false);}};
  return <div style={{display:"grid",gap:18}}>
@@ -76,6 +85,12 @@ export function OutboundConsole({campaign,config,batch,launch,testEnabled,liveEn
     <label style={{display:"flex",gap:9,alignItems:"start",fontSize:13}}><input type="checkbox" checked={confirmLaunch} onChange={e=>setConfirmLaunch(e.target.checked)}/> I reviewed the approved cohort and recognize that launching schedules real, chargeable calls to {batch?.eligible_records??0} eligible recipients.</label>
     <button className="btn-primary" type="submit" disabled={busy||!liveEnabled||campaign.status!=="APPROVED"||!batch||!!launch||!confirmLaunch||!reviewedTest}>{!liveEnabled?"Start Campaign Disabled":campaign.status!=="APPROVED"?"Requires Campaign Approval":launch?"Launch Already Reserved":"Start Campaign"}</button>
    </form>
+   {launch?.sarvam_campaign_id&&<div className="helper-banner" style={{marginTop:15}}>
+    <strong>Campaign controls</strong><p className="muted">Pause queueing stops new Sarvam calls after the provider accepts the request; in-progress calls may finish. Resume remains subject to live calling being enabled and a verified cohort.</p>
+    <label style={{display:"flex",alignItems:"start",gap:9,margin:"10px 0",fontSize:13}}><input type="checkbox" checked={confirmControl} onChange={e=>setConfirmControl(e.target.checked)} disabled={busy}/> I understand this changes the real Sarvam campaign state.</label>
+    <div style={{display:"flex",gap:10,flexWrap:"wrap"}}><button type="button" className="btn-outline small" disabled={busy||!confirmControl} onClick={()=>void changeControl("pause")}>Pause queueing</button><button type="button" className="btn-primary small" disabled={busy||!liveEnabled||!confirmControl||launch.state!=="cohort_completed"} onClick={()=>void changeControl("resume")}>Resume campaign</button></div>
+   </div>}
+
   </section>
   <section className="crm-panel">
    <div className="panel-title"><h2>4. Call results & detailed report</h2><span>{callRecords.length} saved results</span></div>
