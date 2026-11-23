@@ -36,8 +36,11 @@ export default async function Approvals({searchParams}:{searchParams:Promise<{ta
  if(rows.length){
   const {data:configs,error:configError}=await supabase.from("campaign_draft_configs").select("campaign_id,configuration").eq("dealership_id",id).in("campaign_id",rows.map(c=>c.id));
   if(configError)throw new Error("Unable to load draft campaign details.");
+  const {data:batches,error:batchError}=await supabase.from("campaign_recipient_batches").select("campaign_id,eligible_records").eq("dealership_id",id).in("campaign_id",rows.map(c=>c.id));
+  if(batchError)throw new Error("Unable to verify staged recipient batches.");
   const map=new Map((configs??[]).map(c=>[c.campaign_id,c.configuration as {agent_label?:string;outgoing_number_label?:string;recipient_preview?:{preview_only?:boolean;total_rows?:number}}]));
-  for(const row of rows){const config=map.get(row.id);row.agent_label=config?.agent_label??"";row.outgoing_label=config?.outgoing_number_label??"";row.preview_only=config?.recipient_preview?.preview_only??false;row.recipient_count=null;}
+  const countsByCampaign=new Map((batches??[]).map(c=>[c.campaign_id,c.eligible_records]));
+  for(const row of rows){const config=map.get(row.id);row.agent_label=config?.agent_label??"";row.outgoing_label=config?.outgoing_number_label??"";row.recipient_count=countsByCampaign.get(row.id)??null;row.preview_only=row.recipient_count===null?config?.recipient_preview?.preview_only??true:false;}
  }
  return <ApprovalsDirectory rows={rows} dealershipName={membership.dealerships?.name??"Dealership"} dealershipId={id} canApprove={canApprove(membership.role)} counts={counts} tab={tab} query={query} range={range} page={page} pages={pages} totalShown={total} pageSize={PAGE_SIZE}/>;
 }
