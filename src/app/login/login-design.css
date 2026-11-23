@@ -64,3 +64,90 @@
 .fv-submit-spinner{display:inline-block;width:19px;height:19px;border:2.5px solid #ffffff70;border-top-color:#fff;border-radius:50%;animation:fv-spinner .75s linear infinite}
 @keyframes fv-spinner{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.fv-submit-spinner{animation:none;border-color:#fff #fff7 #fff7 #fff7}}
+
+
+/* Reference fidelity: keep the entire login composition visible at common desktop
+   viewport heights and browser display scales without changing the login form. */
+@media (min-width:801px) {
+  .fv-login{min-height:100dvh;align-items:stretch}
+  .fv-left{min-height:100dvh;padding-top:clamp(28px,5.5vh,56px);padding-bottom:20px}
+  .fv-left-content{margin-top:clamp(45px,8.2vh,78px)}
+  .fv-left-content h1{font-size:clamp(52px,6.05vw,82px)}
+  .fv-left-content h2{font-size:clamp(23px,2.4vw,31px)}
+  .fv-left-content>p{font-size:clamp(15px,1.55vw,19px)}
+  .fv-pills{margin-top:clamp(21px,3.1vh,33px);gap:9px}
+  .fv-pills span{padding:9px 12px;font-size:clamp(10px,1vw,13px);gap:8px}
+  .fv-pills svg{width:21px;height:21px}
+  .fv-audio-art{height:clamp(115px,23vh,195px);bottom:clamp(18px,3vh,32px)}
+  .fv-mic-ring{width:clamp(112px,12vw,152px);height:clamp(112px,12vw,152px)}
+  .fv-right{min-height:100dvh;padding:20px clamp(18px,3vw,55px)}
+  .fv-signin-card{width:min(510px,100%);padding:26px clamp(25px,3vw,40px) 24px;border-radius:26px}
+  .fv-login-icon{width:94px;height:94px;margin-bottom:9px}
+  .fv-login-icon img{width:94px;height:94px}
+  .fv-overline{font-size:14px;letter-spacing:.35em;margin-bottom:12px}
+  .fv-signin-card h2{font-size:36px;margin-bottom:8px}
+  .fv-signin-subtitle{font-size:16px;margin-bottom:24px}
+  .fv-login-form{gap:13px}
+  .fv-input-wrap{min-height:54px}
+  .fv-submit{height:55px}
+  .fv-or{margin:20px 0 12px}
+  .fv-access-note{font-size:12px}
+}
+/* Compact landscape windows (including enlarged browser text/zoom): keep
+   sign-in, password toggle, and account provision notice within the first view. */
+@media (min-width:801px) and (max-height:760px) {
+  .fv-left{padding-top:clamp(22px,4.7vh,38px)}
+  .fv-left-top img{width:clamp(56px,9vh,73px);height:clamp(56px,9vh,73px)}
+  .fv-brand-separator{height:50px}
+  .fv-left-top strong{font-size:clamp(18px,3.6vh,24px)}
+  .fv-left-content{margin-top:clamp(28px,7vh,52px)}
+  .fv-left-content h1{font-size:clamp(48px,9.6vh,72px);margin-bottom:8px}
+  .fv-left-content h2{font-size:clamp(20px,4vh,29px);margin-bottom:10px}
+  .fv-left-content>p{font-size:clamp(14px,2.8vh,18px)}
+  .fv-pills{margin-top:clamp(17px,3.4vh,25px)}
+  .fv-pills span{padding:8px 10px}
+  .fv-audio-art{height:clamp(100px,22vh,160px);bottom:12px}
+  .fv-mic-ring{width:clamp(90px,17vh,128px);height:clamp(90px,17vh,128px)}
+  .fv-right{padding:14px 18px}
+  .fv-signin-card{padding:18px 30px 17px}
+  .fv-login-icon,.fv-login-icon img{width:clamp(66px,12vh,85px);height:clamp(66px,12vh,85px)}
+  .fv-login-icon{margin-bottom:6px}
+  .fv-overline{font-size:12px;margin-bottom:8px}
+  .fv-signin-card h2{font-size:clamp(28px,5vh,34px);margin-bottom:6px}
+  .fv-signin-subtitle{font-size:14px;margin-bottom:15px}
+  .fv-login-form{gap:10px}
+  .fv-input-wrap{min-height:46px}
+  .fv-input-wrap input{padding-top:11px!important;padding-bottom:11px!important;font-size:14px!important}
+  .fv-submit{height:49px;font-size:16px}
+  .fv-or{margin:13px 0 9px}
+  .fv-access-note{font-size:11px;line-height:1.4}
+}
+@media (min-width:801px) and (max-height:520px) {
+  .fv-login{min-height:520px}
+  .fv-left,.fv-right{min-height:520px}
+}
+@media (min-width:801px) and (max-width:1150px) {
+  .fv-left-content h1{font-size:clamp(46px,5.6vw,68px)}
+  .fv-pills span{font-size:10px}
+}
+@media (max-width:800px) {
+  .fv-left{min-height:0}
+  .fv-audio-art{opacity:.48}
+  .fv-right{min-height:0}
+}
+@keyframes fv-art-breathe{
+  0%,100%{box-shadow:0 0 8px #2bdfff,0 0 24px #18aefe,inset 0 0 19px #1788ff,0 0 0 12px #34bbf414,0 0 0 25px #11b4ff0c}
+  50%{box-shadow:0 0 14px #2bdfff,0 0 34px #18aefe,inset 0 0 24px #1788ff,0 0 0 19px #34bbf41e,0 0 0 35px #11b4ff13}
+}
+@keyframes fv-card-enter{from{opacity:.65;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fv-wave-shine{0%,100%{opacity:.8}50%{opacity:1}}
+@media (prefers-reduced-motion:no-preference) {
+  .fv-mic-ring{animation:fv-art-breathe 4.6s ease-in-out infinite}
+  .fv-sound-wave{animation:fv-wave-shine 3.4s ease-in-out infinite}
+  .fv-signin-card{animation:fv-card-enter .55s cubic-bezier(.2,.75,.25,1) both}
+  .fv-pills span{transition:background-color .2s,transform .2s,box-shadow .2s}
+  .fv-pills span:hover{transform:translateY(-2px);box-shadow:0 4px 14px #00c7ff20}
+}
+@media (prefers-reduced-motion:reduce) {
+  .fv-mic-ring,.fv-sound-wave,.fv-signin-card{animation:none!important}
+}
