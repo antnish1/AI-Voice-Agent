@@ -49,7 +49,8 @@ export async function submitCampaign(form:FormData){
  if(!membership||!canPrepare(membership.role))throw new Error("Not authorized.");
  const {data:config,error:configError}=await supabase.from("campaign_draft_configs").select("configuration").eq("campaign_id",id).eq("dealership_id",dealershipId).maybeSingle();
  if(configError)throw new Error("Could not verify campaign setup.");
- if(config&&(config.configuration as {recipient_preview?:{preview_only?:boolean}})?.recipient_preview?.preview_only)throw new Error("Recipients are only previewed, not imported. Import and lock recipient records before requesting manager approval.");
+ const {data:batch,error:batchError}=await supabase.from("campaign_recipient_batches").select("csv_sha256,eligible_records").eq("campaign_id",id).eq("dealership_id",dealershipId).maybeSingle();
+ if(batchError||!batch||batch.eligible_records<1)throw new Error("Stage a consent-screened, DNC-filtered CSV cohort before submitting for approval.");
  const {data,error}=await supabase.from("campaigns").update({status:"PENDING_MANAGER_APPROVAL"}).eq("id",id).eq("dealership_id",dealershipId).eq("status","DRAFT").select("id");
  if(error||!data?.length)throw new Error("Could not submit campaign.");
  revalidatePath("/campaigns");revalidatePath("/approvals");
