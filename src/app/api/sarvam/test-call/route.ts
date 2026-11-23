@@ -21,7 +21,8 @@ export async function POST(request:Request){
   const hash=sha256(number+"|"+salt);
   // Atomic PostgreSQL transaction applies the 3-in-24h limit and 10-minute duplicate restriction.
   const {data:reservationId,error:reservationError}=await supabase.rpc("frontvox_reserve_test_call",{
-   p_phone_hash:hash,p_phone_last4:number.slice(-4),p_agent_id:agent
+   p_phone_hash:hash,p_phone_last4:number.slice(-4),p_agent_id:agent,
+   p_agent_version:version,p_connection_id:connection,p_caller_number:outgoing
   });
   if(reservationError||typeof reservationId!=="string")return NextResponse.json({error:"Test call blocked by cooldown, daily limit or audit policy."},{status:409});
   try{
