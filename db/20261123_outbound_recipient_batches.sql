@@ -57,3 +57,60 @@ create policy frontvox_cohort_storage_read on storage.objects for select to auth
  (select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
  and exists(select 1 from public.memberships m where m.user_id=(select auth.uid()) and m.role='super_admin'));
 -- No client DELETE/UPDATE storage policies. A reviewed server-side cleanup job may be added later.
+
+-- A reservation row exists before every provider side effect. Unknown outcomes are never retried automatically.
+create table if not exists public.voice_campaign_launches (
+ campaign_id uuid primary key references public.campaigns(id) on delete cascade,
+ dealership_id uuid not null references public.dealerships(id),
+ recipient_sha256 text not null check(recipient_sha256 ~ '^[a-f0-9]{64}$'),
+ config_sha256 text not null check(config_sha256 ~ '^[a-f0-9]{64}$'),
+ sarvam_campaign_id text unique,
+ sarvam_cohort_id text,
+ state text not null check(state in ('creating','campaign_created','cohort_submitted','cohort_completed','needs_reconciliation','failed')),
+ initiated_by uuid not null references auth.users(id),
+ created_at timestamptz not null default now(),
+ updated_at timestamptz not null default now()
+);
+alter table public.voice_campaign_launches enable row level security;
+drop policy if exists frontvox_launch_read on public.voice_campaign_launches;
+create policy frontvox_launch_read on public.voice_campaign_launches for select to authenticated using (
+ public.frontier_password_setup_complete() and ((select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
+ or exists(select 1 from public.memberships m where m.user_id=(select auth.uid()) and m.dealership_id=voice_campaign_launches.dealership_id))
+);
+-- Inserts and updates must use the authenticated IT session under RLS; service role not needed.
+drop policy if exists frontvox_launch_create on public.voice_campaign_launches;
+create policy frontvox_launch_create on public.voice_campaign_launches for insert to authenticated
+ with check(public.frontier_it_can_write(dealership_id) and initiated_by=(select auth.uid()));
+drop policy if exists frontvox_launch_edit on public.voice_campaign_launches;
+create policy frontvox_launch_edit on public.voice_campaign_launches for update to authenticated
+ using(public.frontier_it_can_write(dealership_id))
+ with check(public.frontier_it_can_write(dealership_id));
+grant select,insert,update on public.voice_campaign_launches to authenticated;
+
+create table if not exists public.voice_test_call_requests (
+ id uuid primary key default gen_random_uuid(),
+ user_id uuid not null references auth.users(id),
+ phone_hash text not null check(phone_hash ~ '^[a-f0-9]{64}$'),
+ phone_last4 text not null check(phone_last4 ~ '^[0-9]{4}$'),
+ window_bucket bigint not null,
+ agent_id text not null,
+ status text not null check(status in ('reserved','submitted','unknown','failed')),
+ sarvam_attempt_id text,
+ created_at timestamptz not null default now(),
+ unique(user_id,phone_hash,window_bucket)
+);
+alter table public.voice_test_call_requests enable row level security;
+drop policy if exists frontvox_test_call_read on public.voice_test_call_requests;
+create policy frontvox_test_call_read on public.voice_test_call_requests for select to authenticated
+ using(public.frontier_password_setup_complete() and user_id=(select auth.uid())
+ and exists(select 1 from public.memberships m where m.user_id=(select auth.uid()) and m.role='super_admin'));
+drop policy if exists frontvox_test_call_insert on public.voice_test_call_requests;
+create policy frontvox_test_call_insert on public.voice_test_call_requests for insert to authenticated
+ with check(user_id=(select auth.uid()) and public.frontier_password_setup_complete()
+ and (select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid
+ and exists(select 1 from public.memberships m where m.user_id=(select auth.uid()) and m.role='super_admin'));
+drop policy if exists frontvox_test_call_update on public.voice_test_call_requests;
+create policy frontvox_test_call_update on public.voice_test_call_requests for update to authenticated
+ using(user_id=(select auth.uid()) and (select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid)
+ with check(user_id=(select auth.uid()) and (select auth.uid())='5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid);
+grant select,insert,update on public.voice_test_call_requests to authenticated;
