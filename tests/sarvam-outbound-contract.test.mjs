@@ -40,7 +40,7 @@ test("provider calls are default-off with explicit server-only switches",()=>{
  const launch=readFileSync("src/app/api/sarvam/launch/route.ts","utf8");
  assert.match(testRoute,/callingEnabled\("test"\)/);
  assert.match(testRoute,/TEST_CALL_ALLOWLIST/);
- assert.match(testRoute,/voice_test_call_requests/);
+ assert.match(testRoute,/frontvox_reserve_test_call/);
  assert.match(launch,/callingEnabled\("campaign"\)/);
  assert.match(launch,/status!=="APPROVED"/);
  assert.match(launch,/csv_sha256/);
