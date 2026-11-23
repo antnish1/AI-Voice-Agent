@@ -19,7 +19,9 @@ export async function POST(request:Request){
   const [{data:batch,error:batchError},{data:config,error:configError},{data:test,error:testError}]=await Promise.all([
    supabase.from("campaign_recipient_batches").select("*").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
    supabase.from("campaign_draft_configs").select("configuration").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
-   supabase.from("voice_test_call_requests").select("id").eq("user_id",user.id).eq("status","submitted").eq("agent_id",String(input.agentId??"")).gte("created_at",new Date(Date.now()-86400000).toISOString()).limit(1)
+   supabase.from("voice_test_call_requests").select("id,agent_id,agent_version,connection_id,caller_number")
+    .eq("user_id",user.id).eq("status","submitted").eq("agent_id",String(input.agentId??""))
+    .gte("created_at",new Date(Date.now()-86400000).toISOString()).limit(20)
   ]);
   if(batchError||configError||testError||!batch||!config||!test?.length)
    return NextResponse.json({error:"A locked recipient cohort, matching approved configuration and a recent test call are required."},{status:409});
@@ -30,6 +32,9 @@ export async function POST(request:Request){
      setup.agent_label!==agent||setup.agent_version_label!==String(version)||
      setup.telephony_label!==connection||normalizePhone(setup.outgoing_number_label??"")!==sender)
    return NextResponse.json({error:"Agent, committed version, connection and caller number must exactly match the approved campaign draft."},{status:400});
+  if(!test.some(attempt=>attempt.agent_id===agent&&attempt.agent_version===version&&
+    attempt.connection_id===connection&&attempt.caller_number===sender))
+   return NextResponse.json({error:"The recent test-call attempt must use the approved agent version, telephony connection and caller number. Re-test this exact setup before launch."},{status:409});
   const start=new Date(String(input.startAt??"")),end=new Date(String(input.endAt??""));
   const istDate=(date:Date)=>{
    const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
