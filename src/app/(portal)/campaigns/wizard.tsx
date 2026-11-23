@@ -4,7 +4,7 @@ import {useRouter} from "next/navigation";
 import {createSimpleCampaign} from "./actions";
 import {excelToRows,makeRecipientTemplate,rowsToCsv} from "@/lib/campaign-excel";
 
-type Dealer={id:string;name:string};
+type Dealer={id:string;name:string;configured:boolean};
 type Preview={filename:string;csv:string;total:number;eligible:number;excluded:number;invalid:number;duplicate:number;sample:string[][];headers:string[]};
 const consentYes=new Set(["yes","true","1","opted_in","consented"]);
 const dncNo=new Set(["no","false","0",""]);
@@ -27,6 +27,7 @@ function downloadBlob(blob:Blob,name:string) {
 export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:Dealer[];initialDealershipId:string}){
  const router=useRouter();
  const [dealershipId,setDealershipId]=useState(initialDealershipId);
+ const profileReady=dealerships.find(d=>d.id===dealershipId)?.configured??false;
  const [preview,setPreview]=useState<Preview|null>(null),[busy,startTransition]=useTransition(),[reading,setReading]=useState(false);
  const [consentCertified,setConsentCertified]=useState(false),[error,setError]=useState(""),[existingDraft,setExistingDraft]=useState("");
  useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==="Escape"&&!busy)router.push("/campaigns");};document.addEventListener("keydown",key);return ()=>document.removeEventListener("keydown",key);},[router,busy]);
@@ -89,6 +90,7 @@ export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:De
       {dealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}
      </select>
     </label>
+    {!profileReady&&<div className="helper-banner" role="status">This dealership does not yet have an active verified Sarvam profile. <a href="/settings/voice-profiles" style={{textDecoration:"underline"}}>Configure Voice Agent Defaults</a> once before creating campaigns.</div>}
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
      <strong>Customer Excel</strong><button type="button" className="btn-outline small" onClick={()=>downloadBlob(makeRecipientTemplate(),"FrontVox_Recipient_Template.xlsx")}>↓ Download Excel Template</button>
     </div>
@@ -108,7 +110,7 @@ export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:De
     <div className="helper-banner">Defaults: 10:00–18:00 IST, Monday–Saturday, 1 call attempt/second, no retries. Campaign is created as a draft. Agent and verified telephony are required before approval and calling.</div>
     {error&&<p role="alert" className="form-error">{error}</p>}
    </div>
-   <footer className="campaign-modal-footer"><button type="button" className="campaign-modal-back" onClick={()=>router.push("/campaigns")}>Cancel</button><span className="campaign-step-count">{preview?preview.eligible+" eligible recipients":"No file selected"}</span><button type="button" disabled={busy||reading||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next">{busy?"Creating…":"Create & Check Details"}</button></footer>
+   <footer className="campaign-modal-footer"><button type="button" className="campaign-modal-back" onClick={()=>router.push("/campaigns")}>Cancel</button><span className="campaign-step-count">{preview?preview.eligible+" eligible recipients":"No file selected"}</span><button type="button" disabled={busy||reading||!profileReady||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next">{busy?"Creating…":"Create & Check Details"}</button></footer>
   </section>
  </div>;
 }
