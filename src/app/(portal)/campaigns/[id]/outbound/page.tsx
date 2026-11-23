@@ -14,11 +14,16 @@ export default async function OutboundPage({params}:{params:Promise<{id:string}>
   supabase.from("voice_campaign_launches").select("state,sarvam_campaign_id,sarvam_cohort_id").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle()
  ]);
  if(configs.error||batches.error||launches.error)throw Error("Outbound preparation tables have not been migrated.");
+ const {data:callRecords,error:callError}=launches.data?.sarvam_campaign_id?
+  await supabase.from("voice_call_records").select("dialed_number,status,duration_seconds,started_at,ended_at,sarvam_attempt_id,agent_id")
+   .eq("dealership_id",campaign.dealership_id).eq("sarvam_campaign_id",launches.data.sarvam_campaign_id)
+   .order("started_at",{ascending:false}).limit(1000):{data:[],error:null};
+ if(callError)throw Error("Could not read saved campaign results.");
  const config=configs.data?.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start?:string;end?:string}}|null;
  return <main>
-  <div className="page-head"><div><p className="eyebrow">FRONTVOX AI · OUTBOUND OPERATIONS</p><h1>{campaign.name}</h1><p>Prepare recipients, test on a verified number, and launch only after approval.</p></div><Link className="btn-outline small" href="/campaigns">Back to Campaigns</Link></div>
+  <div className="page-head"><div><p className="eyebrow">FRONTVOX AI · OUTBOUND OPERATIONS</p><h1>{campaign.name}</h1><p>Review recipient readiness, verify the agent, and start calling only after approval.</p></div><Link className="btn-outline small" href="/campaigns">Back to Campaigns</Link></div>
   <div className="helper-banner">Campaign status: <strong>{campaign.status.replaceAll("_"," ")}</strong>. Sarvam calling is subject to independent server switches and user confirmation.</div>
-  <OutboundConsole campaign={{id:campaign.id,name:campaign.name,status:campaign.status}} config={config} batch={batches.data} launch={launches.data}
+  <OutboundConsole campaign={{id:campaign.id,name:campaign.name,status:campaign.status}} config={config} batch={batches.data} launch={launches.data} callRecords={callRecords??[]}
    testEnabled={process.env.ENABLE_TEST_CALLS==="true"} liveEnabled={process.env.ENABLE_LIVE_CALLS==="true"}/>
  </main>;
 }
