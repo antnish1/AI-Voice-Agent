@@ -231,3 +231,105 @@
   .fv-right{background:linear-gradient(180deg,#eaf3ff6b,#ecf4ffb0)!important}
   .fv-audio-art{display:none}
 }
+
+
+/* Final reference alignment correction.
+   Keep the shipped loginbg.jpeg as the only decorative backdrop, and align
+   branding and form using the *visible viewport*, including short desktop
+   windows caused by browser zoom or browser chrome. */
+@media (min-width:801px) {
+  .fv-login {
+    height:100dvh;
+    min-height:540px;
+    overflow:hidden;
+    grid-template-columns:50% 50%;
+  }
+  .fv-left,.fv-right {min-height:0;height:100%;overflow:visible}
+  .fv-left {
+    padding-top:clamp(26px,8.1vh,60px);
+    padding-left:clamp(36px,5vw,66px);
+    padding-right:0;
+  }
+  .fv-left-top img{width:clamp(66px,10.5vh,88px);height:clamp(66px,10.5vh,88px)}
+  .fv-brand-separator{height:clamp(46px,7.8vh,57px)}
+  .fv-left-top strong{font-size:clamp(20px,3.2vh,27px)}
+  .fv-left-content {
+    /* Reposition title to ~31% from top, as in supplied reference. */
+    position:absolute;
+    top:30.5%;
+    left:clamp(36px,5vw,66px);
+    margin:0;
+  }
+  .fv-left-content h1{
+    font-size:clamp(52px,8.8vh,80px);
+    line-height:1.04;
+    margin-bottom:clamp(7px,1.2vh,10px);
+  }
+  .fv-left-content h2{
+    font-size:clamp(22px,3.6vh,30px);
+    margin-bottom:clamp(12px,2vh,17px);
+  }
+  .fv-left-content>p{font-size:clamp(14px,2.45vh,19px)}
+  .fv-pills{
+    margin-top:clamp(18px,4vh,32px);
+    gap:clamp(5px,.65vw,9px);
+    flex-wrap:nowrap;
+  }
+  .fv-pills span{
+    font-size:clamp(9px,1.65vh,12px);
+    padding:clamp(7px,1.35vh,10px) clamp(8px,1vw,12px);
+    gap:7px;
+  }
+  .fv-pills svg{width:clamp(16px,3vh,22px);height:clamp(16px,3vh,22px)}
+  .fv-right{padding:0 clamp(18px,4.7vw,64px);align-items:center;justify-content:center}
+  .fv-signin-card{
+    width:min(512px,100%);
+    /* 82% of viewport is target reference; allow minimum for accessibility. */
+    min-height:0;
+    max-height:calc(100dvh - 54px);
+    overflow-y:auto;
+    scrollbar-width:thin;
+    padding:clamp(15px,3.1vh,24px) clamp(24px,3.2vw,40px);
+    border-radius:25px;
+  }
+  .fv-login-icon,.fv-login-icon img{
+    width:clamp(64px,11.8vh,91px);
+    height:clamp(64px,11.8vh,91px);
+  }
+  .fv-login-icon{margin-bottom:clamp(6px,1.5vh,12px)}
+  .fv-overline{font-size:clamp(11px,1.85vh,14px);margin-bottom:clamp(9px,1.6vh,14px)}
+  .fv-signin-card h2{font-size:clamp(28px,4.6vh,35px);margin-bottom:clamp(5px,1vh,8px)}
+  .fv-signin-subtitle{
+    font-size:clamp(13px,2.1vh,16px);
+    margin-bottom:clamp(14px,3.2vh,25px);
+  }
+  .fv-login-form{gap:clamp(9px,1.8vh,14px)}
+  .fv-input-wrap{min-height:clamp(43px,7.2vh,54px)}
+  .fv-input-wrap input{
+    padding-top:clamp(9px,1.8vh,14px)!important;
+    padding-bottom:clamp(9px,1.8vh,14px)!important;
+    font-size:clamp(13px,2vh,15px)!important;
+  }
+  .fv-submit{height:clamp(46px,7.4vh,56px);font-size:clamp(15px,2.2vh,17px)}
+  .fv-or{margin:clamp(11px,2.5vh,20px) 0 clamp(8px,1.7vh,12px)}
+  .fv-access-note{font-size:clamp(10px,1.75vh,12px);line-height:1.4}
+  /* Ring is baked into background. The central mic is positioned over it. */
+  .fv-mic-ring{top:77%;left:24.2%;width:clamp(60px,12vh,85px);height:clamp(60px,12vh,85px)}
+}
+/* At reference-like taller landscape heights, preserve its original type scale. */
+@media(min-width:801px) and (min-height:760px) {
+  .fv-left-content{top:30.5%}
+  .fv-signin-card{max-height:calc(100dvh - 70px)}
+}
+/* Narrow laptop widths: keep three feature badges inside the left panel. */
+@media(min-width:801px) and (max-width:1120px){
+  .fv-left-content h1{font-size:clamp(44px,7.5vh,69px)}
+  .fv-pills{flex-wrap:wrap;max-width:95%}
+}
+@media(min-width:801px) and (max-height:580px){
+  .fv-left-content{top:29%}
+  .fv-left-content h1{font-size:clamp(44px,8.3vh,63px)}
+  .fv-left-content h2{font-size:clamp(19px,3.35vh,25px)}
+  .fv-pills{margin-top:17px}
+  .fv-signin-card{max-height:calc(100dvh - 35px)}
+}
