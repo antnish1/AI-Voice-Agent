@@ -1,6 +1,6 @@
 import {NextResponse} from "next/server";
 import {requireItSuperUser} from "@/lib/it-access";
-import {prepareRecipients} from "@/lib/sarvam/recipient-validation";
+import {prepareRecipients,parseCSV,normalizePhone} from "@/lib/sarvam/recipient-validation";
 import {sha256} from "@/lib/sarvam/outbound-provider";
 export const runtime="nodejs";
 export async function POST(request:Request){
@@ -34,6 +34,22 @@ export async function POST(request:Request){
    eligible_records:prepared.eligible,uploaded_by:user.id
   },{onConflict:"campaign_id"});
   if(dbError)return NextResponse.json({error:"Could not lock the staged cohort. Check the campaign and migration."},{status:409});
+  // Index only data supplied in the already consent-screened Excel/CSV. No CRM or external RC lookup.
+  const parsed=parseCSV(prepared.csv),headers=parsed[0],idx=(key:string)=>headers.indexOf(key);
+  const value=(row:string[],key:string)=>idx(key)<0?null:(row[idx(key)]??"").trim().slice(0,300)||null;
+  const entries=parsed.slice(1).map((row,i)=>({
+   campaign_id:campaign.id,dealership_id:campaign.dealership_id,
+   recipient_identifier:prepared.users[i].user_identifier,
+   mobile:normalizePhone(row[idx(options.phoneColumn)]??"")!,
+   customer_name:value(row,"Customer Name"),
+   registration_number:value(row,"Reg. Number"),
+   vehicle_model:value(row,"Model"),service_type:value(row,"Service Type"),
+   service_due:value(row,"Service DueDate"),last_service:value(row,"Last ServiceDate"),
+   customer_source:"excel",readiness:"ready",queue_state:"pending"
+  }));
+  const {error:prospectError}=await supabase.from("campaign_prospects")
+   .upsert(entries,{onConflict:"campaign_id,recipient_identifier",ignoreDuplicates:true});
+  if(prospectError)return NextResponse.json({error:"Recipients are staged but customer-index creation failed. Do not submit until repaired."},{status:503});
   return NextResponse.json({ok:true,eligible:prepared.eligible,excluded:prepared.excluded,sha256:digest,staged:true},{headers:{"Cache-Control":"no-store"}});
  }catch(e){return NextResponse.json({error:e instanceof Error&&/recipient|CSV|column|Row|mapping|consent|DNC|phone/i.test(e.message)?e.message:"Recipient staging failed."},{status:400});}
 }

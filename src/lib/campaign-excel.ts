@@ -153,3 +153,40 @@ export function makeCallOutcomeReport(rows:Array<{
   ["xl/worksheets/sheet1.xml",sheet]
  ]);
 }
+
+export type CampaignProspectReportRow={
+ customer_name:string|null;registration_number:string|null;vehicle_model:string|null;service_type:string|null;
+ service_due:string|null;mobile:string;readiness:string;queue_state:string;
+ connectivity:string|null;duration_seconds:number|null;interest:string|null;call_summary:string|null;
+ follow_up_at:string|null;next_action:string|null;retry_requested:boolean;customer_source:string;
+};
+export function makeCampaignDetailedReport(campaignName:string,rows:CampaignProspectReportRow[]):Blob{
+ const headings=["Campaign","Customer","Registration / Machine","Vehicle / Model","Service Type","Service Due",
+  "Mobile","Readiness","Queue Status","Connectivity","Duration (sec)","Interest","Follow Up Date","Next Action",
+  "Call Summary","Retry Review","Data Source"];
+ const all=[headings,...rows.map(r=>[campaignName,r.customer_name??"",r.registration_number??"",r.vehicle_model??"",
+  r.service_type??"",r.service_due??"",r.mobile,r.readiness,r.queue_state,r.connectivity??"",
+  r.duration_seconds===null?"":String(r.duration_seconds),r.interest??"",r.follow_up_at??"",r.next_action??"",
+  r.call_summary??"",r.retry_requested?"Requested":"",r.customer_source])];
+ const cell=(v:string,col:number,row:number)=>{
+  let letters="",n=col+1;while(n){n--;letters=String.fromCharCode(65+n%26)+letters;n=Math.floor(n/26);}
+  return '<c r="'+letters+row+'" t="inlineStr"><is><t>'+escapeXml(v)+'</t></is></c>';
+ };
+ const sheet=(lines:string[][])=>'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'+
+  lines.map((r,i)=>'<row r="'+(i+1)+'">'+r.map((v,j)=>cell(v,j,i+1)).join("")+'</row>').join("")+'</sheetData></worksheet>';
+ const count=(test:(r:CampaignProspectReportRow)=>boolean)=>String(rows.filter(test).length);
+ const summary=[["Metric","Value"],["Campaign",campaignName],["Uploaded / indexed",String(rows.length)],
+  ["Ready",count(r=>r.readiness==="ready")],["Held",count(r=>r.readiness==="held")],
+  ["Connected",count(r=>r.connectivity==="answered")],["Busy",count(r=>r.connectivity==="busy")],
+  ["No Answer",count(r=>r.connectivity==="no_answer")],["Interested",count(r=>r.interest==="interested")],
+  ["Follow Up",count(r=>r.interest==="follow_up")],["Manual retry review",count(r=>r.retry_requested)]];
+ const contentTypes='<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>';
+ return templateZip([
+  ["[Content_Types].xml",contentTypes],
+  ["_rels/.rels",'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+  ["xl/workbook.xml",'<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Campaign Report" sheetId="1" r:id="rId1"/><sheet name="Summary" sheetId="2" r:id="rId2"/></sheets></workbook>'],
+  ["xl/_rels/workbook.xml.rels",'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/></Relationships>'],
+  ["xl/worksheets/sheet1.xml",sheet(all)],
+  ["xl/worksheets/sheet2.xml",sheet(summary)]
+ ]);
+}
