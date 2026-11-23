@@ -335,32 +335,80 @@
 }
 
 
-/* Screenshot-anchored geometry: source reference is 1280×720.
-   At desktop ratios the white surface occupies x=55.5–95.5%, y=8.3–90.2%;
-   the hero begins at x=5.3%, y=30.8%, with features near y=57%. */
-@media(min-width:801px) and (min-height:620px){
-  .fv-left{padding-left:4.7vw;padding-top:8.2vh}
+/* Reference-matched sign-in card (1280×720 source; x710–1223, y60–649).
+   The content is no longer distributed with space-between. Fixed local spacing
+   recreates the reference and keeps typography stable on desktop screens. */
+@media (min-width:801px) and (min-height:620px) {
+  .fv-left {padding-left:4.7vw;padding-top:8.2vh}
   .fv-left-content{left:5.3%;top:30.8%}
   .fv-left-content h1{font-size:clamp(54px,8.75vh,79px)}
   .fv-left-content h2{font-size:clamp(23px,3.7vh,30px)}
   .fv-pills{margin-top:clamp(22px,3.9vh,30px);margin-left:-8px}
-  .fv-right{justify-content:center}
-  .fv-signin-card{
-    height:82dvh;
-    max-height:calc(100dvh - 46px);
-    min-height:0;
-    justify-content:space-between;
-    padding-top:clamp(19px,3.35vh,26px);
-    padding-bottom:clamp(19px,3.35vh,26px);
-  }
-  .fv-login-icon{margin-bottom:0}
-  .fv-overline{margin-bottom:0}
-  .fv-signin-card h2{margin-bottom:0}
-  .fv-signin-subtitle{margin-bottom:0}
-  .fv-or{margin-top:0;margin-bottom:0}
   .fv-mic-ring{top:80.3%;left:23.9%}
+
+  .fv-right{align-items:center;justify-content:center;padding:0 4.5vw}
+  .fv-signin-card{
+    width:min(512px,100%);
+    height:min(590px,82dvh);
+    max-height:calc(100dvh - 34px);
+    min-height:0;
+    overflow-y:auto;
+    justify-content:flex-start;
+    flex-shrink:0;
+    padding:24px 40px 22px;
+    border-radius:25px;
+    background:rgba(255,255,255,.94);
+    font-family:Inter,Arial,ui-sans-serif,system-ui,sans-serif;
+    text-align:center;
+  }
+  .fv-login-icon{width:96px;height:96px;margin:0 auto 14px;flex:none}
+  .fv-login-icon img{width:96px;height:96px}
+  .fv-overline{
+    font-size:14px;line-height:18px;font-weight:800;
+    letter-spacing:.34em;margin:0 0 17px;
+  }
+  .fv-signin-card h2{
+    font-size:35px;line-height:1.12;
+    font-weight:800;letter-spacing:-.045em;
+    margin:0 0 10px;
+  }
+  .fv-signin-subtitle{
+    font-size:16px;line-height:21px;
+    font-weight:400;margin:0 0 30px;
+  }
+  .fv-login-form{gap:16px;margin:0}
+  .fv-input-wrap{height:54px;min-height:54px;border-radius:13px}
+  .fv-input-wrap input{
+    padding:14px 44px 14px 59px!important;
+    font-size:15px!important;
+    line-height:24px!important;
+  }
+  .fv-submit{height:56px;margin-top:0;border-radius:14px;font-size:17px;font-weight:750}
+  .fv-or{
+    margin:24px auto 15px;
+    width:82%;font-size:13px;line-height:18px;
+  }
+  .fv-access-note{
+    font-size:12px;line-height:1.5;
+    margin:0;align-items:flex-start;
+    text-align:left;
+  }
+  .fv-access-note svg{width:20px;height:20px}
+}
+/* Compact height/zoom fallback: retain hierarchy without cropping sign in. */
+@media(min-width:801px) and (min-height:620px) and (max-height:740px){
+  .fv-signin-card{height:min(590px,82dvh);padding-top:clamp(16px,3.3vh,24px);padding-bottom:16px}
+  .fv-login-icon,.fv-login-icon img{width:clamp(76px,12.5vh,96px);height:clamp(76px,12.5vh,96px)}
+  .fv-login-icon{margin-bottom:clamp(9px,1.9vh,14px)}
+  .fv-overline{margin-bottom:clamp(9px,2.3vh,17px)}
+  .fv-signin-subtitle{margin-bottom:clamp(16px,4vh,30px)}
+  .fv-login-form{gap:clamp(10px,2.2vh,16px)}
+  .fv-or{margin-top:clamp(13px,3.3vh,24px);margin-bottom:clamp(9px,2vh,15px)}
+}
+/* Avoid forced card dimensions when horizontally constrained. */
+@media(min-width:801px) and (max-width:1100px) and (min-height:620px){
+  .fv-signin-card{padding-left:clamp(22px,3vw,40px);padding-right:clamp(22px,3vw,40px)}
 }
 @media(min-width:801px) and (max-height:619px){
-  /* Avoid forcing a tall card or clipping the controls at high browser zoom. */
   .fv-signin-card{height:auto;justify-content:flex-start}
 }
