@@ -27,7 +27,7 @@ function templateZip(files:Array<[string,string]>):Blob{
  const centralSize=central.reduce((n,x)=>n+x.length,0);
  const end=new Uint8Array(22),ev=new DataView(end.buffer);
  u32(ev,0,0x06054b50);u16(ev,8,files.length);u16(ev,10,files.length);u32(ev,12,centralSize);u32(ev,16,offset);
- return new Blob([...chunks,...central,end],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+ return new Blob([...chunks,...central,end].map(bytes=>Uint8Array.from(bytes).buffer),{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
 }
 export function makeRecipientTemplate():Blob {
  const cells=RECIPIENT_TEMPLATE_HEADERS.map((name,i)=>{
@@ -80,7 +80,7 @@ async function unzipEntries(buffer:ArrayBuffer):Promise<Map<string,string>>{
   let data=b.slice(pos,pos+packed);
   if(method===8){
    if(typeof DecompressionStream==="undefined")throw Error("This browser cannot decompress Excel files. Please use the latest Chrome or Edge.");
-   const stream=new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+   const stream=new Blob([Uint8Array.from(data).buffer]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
    const inflated=await new Response(stream).arrayBuffer();
    if(inflated.byteLength>8*1024*1024)throw Error("Excel worksheet exceeds the conversion limit.");
    data=new Uint8Array(inflated);
