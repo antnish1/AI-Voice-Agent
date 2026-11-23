@@ -14,6 +14,7 @@ create table if not exists public.campaign_recipient_batches(
  consent_column text not null,
  dnc_column text not null,
  cohort_name text not null check(char_length(cohort_name) between 1 and 50),
+ variable_mapping jsonb not null default '{}'::jsonb check(jsonb_typeof(variable_mapping)='object'),
  total_records integer not null check(total_records between 1 and 250),
  eligible_records integer not null check(eligible_records between 1 and 250),
  uploaded_by uuid not null references auth.users(id),
