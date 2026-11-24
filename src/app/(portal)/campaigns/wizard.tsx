@@ -28,7 +28,6 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
  const router=useRouter();
  const [dealershipId,setDealershipId]=useState(initialDealershipId);
  const [description,setDescription]=useState("");
- const profileReady=dealerships.find(d=>d.id===dealershipId)?.configured??false;
  const [preview,setPreview]=useState<Preview|null>(null),[busy,startTransition]=useTransition(),[reading,setReading]=useState(false);
  const [consentCertified,setConsentCertified]=useState(false),[error,setError]=useState(""),[existingDraft,setExistingDraft]=useState("");
  useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==="Escape"&&!busy)router.push("/campaigns");};document.addEventListener("keydown",key);return ()=>document.removeEventListener("keydown",key);},[router,busy]);
@@ -96,7 +95,6 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
       <input className="campaign-pill-input" type="text" maxLength={200} placeholder="Optional campaign purpose" value={description} disabled={busy||!!existingDraft} onChange={e=>setDescription(e.target.value)}/>
      </label>
     </div>
-    {!profileReady&&<div className="helper-banner" role="status">You can save this campaign as a draft. {canOpenOutbound?<a href="/settings/voice-profiles" style={{textDecoration:"underline"}}>Configure Voice Agent Defaults</a>:"Your IT Super User must verify the Sarvam connection before any calls can be launched."}</div>}
     <div className="fc-compact-excel-head">
      <strong>Customer Excel</strong>
      <button type="button" className="fc-template-icon" title="Download Excel template" aria-label="Download Excel template" onClick={()=>downloadBlob(makeRecipientTemplate(),"FrontVox_Recipient_Template.xlsx")}>
@@ -116,7 +114,6 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
 
     </div>}
     <label className="fc-compact-consent"><input type="checkbox" checked={consentCertified} disabled={busy} onChange={e=>setConsentCertified(e.target.checked)}/>I confirm customer consent and DNC/suppression screening.</label>
-    <div className="fc-compact-defaults">10:00–18:00 IST · Mon–Sat · 1 attempt/sec · No retries <span>· Saves as draft</span></div>
     {error&&<p role="alert" className="form-error">{error}</p>}
    </div>
    <footer className="campaign-modal-footer"><button type="button" className="campaign-modal-back" onClick={()=>router.push("/campaigns")}>Cancel</button>{preview&&<span className="campaign-step-count">{preview.eligible} eligible</span>}<button type="button" disabled={busy||reading||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next">{busy?"Creating…":"Create Campaign Draft"}</button></footer>
