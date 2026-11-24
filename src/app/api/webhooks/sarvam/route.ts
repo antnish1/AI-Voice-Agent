@@ -7,7 +7,7 @@ const fail=(status:number,reason:string)=>NextResponse.json({error:reason},{stat
 type SarvamPayload={
  app_id?:unknown;attempt_id?:unknown;campaign_id?:unknown;user_phone_number?:unknown;
  interaction_id?:unknown;connectivity_status?:unknown;completion_status?:unknown;
- duration?:unknown;start_datetime?:unknown;end_datetime?:unknown;interaction_transcript?:unknown;
+ output_agent_variables?:unknown; duration?:unknown;start_datetime?:unknown;end_datetime?:unknown;interaction_transcript?:unknown;
 };
 function textOf(value:unknown,max=200){return typeof value==="string"?value.slice(0,max):"";}
 function iso(value:unknown){if(typeof value!=="string"||!value)return null;const d=new Date(value);return Number.isFinite(d.getTime())?d.toISOString():null;}
@@ -37,26 +37,34 @@ export async function POST(req:NextRequest){
  let payload:SarvamPayload;
  try{payload=JSON.parse(raw) as SarvamPayload;}catch{return fail(400,"Malformed payload");}
  const attempt=textOf(payload.attempt_id),campaign=textOf(payload.campaign_id),agent=textOf(payload.app_id);
- if(attempt.length<3||campaign.length<3||agent.length<3)return fail(400,"Required Sarvam identifiers missing");
+ if(attempt.length<3||agent.length<3)return fail(400,"Required Sarvam identifiers missing");
  const phone=textOf(payload.user_phone_number,25);
  if(phone&&!/^\+?[1-9]\d{7,14}$/.test(phone))return fail(400,"Invalid phone number");
  const admin=createClient(url,adminKey,{auth:{persistSession:false,autoRefreshToken:false}});
+ const connectivity=textOf(payload.connectivity_status,30);
+ const completion=textOf(payload.completion_status,30);
+ const status=connectivity==="connected"?"answered":connectivity==="busy"?"busy":connectivity==="no_answer"?"no_answer":connectivity==="failed"||completion==="failed"?"failed":"other";
+ const duration=typeof payload.duration==="number"&&Number.isFinite(payload.duration)?Math.max(0,Math.min(86400,Math.round(payload.duration))):null;
+ const output=payload.output_agent_variables&&typeof payload.output_agent_variables==="object"&&!Array.isArray(payload.output_agent_variables)?payload.output_agent_variables:null;
+ const common={status,duration_seconds:duration,started_at:iso(payload.start_datetime),ended_at:iso(payload.end_datetime),transcript:safeTranscript(payload.interaction_transcript),output_variables:output,last_synced_at:new Date().toISOString()};
+ if(!campaign){
+  const {data:test,error}=await admin.from("voice_test_call_requests").select("id,agent_id").eq("sarvam_attempt_id",attempt).maybeSingle();
+  if(error)return fail(503,"Test attempt lookup unavailable");
+  if(!test||test.agent_id!==agent)return fail(422,"Unlinked test attempt");
+  const {error:save}=await admin.from("voice_test_call_results").upsert({request_id:test.id,interaction_id:textOf(payload.interaction_id)||null,...common},{onConflict:"request_id"});
+  if(save)return fail(503,"Unable to persist test result");
+  return NextResponse.json({ok:true},{headers:{"Cache-Control":"no-store"}});
+ }
  // Never take a tenant ID from a webhook payload or metadata. The verified Sarvam
  // campaign ID must already be explicitly linked to an internal CRM campaign.
  const {data:link,error:lookupError}=await admin.from("voice_campaign_links").select("dealership_id,agent_id,campaign_id").eq("sarvam_campaign_id",campaign).maybeSingle();
  if(lookupError)return fail(503,"Campaign lookup unavailable");
  if(!link)return fail(422,"Unlinked Sarvam campaign");
  if(link.agent_id!==agent)return fail(422,"Agent/campaign mismatch");
- const connectivity=textOf(payload.connectivity_status,30);
- const completion=textOf(payload.completion_status,30);
- const status=connectivity==="connected"?"answered":connectivity==="busy"?"busy":connectivity==="no_answer"?"no_answer":connectivity==="failed"?"failed":completion==="failed"?"failed":"other";
- const duration=typeof payload.duration==="number"&&Number.isFinite(payload.duration)?Math.max(0,Math.min(86400,Math.round(payload.duration))):null;
  const record={
   dealership_id:link.dealership_id,sarvam_attempt_id:attempt,sarvam_campaign_id:campaign,agent_id:agent,
   sarvam_interaction_id:textOf(payload.interaction_id,200)||null,dialed_number:phone||null,
-  status,duration_seconds:duration,started_at:iso(payload.start_datetime),
-  ended_at:iso(payload.end_datetime),transcript:safeTranscript(payload.interaction_transcript),
-  last_synced_at:new Date().toISOString()
+  ...common
  };
  const {error:saveError}=await admin.from("voice_call_records").upsert(record,{onConflict:"dealership_id,sarvam_attempt_id"});
  if(saveError)return fail(503,"Unable to persist verified call result");

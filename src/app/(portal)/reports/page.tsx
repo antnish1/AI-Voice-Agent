@@ -15,10 +15,10 @@ export default async function Reports(){
    const {data,error}=await supabase.from("voice_test_call_requests").select("id,phone_last4,agent_id,agent_version,connection_id,caller_number,status,created_at,sarvam_attempt_id").eq("user_id",user.id).order("created_at",{ascending:false}).order("id").range(offset,offset+199);
    if(error){testLoadError=true;break;}
    const batch=data??[];
-   const ids=batch.map(x=>x.sarvam_attempt_id).filter((v):v is string=>typeof v==="string"&&!!v);
-   const linked=ids.length?await supabase.from("voice_call_records").select("sarvam_attempt_id,status,duration_seconds,started_at,transcript").in("sarvam_attempt_id",ids):{data:[],error:null};
+   const ids=batch.map(x=>x.id);
+   const linked=ids.length?await supabase.from("voice_test_call_results").select("request_id,status,duration_seconds,started_at,transcript").in("request_id",ids):{data:[],error:null};
    if(linked.error)testLoadError=true;
-   for(const t of batch){const matches=(linked.data??[]).filter(x=>x.sarvam_attempt_id===t.sarvam_attempt_id);const call=matches.length===1?matches[0]:undefined;testReports.push({...t,caller_number:t.caller_number?String(t.caller_number).slice(-4):null,outcome:call?.status??null,duration_seconds:call?.duration_seconds??null,started_at:call?.started_at??null,has_transcript:Array.isArray(call?.transcript)&&call.transcript.length>0});}
+   for(const t of batch){const call=(linked.data??[]).find(x=>x.request_id===t.id);testReports.push({...t,caller_number:t.caller_number?String(t.caller_number).slice(-4):null,outcome:call?.status??null,duration_seconds:call?.duration_seconds??null,started_at:call?.started_at??null,has_transcript:Array.isArray(call?.transcript)&&call.transcript.length>0});}
    if(batch.length<200)break;
   }
  }

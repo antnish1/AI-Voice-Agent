@@ -28,7 +28,8 @@ export async function POST(request:Request){
   try{
    const result=await sarvamPost(sarvamPath("outbounds"),{
     app_config:{app_id:agent,app_version:version,connection_config:{connection_id:connection,agent_phone_number:outgoing}},
-    user_config:{user_phone_number:number}
+    user_config:{user_phone_number:number},
+    ...(process.env.SARVAM_STORED_WEBHOOK_ID?{webhook_config:{webhook_id:process.env.SARVAM_STORED_WEBHOOK_ID}}:{})
    });
    if(typeof result.attempt_id!=="string"||!result.attempt_id)throw Error("Provider returned no attempt ID");
    await supabase.from("voice_test_call_requests").update({status:"submitted",sarvam_attempt_id:result.attempt_id}).eq("id",reservationId);
