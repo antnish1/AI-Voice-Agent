@@ -1,4 +1,5 @@
 import {requireMembership} from "@/lib/auth";
+import {reportValues,phoneKey,type OperationalReport} from "@/lib/report-fields";
 import {ReportsDirectory} from "./reports-directory";
 export default async function Reports(){
  const {supabase,membership}=await requireMembership();if(!membership)return null;
@@ -22,11 +23,16 @@ export default async function Reports(){
   }
   return rows;
  };
- const [people,history,prospects,batches]=await Promise.all([
+ const [people,history,prospects,batches,calls,links,appointments,callbacks,pickups]=await Promise.all([
   all("customers","id,name,mobile,created_at"),
   all("customer_import_rows","id,customer_id,batch_id,row_number,source_data,status"),
-  all("campaign_prospects","id,customer_name,mobile,vehicle_model,registration_number,service_type,service_due,last_service,follow_up_at,call_summary,created_at,updated_at"),
-  all("customer_import_batches","id,created_at")
+  all("campaign_prospects","id,campaign_id,customer_name,mobile,vehicle_model,registration_number,service_type,service_due,last_service,follow_up_at,call_summary,next_action,created_at,updated_at"),
+  all("customer_import_batches","id,created_at"),
+  all("voice_call_records","id,customer_id,sarvam_campaign_id,dialed_number,status,duration_seconds,started_at"),
+  all("voice_campaign_links","id,campaign_id,sarvam_campaign_id"),
+  all("crm_appointments","id,customer_id,status,appointment_at,updated_at"),
+  all("crm_callbacks","id,customer_id,status,requested_at,updated_at"),
+  all("crm_pickup_drop","id,customer_id,status,requested_at,pickup_address,drop_address,updated_at")
  ]);
  const str=(x:unknown)=>typeof x==="string"||typeof x==="number"?String(x):"";
  const normalize=(x:string)=>x.toLowerCase().replace(/[^a-z0-9]/g,"");
@@ -50,9 +56,33 @@ export default async function Reports(){
   put([get("Customer Name")||str(p.name),str(p.mobile),get("Model","vehicle_model"),get("Reg. Number","registration_number"),get("Service Type"),get("Service DueDate","service_due"),get("Last ServiceDate","last_service"),get("Original CallDate"),get("Last Reported Mileage"),get("Last Follow up date"),get("Last Follow up Remarks")],batchDates.get(str(h.batch_id))??str(p.created_at),"import:"+str(h.id));
  }
  for(const p of prospects.sort((a,b)=>str(a.updated_at).localeCompare(str(b.updated_at)))){
-  put([str(p.customer_name),str(p.mobile),str(p.vehicle_model),str(p.registration_number),str(p.service_type),str(p.service_due),str(p.last_service),"","", "",str(p.call_summary)],str(p.updated_at)||str(p.created_at),"prospect:"+str(p.id));
+  put([str(p.customer_name),str(p.mobile),str(p.vehicle_model),str(p.registration_number),str(p.service_type),str(p.service_due),str(p.last_service),"","","",""],str(p.updated_at)||str(p.created_at),"prospect:"+str(p.id));
  }
  for(const p of people)if(!seenCustomers.has(str(p.id))&&!Array.from(rows.values()).some(r=>r.values[1]&&key(r.values[1],"")===key(str(p.mobile),"")))put([str(p.name),str(p.mobile),"","","","","","","","",""],str(p.created_at),"customer:"+str(p.id));
- const serviceRecords=Array.from(rows.values()).sort((a,b)=>b.date.localeCompare(a.date));
+ const inputs=Array.from(rows.entries());
+ const linkMap=new Map(links.map(l=>[str(l.sarvam_campaign_id),str(l.campaign_id)]));
+ const unique=<T,>(xs:T[])=>xs.length===1?xs[0]:undefined;
+ const latest=(xs:Record<string,unknown>[],customerId:string)=>customerId?xs.filter(x=>str(x.customer_id)===customerId).sort((a,b)=>str(b.updated_at).localeCompare(str(a.updated_at)))[0]:undefined;
+ const operations=(customerId:string)=>({appointment:latest(appointments,customerId),callback:latest(callbacks,customerId),pickup:latest(pickups,customerId)});
+ const matched=new Set<string>();
+ const serviceRecords:OperationalReport[]=calls.map(c=>{
+  const phone=phoneKey(c.dialed_number);
+  const campaign=linkMap.get(str(c.sarvam_campaign_id));
+  const p=campaign&&phone?unique(prospects.filter(x=>str(x.campaign_id)===campaign&&phoneKey(x.mobile)===phone)):undefined;
+  const candidates=phone?inputs.filter(([,x])=>phoneKey(x.values[1])===phone):[];
+  const match=p&&str(p.registration_number)?unique(candidates.filter(([,x])=>normalize(x.values[3])===normalize(str(p.registration_number)))):unique(candidates);
+  if(match)matched.add(match[0]);
+  const base=match?.[1].values??[];
+  const person=byId.get(str(c.customer_id));
+  const input=[str(p?.customer_name)||base[0]||str(person?.name),str(c.dialed_number)||base[1]||"",str(p?.vehicle_model)||base[2]||"",str(p?.registration_number)||base[3]||"",str(p?.service_type)||base[4]||"",str(p?.service_due)||base[5]||"",str(p?.last_service)||base[6]||"",base[7]||"",base[8]||"",base[9]||"",base[10]||""];
+  return {id:"call:"+str(c.id),callId:str(c.id),date:str(c.started_at),values:reportValues(input,c,p,operations(str(c.customer_id)))};
+ });
+ for(const [k,row] of inputs)if(!matched.has(k)){
+  const phone=phoneKey(row.values[1]);
+  const p=phone?unique(prospects.filter(x=>phoneKey(x.mobile)===phone&&normalize(str(x.registration_number))===normalize(row.values[3]??""))):undefined;
+  const person=phone?unique(people.filter(x=>phoneKey(x.mobile)===phone)):undefined;
+  serviceRecords.push({id:k,date:row.date,values:reportValues(row.values,undefined,p,operations(str(person?.id)))});
+ }
+ serviceRecords.sort((a,b)=>b.date.localeCompare(a.date));
  return <ReportsDirectory serviceRecords={serviceRecords} metrics={{customers:customers.count??0,campaigns:campaigns.count??0,imports:imports.count??0,pending:pending.count??0}} campaigns={listed.data??[]}/>;
 }
