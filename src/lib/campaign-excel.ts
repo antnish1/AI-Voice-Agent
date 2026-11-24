@@ -153,3 +153,22 @@ export function makeCallOutcomeReport(rows:Array<{
   ["xl/worksheets/sheet1.xml",sheet]
  ]);
 }
+
+export const SERVICE_REPORT_HEADERS=["Customer Name","Mobile","Model","Reg. Number","Service Type","Service DueDate","Last ServiceDate","Original CallDate","Last Reported Mileage","Last Follow up date","Last Follow up Remarks"] as const;
+export function makeServiceReport(rows:string[][]):Blob{
+ const lines=[Array.from(SERVICE_REPORT_HEADERS),...rows];
+ const cell=(value:string,col:number,row:number)=>{
+  let letters="",n=col+1;while(n){n--;letters=String.fromCharCode(65+n%26)+letters;n=Math.floor(n/26);}
+  // Inline strings prevent Excel formula execution for untrusted customer/provider fields.
+  return '<c r="'+letters+row+'" t="inlineStr"><is><t xml:space="preserve">'+escapeXml(value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g,""))+'</t></is></c>';
+ };
+ const body=lines.map((line,i)=>'<row r="'+(i+1)+'">'+line.map((v,j)=>cell(v,j,i+1)).join("")+'</row>').join("");
+ const sheet='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'+body+'</sheetData></worksheet>';
+ return templateZip([
+  ["[Content_Types].xml",'<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'],
+  ["_rels/.rels",'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+  ["xl/workbook.xml",'<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Service Records" sheetId="1" r:id="rId1"/></sheets></workbook>'],
+  ["xl/_rels/workbook.xml.rels",'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>'],
+  ["xl/worksheets/sheet1.xml",sheet]
+ ]);
+}
