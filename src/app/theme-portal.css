@@ -1,0 +1,89 @@
+/* Persistent portal color themes: System resolves to an explicit data-theme via
+   matchMedia. Login artwork intentionally remains unchanged. */
+.frontier-theme-and-layout{display:flex;align-items:center;justify-content:flex-end;flex:1;gap:17px;flex-wrap:wrap}
+.frontier-theme-control{display:flex;align-items:center;gap:9px;color:#384e75;font-size:12px;font-weight:750}
+.frontvox-theme-fieldset{margin:0;padding:0;border:0;min-width:0}
+.frontvox-theme-switch{display:inline-flex;gap:1px;align-items:center;border:1px solid #e0e5ee;border-radius:99px;background:#f9fbff;padding:3px}
+.frontvox-theme-switch label{position:relative;cursor:pointer;display:grid;place-items:center;width:34px;height:32px;border-radius:99px;color:#64748b;transition:background .15s,color .15s}
+.frontvox-theme-switch label.selected{background:white;color:#182943;box-shadow:0 1px 4px #18325225}
+.frontvox-theme-switch label:hover{color:#0c82a0}
+.frontvox-theme-switch input{position:absolute;opacity:0;width:100%;height:100%;inset:0;cursor:pointer}
+.frontvox-theme-switch label:has(input:focus-visible){outline:3px solid #10afd1;outline-offset:2px}
+.frontvox-theme-switch svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.frontvox-theme-switch label span{position:absolute;clip:rect(0 0 0 0);width:1px;height:1px;overflow:hidden}
+.frontier-layout-compact .frontier-theme-and-layout .frontier-layout-options{flex:0 1 auto}
+@media(max-width:1150px){.frontier-layout-settings.frontier-layout-compact{flex-wrap:wrap}.frontier-theme-and-layout{justify-content:flex-start}}
+@media(max-width:760px){.frontier-theme-and-layout{justify-content:flex-start;align-items:stretch;flex-direction:column;gap:12px}.frontier-layout-compact .frontier-theme-and-layout .frontier-layout-options{width:100%}}
+/* Centralize the dark text/background palette while keeping accents readable. */
+:root[data-theme="dark"]{
+ color-scheme:dark;
+ --navy:#081629;--navy-deep:#081629;--ink:#dce9fa;--muted:#a2b4cb;
+ --line:#2a3c53;--surface:#15243a;--canvas:#091525;
+ background:#091525;color:#dce9fa;
+}
+:root[data-theme="dark"] body{background:#091525;color:#dce9fa}
+:root[data-theme="dark"] .crm-app,:root[data-theme="dark"] .crm-workspace{background:#091525;color:#dce9fa}
+:root[data-theme="dark"] .crm-main,:root[data-theme="dark"] .ref-main{color:#dce9fa}
+:root[data-theme="dark"] .crm-topbar,:root[data-theme="dark"] .ref-topbar,
+:root[data-theme="dark"] .frontier-top-navigation,:root[data-theme="dark"] .frontier-top-mega-panel{background:#102038;color:#dce9fa;border-color:#2b405b}
+:root[data-theme="dark"] .frontier-reference-sidebar.ref-sidebar{background:#0d2036;color:#dce9fa;border-color:#29445b}
+:root[data-theme="dark"] .frontier-sidebar-brand .frontier-brand-text,:root[data-theme="dark"] .frontier-topbar-brand,
+:root[data-theme="dark"] .frontier-reference-sidebar .frontier-sidebar-nav .frontier-nav-link{color:#dce9fa}
+:root[data-theme="dark"] .frontier-reference-sidebar .frontier-sidebar-nav .frontier-nav-link .nav-icon{color:#9ccfe2}
+:root[data-theme="dark"] .frontier-reference-sidebar .frontier-motion-active-nav,
+:root[data-theme="dark"] .frontier-reference-sidebar .frontier-nav-row.selected{background:#15475c!important;border-color:#1a788f;color:#dffbff}
+:root[data-theme="dark"] .frontier-reference-sidebar .frontier-nav-row:not(.selected):hover,
+:root[data-theme="dark"] .frontier-top-nav-entry:hover{background:#1a334b}
+:root[data-theme="dark"] .frontier-reference-sidebar .frontier-help-card{background:#17334b;border-color:#35526b;color:#dce9fa}
+:root[data-theme="dark"] .frontier-top-nav-link,:root[data-theme="dark"] .frontier-mega-link{color:#c9dcef}
+:root[data-theme="dark"] .frontier-top-nav-entry.active,:root[data-theme="dark"] .frontier-top-campaign-menu a{background:#174357;color:#a8eff8}
+:root[data-theme="dark"] .frontier-top-mega-panel :is(h2,h3,strong){color:#eff7ff}
+:root[data-theme="dark"] .frontier-top-mega-link-icon,:root[data-theme="dark"] .frontier-mega-link-icon{background:#20324d}
+:root[data-theme="dark"] :is(.crm-panel,.metric-card,.stat,.panel,.crm-operations,.settings-ref-card,.settings-ref-profile-card,.settings-ref-other-panel,.settings-ref-sidebar,.settings-ref-main>section,.frontier-layout-settings,.it-user-card,.it-user-stats article,.campaign-modal,.fc-campaign-list,.vdp-card,.docs-ref,.content-card){background:#14243a;color:#dce9fa;border-color:#2a405b;box-shadow:0 3px 15px #030a1833}
+:root[data-theme="dark"] :is(.page-head h1,.panel-title h2,.metric-value,.metric-label,.settings-ref-card h3,.settings-ref-card strong,.settings-ref-profile-card h2,.settings-ref-other-panel h2,.frontier-layout-title h3,.frontier-layout-option strong,.vdp-card h2,.fc-list-toolbar h2,.it-user-card h2){color:#eef6ff}
+:root[data-theme="dark"] :is(.page-head p,.muted,.metric-note,.settings-ref-card p,.settings-ref-footnote,.settings-ref-card small,.settings-ref-profile-card p,.settings-ref-other-panel p,.frontier-layout-option small,.vdp-card p){color:#9badc5}
+:root[data-theme="dark"] :is(.frontier-layout-option,.settings-ref-sidebar button,.settings-ref-card-action,.btn-outline,.btn-soft,.review-row,.upload-zone,.campaign-modal-scroll,.campaign-modal-header,.campaign-modal-footer){background:#1b2d45;color:#dbe8f9;border-color:#35465d}
+:root[data-theme="dark"] :is(.frontier-layout-option.selected,.settings-ref-sidebar button.active,.frontier-layout-option:hover){background:#183d51;color:#b7f6fa;border-color:#298ca8}
+:root[data-theme="dark"] :is(.helper-banner,.settings-ref-plan-indicator,.fc-campaign-notice,.vdp-info,.settings-ref-unavailable){background:#15374d;color:#c3e7f2;border-color:#28637b}
+:root[data-theme="dark"] :is(.status-pill,.chip,.environment-tag){background:#22415a;color:#b9eefa;border-color:#315e77}
+:root[data-theme="dark"] :is(input,select,textarea):not([type="checkbox"]):not([type="radio"]):not(.fv-login input){background:#182a42;color:#e3edf8;border-color:#3a516c}
+:root[data-theme="dark"] :is(input,select,textarea)::placeholder{color:#91a6be}
+:root[data-theme="dark"] :is(.crm-table th,table th,.it-user-table th){background:#1a304a;color:#afc8df;border-color:#2c425c}
+:root[data-theme="dark"] :is(.crm-table td,table td,.review-row,.settings-ref-preference){color:#d1e2f3;border-color:#2a405b}
+:root[data-theme="dark"] .crm-table tr:hover td{background:#1a344c}
+:root[data-theme="dark"] .settings-ref-profile-content,:root[data-theme="dark"] .settings-ref-profile-form,
+:root[data-theme="dark"] .settings-ref-profile-identity,:root[data-theme="dark"] .settings-ref-other-heading,
+:root[data-theme="dark"] .settings-ref-details{color:#dce9fa}
+:root[data-theme="dark"] .settings-ref-profile-form label,:root[data-theme="dark"] .settings-ref-profile-identity strong{color:#e7f3ff}
+:root[data-theme="dark"] .settings-ref-profile-form label span,:root[data-theme="dark"] .settings-ref-profile-form input{background:#1a2c45;border-color:#35485f;color:#dce9fa}
+:root[data-theme="dark"] .settings-ref-sidebar button:not(.active):hover{background:#243f57}
+:root[data-theme="dark"] .frontier-theme-control{color:#d8e6f4}
+:root[data-theme="dark"] .frontvox-theme-switch{background:#0c1d30;border-color:#3a4d65}
+:root[data-theme="dark"] .frontvox-theme-switch label{color:#9fbed7}
+:root[data-theme="dark"] .frontvox-theme-switch label.selected{background:#304b66;color:#fff;box-shadow:0 1px 4px #0006}
+:root[data-theme="dark"] .fc-campaign-hero:before{background:radial-gradient(ellipse at 74% 32%,#0760a077,transparent 52%),linear-gradient(120deg,#102744,#12314e 52%,#162d48)}
+:root[data-theme="dark"] .fc-campaign-hero:after{border-color:#16446e77}
+:root[data-theme="dark"] .fc-hero-copy h1,:root[data-theme="dark"] .fc-campaign-empty h3,:root[data-theme="dark"] .fc-count-content strong{color:#edf7ff}
+:root[data-theme="dark"] .fc-hero-copy p,:root[data-theme="dark"] .fc-count-content>span,:root[data-theme="dark"] .fc-campaign-empty p{color:#b4cbe1}
+:root[data-theme="dark"] .fc-eyebrow{color:#85c5f4}
+:root[data-theme="dark"] .fc-count-card{background:#14243a;border-color:#284463}
+:root[data-theme="dark"] .fc-count-arrow{background:#244360;color:#a6dcff}
+:root[data-theme="dark"] .fc-list-toolbar{border-color:#2c4057}
+:root[data-theme="dark"] .fc-search,:root[data-theme="dark"] .fc-status,:root[data-theme="dark"] .fc-date-details>summary,
+:root[data-theme="dark"] .fc-date-panel,:root[data-theme="dark"] .fc-voice-button{background:#20344e;color:#d8e8f8;border-color:#385572}
+:root[data-theme="dark"] .fc-search input,:root[data-theme="dark"] .fc-status select{background:transparent;color:#dbeafb}
+:root[data-theme="dark"] .fc-date-panel label{color:#cbdfee}
+:root[data-theme="dark"] .fc-campaign-empty:before{opacity:.18}
+:root[data-theme="dark"] .vdp-page:before{background:radial-gradient(ellipse at 77% 21%,#12608c65,transparent 42%),linear-gradient(125deg,#101f37,#102b46)}
+:root[data-theme="dark"] .vdp-heading h1,:root[data-theme="dark"] .vdp-card-title h2,:root[data-theme="dark"] .vdp-label{color:#ebf5ff}
+:root[data-theme="dark"] .vdp-heading p,:root[data-theme="dark"] .vdp-card-title p{color:#b7cde1}
+:root[data-theme="dark"] .vdp-back,:root[data-theme="dark"] .vdp-control{background:#20344d;color:#ddeafa;border-color:#354d68}
+:root[data-theme="dark"] .vdp-control input,:root[data-theme="dark"] .vdp-control select{background:transparent;color:#e6f1fc}
+:root[data-theme="dark"] .vdp-visual{filter:brightness(.85)}
+:root[data-theme="dark"] .campaign-modal-overlay{background:#020b18ae}
+:root[data-theme="dark"] .campaign-modal-header h2,:root[data-theme="dark"] .campaign-modal-scroll strong{color:#eef7ff}
+:root[data-theme="dark"] .campaign-pill-input,:root[data-theme="dark"] .wizard-field :is(input,select,textarea){background:#1e344e;color:#e2effb;border-color:#395670}
+:root[data-theme="dark"] .settings-ref-modal-backdrop{background:#000b}
+:root[data-theme="dark"] .settings-ref-modal{background:#162942;color:#e7f1fb;border:1px solid #34506b}
+:root[data-theme="dark"] .settings-ref-modal h2,:root[data-theme="dark"] .settings-ref-modal label{color:#e7f1fb}
+@media(prefers-reduced-motion:reduce){.frontvox-theme-switch label{transition:none}}
