@@ -54,3 +54,15 @@ test("contact fields are additive and old dealership records remain",()=>{
  for(const col of ["contact","mobile","contact_person","email"])assert.match(migration,new RegExp("add column if not exists "+col+" text"));
  assert.doesNotMatch(migration,/drop table|truncate|delete from|alter column.*not null/i);
 });
+
+test("only the verified IT Super User can reset a dealership viewer password",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ assert.match(serverPage,/isItSuperUser/);
+ assert.match(edge,/user\.id!==IT_ID/);
+ assert.match(edge,/membership.*super_admin/);
+ assert.match(edge,/body\.confirm!=="RESET DEALERSHIP PASSWORD"/);
+ assert.match(edge,/row\.data\.role!=="management"/);
+ assert.match(ui,/confirm:"RESET DEALERSHIP PASSWORD"/);
+ assert.match(edge,/must_change_password:true/);
+ assert.doesNotMatch(edge,/inviteUserByEmail|resetPasswordForEmail/);
+});
