@@ -26,15 +26,19 @@ end $$;
 do $$
 declare v_id uuid; v_dealer uuid; v_count integer; v_number bigint; v_ref text;
 begin
- select count(*) into v_count from public.campaigns c join public.dealerships d on d.id=c.dealership_id where d.name='Frontier MG Noida' and c.name='Frontier MG Noida Service Campaign 2026-11-25' and c.campaign_reference is null;
+ select count(*) into v_count from public.campaigns c join public.dealerships d on d.id=c.dealership_id where d.name='Frontier MG Noida' and c.name='Frontier MG Noida Service Campaign 2026-11-25' and c.campaign_reference is null and c.status='DRAFT' and c.approved_by is null and c.approved_at is null;
  if v_count=0 then return; end if;
  if v_count<>1 then raise exception 'Legacy campaign is ambiguous'; end if;
- select c.id,c.dealership_id into v_id,v_dealer from public.campaigns c join public.dealerships d on d.id=c.dealership_id where d.name='Frontier MG Noida' and c.name='Frontier MG Noida Service Campaign 2026-11-25' and c.campaign_reference is null;
+ select c.id,c.dealership_id into v_id,v_dealer from public.campaigns c join public.dealerships d on d.id=c.dealership_id where d.name='Frontier MG Noida' and c.name='Frontier MG Noida Service Campaign 2026-11-25' and c.campaign_reference is null and c.status='DRAFT' and c.approved_by is null and c.approved_at is null;
  insert into private_campaign_reference.counters(dealership_id,period,last_number) values(v_dealer,date '2026-11-01',1)
  on conflict(dealership_id,period) do update set last_number=private_campaign_reference.counters.last_number+1 returning last_number into v_number;
  v_ref:='Nov 2026- MG '||lpad(v_number::text,greatest(3,length(v_number::text)),'0');
+ -- Exclusive table lock prevents concurrent changes; both guards are restored in this transaction.
+ alter table public.campaigns disable trigger enforce_campaign_approval_transition;
  alter table public.campaigns disable trigger campaign_reference_assign;
- update public.campaigns set name=v_ref,campaign_reference=v_ref,campaign_period=date '2026-11-01' where id=v_id;
+ update public.campaigns set name=v_ref,campaign_reference=v_ref,campaign_period=date '2026-11-01' where id=v_id and status='DRAFT' and campaign_reference is null;
+ if not found then raise exception 'Legacy draft changed'; end if;
  alter table public.campaigns enable trigger campaign_reference_assign;
+ alter table public.campaigns enable trigger enforce_campaign_approval_transition;
 end $$;
 commit;
