@@ -28,6 +28,11 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
  const router=useRouter();
  const [dealershipId,setDealershipId]=useState(initialDealershipId);
  const [description,setDescription]=useState("");
+ const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit"}).formatToParts(new Date());
+ const currentYear=Number(today.find(p=>p.type==="year")?.value??"2026");
+ const [month,setMonth]=useState(today.find(p=>p.type==="month")?.value??"01"),[year,setYear]=useState(String(currentYear));
+ const [reference,setReference]=useState(""),[success,setSuccess]=useState(false),[copied,setCopied]=useState(false);
+ const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
  const [preview,setPreview]=useState<Preview|null>(null),[busy,startTransition]=useTransition(),[reading,setReading]=useState(false);
  const [consentCertified,setConsentCertified]=useState(false),[error,setError]=useState(""),[existingDraft,setExistingDraft]=useState("");
  useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==="Escape"&&!busy)router.push("/campaigns");};document.addEventListener("keydown",key);return ()=>document.removeEventListener("keydown",key);},[router,busy]);
@@ -64,9 +69,9 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
   startTransition(async()=>{
    let id=existingDraft;
    if(!id){
-    const created=await createSimpleCampaign(dealershipId,preview.filename,preview.total,description);
+    const created=await createSimpleCampaign(dealershipId,preview.filename,preview.total,description,year+"-"+month+"-01");
     if(!created.id){setError(created.error??"Could not create campaign.");return;}
-    id=created.id;setExistingDraft(id);
+    id=created.id;setExistingDraft(id);setReference(created.reference??"");
    }
    const form=new FormData();
    form.set("campaignId",id);form.set("file",new File([preview.csv],"recipients.csv",{type:"text/csv"}));
@@ -77,20 +82,22 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
     const response=await fetch("/api/sarvam/recipients",{method:"POST",body:form,cache:"no-store"});
     const data=await response.json();
     if(!response.ok||!data.ok){setError((data.error??"Could not stage recipient file.")+" The draft was retained; retrying will not create another draft.");return;}
-    router.push("/campaigns/"+id+(canOpenOutbound?"/outbound":"/view"));router.refresh();
+    setSuccess(true);
    }catch{setError("Upload failed. Your draft was retained; retry to securely stage the same file.");}
   });
  }
+ if(success)return <div className="campaign-modal-overlay"><section className="campaign-modal fc-success-campaign" role="dialog" aria-modal="true" aria-labelledby="campaign-success-title"><div className="fc-success-tick" aria-hidden="true">✓</div><h2 id="campaign-success-title">Campaign Created Successfully</h2><p>Unique Campaign ID</p><strong className="fc-success-reference">{reference||existingDraft}</strong><div className="fc-success-status"><span>Status</span><span className="status-pill">Draft</span></div><div className="fc-success-actions"><button type="button" className="btn-outline" onClick={async()=>{try{await navigator.clipboard.writeText(reference||existingDraft);setCopied(true);}catch{setCopied(false);}}}>{copied?"Copied":"Copy Campaign ID"}</button><button type="button" className="btn-primary" onClick={()=>{router.push("/campaigns/"+existingDraft+(canOpenOutbound?"/outbound":"/view"));router.refresh();}}>View Campaign</button></div></section></div>;
  return <div className="campaign-modal-overlay" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)router.push("/campaigns");}}>
   <section className="campaign-modal fc-compact-campaign" role="dialog" aria-modal="true" aria-labelledby="campaign-dialog-title">
    <header className="campaign-modal-header"><div><h2 id="campaign-dialog-title">Create AI Calling Campaign</h2></div><button type="button" className="campaign-modal-close" aria-label="Close" onClick={()=>router.push("/campaigns")}>×</button></header>
    <div className="campaign-modal-scroll fc-compact-scroll">
     <div className="fc-compact-fields">
-     <label className="campaign-form-label">Dealership <span>*</span>
+     {canOpenOutbound&&<label className="campaign-form-label">Dealership <span>*</span>
       <select className="campaign-pill-input" value={dealershipId} disabled={busy||!!existingDraft||dealerships.length===1} onChange={e=>{setDealershipId(e.target.value);setPreview(null);setExistingDraft("");}}>
        {dealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}
       </select>
-     </label>
+     </label>}
+     <div className="campaign-form-label">Campaign Month &amp; Year <span>*</span><div className="fc-period-fields"><select aria-label="Campaign month" className="campaign-pill-input" value={month} disabled={busy||!!existingDraft} onChange={e=>setMonth(e.target.value)}>{months.map((m,i)=><option key={m} value={String(i+1).padStart(2,"0")}>{m}</option>)}</select><select aria-label="Campaign year" className="campaign-pill-input" value={year} disabled={busy||!!existingDraft} onChange={e=>setYear(e.target.value)}>{Array.from({length:currentYear-1899},(_,i)=>currentYear-i).map(y=><option key={y} value={y}>{y}</option>)}</select></div></div>
      <label className="campaign-form-label">Description
       <input className="campaign-pill-input" type="text" maxLength={200} placeholder="Optional campaign purpose" value={description} disabled={busy||!!existingDraft} onChange={e=>setDescription(e.target.value)}/>
      </label>
