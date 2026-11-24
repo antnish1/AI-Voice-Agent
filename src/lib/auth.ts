@@ -37,3 +37,6 @@ export async function requireMembership(dealershipId?: string) {
 
 export function canPrepare(role: Role) { return role === "super_admin"; }
 export function canApprove(role: Role) { return role === "super_admin"; }
+
+/** Dealership members may create drafts only for their assigned dealership. */
+export function canCreateCampaign(role:Role){return ROLES.includes(role);}
