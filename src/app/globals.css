@@ -1426,3 +1426,19 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 .it-full-width .tablewrap{max-width:100%;overflow-x:auto}
 @media(max-width:1000px){.it-user-creation-grid{grid-template-columns:1fr}}
 @media(max-width:580px){.it-user-creation-grid .it-user-form{grid-template-columns:1fr}}
+
+/* User management: full-width onboarding, register switch and native modal */
+.it-user-heading .it-create-dealer{background:#078d9b;color:#fff;border-radius:8px;padding:11px 16px;font-size:12px;font-weight:700}
+.it-user-creation-grid.it-user-single{grid-template-columns:minmax(0,1fr)}
+.it-user-single .it-user-form{grid-template-columns:repeat(3,minmax(0,1fr))}
+.it-register-tabs{display:flex;flex-wrap:wrap;gap:8px;padding:8px;border:1px solid #e1eaf3;border-radius:12px 12px 0 0;background:#f5f8fb}
+.it-register-tabs button{padding:10px 16px;border-radius:8px;color:#36516e;font-size:12px;font-weight:650}
+.it-register-tabs button[aria-pressed=true]{background:#173956;color:#fff}
+.it-register-tabs+.it-user-list{border-top:0;border-radius:0 0 13px 13px}
+.it-dealer-dialog{width:min(800px,calc(100% - 28px));max-height:calc(100dvh - 32px);margin:auto;padding:0;border:0;border-radius:13px;background:transparent;color:inherit;overflow:auto}
+.it-dealer-dialog::backdrop{background:rgba(17,40,64,.48)}
+.it-dealer-dialog .it-user-form{grid-template-columns:repeat(2,minmax(0,1fr))}
+.it-dealer-dialog .it-user-form>button{grid-column:1/-1}
+.it-dealer-dialog .it-user-table-head{margin-bottom:12px;align-items:center}
+@media(max-width:900px){.it-user-single .it-user-form{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:580px){.it-user-single .it-user-form,.it-dealer-dialog .it-user-form{grid-template-columns:minmax(0,1fr)}}
