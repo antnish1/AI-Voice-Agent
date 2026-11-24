@@ -31,12 +31,15 @@ export function UserManagement(){
  const resetDialogRef=useRef<HTMLDialogElement>(null);
  const [selectedAccount,setSelectedAccount]=useState<Account|null>(null);
  const [resetPassword,setResetPassword]=useState(""),[resetError,setResetError]=useState(""),[resetNotice,setResetNotice]=useState("");
+ const [resetExpanded,setResetExpanded]=useState(false);
+ const [customPassword,setCustomPassword]=useState(""),[correctEmail,setCorrectEmail]=useState(""),[resetConfirm,setResetConfirm]=useState("");
+ const clearResetFields=()=>{setResetExpanded(false);setCustomPassword("");setCorrectEmail("");setResetConfirm("");};
  const [lifecycleAction,setLifecycleAction]=useState<LifecycleAction>("disable-login");
  const [lifecycleConfirm,setLifecycleConfirm]=useState("");
  const [dependencies,setDependencies]=useState<Dependency[]|null>(null);
  const selectLifecycle=(action:LifecycleAction)=>{setLifecycleAction(action);setLifecycleConfirm("");setResetError("");};
- const openReset=(account:Account)=>{setLifecycleAction("disable-login");setLifecycleConfirm("");setDependencies(null);setSelectedAccount(account);setResetPassword("");setResetError("");setResetNotice("");resetDialogRef.current?.showModal();};
- const clearReset=()=>{setLifecycleConfirm("");setDependencies(null);setSelectedAccount(null);setResetPassword("");setResetError("");setResetNotice("");};
+ const openReset=(account:Account)=>{clearResetFields();setLifecycleAction("disable-login");setLifecycleConfirm("");setDependencies(null);setSelectedAccount(account);setResetPassword("");setResetError("");setResetNotice("");resetDialogRef.current?.showModal();};
+ const clearReset=()=>{clearResetFields();setLifecycleConfirm("");setDependencies(null);setSelectedAccount(null);setResetPassword("");setResetError("");setResetNotice("");};
  const openDealer=()=>{setError("");dialogRef.current?.showModal();};
  const load=useCallback(async()=>{setLoading(true);try{const result=await call({action:"list"});setDealers(result.dealerships??[]);setUsers(result.users??[]);setError("");}catch(e){setError(e instanceof Error?e.message:"Could not load users.");}finally{setLoading(false);}},[]);
  useEffect(()=>{void load();},[load]);
@@ -49,8 +52,8 @@ export function UserManagement(){
   catch(e){setError(e instanceof Error?e.message:"Unable to create user.");}
  });};
  const reset=(account:Account)=>{
-  if(pending||resetPassword)return;
-  setResetError("");setResetNotice("");startTransition(async()=>{try{const result=await call({action:"reset",userId:account.id,confirm:"RESET DEALERSHIP PASSWORD"});setResetNotice(result.message??"Password reset.");setResetPassword(result.issuedPassword??"");await load();}
+  if(pending||resetPassword||!resetExpanded||resetConfirm!=="RESET")return;
+  setResetError("");setResetNotice("");startTransition(async()=>{try{const result=await call({action:"reset",userId:account.id,confirm:resetConfirm,password:customPassword,email:correctEmail.trim()});setResetNotice(result.message??"Password reset.");setResetPassword(result.issuedPassword??"");setSelectedAccount(v=>v?{...v,email:correctEmail.trim().toLowerCase()||v.email,activated:true,passwordChangePending:false}:v);setCustomPassword("");setCorrectEmail("");setResetConfirm("");await load();}
    catch(e){setResetError(e instanceof Error?e.message:"Could not reset password.");}});
  };
  const inspectDependencies=(account:Account)=>{
@@ -95,7 +98,14 @@ export function UserManagement(){
      {([["User ID",selectedAccount.id],["Dealership",selectedAccount.dealership],["Login Method","Email"],["Auth Login",selectedAccount.email],["Employee ID",selectedAccount.employeeId||"—"],["Auth Status",selectedAccount.activated?"Confirmed":"Unconfirmed"],["Mobile",selectedAccount.mobile||"—"],["System Permission","Dealership Viewer"],["Role / Post",selectedAccount.post||"—"],["Account Status",accountStatus(selectedAccount)],["Original Login Email",selectedAccount.originalEmail||"—"]] as const).map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
     </dl>
     {!selectedAccount.activated&&<div className="it-reset-warning"><strong>Identity warnings</strong><p>Email unconfirmed</p></div>}
-    <div className="it-reset-action"><div><strong>IT Super User · Password reset</strong><p>Reset this account's login password. No invitation or reset email will be sent.</p></div><button type="button" disabled={pending||Boolean(resetPassword)||Boolean(selectedAccount.accountState&&selectedAccount.accountState!=="active")} onClick={()=>reset(selectedAccount)}>{pending?"Resetting…":"Reset password"}</button></div>
+    <section className="it-reset-action it-reset-expandable">
+     <div className="it-reset-action-head"><div><strong>IT Super User · Temporary password</strong><p>Reset the password and confirm this account's login email. Optionally correct the email before resetting.</p></div><button type="button" disabled={pending||(!resetExpanded&&Boolean(resetPassword))||Boolean(selectedAccount.accountState&&selectedAccount.accountState!=="active")} onClick={()=>{if(resetExpanded){clearResetFields();}else{setResetExpanded(true);setResetError("");}}}>{resetExpanded?"Close":"Reset password"}</button></div>
+     {resetExpanded&&!resetPassword&&<form className="it-reset-fields" onSubmit={e=>{e.preventDefault();reset(selectedAccount);}}>
+      <label>New password (optional)<input type="password" autoComplete="new-password" placeholder="Generate if blank" minLength={8} maxLength={72} value={customPassword} onChange={e=>setCustomPassword(e.target.value)} disabled={pending}/></label>
+      <label>Correct login email (optional)<input type="email" autoComplete="off" placeholder="Leave blank to keep current" maxLength={254} value={correctEmail} onChange={e=>setCorrectEmail(e.target.value)} disabled={pending}/></label>
+      <div className="it-reset-confirm-row"><label>Type RESET to confirm<input autoComplete="off" value={resetConfirm} onChange={e=>setResetConfirm(e.target.value)} disabled={pending}/></label><button type="submit" disabled={pending||resetConfirm!=="RESET"}>{pending?"Issuing…":"Issue temporary password"}</button></div>
+     </form>}
+    </section>
     <div className="it-account-removal">
      <div className="it-account-archive"><strong>Archive user / Retire identity (recommended)</strong><p>Disable login and retain the original user identity, dealership membership and business history.</p><button type="button" disabled={pending||selectedAccount.accountState==="archived"} onClick={()=>selectLifecycle("archive-user")}>Archive user</button></div>
      <div className="it-account-archive"><strong>Archive account &amp; release login email</strong><p>Release the original email for a new user while retaining the old identity and linked records. The retired account stays disabled.</p><button type="button" disabled={pending||Boolean(selectedAccount.originalEmail)} onClick={()=>selectLifecycle("archive-release-email")}>Release email for a new user</button></div>
