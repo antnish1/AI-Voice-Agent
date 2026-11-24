@@ -86,11 +86,10 @@ Deno.serve(async(req)=>{
   if(!/^[0-9a-f-]{36}$/i.test(dealerId))return json({error:"Choose an existing dealership."},400,headers);
   const dealer=await admin.from("dealerships").select("id").eq("id",dealerId).maybeSingle();
   if(dealer.error||!dealer.data)return json({error:"Dealership does not exist. Create it first."},404,headers);
-  // createUser does not send an invitation or confirmation email.
-  // Email is marked confirmed so the user can sign in with the temporary password.
-  // Existing portal auth checks must_change_password before allowing CRM access.
+  // No invitation emails. Only IT receives this unique password once.
+  const issuedPassword=makePassword();
   const created=await admin.auth.admin.createUser({
-   email,password:DEFAULT_TEMP_PASSWORD,email_confirm:true,
+   email,password:issuedPassword,email_confirm:true,
    user_metadata:{display_name:name,mobile:mobile.startsWith("+")?mobile:mobile.startsWith("91")?"+"+mobile:"+91"+mobile,employee_id:employeeId,post},
    app_metadata:{must_change_password:false,account_kind:"dealership"}
   });
@@ -111,10 +110,11 @@ Deno.serve(async(req)=>{
   if(!/^[0-9a-f-]{36}$/i.test(id)||id===IT_ID)return json({error:"Invalid dealership user"},400,headers);
   const row=await admin.from("memberships").select("role").eq("user_id",id).maybeSingle();
   if(row.error||!row.data||row.data.role!=="management")return json({error:"Only assigned dealership viewer accounts can be reset."},403,headers);
-  // Reset directly without sending an email. Force another password change
-  // before protected CRM routes can be accessed.
+  // IT-only password reset; no email and no dealership self-service.
+  // Clear the legacy first-login flag to avoid trapping existing accounts.
+  const issuedPassword=makePassword();
   const reset=await admin.auth.admin.updateUserById(id,{
-   password:DEFAULT_TEMP_PASSWORD,app_metadata:{must_change_password:true}
+   password:issuedPassword,app_metadata:{must_change_password:false}
   });
   if(reset.error)return json({error:"Could not reset temporary password."},500,headers);
   return json({ok:true,message:"Password reset. No email sent. Share the new password securely.",issuedPassword},200,headers);
