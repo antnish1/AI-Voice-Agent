@@ -113,3 +113,15 @@ These are operational reference points, not blanket permission to deploy, call c
 - Review `docs/ACTIVE_INFRASTRUCTURE.md`, `docs/AUTH_INVITATION_REDIRECT.md`, and `docs/ADMIN_ACCOUNT_SETUP.md` alongside this file. Some notes were written before deployment and may be outdated; the current verified state and newer documentation win.
 - All changes must be reviewed against strict multi-tenancy, least-privilege RLS, stable agent-version approvals, data privacy and explicit calling consent. Do not commit production secrets, recordings or identifiable customer data.
 - The connected Vercel account is shared with InsureIT, but the Frontier project must remain isolated. Never modify InsureIT settings, deployments or domains while working on Frontier.
+
+## M. Canonical production target — mandatory (24 November 2026)
+
+User explicitly designated the following as the only release target for Frontier / FrontVox AI CRM:
+- GitHub: `antnish1/AI-Voice-Agent`, production branch `main`; feature branches and reviewed PRs remain the development workflow.
+- Vercel account/team: `antnish1s-projects` (antnish1), project `frontier-ai-voice-crm`, ID `prj_51k5pHkUt6ZRbcaf2kS798fT2KL9`.
+- Verified canonical domain: `https://frontier-ai-voice-crm.vercel.app`; User Management: `/users`.
+- Do not deploy, promote, configure, or use the similarly named project in Ragini Gupta's Vercel account (`prj_ouFxCa9uC1h16J22wNrOgbnOfwK2`, domain `frontier-ai-voice-crm-six.vercel.app`) as the release target. Do not switch accounts to bypass quotas. If automatic Git integration builds another project, do not treat that as canonical release success.
+- Supabase remains the dedicated AI VOICE AGENT project `kagzuxkeabiuswccxjme`; do not change unrelated projects.
+- Before every approved release, verify the canonical domain's project ID, exact Git commit, production target and READY status. Verify the domain points to that deployment; a preview or other account's successful build is insufficient. Never claim deployment success without this evidence.
+- PR #60 proposes an IT-configured initial dealership password via server-only `DEALERSHIP_DEFAULT_PASSWORD`. Never commit the value in this public repository. Do not deploy the updated provisioning function before the required private configuration exists. Existing accounts and IT-only reset behavior remain unchanged unless separately authorized.
+- This section supersedes historical infrastructure target references. It is not blanket authorization to merge/deploy future changes without user approval.
