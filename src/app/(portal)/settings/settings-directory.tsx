@@ -4,6 +4,7 @@ import {useRouter} from "next/navigation";
 import {createBrowserSupabase} from "@/lib/supabase/browser";
 import {SarvamConnectionCard} from "./sarvam-connection-card";
 import {useNavigationLayout} from "@/components/navigation-layout-preference";
+import {ThemeSwitcher} from "@/components/theme-preference";
 
 type Section="profile"|"organization"|"notifications"|"api"|"security"|"billing"|"advanced";
 type Props={userId:string;email:string;role:string;dealership:string;displayName:string;phone:string;avatarPath:string};
@@ -88,7 +89,7 @@ export function SettingsDirectory({userId,email,role,dealership,displayName,phon
      </div></section>
      <section className="frontier-layout-settings frontier-layout-compact" aria-labelledby="frontier-layout-title">
       <div className="frontier-layout-title"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><h3 id="frontier-layout-title">Appearance &amp; Layout</h3></div>
-      <div className="frontier-layout-options" role="radiogroup" aria-label="Navigation layout">
+      <div className="frontier-theme-and-layout"><div className="frontier-theme-control"><span>Theme</span><ThemeSwitcher/></div><div className="frontier-layout-options" role="radiogroup" aria-label="Navigation layout">
        <label className={`frontier-layout-option ${navigationLayout==="sidebar"?"selected":""}`}>
         <input type="radio" name="frontier-navigation-layout" value="sidebar" checked={navigationLayout==="sidebar"} onChange={()=>setNavigationLayout("sidebar")}/>
         <svg width="29" height="29" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2.5" y="3" width="19" height="18" rx="2"/><path d="M9 3v18"/></svg>
@@ -99,7 +100,7 @@ export function SettingsDirectory({userId,email,role,dealership,displayName,phon
         <svg width="29" height="29" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2.5" y="3" width="19" height="18" rx="2"/><path d="M2.5 9h19"/></svg>
         <span><strong>Top Menu Bar</strong></span>
        </label>
-      </div>
+      </div></div>
      </section>
      <div className="settings-ref-card-grid">
       <section className="settings-ref-card"><h3><Icon name="bell" size={18}/> Notification Preferences</h3><p>Choose how you want to receive notifications</p>{[["Campaign Status Updates","Get notified about campaign progress"],["Call Summary Reports","Receive periodic call reports"],["Approval Requests","Be notified of pending approvals"],["System Updates","Get notified about new features"]].map(([label,desc])=><div className="settings-ref-preference" key={label}><div><strong>{label}</strong><small>{desc}</small></div><span className="settings-ref-switch-disabled" title="Notification delivery is not configured" aria-label={label+" not configured"}><span/></span></div>)}<small className="settings-ref-footnote">Notification delivery and preferences are not connected yet.</small></section>
