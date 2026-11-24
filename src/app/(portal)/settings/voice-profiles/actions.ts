@@ -15,7 +15,14 @@ export async function saveVoiceProfile(form:FormData):Promise<{error?:string;ok?
   if(!/^[\da-f-]{36}$/i.test(dealershipId))return {error:"Choose a valid dealership."};
   if(!/^[A-Za-z0-9_.-]{3,200}$/.test(agentId))return {error:"Enter the real Sarvam Agent ID, not its display name."};
   if(!Number.isInteger(version)||version<1)return {error:"Enter the committed agent version number from Sarvam; a draft version cannot be used for calling."};
-  if(!/^[A-Za-z0-9_.-]{3,200}$/.test(connectionId))return {error:"Telephony Connection ID is required. 'Sarvam Managed (Vobiz)' is a provider name, not a connection ID. Copy the actual ID from Sarvam."};
+  // The database permits display names on inactive drafts, but active profiles
+  // must use a genuine connection identifier. Never treat a name as verified.
+  const idPattern=/^[A-Za-z0-9_.-]{3,200}$/;
+  const draftNamePattern=/^[A-Za-z0-9][A-Za-z0-9 _().-]{2,199}$/;
+  if(active&&!idPattern.test(connectionId))
+   return {error:"To activate this profile, enter the actual Sarvam telephony Connection ID. 'Sarvam Managed (Vobiz)' is only its display name."};
+  if(!active&&!draftNamePattern.test(connectionId))
+   return {error:"Enter a valid telephony connection name or ID. Inactive drafts can use 'Sarvam Managed (Vobiz)'."};
   if(!/^\+[1-9]\d{7,14}$/.test(callerNumber))return {error:"Enter a valid connected caller number. Indian 10-digit numbers are automatically formatted as +91XXXXXXXXXX."};
   const {data:dealership,error:dealerError}=await supabase.from("dealerships").select("id").eq("id",dealershipId).maybeSingle();
   if(dealerError||!dealership)return {error:"Dealership not found."};
