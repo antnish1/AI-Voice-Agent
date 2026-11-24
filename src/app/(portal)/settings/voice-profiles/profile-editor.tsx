@@ -2,6 +2,9 @@
 import {useState,useTransition} from "react";
 import {saveVoiceProfile} from "./actions";
 type Dealership={id:string;name:string;profile?:{agent_id:string;app_version:number;connection_id:string;caller_number:string;active:boolean}|null};
+type DeploymentOption={deploymentId:string;label:string;agentId:string;version:number;connectionId:string;callerNumber:string};
+type ImportResult={ok:boolean;code:string;message:string;options?:DeploymentOption[];counts?:{total:number;scanned:number;outbound:number;active:number;verified:number}};
+
 function FieldIcon({kind}:{kind:"dealer"|"agent"|"version"|"connection"|"phone"|"settings"|"save"|"info"}) {
  const shape={
   dealer:<><rect x="4" y="7" width="16" height="14" rx="1"/><path d="M8 7V3h8v4M8 12h2m4 0h2M8 16h2m4 0h2M11 21v-5h2v5"/></>,
@@ -23,10 +26,38 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}) {
  const [id,setId]=useState(dealerships[0]?.id??""),[busy,start]=useTransition(),[message,setMessage]=useState("");
  const dealer=dealerships.find(d=>d.id===id),p=dealer?.profile;
  const [revision,setRevision]=useState(0);
+ const [loadingSarvam,setLoadingSarvam]=useState(false);
+ const [importResult,setImportResult]=useState<ImportResult|null>(null);
+ const [deploymentId,setDeploymentId]=useState("");
+ async function loadSarvam(){
+  setLoadingSarvam(true);setImportResult(null);setDeploymentId("");
+  try{
+   const response=await fetch("/api/sarvam/voice-deployments",{method:"GET",cache:"no-store"});
+   const data:ImportResult=await response.json();
+   setImportResult(data);
+  }catch{setImportResult({ok:false,code:"NETWORK",message:"Could not contact the FrontVox Sarvam import endpoint. Verify network access and try again."});}
+  finally{setLoadingSarvam(false);}
+ }
+ function applySarvam(){
+  const selected=importResult?.options?.find(x=>x.deploymentId+"|"+x.connectionId+"|"+x.callerNumber===deploymentId);
+  if(!selected)return;
+  setAgent(selected.agentId);setVersion(String(selected.version));setConnection(selected.connectionId);setCaller(selected.callerNumber);
+  setMessage("Verified settings loaded into the form. Review and save them explicitly; no agent or calls were changed.");
+ }
+
  const [agent,setAgent]=useState(p?.agent_id??""),[version,setVersion]=useState(String(p?.app_version??1)),[connection,setConnection]=useState(p?.connection_id??""),[caller,setCaller]=useState(p?.caller_number??"");
- function changeDealer(value:string){const selected=dealerships.find(d=>d.id===value)?.profile;setId(value);setRevision(v=>v+1);setMessage("");setAgent(selected?.agent_id??"");setVersion(String(selected?.app_version??1));setConnection(selected?.connection_id??"");setCaller(selected?.caller_number??"");}
+ function changeDealer(value:string){const selected=dealerships.find(d=>d.id===value)?.profile;setId(value);setRevision(v=>v+1);setMessage("");setAgent(selected?.agent_id??"");setVersion(String(selected?.app_version??1));setConnection(selected?.connection_id??"");setCaller(selected?.caller_number??"");setImportResult(null);setDeploymentId("");}
  return <section className="vdp-card" aria-labelledby="vdp-card-title">
   <div className="vdp-card-title"><div className="vdp-gear"><FieldIcon kind="settings"/></div><div><h2 id="vdp-card-title">Dealership AI Calling Defaults</h2><p>Configure default settings for your dealership&apos;s AI calling campaigns. These settings will be applied to new campaigns unless overridden.</p></div></div>
+  <div className="vdp-import">
+   <div className="vdp-import-head"><strong>Import verified settings from Sarvam</strong><button type="button" className="vdp-import-btn" onClick={()=>void loadSarvam()} disabled={loadingSarvam}>{loadingSarvam?"Checking workspace…":"Load from Sarvam"}</button></div>
+   {importResult&&<div className={importResult.ok&&importResult.options?.length?"vdp-import-ok":"vdp-import-notice"} role="status">
+    <p>{importResult.message}</p>
+    {importResult.counts&&<p>Workspace results: {importResult.counts.scanned} deployments checked · {importResult.counts.outbound} outbound-capable · {importResult.counts.verified} verified calling configurations.</p>}
+    {importResult.options?.length? <div className="vdp-import-select"><label htmlFor="vdp-select-deployment">Available outbound deployments</label><select id="vdp-select-deployment" value={deploymentId} onChange={e=>setDeploymentId(e.target.value)}><option value="">Select an agent + phone number</option>{importResult.options.map((d,i)=><option key={d.deploymentId+"-"+i} value={d.deploymentId+"|"+d.connectionId+"|"+d.callerNumber}>{d.label} · v{d.version} · {d.callerNumber}</option>)}</select><button type="button" disabled={!deploymentId} onClick={applySarvam}>Use verified settings</button></div>:null}
+    {importResult.code==="no_deployments"||importResult.code==="no_outbound"||importResult.code==="incomplete"?<p>Open Sarvam → Build → Agents for the committed version and Deploy → Phone Numbers for the connection ID and caller number. You can complete the fields below manually without creating a deployment.</p>:null}
+   </div>}
+  </div>
   <div className="vdp-fields">
    <label className="vdp-field vdp-dealer"><span className="vdp-label"><FieldIcon kind="dealer"/> Dealership</span><span className="vdp-control"><select value={id} onChange={e=>changeDealer(e.target.value)}>{dealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></span></label>
    <form id="vdp-save-form" className="vdp-form" key={id+"-"+revision} action={form=>start(async()=>{setMessage("");const r=await saveVoiceProfile(form);setMessage(r.error??"Saved. Reload to view the latest profile.");})}>
