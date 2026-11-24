@@ -1413,3 +1413,16 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
  .fc-compact-campaign .fc-compact-upload{flex-wrap:wrap;gap:6px;min-height:82px}
  .fc-compact-upload small{width:100%;text-align:center}
 }
+
+/* IT User Management: two independent provisioning flows, dealership first. */
+.it-user-creation-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:16px;margin-bottom:16px}
+.it-user-creation-grid .it-user-card h2{display:flex;align-items:center;gap:10px}
+.it-step{display:grid;place-items:center;width:25px;height:25px;border-radius:8px;background:#d9f4f4;color:#0a8995;font-size:12px;font-weight:800}
+.it-user-creation-grid .it-user-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px}
+.it-user-creation-grid .it-user-form>label{min-width:0}
+.it-user-creation-grid .it-user-form>.it-user-permission,.it-user-creation-grid .it-user-form>.it-user-temporary,.it-user-creation-grid .it-user-form>button{grid-column:1/-1}
+.it-user-creation-grid .it-user-form>button{width:100%}
+.it-full-width{margin-top:16px}
+.it-full-width .tablewrap{max-width:100%;overflow-x:auto}
+@media(max-width:1000px){.it-user-creation-grid{grid-template-columns:1fr}}
+@media(max-width:580px){.it-user-creation-grid .it-user-form{grid-template-columns:1fr}}
