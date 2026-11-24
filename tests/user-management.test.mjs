@@ -17,7 +17,7 @@ test("no-email provisioning and IT-controlled unique account credentials are ser
  assert.match(edge,/action==="create-dealership"/);
  assert.match(edge,/action==="create-user"/);
  assert.doesNotMatch(edge,/inviteUserByEmail|resetPasswordForEmail/);
- assert.match(edge,/makePassword\(\)/);
+ assert.match(edge,/const makePassword=/);
  assert.match(edge,/crypto\.getRandomValues/);
  assert.doesNotMatch(edge,/DEFAULT_TEMP_PASSWORD|password:"12345678"/);
  assert.match(edge,/must_change_password:false/);
