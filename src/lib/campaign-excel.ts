@@ -155,8 +155,8 @@ export function makeCallOutcomeReport(rows:Array<{
 }
 
 export const SERVICE_REPORT_HEADERS=["Customer Name","Mobile","Model","Reg. Number","Service Type","Service DueDate","Last ServiceDate","Original CallDate","Last Reported Mileage","Last Follow up date","Last Follow up Remarks"] as const;
-export function makeServiceReport(rows:string[][]):Blob{
- const lines=[Array.from(SERVICE_REPORT_HEADERS),...rows];
+export function makeServiceReport(rows:string[][],headers:readonly string[]=SERVICE_REPORT_HEADERS):Blob{
+ const lines=[Array.from(headers),...rows];
  const cell=(value:string,col:number,row:number)=>{
   let letters="",n=col+1;while(n){n--;letters=String.fromCharCode(65+n%26)+letters;n=Math.floor(n/26);}
   // Inline strings prevent Excel formula execution for untrusted customer/provider fields.
