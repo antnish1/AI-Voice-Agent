@@ -3,10 +3,11 @@ import {requireMembership,canCreateCampaign} from "@/lib/auth";
 import {submitCampaign} from "./actions";
 import {isItSuperUser} from "@/lib/it-access";
 import "./campaigns-reference.css";
+import {CampaignDetailsPopup} from "./campaign-details-popup";
 import {AutoCampaignFilters} from "./auto-campaign-filters";
 
 type Filters={q?:string;status?:string;from?:string;to?:string};
-type Campaign={id:string;name:string;status:string;created_at:string};
+type Campaign={id:string;name:string;status:string;created_at:string;approved_at:string|null};
 
 function CampaignIcon({kind}:{kind:"all"|"draft"|"pending"|"grid"|"search"|"filter"|"calendar"|"voice"}){
  const shapes:Record<typeof kind,React.ReactNode>={
@@ -40,11 +41,13 @@ function CountsCard({kind,label,value}:{kind:"all"|"draft"|"pending";label:strin
 function normalizeDate(input?:string){return input&&/^\d{4}-\d{2}-\d{2}$/.test(input)?input:"";}
 export default async function Campaigns({searchParams}:{searchParams?:Promise<Filters>}={}){
  const {supabase,membership,user,memberships}=await requireMembership();if(!membership)return null;
- const {data,error}=await supabase.from("campaigns").select("id,name,status,created_at").eq("dealership_id",membership.dealership_id).order("created_at",{ascending:false}).limit(100);
+ const {data,error}=await supabase.from("campaigns").select("id,name,status,created_at,approved_at").eq("dealership_id",membership.dealership_id).order("created_at",{ascending:false}).limit(100);
  if(error)throw new Error("Could not read campaigns.");
  const campaigns=(data??[]) as Campaign[];
- const batchResult=campaigns.length?await supabase.from("campaign_recipient_batches").select("campaign_id,eligible_records").eq("dealership_id",membership.dealership_id).in("campaign_id",campaigns.map(x=>x.id)):null;
+ const batchResult=campaigns.length?await supabase.from("campaign_recipient_batches").select("campaign_id,eligible_records,total_records").eq("dealership_id",membership.dealership_id).in("campaign_id",campaigns.map(x=>x.id)):null;
  if(batchResult?.error)throw new Error("Could not read staged campaign recipients.");
+ const batches=new Map((batchResult?.data??[]).map(x=>[x.campaign_id,x]));
+ const formatDate=(value:string)=>new Date(value).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Kolkata"});
  const staged=new Set((batchResult?.data??[]).filter(x=>x.eligible_records>0).map(x=>x.campaign_id));
  const total=campaigns.length,drafts=campaigns.filter(c=>c.status==="DRAFT").length,pending=campaigns.filter(c=>c.status==="PENDING_MANAGER_APPROVAL").length;
  const filters=await (searchParams??Promise.resolve({} as Filters));const q=(filters.q??"").trim().slice(0,120),status=filters.status??"",from=normalizeDate(filters.from),to=normalizeDate(filters.to);
@@ -71,7 +74,7 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
      {filtered&&<Link href="/campaigns" className="fc-clear">Clear</Link>}
     </AutoCampaignFilters>
    </div>
-   {shown.length?<div className="fc-tablewrap"><table className="crm-table"><thead><tr><th>Campaign</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>{shown.map(c=><tr key={c.id}><td><strong>{c.name}</strong><div className="fc-row-id">#{c.id.slice(0,8)}</div></td><td><span className={`status-pill ${c.status==="APPROVED"?"approved":c.status==="REJECTED"?"rejected":c.status==="PENDING_MANAGER_APPROVAL"?"pending":""}`}>{c.status.replaceAll("_"," ")}</span></td><td>{new Date(c.created_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</td><td>{canOperate?<div className="fc-row-actions"><Link className="btn-outline small" href={"/campaigns/"+c.id+"/outbound"}>Review / Start</Link>{c.status==="DRAFT"&&staged.has(c.id)?<form action={submitCampaign}><input type="hidden" name="dealership_id" value={membership.dealership_id}/><input type="hidden" name="campaign_id" value={c.id}/><button className="btn-soft small">Submit for review</button></form>:c.status==="DRAFT"?<span className="status-pill pending">Awaiting eligible Excel</span>:null}</div>:<Link className="btn-outline small" href={"/campaigns/"+c.id+"/view"}>View</Link>}</td></tr>)}</tbody></table><p className="fc-list-count">Showing {shown.length} of the latest {total} campaigns</p></div>:
+   {shown.length?<div className="fc-tablewrap"><table className="crm-table"><thead><tr><th>Campaign</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>{shown.map(c=><tr key={c.id}><td><strong>{c.name}</strong><div className="fc-row-id">#{c.id.slice(0,8)}</div></td><td><span className={`status-pill ${c.status==="APPROVED"?"approved":c.status==="REJECTED"?"rejected":c.status==="PENDING_MANAGER_APPROVAL"?"pending":""}`}>{c.status.replaceAll("_"," ")}</span></td><td>{new Date(c.created_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</td><td>{canOperate?<div className="fc-row-actions"><Link className="btn-outline small" href={"/campaigns/"+c.id+"/outbound"}>Review / Start</Link>{c.status==="DRAFT"&&staged.has(c.id)?<form action={submitCampaign}><input type="hidden" name="dealership_id" value={membership.dealership_id}/><input type="hidden" name="campaign_id" value={c.id}/><button className="btn-soft small">Submit for review</button></form>:c.status==="DRAFT"?<span className="status-pill pending">Awaiting eligible Excel</span>:null}</div>:<CampaignDetailsPopup name={c.name} dealership={membership.dealerships?.name??"Assigned dealership"} status={c.status} created={formatDate(c.created_at)} approved={c.approved_at?formatDate(c.approved_at):"Not approved"} uploaded={batches.get(c.id)?.total_records??null} eligible={batches.get(c.id)?.eligible_records??null}/>}</td></tr>)}</tbody></table><p className="fc-list-count">Showing {shown.length} of the latest {total} campaigns</p></div>:
    <div className="fc-campaign-empty"><EmptyArt/><h3>{filtered?"No matching campaigns":"Start your first campaign"}</h3>{filtered&&<p>Try another search, status, or date range.</p>}{filtered?<Link href="/campaigns" className="fc-primary-button">Clear Filters</Link>:permitted?<Link href="/campaigns/new" className="fc-primary-button">＋ Create Campaign <span aria-hidden="true">→</span></Link>:null}</div>}
   </section>
  </div>;
