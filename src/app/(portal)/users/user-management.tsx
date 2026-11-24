@@ -121,7 +121,7 @@ export function UserManagement(){
       {dependencies!==null&&(dependencies.length?<><p>Protected records found. Permanent deletion is blocked. Retain this account or resolve these records through their authorized workflows.</p><ul>{dependencies.map((dep,i)=><li key={i}>{dep.label}{dep.count===null?"":": "+dep.count} — {dep.reason}</li>)}</ul></>:<p>No protected dependencies found. The server will recheck before deletion.</p>)}
      </div>
     </div>
-    {resetError&&<p role="alert" className="it-user-error">{resetError}</p>
+    {resetError&&<p role="alert" className="it-user-error">{resetError}</p>}
     {resetNotice&&<p role="status" className="it-user-success">{resetNotice}</p>}
     {resetPassword&&<div className="it-user-temporary" role="status"><strong>New password — visible once</strong><div className="it-reset-secret"><code>{resetPassword}</code><button type="button" className="btn-outline small" onClick={async()=>{try{await navigator.clipboard.writeText(resetPassword);setResetNotice("Password copied.");}catch{setResetError("Could not copy. Select the password manually.");}}}>Copy</button></div><p>Share privately. Closing this popup clears the displayed password.</p></div>}
    </section>}
