@@ -80,7 +80,7 @@ export function SettingsDirectory({userId,email,role,dealership,displayName,phon
  return <div className="settings-ref">
 
   <div className="settings-ref-layout">
-   <nav className="settings-ref-sidebar" aria-label="Settings sections">{sections.map(item=><button key={item.id} type="button" className={section===item.id?"active":""} aria-current={section===item.id?"page":undefined} onClick={()=>{setSection(item.id);setError("");setNotice("");}}><Icon name={item.icon} size={17}/>{item.label}</button>)}</nav>
+   <nav className="settings-ref-sidebar" aria-label="Settings sections">{sections.filter(item=>role==="super_admin"||!["organization","api","billing","advanced"].includes(item.id)).map(item=><button key={item.id} type="button" className={section===item.id?"active":""} aria-current={section===item.id?"page":undefined} onClick={()=>{setSection(item.id);setError("");setNotice("");}}><Icon name={item.icon} size={17}/>{item.label}</button>)}</nav>
    <div className="settings-ref-main">
     {section==="profile"?<>
      <section className="settings-ref-profile-card"><div className="settings-ref-card-heading"><h2>Profile Settings</h2><p>Update your profile information</p></div><div className="settings-ref-profile-content">
