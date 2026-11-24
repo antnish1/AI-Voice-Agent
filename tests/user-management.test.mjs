@@ -11,17 +11,20 @@ test("new user page is server-gated and excluded from dealership sidebar",()=>{
  assert.match(serverPage,/isItSuperUser/);assert.match(serverPage,/notFound\(\)/);
  assert.match(shell,/isItAdmin\?\[/);
 });
-test("no-email provisioning, IT authorization and temporary password setup are server-side",()=>{
+test("no-email provisioning and IT-controlled unique account credentials are server-side",()=>{
  assert.match(edge,/admin\.auth\.admin\.createUser/);
  assert.match(edge,/email_confirm:true/);
  assert.match(edge,/action==="create-dealership"/);
  assert.match(edge,/action==="create-user"/);
  assert.doesNotMatch(edge,/inviteUserByEmail|resetPasswordForEmail/);
- assert.match(edge,/DEFAULT_TEMP_PASSWORD="12345678"/);
- assert.match(edge,/must_change_password:true/);
+ assert.match(edge,/makePassword\(\)/);
+ assert.match(edge,/crypto\.getRandomValues/);
+ assert.doesNotMatch(edge,/DEFAULT_TEMP_PASSWORD|password:"12345678"/);
+ assert.match(edge,/must_change_password:false/);
  assert.match(edge,/user\.id!==IT_ID/);
  assert.match(edge,/membership.*super_admin/);
  assert.match(edge,/action==="set-own-password"/);
+ assert.match(edge,/Only the IT Super User can manage dealership passwords/);
  assert.doesNotMatch(file("../src/app/(portal)/users/user-management.tsx"),/SUPABASE_SERVICE_ROLE_KEY/);
 });
 test("RLS migration restricts write access and retains dealership read scopes",()=>{
@@ -47,7 +50,7 @@ test("new dealership and user are separate, and user creation cannot create a de
  assert.match(edge,/Dealership does not exist\. Create it first\./);
  assert.match(edge,/role:"management"/);
  assert.match(edge,/employee_id:employeeId/);
- assert.match(edge,/must_change_password:true/);
+ assert.match(edge,/must_change_password:false/);
 });
 test("contact fields are additive and old dealership records remain",()=>{
  const migration=file("../db/20261124_dealership_contact_details.sql");
@@ -63,6 +66,18 @@ test("only the verified IT Super User can reset a dealership viewer password",()
  assert.match(edge,/body\.confirm!=="RESET DEALERSHIP PASSWORD"/);
  assert.match(edge,/row\.data\.role!=="management"/);
  assert.match(ui,/confirm:"RESET DEALERSHIP PASSWORD"/);
- assert.match(edge,/must_change_password:true/);
+ assert.match(edge,/must_change_password:false/);
  assert.doesNotMatch(edge,/inviteUserByEmail|resetPasswordForEmail/);
+});
+
+test("dealer users do not have a portal password change or self-reset flow",()=>{
+ const screen=file("../src/app/change-password/page.tsx");
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ assert.match(screen,/Password managed by IT/);
+ assert.match(screen,/if\(!isIt\)/);
+ assert.match(edge,/Only the IT Super User can manage dealership passwords/);
+ assert.doesNotMatch(edge,/inviteUserByEmail|resetPasswordForEmail/);
+ assert.match(ui,/issuedPassword/);
+ assert.match(ui,/visible once/);
+ assert.match(ui,/IT-controlled login password/);
 });
