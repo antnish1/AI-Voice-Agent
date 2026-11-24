@@ -64,6 +64,7 @@ export function TopMenuNavigation({items,pendingApprovals,isItAdmin}:{items:Item
  const menu=open?menus[open]:undefined;
  const secondary=menu?.secondary??[];
  const selected=isItAdmin?secondary:secondary.filter(x=>x.href!=="/users");
+ const featured=isItAdmin?(menu?.featured??[]):(menu?.featured??[]).filter(x=>x.href!=="/campaigns/new");
  const close=()=>setOpen(null);
  return <nav className="frontier-top-navigation frontier-mega-navigation" aria-label="Main navigation"
   onMouseLeave={close}
@@ -104,7 +105,7 @@ export function TopMenuNavigation({items,pendingApprovals,isItAdmin}:{items:Item
      </header>
      <div className="frontier-mega-body">
       <section aria-label="Main destinations"><h3>QUICK ACCESS</h3>
-       <div className="frontier-mega-links">{menu.featured.map(item=><Link className="frontier-mega-link" href={item.href} key={item.href} onClick={close}>
+       <div className="frontier-mega-links">{featured.map(item=><Link className="frontier-mega-link" href={item.href} key={item.href} onClick={close}>
         <span className="frontier-mega-link-icon"><SidebarIcon name={item.icon} size={20}/></span>
         <span className="frontier-mega-link-text"><strong>{item.label}</strong><small>{item.description}</small></span>
         <span className="frontier-mega-arrow" aria-hidden="true">→</span>
