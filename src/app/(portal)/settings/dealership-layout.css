@@ -54,7 +54,7 @@
 .settings-ref .frontier-appearance-layout-half .frontier-layout-option{display:flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:7px 10px;flex:0 0 auto}
 .settings-ref .frontier-appearance-layout-half .frontier-layout-option svg{width:21px;height:21px;flex:none}
 .settings-ref .frontier-appearance-layout-half .frontier-layout-option strong{font-size:11px;white-space:nowrap}
-.settings-ref .frontier-appearance-theme-half{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:12px;padding-left:18px;min-width:0;border-left:1px solid #dbe5f1;min-height:42px}
+.settings-ref .frontier-appearance-theme-half{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-left:18px;min-width:0;border-left:1px solid #dbe5f1;min-height:42px}
 .settings-ref .frontier-appearance-theme-half .frontvox-theme-switch{display:flex;gap:3px;padding:3px}
 .settings-ref .frontier-appearance-theme-half .frontvox-theme-switch label{width:auto;min-width:74px;height:35px;padding:0 9px;display:flex;align-items:center;justify-content:center;gap:5px}
 .settings-ref .frontier-appearance-theme-half .frontvox-theme-switch label span{position:static;clip:auto;width:auto;height:auto;overflow:visible;white-space:nowrap;font-size:10px;font-weight:700}
@@ -68,3 +68,15 @@
  .settings-ref .frontier-appearance-layout-half{padding-right:0}
  .settings-ref .frontier-appearance-theme-half{border-left:0;border-top:1px solid #dbe5f1;padding:12px 0 0}
 }
+
+/* Shared alignment for IT super-user and dealership settings. */
+@container (min-width:1040px){
+ .settings-ref .frontier-appearance-layout-half{flex-wrap:nowrap;gap:8px;padding-right:8px}
+ .settings-ref .frontier-appearance-layout-half .frontier-layout-title{white-space:nowrap;gap:6px}
+ .settings-ref .frontier-appearance-layout-half .frontier-layout-title h3{font-size:clamp(13px,1.15cqw,16px);white-space:nowrap}
+ .settings-ref .frontier-appearance-layout-half .frontier-layout-options{flex-wrap:nowrap;gap:5px}
+ .settings-ref .frontier-appearance-layout-half .frontier-layout-option{padding:6px 8px}
+ .settings-ref .frontier-appearance-layout-half .frontier-layout-option svg{width:17px;height:17px}
+ .settings-ref .frontier-appearance-theme-half{flex-wrap:nowrap;justify-content:space-between}
+}
+.settings-ref .frontier-appearance-theme-half>span{text-transform:uppercase;white-space:nowrap}
