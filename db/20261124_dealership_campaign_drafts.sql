@@ -105,8 +105,8 @@ for insert to authenticated with check (
  and name ~ '^[0-9a-f-]{36}/[0-9a-f-]{36}/[0-9a-f]{64}[.]csv$'
  and exists(
   select 1 from public.campaigns c
-   where c.id::text=split_part(name,'/',2)
-    and c.dealership_id::text=split_part(name,'/',1)
+   where c.id::text=split_part(storage.objects.name,'/',2)
+    and c.dealership_id::text=split_part(storage.objects.name,'/',1)
     and c.created_by=(select auth.uid())
     and c.status='DRAFT'
     and public.frontvox_can_create_own_draft(c.dealership_id)
