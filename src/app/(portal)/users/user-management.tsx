@@ -60,7 +60,7 @@ export function UserManagement(){
   if(pending||lifecycleConfirm!==lifecyclePhrases[lifecycleAction]||(lifecycleAction==="delete-user"&&(!dependencies||dependencies.length)))return;
   setResetError("");setResetNotice("");startTransition(async()=>{try{const result=await call({action:lifecycleAction,userId:account.id,confirm:lifecycleConfirm});setNotice(result.message??"Account updated.");resetDialogRef.current?.close();await load();}catch(e){setDependencies(null);setResetError(e instanceof Error?e.message:"Account action failed.");}});
  };
- const visible=users.filter(u=>(u.email+" "+u.name+" "+u.dealership+" "+(u.employeeId??"")+" "+(u.post??"")).toLowerCase().includes(search.toLowerCase()));
+ const visible=users.filter(u=>(u.email+" "+(u.originalEmail??"")+" "+u.name+" "+u.dealership+" "+(u.employeeId??"")+" "+(u.post??"")).toLowerCase().includes(search.toLowerCase()));
  return <div className="it-user-page">
   <header className="it-user-heading"><h1>User Management</h1><button type="button" className="it-create-dealer" onClick={openDealer}>+ Create Dealership</button></header>
   <div className="it-user-stats"><article><span>Dealerships</span><strong>{loading?"—":dealers.length}</strong></article><article><span>Dealer users</span><strong>{loading?"—":users.length}</strong></article><article><span>Active accounts</span><strong>{loading?"—":users.filter(u=>u.activated&&(!u.accountState||u.accountState==="active")).length}</strong></article><article><span>System permission</span><strong>Viewer</strong></article></div>
