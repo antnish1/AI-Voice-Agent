@@ -4,7 +4,7 @@ import {createBrowserSupabase} from "@/lib/supabase/browser";
 
 type Dealer={id:string;name:string;contact?:string|null;mobile?:string|null;contact_person?:string|null;email?:string|null};
 type Account={id:string;email:string;name:string;dealershipId:string;dealership:string;role:string;activated:boolean;mobile?:string;employeeId?:string;post?:string;passwordChangePending?:boolean};
-type Result={dealerships?:Dealer[];users?:Account[];ok?:boolean;message?:string;error?:string};
+type Result={dealerships?:Dealer[];users?:Account[];ok?:boolean;message?:string;error?:string;issuedPassword?:string};
 const endpoint=(process.env.NEXT_PUBLIC_SUPABASE_URL??"")+"/functions/v1/it-user-management";
 async function call(action:Record<string,unknown>):Promise<Result>{
  const supabase=createBrowserSupabase();
@@ -20,7 +20,7 @@ const emptyUser={dealershipId:"",mobile:"",email:"",employeeId:"",name:"",post:"
 export function UserManagement(){
  const [dealers,setDealers]=useState<Dealer[]>([]),[users,setUsers]=useState<Account[]>([]);
  const [dealership,setDealership]=useState(emptyDealership),[employee,setEmployee]=useState(emptyUser);
- const [search,setSearch]=useState(""),[pending,startTransition]=useTransition(),[loading,setLoading]=useState(true),[error,setError]=useState(""),[notice,setNotice]=useState("");
+ const [issuedPassword,setIssuedPassword]=useState(""),[issuedFor,setIssuedFor]=useState(""),[search,setSearch]=useState(""),[pending,startTransition]=useTransition(),[loading,setLoading]=useState(true),[error,setError]=useState(""),[notice,setNotice]=useState("");
  const load=useCallback(async()=>{setLoading(true);try{const result=await call({action:"list"});setDealers(result.dealerships??[]);setUsers(result.users??[]);setError("");}catch(e){setError(e instanceof Error?e.message:"Could not load users.");}finally{setLoading(false);}},[]);
  useEffect(()=>{void load();},[load]);
  const makeDealer=(event:React.FormEvent)=>{event.preventDefault();setError("");setNotice("");startTransition(async()=>{
@@ -28,19 +28,28 @@ export function UserManagement(){
   catch(e){setError(e instanceof Error?e.message:"Unable to create dealership.");}
  });};
  const makeUser=(event:React.FormEvent)=>{event.preventDefault();setError("");setNotice("");startTransition(async()=>{
-  try{const result=await call({action:"create-user",...employee});setNotice(result.message??"User created without email invitation.");setEmployee(emptyUser);await load();}
+  try{const result=await call({action:"create-user",...employee});setNotice(result.message??"User created without email invitation.");setIssuedPassword(result.issuedPassword??"");setIssuedFor(employee.name);setEmployee(emptyUser);await load();}
   catch(e){setError(e instanceof Error?e.message:"Unable to create user.");}
  });};
  const reset=(account:Account)=>{
-  if(!window.confirm("Reset "+account.name+" to the temporary password 12345678? No email will be sent and they must change it after login."))return;
-  setError("");setNotice("");startTransition(async()=>{try{const result=await call({action:"reset",userId:account.id,confirm:"RESET DEALERSHIP PASSWORD"});setNotice(result.message??"Temporary password reset.");await load();}
+  if(!window.confirm("IT-only password reset for "+account.name+"? No email will be sent. A new unique password will be displayed only once."))return;
+  setError("");setNotice("");startTransition(async()=>{try{const result=await call({action:"reset",userId:account.id,confirm:"RESET DEALERSHIP PASSWORD"});setNotice(result.message??"Password reset.");setIssuedPassword(result.issuedPassword??"");setIssuedFor(account.name);await load();}
    catch(e){setError(e instanceof Error?e.message:"Could not reset password.");}});
  };
  const visible=users.filter(u=>(u.email+" "+u.name+" "+u.dealership+" "+(u.employeeId??"")+" "+(u.post??"")).toLowerCase().includes(search.toLowerCase()));
  return <div className="it-user-page">
   <header className="it-user-heading"><div><p className="it-user-eyebrow">ACCESS CONTROL / IT SUPER USER</p><h1>User Management</h1><p>Create a dealership first, then add its employees. No invitation emails are sent.</p></div><span className="it-user-admin-tag">IT Super User only</span></header>
-  <div className="it-user-stats"><article><span>Dealerships</span><strong>{loading?"—":dealers.length}</strong></article><article><span>Dealer users</span><strong>{loading?"—":users.length}</strong></article><article><span>Ready accounts</span><strong>{loading?"—":users.filter(u=>u.activated&&!u.passwordChangePending).length}</strong></article><article><span>System permission</span><strong>Viewer</strong></article></div>
+  <div className="it-user-stats"><article><span>Dealerships</span><strong>{loading?"—":dealers.length}</strong></article><article><span>Dealer users</span><strong>{loading?"—":users.length}</strong></article><article><span>Active accounts</span><strong>{loading?"—":users.filter(u=>u.activated).length}</strong></article><article><span>System permission</span><strong>Viewer</strong></article></div>
   {error&&<p role="alert" className="it-user-error">{error}</p>}{notice&&<p role="status" className="it-user-success">{notice}</p>}
+  {issuedPassword&&<div role="status" className="it-user-temporary" style={{margin:"12px 0 18px"}}>
+   <strong>New password for {issuedFor} — visible once</strong>
+   <div style={{display:"flex",flexWrap:"wrap",alignItems:"center",gap:10,marginTop:8}}>
+    <code style={{fontSize:16,overflowWrap:"anywhere"}}>{issuedPassword}</code>
+    <button type="button" className="btn-outline small" onClick={()=>void navigator.clipboard.writeText(issuedPassword)}>Copy</button>
+    <button type="button" className="btn-outline small" onClick={()=>{setIssuedPassword("");setIssuedFor("");}}>Dismiss</button>
+   </div>
+   <p>Only IT can reset this password. Share it privately; no email was sent. It will not be available again after you dismiss it.</p>
+  </div>}
   <div className="it-user-creation-grid">
    <section className="it-user-card">
     <h2><span className="it-step">1</span> Create Dealership</h2><p>Create dealership details independently from user accounts.</p>
@@ -63,7 +72,7 @@ export function UserManagement(){
      <label>Full Name<input required minLength={2} maxLength={100} placeholder="Employee name" value={employee.name} onChange={e=>setEmployee(v=>({...v,name:e.target.value}))}/></label>
      <label>Role / Post<input required minLength={2} maxLength={100} placeholder="Service Manager, CRM Executive, etc." value={employee.post} onChange={e=>setEmployee(v=>({...v,post:e.target.value}))}/></label>
      <div className="it-user-permission"><strong>System permissions</strong><span>Dealership Viewer</span><p>Role / Post is a job title only; it does not grant campaign creation, approvals, uploads or administration.</p></div>
-     <div className="it-user-temporary"><strong>Temporary password: 12345678</strong><p>No activation/invitation email is sent. For security, users must change the temporary password to at least 12 characters on first login before accessing CRM data.</p></div>
+     <div className="it-user-temporary"><strong>IT-controlled login password</strong><p>A unique strong password is generated and shown once after user creation. No invitation email is sent. Dealership users cannot change their password in FrontVox; only IT can reset it.</p></div>
      <button type="submit" disabled={loading||pending||!employee.dealershipId||!dealers.length}>{pending?"Creating…":"Create User (No Email)"}</button>
     </form>
    </section>
@@ -79,10 +88,10 @@ export function UserManagement(){
    <div className="it-user-table-head"><div><h2>Dealership User Accounts</h2><p>Accounts are created directly without sending an invitation email.</p></div><button type="button" disabled={loading||pending} onClick={()=>void load()}>Refresh</button></div>
    <input className="it-user-search" aria-label="Search dealership users" placeholder="Search name, email, employee ID or dealership..." value={search} onChange={e=>setSearch(e.target.value)}/>
    <div className="tablewrap"><table><thead><tr><th>User</th><th>Dealership</th><th>Mobile</th><th>Employee ID</th><th>Role / Post</th><th>Account</th><th>Actions</th></tr></thead><tbody>
-    {visible.map(u=><tr key={u.id}><td><strong>{u.name||"Dealership User"}</strong><small>{u.email}</small></td><td>{u.dealership}</td><td>{u.mobile||"—"}</td><td>{u.employeeId||"—"}</td><td>{u.post||"—"}</td><td><span className={u.activated&&!u.passwordChangePending?"it-user-active":"it-user-invited"}>{!u.activated?"Pending setup":u.passwordChangePending?"Password change pending":"Ready"}</span></td><td><button type="button" aria-label={"IT Super User: reset password for "+u.name} title="IT Super User only · Reset temporary password without email" onClick={()=>reset(u)} disabled={pending}>Reset password</button></td></tr>)}
+    {visible.map(u=><tr key={u.id}><td><strong>{u.name||"Dealership User"}</strong><small>{u.email}</small></td><td>{u.dealership}</td><td>{u.mobile||"—"}</td><td>{u.employeeId||"—"}</td><td>{u.post||"—"}</td><td><span className={u.activated?"it-user-active":"it-user-invited"}>{!u.activated?"Not activated":u.passwordChangePending?"IT reset required":"Ready"}</span></td><td><button type="button" aria-label={"IT Super User: reset password for "+u.name} title="IT Super User only · Reset temporary password without email" onClick={()=>reset(u)} disabled={pending}>Reset password</button></td></tr>)}
     {!visible.length&&<tr><td colSpan={7} className="it-user-empty">{loading?"Loading users…":"No dealership users found."}</td></tr>}
    </tbody></table></div>
   </section>
-  <p className="it-user-footnote">Only IT Super Users can provision accounts. New users are restricted to their assigned dealership. A shared temporary password is less secure than unique passwords; distribute it privately and require immediate change.</p>
+  <p className="it-user-footnote">Only IT Super Users can provision accounts. New users are restricted to their assigned dealership. Only IT can issue and reset unique passwords. Share credentials privately; no password invitation or reset emails are sent.</p>
  </div>;
 }
