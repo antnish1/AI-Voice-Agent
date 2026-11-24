@@ -14,7 +14,7 @@ const serviceKey=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")??"";
 const publicKey=Deno.env.get("SUPABASE_ANON_KEY")??"";
 const admin=createClient(authUrl,serviceKey,{auth:{autoRefreshToken:false,persistSession:false}});
 const auth=createClient(authUrl,publicKey,{auth:{autoRefreshToken:false,persistSession:false}});
-type Input={action?:string;email?:string;name?:string;dealershipId?:string;password?:string;userId?:string;
+type Input={action?:string;email?:string;name?:string;dealershipId?:string;password?:string;userId?:string;confirm?:string;
  contact?:string;mobile?:string;contactPerson?:string;employeeId?:string;post?:string};
 Deno.serve(async(req)=>{
  const origin=req.headers.get("origin")??"";
@@ -105,10 +105,13 @@ Deno.serve(async(req)=>{
   return json({ok:true,message:"Dealership user created. No invitation email was sent. Temporary password: 12345678; user must change it on first login."},201,headers);
  }
  if(body.action==="reset"){
+  // IT Super User authorization is enforced above for every account-management action.
+  // This operation cannot be called by dealership users, even directly via HTTP.
+  if(body.confirm!=="RESET DEALERSHIP PASSWORD")return json({error:"Explicit IT password reset confirmation required."},400,headers);
   const id=body.userId??"";
   if(!/^[0-9a-f-]{36}$/i.test(id)||id===IT_ID)return json({error:"Invalid dealership user"},400,headers);
   const row=await admin.from("memberships").select("role").eq("user_id",id).maybeSingle();
-  if(row.error||!row.data||row.data.role==="super_admin")return json({error:"Only dealership users can be reset"},403,headers);
+  if(row.error||!row.data||row.data.role!=="management")return json({error:"Only assigned dealership viewer accounts can be reset."},403,headers);
   // Reset directly without sending an email. Force another password change
   // before protected CRM routes can be accessed.
   const reset=await admin.auth.admin.updateUserById(id,{
