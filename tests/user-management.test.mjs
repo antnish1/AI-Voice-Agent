@@ -141,3 +141,12 @@ test("temporary password form supports optional custom password and email correc
  assert.match(ui,/setDirectoryView\(false\);await load\(\)/);
  assert.match(css,/\.it-register-tabs button\[aria-pressed=true\].*background:var\(--teal/);
  });
+
+ test("user management exposes separate password and accessible action icons",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ assert.match(ui,/<th>Password Set<\/th><th>Action<\/th>/);
+ for(const label of ["Edit User","Disable User","Enable User","Delete User"])assert.ok(ui.includes(label));
+ assert.match(ui,/action:"edit-user"/);
+ assert.match(edge,/body.action==="edit-user"/);
+ assert.match(edge,/user_metadata:\{\.\.\.account.data.user.user_metadata/);
+ });
