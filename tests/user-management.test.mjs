@@ -65,9 +65,9 @@ test("only the verified IT Super User can reset a dealership viewer password",()
  assert.match(serverPage,/isItSuperUser/);
  assert.match(edge,/user\.id!==IT_ID/);
  assert.match(edge,/membership.*super_admin/);
- assert.match(edge,/body\.confirm!=="RESET DEALERSHIP PASSWORD"/);
- assert.match(edge,/row\.data\.role!=="management"/);
- assert.match(ui,/confirm:"RESET DEALERSHIP PASSWORD"/);
+ assert.match(edge,/body\.confirm!=="RESET"/);
+ assert.match(edge,/row\.data\.some\(m=>m\.role!=="management"\)/);
+ assert.match(ui,/confirm:resetConfirm/);
  assert.match(edge,/must_change_password:false/);
  assert.doesNotMatch(edge,/inviteUserByEmail|resetPasswordForEmail/);
 });
@@ -88,7 +88,7 @@ test("password reset requires opening account details and explicit in-dialog act
  const ui=file("../src/app/(portal)/users/user-management.tsx");
  assert.match(ui,/onClick=\{\(\)=>openReset\(u\)\}/);
  assert.match(ui,/ref=\{resetDialogRef\}/);
- assert.match(ui,/onClick=\{\(\)=>reset\(selectedAccount\)\}/);
+ assert.match(ui,/onSubmit=\{e=>\{e\.preventDefault\(\);reset\(selectedAccount\);\}\}/);
  assert.match(ui,/onClose=\{clearReset\}/);
  assert.doesNotMatch(ui,/window\.confirm/);
 });
@@ -120,4 +120,16 @@ test("account lifecycle operations are IT-only, explicit, and fail closed on mis
  assert.match(ui,/Resolve Dependencies/);
  assert.match(ui,/lifecycleConfirm!==lifecyclePhrases\[lifecycleAction\]/);
  assert.match(ui,/lifecycleAction==="delete-user"&&\(!dependencies\|\|dependencies\.length/);
+});
+
+test("temporary password form supports optional custom password and email correction only after RESET",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ assert.match(ui,/resetExpanded&&!resetPassword/);
+ assert.match(ui,/resetConfirm!=="RESET"/);
+ assert.match(ui,/password:customPassword,email:correctEmail\.trim\(\)/);
+ assert.match(ui,/Issue temporary password/);
+ assert.match(edge,/requestedPassword\|\|makePassword\(\)/);
+ assert.match(edge,/correctedEmail&&!validEmail\(correctedEmail\)/);
+ assert.match(edge,/password:issuedPassword,email_confirm:true/);
+ assert.match(edge,/correctedEmail\?\{email:correctedEmail\}/);
 });
