@@ -105,6 +105,20 @@ Deno.serve(async(req)=>{
   }
   return json({ok:true,message:"Dealership user created. No email was sent. Share the issued password securely.",issuedPassword},201,headers);
  }
+ if(body.action==="edit-user"){
+  const id=body.userId??"";
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)||id===IT_ID)return json({error:"Invalid dealership user."},400,headers);
+  const membershipRows=await admin.from("memberships").select("role").eq("user_id",id);
+  if(membershipRows.error||!membershipRows.data?.length||membershipRows.data.some(m=>m.role!=="management"))return json({error:"Only dealership viewer accounts may be managed."},403,headers);
+  const account=await admin.auth.admin.getUserById(id);
+  if(account.error||!account.data.user||account.data.user.app_metadata?.frontvox_account_state==="archived")return json({error:"Editable account not found."},404,headers);
+  if([body.name,body.mobile,body.employeeId,body.post].some(v=>typeof v!=="string"))return json({error:"Invalid user details."},400,headers);
+  const name=body.name!.trim().replace(/\s+/g," "),mobile=body.mobile!.trim().replace(/[\s()-]/g,""),employeeId=body.employeeId!.trim(),post=body.post!.trim();
+  if(name.length<2||name.length>100||(mobile&&!validMobile(mobile))||(employeeId&&!/^[A-Za-z0-9_./-]{2,40}$/.test(employeeId))||(post&&(post.length<2||post.length>100)))return json({error:"Check name, mobile, employee ID and role / post."},400,headers);
+  const saved=await admin.auth.admin.updateUserById(id,{user_metadata:{...account.data.user.user_metadata,display_name:name,mobile:mobile?(mobile.startsWith("+")?mobile:mobile.startsWith("91")?"+"+mobile:"+91"+mobile):"",employee_id:employeeId,post}});
+  if(saved.error||!saved.data.user)return json({error:"Unable to update user details."},400,headers);
+  return json({ok:true,message:"User details updated."},200,headers);
+ }
  if(["account-dependencies","archive-user","archive-release-email","disable-login","enable-login","delete-user"].includes(body.action??"")){
   const id=body.userId??"";
   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)||id===IT_ID)return json({error:"Invalid dealership user."},400,headers);
