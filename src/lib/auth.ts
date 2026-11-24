@@ -11,6 +11,7 @@ export async function requireUser() {
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) redirect("/login");
+  if(user.app_metadata?.frontvox_account_state==="disabled"||user.app_metadata?.frontvox_account_state==="archived") redirect("/login");
   if(user.app_metadata?.must_change_password === true) redirect("/change-password");
   return { supabase, user };
 }
