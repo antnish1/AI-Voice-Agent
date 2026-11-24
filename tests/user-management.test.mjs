@@ -92,3 +92,32 @@ test("password reset requires opening account details and explicit in-dialog act
  assert.match(ui,/onClose=\{clearReset\}/);
  assert.doesNotMatch(ui,/window\.confirm/);
 });
+
+test("account lifecycle operations are IT-only, explicit, and fail closed on missing protection checks",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx"),migration=file("../db/20261124_account_lifecycle.sql");
+ assert.match(edge,/membershipRows\.data\.some\(m=>m\.role!=="management"\)/);
+ assert.match(edge,/id===IT_ID/);
+ assert.match(edge,/admin\.rpc\("frontvox_account_dependencies"/);
+ assert.match(edge,/dependencies\.error\|\|!Array\.isArray\(dependencies\.data\)/);
+ assert.match(edge,/body\.confirm!==phrases/);
+ assert.match(edge,/if\(dependencies\.data\.length\)return json/);
+ assert.match(edge,/admin\.auth\.admin\.deleteUser\(id,false\)/);
+ assert.match(edge,/ban_duration:state==="active"\?"none":"876000h"/);
+ assert.match(edge,/frontvox_account_state:state/);
+ assert.match(edge,/frontvox_original_login_email/);
+ assert.match(edge,/Enable the account before resetting its password/);
+ assert.match(access,/frontvox_account_state==="disabled"/);
+ assert.match(migration,/as restrictive for all to authenticated/i);
+ assert.match(migration,/raw_app_meta_data->>'frontvox_account_state'/);
+ assert.match(migration,/u\.banned_until/);
+ assert.match(migration,/revoke all on function public\.frontvox_account_dependencies\(uuid\) from public, anon, authenticated/i);
+ assert.match(migration,/grant execute on function public\.frontvox_account_dependencies\(uuid\) to service_role/i);
+ assert.match(migration,/confrelid='public\.memberships'::regclass/);
+ assert.match(migration,/storage\.objects/);
+ assert.match(migration,/internal\.staff_invitation_requests/);
+ assert.match(ui,/Archive user \/ Retire identity/);
+ assert.match(ui,/archive-release-email/);
+ assert.match(ui,/Resolve Dependencies/);
+ assert.match(ui,/lifecycleConfirm!==lifecyclePhrases\[lifecycleAction\]/);
+ assert.match(ui,/lifecycleAction==="delete-user"&&\(!dependencies\|\|dependencies\.length/);
+});
