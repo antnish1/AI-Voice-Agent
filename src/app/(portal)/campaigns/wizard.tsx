@@ -96,7 +96,7 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
       <input className="campaign-pill-input" type="text" maxLength={200} placeholder="Optional campaign purpose" value={description} disabled={busy||!!existingDraft} onChange={e=>setDescription(e.target.value)}/>
      </label>
     </div>
-    {!profileReady&&<div className="helper-banner" role="status">This dealership does not yet have an active verified Sarvam profile. {canOpenOutbound?<a href="/settings/voice-profiles" style={{textDecoration:"underline"}}>Configure Voice Agent Defaults</a>:"Ask your IT Super User to configure Voice Agent Defaults."}</div>}
+    {!profileReady&&<div className="helper-banner" role="status">You can save this campaign as a draft. {canOpenOutbound?<a href="/settings/voice-profiles" style={{textDecoration:"underline"}}>Configure Voice Agent Defaults</a>:"Your IT Super User must verify the Sarvam connection before any calls can be launched."}</div>}
     <div className="fc-compact-excel-head">
      <strong>Customer Excel</strong>
      <button type="button" className="fc-template-icon" title="Download Excel template" aria-label="Download Excel template" onClick={()=>downloadBlob(makeRecipientTemplate(),"FrontVox_Recipient_Template.xlsx")}>
@@ -119,7 +119,7 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
     <div className="fc-compact-defaults">10:00–18:00 IST · Mon–Sat · 1 attempt/sec · No retries <span>· Saves as draft</span></div>
     {error&&<p role="alert" className="form-error">{error}</p>}
    </div>
-   <footer className="campaign-modal-footer"><button type="button" className="campaign-modal-back" onClick={()=>router.push("/campaigns")}>Cancel</button>{preview&&<span className="campaign-step-count">{preview.eligible} eligible</span>}<button type="button" disabled={busy||reading||!profileReady||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next">{busy?"Creating…":"Create Campaign Draft"}</button></footer>
+   <footer className="campaign-modal-footer"><button type="button" className="campaign-modal-back" onClick={()=>router.push("/campaigns")}>Cancel</button>{preview&&<span className="campaign-step-count">{preview.eligible} eligible</span>}<button type="button" disabled={busy||reading||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next">{busy?"Creating…":"Create Campaign Draft"}</button></footer>
   </section>
  </div>;
 }
