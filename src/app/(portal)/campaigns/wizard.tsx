@@ -27,6 +27,7 @@ function downloadBlob(blob:Blob,name:string) {
 export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:Dealer[];initialDealershipId:string}){
  const router=useRouter();
  const [dealershipId,setDealershipId]=useState(initialDealershipId);
+ const [description,setDescription]=useState("");
  const profileReady=dealerships.find(d=>d.id===dealershipId)?.configured??false;
  const [preview,setPreview]=useState<Preview|null>(null),[busy,startTransition]=useTransition(),[reading,setReading]=useState(false);
  const [consentCertified,setConsentCertified]=useState(false),[error,setError]=useState(""),[existingDraft,setExistingDraft]=useState("");
@@ -64,7 +65,7 @@ export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:De
   startTransition(async()=>{
    let id=existingDraft;
    if(!id){
-    const created=await createSimpleCampaign(dealershipId,preview.filename,preview.total);
+    const created=await createSimpleCampaign(dealershipId,preview.filename,preview.total,description);
     if(!created.id){setError(created.error??"Could not create campaign.");return;}
     id=created.id;setExistingDraft(id);
    }
@@ -82,20 +83,28 @@ export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:De
   });
  }
  return <div className="campaign-modal-overlay" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)router.push("/campaigns");}}>
-  <section className="campaign-modal" role="dialog" aria-modal="true" aria-labelledby="campaign-dialog-title">
-   <header className="campaign-modal-header"><div><h2 id="campaign-dialog-title">Create AI Calling Campaign</h2><p>Select dealership, upload Excel, and review eligible recipients</p></div><button type="button" className="campaign-modal-close" aria-label="Close" onClick={()=>router.push("/campaigns")}>×</button></header>
-   <div className="campaign-modal-scroll" style={{display:"grid",gap:18}}>
-    <label className="campaign-form-label">Dealership <span>*</span>
-     <select className="campaign-pill-input" value={dealershipId} disabled={busy||!!existingDraft} onChange={e=>{setDealershipId(e.target.value);setPreview(null);setExistingDraft("");}}>
-      {dealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}
-     </select>
-    </label>
-    {!profileReady&&<div className="helper-banner" role="status">This dealership does not yet have an active verified Sarvam profile. <a href="/settings/voice-profiles" style={{textDecoration:"underline"}}>Configure Voice Agent Defaults</a> once before creating campaigns.</div>}
-    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
-     <strong>Customer Excel</strong><button type="button" className="btn-outline small" onClick={()=>downloadBlob(makeRecipientTemplate(),"FrontVox_Recipient_Template.xlsx")}>↓ Download Excel Template</button>
+  <section className="campaign-modal fc-compact-campaign" role="dialog" aria-modal="true" aria-labelledby="campaign-dialog-title">
+   <header className="campaign-modal-header"><div><h2 id="campaign-dialog-title">Create AI Calling Campaign</h2></div><button type="button" className="campaign-modal-close" aria-label="Close" onClick={()=>router.push("/campaigns")}>×</button></header>
+   <div className="campaign-modal-scroll fc-compact-scroll">
+    <div className="fc-compact-fields">
+     <label className="campaign-form-label">Dealership <span>*</span>
+      <select className="campaign-pill-input" value={dealershipId} disabled={busy||!!existingDraft} onChange={e=>{setDealershipId(e.target.value);setPreview(null);setExistingDraft("");}}>
+       {dealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}
+      </select>
+     </label>
+     <label className="campaign-form-label">Description
+      <input className="campaign-pill-input" type="text" maxLength={200} placeholder="Optional campaign purpose" value={description} disabled={busy||!!existingDraft} onChange={e=>setDescription(e.target.value)}/>
+     </label>
     </div>
-    <label className="upload-zone" style={{display:"block"}}><span style={{fontSize:24}}>⇧</span><strong>{reading?"Checking file…":"Upload Customer Excel (.xlsx)"}</strong><small>Excel or CSV, up to 5 MB · The first worksheet is converted to CSV locally.</small><input type="file" accept=".xlsx,.csv" disabled={busy||reading||!!existingDraft} style={{display:"none"}} onChange={e=>void chooseFile(e.target.files?.[0])}/></label>
-    {preview&&<div className="crm-panel" style={{padding:16}}>
+    {!profileReady&&<div className="helper-banner" role="status">This dealership does not yet have an active verified Sarvam profile. <a href="/settings/voice-profiles" style={{textDecoration:"underline"}}>Configure Voice Agent Defaults</a> once before creating campaigns.</div>}
+    <div className="fc-compact-excel-head">
+     <strong>Customer Excel</strong>
+     <button type="button" className="fc-template-icon" title="Download Excel template" aria-label="Download Excel template" onClick={()=>downloadBlob(makeRecipientTemplate(),"FrontVox_Recipient_Template.xlsx")}>
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+     </button>
+    </div>
+    <label className="upload-zone fc-compact-upload"><span aria-hidden="true" className="fc-upload-symbol">⇧</span><strong>{reading?"Checking file…":"Upload Excel / CSV"}</strong><small>Up to 5 MB</small><input type="file" accept=".xlsx,.csv" disabled={busy||reading||!!existingDraft} style={{display:"none"}} onChange={e=>void chooseFile(e.target.files?.[0])}/></label>
+    {preview&&<div className="crm-panel fc-compact-preview">
      <div className="panel-title"><h2>Recipient readiness</h2><span>{preview.filename}</span></div>
      <div className="wizard-grid">
       <div className="review-row"><span>Total rows</span><strong>{preview.total}</strong></div>
@@ -103,14 +112,14 @@ export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:De
       <div className="review-row"><span>Held / excluded</span><strong>{preview.excluded}</strong></div>
       <div className="review-row"><span>Invalid / duplicate</span><strong>{preview.invalid} / {preview.duplicate}</strong></div>
      </div>
-     <div className="tablewrap" style={{marginTop:12}}><table className="crm-table"><thead><tr>{preview.headers.slice(0,4).map((h,i)=><th key={i}>{h}</th>)}</tr></thead><tbody>{preview.sample.map((row,i)=><tr key={i}>{row.slice(0,4).map((c,j)=><td key={j}>{c}</td>)}</tr>)}</tbody></table></div>
-     <small className="muted">Preliminary checks. Server validates and locks the actual cohort; rows without consent or on the DNC list are excluded. This is not an insurance/vehicle lookup.</small>
+     <div className="tablewrap fc-compact-preview-table"><table className="crm-table"><thead><tr>{preview.headers.slice(0,4).map((h,i)=><th key={i}>{h}</th>)}</tr></thead><tbody>{preview.sample.map((row,i)=><tr key={i}>{row.slice(0,4).map((c,j)=><td key={j}>{c}</td>)}</tr>)}</tbody></table></div>
+
     </div>}
-    <label style={{display:"flex",gap:10,alignItems:"start",fontSize:13}}><input type="checkbox" checked={consentCertified} disabled={busy} onChange={e=>setConsentCertified(e.target.checked)}/>I confirm these customers consented to this calling purpose and the list has been checked against our suppression/DNC records.</label>
-    <div className="helper-banner">Defaults: 10:00–18:00 IST, Monday–Saturday, 1 call attempt/second, no retries. Campaign is created as a draft. Agent and verified telephony are required before approval and calling.</div>
+    <label className="fc-compact-consent"><input type="checkbox" checked={consentCertified} disabled={busy} onChange={e=>setConsentCertified(e.target.checked)}/>I confirm customer consent and DNC/suppression screening.</label>
+    <div className="fc-compact-defaults">10:00–18:00 IST · Mon–Sat · 1 attempt/sec · No retries <span>· Saves as draft</span></div>
     {error&&<p role="alert" className="form-error">{error}</p>}
    </div>
-   <footer className="campaign-modal-footer"><button type="button" className="campaign-modal-back" onClick={()=>router.push("/campaigns")}>Cancel</button><span className="campaign-step-count">{preview?preview.eligible+" eligible recipients":"No file selected"}</span><button type="button" disabled={busy||reading||!profileReady||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next">{busy?"Creating…":"Create & Check Details"}</button></footer>
+   <footer className="campaign-modal-footer"><button type="button" className="campaign-modal-back" onClick={()=>router.push("/campaigns")}>Cancel</button>{preview&&<span className="campaign-step-count">{preview.eligible} eligible</span>}<button type="button" disabled={busy||reading||!profileReady||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next">{busy?"Creating…":"Create & Check Details"}</button></footer>
   </section>
  </div>;
 }
