@@ -78,7 +78,7 @@ export async function createSimpleCampaign(dealershipId:string,filename:string,t
    .eq("dealership_id",dealershipId).maybeSingle();
   if(profileResult.error)return {error:"Dealership voice settings are not available. Apply the reviewed profile migration first."};
   const profile=profileResult.data?.active?profileResult.data:null;
-  if(!profile)return {error:"This dealership needs a verified active Sarvam profile. Configure it in Voice Agent Defaults before creating a campaign."};
+  // A draft may be prepared without a verified profile. It cannot launch until\n  // IT confirms the voice agent, telephony connection, and all safeguards.
   const draft=await saveWizardDraft({dealershipId,name,configuration:{
    description:description.trim()||"Service reminder calling",
    agent_label:profile?.agent_id??"",agent_version_label:profile?String(profile.app_version):"",telephony_label:profile?.connection_id??"",outgoing_number_label:profile?.caller_number??"",
