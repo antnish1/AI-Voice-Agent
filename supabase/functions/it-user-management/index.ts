@@ -4,7 +4,13 @@ import {createClient} from "npm:@supabase/supabase-js@2.58.0";
 
 const ALLOWED_ORIGINS=new Set(["https://frontier-ai-voice-crm.vercel.app","https://frontier-ai-voice-crm-six.vercel.app"]);
 const IT_ID="5bd78ada-44f5-4045-a9fb-75c9dad69893";
-const DEFAULT_TEMP_PASSWORD="12345678";
+// Generate a separate credential for each account; shared passwords are not safe
+// when dealership users cannot change their own passwords.
+const makePassword=()=>{
+ const bytes=crypto.getRandomValues(new Uint8Array(24));
+ const alphabet="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
+ return Array.from(bytes,v=>alphabet[v%alphabet.length]).join("");
+};
 const validEmail=(v:string)=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)&&v.length<=254;
 const validMobile=(v:string)=>/^(?:\+91|91)?[6-9]\d{9}$/.test(v.replace(/[\s()-]/g,""));
 const validContact=(v:string)=>/^[+\d\s().-]{7,22}$/.test(v);
@@ -27,15 +33,8 @@ Deno.serve(async(req)=>{
  const {data:{user},error:authError}=await auth.auth.getUser(jwt);
  if(authError||!user)return json({error:"Invalid or expired session"},401,headers);
  let body:Input;try{body=await req.json();}catch{return json({error:"Invalid JSON"},400,headers);}
- // Password reset is the only non-superuser action. Membership is already checked by the portal.
- if(body.action==="set-own-password"){
-  if(user.app_metadata?.must_change_password!==true)return json({error:"Password setup is not pending"},403,headers);
-  const password=body.password??"";
-  if(password.length<12||password.length>128||password===DEFAULT_TEMP_PASSWORD)return json({error:"Choose at least 12 characters and do not reuse the temporary password"},400,headers);
-  const {error}=await admin.auth.admin.updateUserById(user.id,{password,app_metadata:{must_change_password:false}});
-  if(error)return json({error:"Could not update password"},500,headers);
-  return json({ok:true},200,headers);
- }
+ // No self-service password management for dealership users.
+ if(body.action==="set-own-password")return json({error:"Only the IT Super User can manage dealership passwords."},403,headers);
  // This is an exact identity check AND a database membership check (not a UI-only guard).
  if(user.id!==IT_ID||user.email?.toLowerCase()!=="it@insureit.in")return json({error:"IT Super User only"},403,headers);
  const {data:membership,error:memError}=await admin.from("memberships").select("id").eq("user_id",user.id).eq("role","super_admin").limit(1);
@@ -93,7 +92,7 @@ Deno.serve(async(req)=>{
   const created=await admin.auth.admin.createUser({
    email,password:DEFAULT_TEMP_PASSWORD,email_confirm:true,
    user_metadata:{display_name:name,mobile:mobile.startsWith("+")?mobile:mobile.startsWith("91")?"+"+mobile:"+91"+mobile,employee_id:employeeId,post},
-   app_metadata:{must_change_password:true,account_kind:"dealership"}
+   app_metadata:{must_change_password:false,account_kind:"dealership"}
   });
   if(created.error||!created.data.user)return json({error:created.error?.message??"Unable to create account."},400,headers);
   const id=created.data.user.id;
@@ -102,7 +101,7 @@ Deno.serve(async(req)=>{
    await admin.auth.admin.deleteUser(id);
    return json({error:"Dealership membership failed; account creation was rolled back."},500,headers);
   }
-  return json({ok:true,message:"Dealership user created. No invitation email was sent. Temporary password: 12345678; user must change it on first login."},201,headers);
+  return json({ok:true,message:"Dealership user created. No email was sent. Share the issued password securely.",issuedPassword},201,headers);
  }
  if(body.action==="reset"){
   // IT Super User authorization is enforced above for every account-management action.
@@ -118,7 +117,7 @@ Deno.serve(async(req)=>{
    password:DEFAULT_TEMP_PASSWORD,app_metadata:{must_change_password:true}
   });
   if(reset.error)return json({error:"Could not reset temporary password."},500,headers);
-  return json({ok:true,message:"Temporary password reset to 12345678. No email sent. User must change password on next login."},200,headers);
+  return json({ok:true,message:"Password reset. No email sent. Share the new password securely.",issuedPassword},200,headers);
  }
  return json({error:"Unsupported operation"},400,headers);
 });
