@@ -86,8 +86,9 @@ Deno.serve(async(req)=>{
   if(!/^[0-9a-f-]{36}$/i.test(dealerId))return json({error:"Choose an existing dealership."},400,headers);
   const dealer=await admin.from("dealerships").select("id").eq("id",dealerId).maybeSingle();
   if(dealer.error||!dealer.data)return json({error:"Dealership does not exist. Create it first."},404,headers);
-  // No invitation emails. Only IT receives this unique password once.
-  const issuedPassword=makePassword();
+  // Initial dealership password is configured privately by IT; never commit it.
+  const issuedPassword=Deno.env.get("DEALERSHIP_DEFAULT_PASSWORD");
+  if(!issuedPassword)return json({error:"IT must configure the dealership default password."},503,headers);
   const created=await admin.auth.admin.createUser({
    email,password:issuedPassword,email_confirm:true,
    user_metadata:{display_name:name,mobile:mobile.startsWith("+")?mobile:mobile.startsWith("91")?"+"+mobile:"+91"+mobile,employee_id:employeeId,post},
