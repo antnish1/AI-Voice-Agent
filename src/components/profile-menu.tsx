@@ -84,14 +84,15 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
    {message&&<p role="status" className="portal-profile-success">{message}</p>}
    {error&&!passwordOpen&&!editOpen&&<p role="alert" className="portal-profile-error">{error}</p>}
    <div className="portal-profile-actions">{canManageAccount&&<><button role="menuitem" type="button" onClick={()=>{setError("");setPassword("");setConfirm("");setPasswordOpen(true);}}>Reset Password <span>→</span></button><Link role="menuitem" href="/settings" onClick={()=>setOpen(false)}>Account Settings <span>→</span></Link></>}<div className="portal-profile-appearance" aria-label="Appearance preferences">
+    <div className="portal-profile-appearance-group portal-profile-theme-row"><span className="portal-profile-appearance-label" style={{fontWeight:400}}>Theme</span><ThemeSwitcher/></div>
     <div className="portal-profile-appearance-group">
-     <span className="portal-profile-appearance-label">Appearance &amp; Layout</span>
+     <span className="portal-profile-appearance-label" style={{fontWeight:400}}>Appearance &amp; Layout</span>
      <div className="portal-profile-layout-switch" role="radiogroup" aria-label="Navigation layout">
       <label className={navigationLayout==="sidebar"?"selected":""}><input type="radio" name="profile-nav-layout" value="sidebar" checked={navigationLayout==="sidebar"} onChange={()=>setNavigationLayout("sidebar")}/>Sidebar</label>
       <label className={navigationLayout==="topbar"?"selected":""}><input type="radio" name="profile-nav-layout" value="topbar" checked={navigationLayout==="topbar"} onChange={()=>setNavigationLayout("topbar")}/>Top Menu</label>
      </div>
     </div>
-    <div className="portal-profile-appearance-group portal-profile-theme-row"><span className="portal-profile-appearance-label">Theme</span><ThemeSwitcher/></div>
+
    </div><form action={signOut}><button role="menuitem" type="submit" className="portal-logout">Logout <span>↗</span></button></form></div>
   </div>}
   {canManageAccount&&(passwordOpen||editOpen)&&<div className="portal-account-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget){setPasswordOpen(false);setEditOpen(false);}}}><section className="portal-account-modal" role="dialog" aria-modal="true" aria-label={passwordOpen?"Reset password":"Edit profile"}>
