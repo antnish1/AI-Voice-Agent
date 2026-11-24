@@ -30,7 +30,7 @@ export async function saveWizardDraft(input:WizardInput):Promise<{error?:string;
   const {data,error}=input.period?await supabase.rpc("create_period_campaign_draft",{p_dealership_id:input.dealershipId,p_period:input.period,p_configuration:safe}):await supabase.rpc("create_campaign_draft_with_config",{p_dealership_id:input.dealershipId,p_name:input.name.trim(),p_configuration:safe});
   if(error)return {error:"Could not save draft. Please check database permissions and try again."};
   revalidatePath("/campaigns");revalidatePath("/dashboard");
-  if(input.period){const result=await supabase.from("campaigns").select("campaign_reference").eq("id",String(data)).eq("dealership_id",input.dealershipId).single();return {id:String(data),reference:result.data?.campaign_reference??undefined};}
+  if(input.period){const result=data as {id:string;reference:string}|null;if(!result?.id||!result.reference)return {error:"Campaign reference was not returned."};return result;}
   return {id:String(data)};
  }catch{return {error:"Could not save this campaign draft."};}
 }
