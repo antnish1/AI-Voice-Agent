@@ -1,0 +1,44 @@
+/* PR #56: dealership-only Settings layout. Admin remains unchanged. */
+.settings-ref-dealership .settings-ref-layout{display:block;min-width:0}
+.settings-ref-dealership .settings-ref-main{width:100%;min-width:0}
+.settings-ref-user-name{display:flex;align-items:center;gap:8px;min-width:0}
+.settings-ref-user-name strong{min-width:0}
+.settings-ref-verified-check{display:inline-flex;align-items:center;justify-content:center;flex:none;color:#08a65f;background:none!important;border:0!important;box-shadow:none!important;padding:0!important}
+.settings-ref-verified-check svg{stroke-width:3}
+.settings-ref-dealership .settings-ref-profile-content{grid-template-columns:minmax(230px,.65fr) minmax(0,1.5fr);gap:20px}
+.settings-ref-dealership .settings-ref-profile-form{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:end}
+.settings-ref-dealership .settings-ref-profile-form label{min-width:0}
+.settings-ref-dealership .settings-ref-profile-form input[readonly]{cursor:default}
+.settings-ref-dealership .frontier-layout-settings.frontier-layout-compact{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:nowrap}
+.settings-ref-dealership .frontier-layout-title{flex:0 0 auto}
+.settings-ref-dealership .frontier-theme-and-layout{display:flex;align-items:center;justify-content:flex-end;flex:1;min-width:0;gap:14px;flex-wrap:nowrap}
+.settings-ref-dealership .frontier-layout-options{display:flex;align-items:center;gap:7px;flex:0 0 auto}
+.settings-ref-dealership .frontier-layout-option{display:flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:7px 11px}
+.settings-ref-dealership .frontier-layout-option svg{width:21px;height:21px;flex:none}
+.settings-ref-dealership .frontier-layout-option strong{font-size:11px;white-space:nowrap}
+.settings-ref-dealership .settings-appearance-divider{display:block;width:1px;height:35px;background:#dbe5f1;flex:0 0 1px}
+.settings-ref-dealership .frontier-theme-control{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.settings-ref-dealership .frontier-theme-control>span{font-size:12px;font-weight:750}
+.settings-ref-dealership .frontvox-theme-switch{display:flex;gap:3px;padding:3px}
+.settings-ref-dealership .frontvox-theme-switch label{width:auto;min-width:74px;height:35px;padding:0 9px;display:flex;align-items:center;justify-content:center;gap:5px}
+.settings-ref-dealership .frontvox-theme-switch label svg{width:16px;height:16px}
+.settings-ref-dealership .frontvox-theme-switch label span{position:static;clip:auto;width:auto;height:auto;overflow:visible;white-space:nowrap;font-size:10px;font-weight:700}
+:root[data-theme="dark"] .settings-ref-dealership .settings-appearance-divider{background:#40566f}
+@media(max-width:1370px){
+ .settings-ref-dealership .frontier-layout-settings.frontier-layout-compact{flex-wrap:wrap}
+ .settings-ref-dealership .frontier-theme-and-layout{justify-content:flex-start;flex-wrap:wrap}
+ .settings-ref-dealership .settings-appearance-divider{display:none}
+}
+@media(max-width:1100px){
+ .settings-ref-dealership .settings-ref-profile-content{grid-template-columns:1fr}
+ .settings-ref-dealership .settings-ref-profile-identity{border-right:0;border-bottom:1px solid #eaf0f5;padding-bottom:12px}
+ .settings-ref-dealership .settings-ref-profile-form{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:650px){
+ .settings-ref-dealership .settings-ref-profile-form{grid-template-columns:1fr}
+ .settings-ref-dealership .frontier-layout-settings.frontier-layout-compact{align-items:flex-start}
+ .settings-ref-dealership .frontier-theme-and-layout{width:100%;gap:11px}
+ .settings-ref-dealership .frontier-layout-options{flex-wrap:wrap;width:100%}
+ .settings-ref-dealership .frontier-theme-control{flex-wrap:wrap}
+ .settings-ref-dealership .frontvox-theme-switch label{min-width:65px;padding:0 7px}
+}
