@@ -1,7 +1,6 @@
 "use server";
 import { revalidatePath } from "next/cache";
-import { requireMembership, canPrepare } from "@/lib/auth";
-import {requireItSuperUser} from "@/lib/it-access";
+import { requireMembership, canPrepare,canCreateCampaign } from "@/lib/auth";
 type WizardInput={dealershipId:string;name:string;configuration:{
  description:string;agent_label:string;agent_version_label:string;telephony_label:string;outgoing_number_label:string;
  schedule:{start:string;end:string;days:string[];from:string;to:string;cps:number;max_retries:number;retry_interval_minutes:number};
@@ -10,8 +9,8 @@ type WizardInput={dealershipId:string;name:string;configuration:{
 export async function saveWizardDraft(input:WizardInput):Promise<{error?:string;id?:string}>{
  try{
   if(!input||typeof input.name!=="string"||input.name.trim().length<3||input.name.trim().length>120) return {error:"Campaign name must be 3–120 characters."};
-  const {supabase,membership}=await requireMembership(input.dealershipId);
-  if(!membership||!canPrepare(membership.role))return {error:"Not authorized to prepare campaigns."};
+  const {supabase,membership}=await requireMembership();
+  if(!membership||membership.dealership_id!==input.dealershipId||!canCreateCampaign(membership.role))return {error:"You may create drafts only for your assigned dealership."};
   const c=input.configuration,s=c?.schedule,r=c?.recipient_preview;
   if(!c||!s||!r||!Array.isArray(s.days)||s.days.some(d=>!["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].includes(d))||
      !Number.isInteger(s.cps)||s.cps<1||s.cps>30||!Number.isInteger(s.max_retries)||s.max_retries<0||s.max_retries>10||
@@ -38,8 +37,8 @@ export async function createCampaign(form:FormData){
  const dealershipId=String(form.get("dealership_id")??"");
  const name=String(form.get("name")??"").trim();
  if(name.length<3||name.length>120)throw new Error("Campaign name must be 3–120 characters.");
- const {supabase,user,membership}=await requireMembership(dealershipId);
- if(!membership||!canPrepare(membership.role))throw new Error("Not authorized to prepare campaigns.");
+ const {supabase,user,membership}=await requireMembership();
+ if(!membership||membership.dealership_id!==dealershipId||!canCreateCampaign(membership.role))throw new Error("You may create drafts only for your assigned dealership.");
  const {error}=await supabase.from("campaigns").insert({name,dealership_id:dealershipId,created_by:user.id,status:"DRAFT"});
  if(error)throw new Error("Could not create campaign.");
  revalidatePath("/campaigns");
@@ -60,9 +59,8 @@ export async function submitCampaign(form:FormData){
 /** Minimal InsureIT-style creation. Settings are server-controlled, never inferred from an Excel sheet. */
 export async function createSimpleCampaign(dealershipId:string,filename:string,totalRows:number,description=""):Promise<{error?:string;id?:string}>{
  try {
-  await requireItSuperUser();
-  const {supabase,membership}=await requireMembership(dealershipId);
-  if(!membership||!canPrepare(membership.role)||membership.dealership_id!==dealershipId)return {error:"You cannot create campaigns for this dealership."};
+  const {supabase,membership}=await requireMembership();
+  if(!membership||!canCreateCampaign(membership.role)||membership.dealership_id!==dealershipId)return {error:"You cannot create campaigns for another dealership."};
   if(!Number.isInteger(totalRows)||totalRows<1||totalRows>250)return {error:"Select 1–250 customer records per campaign."};
   if(typeof description!=="string"||description.length>200)return {error:"Description must be 200 characters or fewer."};
   const {data:dealer,error}=await supabase.from("dealerships").select("name").eq("id",dealershipId).maybeSingle();
