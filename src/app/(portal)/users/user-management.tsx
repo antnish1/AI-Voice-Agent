@@ -25,7 +25,7 @@ const emptyUser={dealershipId:"",mobile:"",email:"",employeeId:"",name:"",post:"
 export function UserManagement(){
  const [dealers,setDealers]=useState<Dealer[]>([]),[users,setUsers]=useState<Account[]>([]);
  const [dealership,setDealership]=useState(emptyDealership),[employee,setEmployee]=useState(emptyUser);
- const [issuedPassword,setIssuedPassword]=useState(""),[issuedFor,setIssuedFor]=useState(""),[search,setSearch]=useState(""),[pending,startTransition]=useTransition(),[loading,setLoading]=useState(true),[error,setError]=useState(""),[notice,setNotice]=useState("");
+ const [issuedPassword,setIssuedPassword]=useState(""),[issuedFor,setIssuedFor]=useState(""),[pending,startTransition]=useTransition(),[loading,setLoading]=useState(true),[error,setError]=useState(""),[notice,setNotice]=useState("");
  const [directoryView,setDirectoryView]=useState(false);
  const dialogRef=useRef<HTMLDialogElement>(null);
  const resetDialogRef=useRef<HTMLDialogElement>(null);
@@ -63,10 +63,9 @@ export function UserManagement(){
   if(pending||lifecycleConfirm!==lifecyclePhrases[lifecycleAction]||(lifecycleAction==="delete-user"&&(!dependencies||dependencies.length)))return;
   setResetError("");setResetNotice("");startTransition(async()=>{try{const result=await call({action:lifecycleAction,userId:account.id,confirm:lifecycleConfirm});setNotice(result.message??"Account updated.");resetDialogRef.current?.close();await load();}catch(e){setDependencies(null);setResetError(e instanceof Error?e.message:"Account action failed.");}});
  };
- const visible=users.filter(u=>(u.email+" "+(u.originalEmail??"")+" "+u.name+" "+u.dealership+" "+(u.employeeId??"")+" "+(u.post??"")).toLowerCase().includes(search.toLowerCase()));
  return <div className="it-user-page">
   <header className="it-user-heading"><h1>User Management</h1><button type="button" className="it-create-dealer" onClick={openDealer}>+ Create Dealership</button></header>
-  <div className="it-user-stats"><article><span>Dealerships</span><strong>{loading?"—":dealers.length}</strong></article><article><span>Dealer users</span><strong>{loading?"—":users.length}</strong></article><article><span>Active accounts</span><strong>{loading?"—":users.filter(u=>u.activated&&(!u.accountState||u.accountState==="active")).length}</strong></article><article><span>System permission</span><strong>Viewer</strong></article></div>
+  <div className="it-user-stats"><article><svg className="it-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V5l7-2v18M12 9h7v12M8 8v1m0 3v1m0 3v1m7-4v1m0 3v1"/></svg><span>Dealerships</span><strong>{loading?"—":dealers.length}</strong></article><article><svg className="it-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/><circle cx="9" cy="7" r="4"/></svg><span>Dealer users</span><strong>{loading?"—":users.length}</strong></article><article><svg className="it-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><span>Active accounts</span><strong>{loading?"—":users.filter(u=>u.activated&&(!u.accountState||u.accountState==="active")).length}</strong></article><article><svg className="it-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg><span>System permission</span><strong>Viewer</strong></article></div>
   {error&&<p role="alert" className="it-user-error">{error}</p>}{notice&&<p role="status" className="it-user-success">{notice}</p>}
   {issuedPassword&&<div role="status" className="it-user-temporary" style={{margin:"12px 0 18px"}}>
    <strong>New password for {issuedFor} — visible once</strong>
@@ -136,25 +135,22 @@ export function UserManagement(){
      <label>Employee ID<input required minLength={2} maxLength={40} placeholder="EMP001" value={employee.employeeId} onChange={e=>setEmployee(v=>({...v,employeeId:e.target.value}))}/></label>
      <label>Full Name<input required minLength={2} maxLength={100} placeholder="Employee name" value={employee.name} onChange={e=>setEmployee(v=>({...v,name:e.target.value}))}/></label>
      <label>Role / Post<input required minLength={2} maxLength={100} placeholder="Service Manager, CRM Executive, etc." value={employee.post} onChange={e=>setEmployee(v=>({...v,post:e.target.value}))}/></label>
-     <div className="it-user-permission"><strong>System permissions</strong><span>Dealership Viewer</span><p>Role / Post is a job title only; it does not grant campaign creation, approvals, uploads or administration.</p></div>
-     <div className="it-user-temporary"><strong>IT-controlled login password</strong><p>The IT-configured default password is assigned to new dealership users. No invitation email is sent. Dealership users cannot change their password in FrontVox; only IT can reset it.</p></div>
-     <button type="submit" disabled={loading||pending||!employee.dealershipId||!dealers.length}>{pending?"Creating…":"Create User (No Email)"}</button>
+     <button type="submit" disabled={loading||pending||!employee.dealershipId||!dealers.length}>{pending?"Creating…":"Create User"}</button>
     </form>
    </section>
   </div>
   <div className="it-register-tabs" role="group" aria-label="Select register"><button type="button" aria-pressed={!directoryView} onClick={()=>setDirectoryView(false)}>Dealership User Accounts</button><button type="button" aria-pressed={directoryView} onClick={()=>setDirectoryView(true)}>Dealership Directory</button></div>
   {directoryView ? <section className="it-user-card it-user-list it-full-width">
-   <div className="it-user-table-head"><div><h2>Dealership Directory</h2></div><button type="button" disabled={loading||pending} onClick={()=>void load()}>Refresh</button></div>
+   <div className="it-user-table-head"><div><h2>Dealership Directory</h2></div></div>
    <div className="tablewrap"><table><thead><tr><th>Dealership</th><th>Contact</th><th>Mobile</th><th>Contact Person</th><th>Email</th></tr></thead><tbody>
    {dealers.map(d=><tr key={d.id}><td><strong>{d.name}</strong></td><td>{d.contact??"—"}</td><td>{d.mobile??"—"}</td><td>{d.contact_person??"—"}</td><td>{d.email??"—"}</td></tr>)}
    {!dealers.length&&<tr><td colSpan={5} className="it-user-empty">{loading?"Loading…":"No dealerships found."}</td></tr>}
    </tbody></table></div>
   </section> : <section className="it-user-card it-user-list it-full-width">
-   <div className="it-user-table-head"><div><h2>Dealership User Accounts</h2></div><button type="button" disabled={loading||pending} onClick={()=>void load()}>Refresh</button></div>
-   <input className="it-user-search" aria-label="Search dealership users" placeholder="Search name, email, employee ID or dealership..." value={search} onChange={e=>setSearch(e.target.value)}/>
+   <div className="it-user-table-head"><div><h2>Dealership User Accounts</h2></div></div>
    <div className="tablewrap"><table><thead><tr><th>User</th><th>Dealership</th><th>Mobile</th><th>Employee ID</th><th>Role / Post</th><th>Account</th><th>Actions</th></tr></thead><tbody>
-    {visible.map(u=><tr key={u.id}><td><strong>{u.name||"Dealership User"}</strong><small>{u.email}</small></td><td>{u.dealership}</td><td>{u.mobile||"—"}</td><td>{u.employeeId||"—"}</td><td>{u.post||"—"}</td><td><span className={u.activated&&(!u.accountState||u.accountState==="active")?"it-user-active":"it-user-invited"}>{accountStatus(u)}</span></td><td><button type="button" aria-label={"IT Super User: reset password for "+u.name} title="IT Super User only · Reset temporary password without email" onClick={()=>openReset(u)} disabled={pending}>Reset password</button></td></tr>)}
-    {!visible.length&&<tr><td colSpan={7} className="it-user-empty">{loading?"Loading users…":"No dealership users found."}</td></tr>}
+    {users.map(u=><tr key={u.id}><td><strong>{u.name||"Dealership User"}</strong><small>{u.email}</small></td><td>{u.dealership}</td><td>{u.mobile||"—"}</td><td>{u.employeeId||"—"}</td><td>{u.post||"—"}</td><td><span className={u.activated&&(!u.accountState||u.accountState==="active")?"it-user-active":"it-user-invited"}>{accountStatus(u)}</span></td><td><button type="button" aria-label={"IT Super User: reset password for "+u.name} title="IT Super User only · Reset temporary password without email" onClick={()=>openReset(u)} disabled={pending}>Reset password</button></td></tr>)}
+    {!users.length&&<tr><td colSpan={7} className="it-user-empty">{loading?"Loading users…":"No dealership users found."}</td></tr>}
    </tbody></table></div>
   </section>}
   <p className="it-user-footnote">Only IT Super Users can provision accounts. New users are restricted to their assigned dealership. Only IT can issue and reset passwords. Share credentials privately; no password invitation or reset emails are sent.</p>
