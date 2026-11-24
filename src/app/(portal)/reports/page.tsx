@@ -2,24 +2,55 @@ import {requireMembership} from "@/lib/auth";
 import {isItSuperUser} from "@/lib/it-access";
 import {reportValues,phoneKey,type OperationalReport} from "@/lib/report-fields";
 import {ReportsDirectory} from "./reports-directory";
+import type {TestCallReport} from "./test-call-reports";
 export default async function Reports(){
  const {supabase,membership,user,memberships}=await requireMembership();if(!membership)return null;
  const id=membership.dealership_id;
  const dealershipView=!isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
- const [customers,campaigns,imports,pending,listed]=await Promise.all([
-  supabase.from("customers").select("id",{count:"exact",head:true}).eq("dealership_id",id),
-  supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id),
-  supabase.from("customer_import_batches").select("id",{count:"exact",head:true}).eq("dealership_id",id),
-  supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id).eq("status","PENDING_MANAGER_APPROVAL"),
-  supabase.from("campaigns").select("id,name,status,created_at").eq("dealership_id",id).order("created_at",{ascending:false}).limit(250)
+ const testReports:TestCallReport[]=[];
+ let testLoadError=false;
+ if(!dealershipView){
+  // Test requests belong to IT, not the currently selected dealership. Existing RLS and ownership still apply.
+  for(let offset=0;;offset+=200){
+   const {data,error}=await supabase.from("voice_test_call_requests").select("id,phone_last4,agent_id,agent_version,connection_id,caller_number,status,created_at,sarvam_attempt_id").eq("user_id",user.id).order("created_at",{ascending:false}).order("id").range(offset,offset+199);
+   if(error){testLoadError=true;break;}
+   const batch=data??[];
+   const ids=batch.map(x=>x.sarvam_attempt_id).filter((v):v is string=>typeof v==="string"&&!!v);
+   const linked=ids.length?await supabase.from("voice_call_records").select("sarvam_attempt_id,status,duration_seconds,started_at,transcript").in("sarvam_attempt_id",ids):{data:[],error:null};
+   if(linked.error)testLoadError=true;
+   for(const t of batch){const matches=(linked.data??[]).filter(x=>x.sarvam_attempt_id===t.sarvam_attempt_id);const call=matches.length===1?matches[0]:undefined;testReports.push({...t,caller_number:t.caller_number?String(t.caller_number).slice(-4):null,outcome:call?.status??null,duration_seconds:call?.duration_seconds??null,started_at:call?.started_at??null,has_transcript:Array.isArray(call?.transcript)&&call.transcript.length>0});}
+   if(batch.length<200)break;
+  }
+ }
+ const dealershipOptions=dealershipView?[]:await (async()=>{
+  const options:{id:string;name:string}[]=[];
+  for(let offset=0;;offset+=500){
+   const {data,error}=await supabase.from("dealerships").select("id,name").order("id").range(offset,offset+499);
+   if(error)throw Error("Could not load dealership report options.");
+   options.push(...(data??[]));if((data??[]).length<500)break;
+  }
+  return options.sort((a,b)=>a.name.localeCompare(b.name));
+ })();
+ const dealerIds=dealershipView?[id]:dealershipOptions.map(d=>d.id);
+ async function loadDealership(dealerId:string){
+ const [customers,campaigns,imports,pending]=await Promise.all([
+  supabase.from("customers").select("id",{count:"exact",head:true}).eq("dealership_id",dealerId),
+  supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",dealerId),
+  supabase.from("customer_import_batches").select("id",{count:"exact",head:true}).eq("dealership_id",dealerId),
+  supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",dealerId).eq("status","PENDING_MANAGER_APPROVAL")
  ]);
- if([customers,campaigns,imports,pending,listed].some(x=>x.error))throw new Error("Could not load dealership report records.");
- // Read all authorized records, not just the first PostgREST page.
+ if([customers,campaigns,imports,pending].some(x=>x.error))throw Error("Could not load dealership report records.");
+ const listed:{id:string;name:string;status:string;created_at:string;dealership_id:string}[]=[];
+ for(let offset=0;;offset+=500){
+  const {data,error}=await supabase.from("campaigns").select("id,name,status,created_at,dealership_id").eq("dealership_id",dealerId).order("id").range(offset,offset+499);
+  if(error)throw Error("Could not load campaigns.");
+  listed.push(...(data??[]));if((data??[]).length<500)break;
+ }
  const all=async (table:string,columns:string)=>{
   const rows:Record<string,unknown>[]=[];
   for(let offset=0;;offset+=500){
-   const {data,error}=await supabase.from(table).select(columns).eq("dealership_id",id).order("id").range(offset,offset+499);
-   if(error)throw new Error("Could not load service records.");
+   const {data,error}=await supabase.from(table).select(columns).eq("dealership_id",dealerId).order("id").range(offset,offset+499);
+   if(error)throw Error("Could not load service records.");
    const batch=(data??[]) as unknown as Record<string,unknown>[];
    rows.push(...batch);if(batch.length<500)break;
   }
@@ -30,7 +61,7 @@ export default async function Reports(){
   all("customer_import_rows","id,customer_id,batch_id,row_number,source_data,status"),
   all("campaign_prospects","id,campaign_id,customer_name,mobile,vehicle_model,registration_number,service_type,service_due,last_service,follow_up_at,call_summary,next_action,created_at,updated_at"),
   all("customer_import_batches","id,created_at"),
-  all("voice_call_records","id,customer_id,sarvam_campaign_id,dialed_number,status,duration_seconds,started_at"),
+  all("voice_call_records","id,customer_id,sarvam_campaign_id,sarvam_attempt_id,dialed_number,status,duration_seconds,started_at"),
   all("voice_campaign_links","id,campaign_id,sarvam_campaign_id"),
   all("crm_appointments","id,customer_id,status,appointment_at,updated_at"),
   all("crm_callbacks","id,customer_id,status,requested_at,updated_at"),
@@ -67,7 +98,8 @@ export default async function Reports(){
  const latest=(xs:Record<string,unknown>[],customerId:string)=>customerId?xs.filter(x=>str(x.customer_id)===customerId).sort((a,b)=>str(b.updated_at).localeCompare(str(a.updated_at)))[0]:undefined;
  const operations=(customerId:string)=>({appointment:latest(appointments,customerId),callback:latest(callbacks,customerId),pickup:latest(pickups,customerId)});
  const matched=new Set<string>();
- const serviceRecords:OperationalReport[]=calls.map(c=>{
+ const testAttemptIds=new Set(testReports.map(t=>t.sarvam_attempt_id).filter(Boolean));
+ const serviceRecords:OperationalReport[]=calls.filter(c=>!testAttemptIds.has(str(c.sarvam_attempt_id))).map(c=>{
   const phone=phoneKey(c.dialed_number);
   const campaign=linkMap.get(str(c.sarvam_campaign_id));
   const p=campaign&&phone?unique(prospects.filter(x=>str(x.campaign_id)===campaign&&phoneKey(x.mobile)===phone)):undefined;
@@ -95,5 +127,14 @@ export default async function Reports(){
   const input=[str(prospect.customer_name),str(prospect.mobile),str(prospect.vehicle_model),str(prospect.registration_number),str(prospect.service_type),str(prospect.service_due),str(prospect.last_service),"","","",""];
   campaignRecords.push({id:"campaign-prospect:"+str(prospect.id),campaignId,date:str(prospect.updated_at)||str(prospect.created_at),values:reportValues(input,undefined,prospect,operations(str(person?.id)))});
  }
- return <ReportsDirectory dealershipView={dealershipView} campaignRecords={campaignRecords} serviceRecords={serviceRecords} metrics={{customers:customers.count??0,campaigns:campaigns.count??0,imports:imports.count??0,pending:pending.count??0}} campaigns={listed.data??[]}/>;
+ return {dealershipId:dealerId,campaigns:listed,serviceRecords:serviceRecords.map(r=>({...r,dealershipId:dealerId})),campaignRecords:campaignRecords.map(r=>({...r,dealershipId:dealerId})),metrics:{customers:customers.count??0,campaigns:campaigns.count??0,imports:imports.count??0,pending:pending.count??0}};
+ }
+ // Keep joins isolated by dealership; never join identical phone numbers across tenants.
+ const reports=[];
+ for(const dealerId of dealerIds)reports.push(await loadDealership(dealerId));
+ const serviceRecords=reports.flatMap(r=>r.serviceRecords).sort((a,b)=>b.date.localeCompare(a.date));
+ const campaignRecords=reports.flatMap(r=>r.campaignRecords).sort((a,b)=>b.date.localeCompare(a.date));
+ const campaigns=reports.flatMap(r=>r.campaigns).sort((a,b)=>b.created_at.localeCompare(a.created_at));
+ const metrics=reports.reduce((a,r)=>({customers:a.customers+r.metrics.customers,campaigns:a.campaigns+r.metrics.campaigns,imports:a.imports+r.metrics.imports,pending:a.pending+r.metrics.pending}),{customers:0,campaigns:0,imports:0,pending:0});
+ return <ReportsDirectory testReports={testReports} testLoadError={testLoadError} dealershipView={dealershipView} dealershipOptions={dealershipOptions} dealershipMetrics={reports.map(r=>({dealershipId:r.dealershipId,...r.metrics}))} campaignRecords={campaignRecords} serviceRecords={serviceRecords} metrics={metrics} campaigns={campaigns}/>;
 }
