@@ -1,0 +1,78 @@
+/* Voice Agent Defaults — reference-specific design, scoped to this route. */
+.vdp-page{position:relative;isolation:isolate;min-height:calc(100dvh - 160px);padding:9px 0 38px;color:#0a204e;overflow:hidden}
+.vdp-page:before{content:"";z-index:-2;position:absolute;inset:-35px -40px -70px;background:
+radial-gradient(ellipse at 77% 21%,#95d8ff8f,transparent 42%),
+radial-gradient(ellipse at 0% 85%,#ffffff,transparent 44%),
+linear-gradient(125deg,#e8f4ff 0%,#edf4ff 50%,#dceeff 100%);}
+.vdp-page:after{content:"";z-index:-1;position:absolute;right:-26%;top:-34%;width:90%;height:95%;transform:rotate(-13deg);border:44px solid #90d6fe44;border-radius:50%;pointer-events:none}
+.vdp-header{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding:6px 4px 23px}
+.vdp-heading{display:flex;align-items:center;gap:20px;min-width:0}
+.vdp-brand-icon{display:grid;place-items:center;flex-shrink:0;width:86px;height:86px;border-radius:23px;background:linear-gradient(150deg,#04ded2 0%,#087cc9 54%,#3d0ab6 100%);box-shadow:0 6px 12px #0a71c833,inset 0 1px 2px #ffffff96;border:2px solid #fff;color:white}
+.vdp-brand-icon svg{width:64px;height:64px;filter:drop-shadow(0 1px 5px #f9ffff)}
+.vdp-kicker{font-size:12px;letter-spacing:1.8px;font-weight:800;color:#0787bc}
+.vdp-heading h1{font-size:31px;font-weight:850;letter-spacing:-.95px;line-height:1.18;margin:4px 0 6px;color:#07163d}
+.vdp-heading p{margin:0;color:#5d6e94;font-size:14px}
+.vdp-back{display:inline-flex;align-items:center;justify-content:center;gap:11px;background:#ffffffea;border:1px solid #cfd9eb;border-radius:12px;box-shadow:0 3px 7px #172c6d1f;color:#1c2c55;padding:13px 16px;font-size:12px;font-weight:800;white-space:nowrap}
+.vdp-back span{font-size:20px;line-height:10px}
+.vdp-back:hover{background:#f2f9ff}
+.vdp-body{position:relative;display:grid;grid-template-columns:minmax(0,70%) minmax(0,30%);gap:0;align-items:start}
+.vdp-card{position:relative;z-index:2;background:#ffffffef;backdrop-filter:blur(8px);border:1px solid #dce6fb;border-radius:17px;padding:23px 25px 26px;box-shadow:0 7px 19px #28549523,0 2px 3px #2958a71c}
+.vdp-card-title{display:flex;align-items:center;gap:18px;margin-bottom:22px}
+.vdp-gear{display:grid;place-items:center;flex-shrink:0;width:76px;height:76px;background:radial-gradient(circle,#e3e9ff,#c9daff);color:#136ce4;border-radius:50%;box-shadow:0 4px 10px #3a7be127}
+.vdp-gear svg{height:42px;width:42px;stroke-width:2.5}
+.vdp-card-title h2{font-size:19px;line-height:1.24;color:#0b1a42;font-weight:800;letter-spacing:-.35px;margin:0 0 5px}
+.vdp-card-title p{font-size:13px;line-height:1.55;color:#5e6d8b;margin:0;max-width:575px}
+.vdp-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:37px;row-gap:18px}
+.vdp-form{display:contents}
+.vdp-field{display:flex;flex-direction:column;gap:9px;min-width:0}
+.vdp-dealer{grid-column:1;grid-row:1}
+.vdp-agent{grid-column:2;grid-row:1}
+.vdp-version{grid-column:1;grid-row:2}
+.vdp-connection{grid-column:2;grid-row:2}
+.vdp-caller{grid-column:1;grid-row:3}
+.vdp-checkbox-info{grid-column:2;grid-row:3;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.vdp-label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:#11244e}
+.vdp-label svg{width:17px;height:17px;flex-shrink:0;color:#146be0;stroke-width:2.5}
+.vdp-control{height:46px;display:flex;align-items:center;gap:2px;border:1px solid #d7deeb;background:linear-gradient(#fff,#f9fbff);border-radius:11px;box-shadow:0 1px 2px #3457a413;overflow:hidden}
+.vdp-control:focus-within{border-color:#389bdf;box-shadow:0 0 0 3px #2bb7f126}
+.vdp-control input,.vdp-control select{width:100%;min-width:0;min-height:44px;border:0;outline:0;background:transparent;font-size:13px;color:#142348;padding:0 14px}
+.vdp-control input::placeholder{color:#8895af}
+.vdp-control select{cursor:pointer}
+.vdp-copy{height:33px;width:34px;display:grid;place-items:center;padding:6px;margin-right:4px;background:transparent;color:#40537a;border-radius:7px;flex-shrink:0;box-shadow:none}
+.vdp-copy:hover{background:#ebf4fe;color:#086bd7}
+.vdp-copy:disabled{opacity:.4;cursor:default}
+.vdp-copy svg{height:18px;width:18px}
+.vdp-check{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:750;color:#172752;line-height:1.4;cursor:pointer}
+.vdp-check input{width:17px;height:17px;flex-shrink:0;accent-color:#056cde;cursor:pointer}
+.vdp-info{display:flex;align-items:flex-start;gap:10px;background:#def0ff;border:1px solid #bdddfb;color:#315580;border-radius:9px;padding:12px 13px;line-height:1.5;font-size:10px}
+.vdp-info svg{height:18px;width:18px;flex-shrink:0;color:#1673d6}
+.vdp-success,.vdp-error{grid-column:1 / -1;font-size:12px;padding:10px 12px;margin:0;border-radius:10px}
+.vdp-success{background:#e5fff5;color:#00724f}
+.vdp-error{background:#fff0ed;color:#a92c31}
+.vdp-save{grid-column:1 / -1;width:100%;height:59px;margin-top:3px;border-radius:17px;background:linear-gradient(100deg,#05c8e7 0%,#1379f5 46%,#4a3bf0 100%);box-shadow:0 6px 15px #1c68ec3d;color:white;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:14px;position:relative;transition:transform .17s ease,filter .17s ease}
+.vdp-save:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.04);background:linear-gradient(100deg,#05c8e7,#1379f5 46%,#4a3bf0)}
+.vdp-save:disabled{opacity:.67;cursor:progress}
+.vdp-save>svg{height:25px;width:25px;stroke-width:2.3}
+.vdp-save-arrow{position:absolute;right:15px;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#ffffff20;font-size:20px}
+.vdp-visual{height:515px;position:relative;display:grid;place-items:center;pointer-events:none;overflow:visible}
+.vdp-visual:before{content:"";position:absolute;width:122%;height:83%;border-radius:50%;background:radial-gradient(circle,#7ed4ff36,#89c8ff13 65%,transparent 70%);box-shadow:inset 0 0 0 2px #a1daff33}
+.vdp-visual:after{content:"";position:absolute;bottom:-65px;right:-95px;width:170%;height:155px;border-radius:50%;transform:rotate(-15deg);border:35px solid #5a86f450;background:#91d6ff38;z-index:-1}
+.vdp-robot{position:relative;width:min(470px,124%);height:auto;max-height:515px;filter:drop-shadow(0 16px 20px #3777ca25)}
+@media(max-width:1150px){.vdp-body{grid-template-columns:minmax(0,68%) minmax(0,32%)}.vdp-fields{column-gap:17px}.vdp-card{padding:20px}.vdp-visual{height:460px}.vdp-robot{width:130%}}
+@media(max-width:900px){.vdp-body{grid-template-columns:1fr}.vdp-visual{height:270px}.vdp-robot{width:min(340px,90%);height:270px}.vdp-card{max-width:850px}.vdp-header{flex-wrap:wrap}.vdp-heading h1{font-size:28px}}
+@media(max-width:650px){.vdp-heading{gap:12px}.vdp-brand-icon{height:58px;width:58px;border-radius:16px}.vdp-brand-icon svg{height:42px;width:42px}.vdp-heading h1{font-size:22px}.vdp-heading p{font-size:12px}.vdp-kicker{font-size:10px}.vdp-card-title{align-items:flex-start;gap:11px}.vdp-gear{height:52px;width:52px}.vdp-gear svg{width:29px;height:29px}.vdp-fields{grid-template-columns:1fr}.vdp-dealer,.vdp-agent,.vdp-version,.vdp-connection,.vdp-caller,.vdp-checkbox-info,.vdp-save{grid-column:1;grid-row:auto}.vdp-card{padding:17px}.vdp-card-title h2{font-size:16px}.vdp-card-title p{font-size:12px}.vdp-save{font-size:15px}.vdp-back{margin-left:auto}}
+@media(prefers-reduced-motion:reduce){.vdp-save{transition:none!important}}
+
+
+/* Sarvam verification lookup — integrated into the reference-designed card. */
+.vdp-lookup{margin:-3px 0 19px;padding:12px 14px;background:#f4faff;border:1px solid #dbeaff;border-radius:12px}
+.vdp-lookup-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.vdp-lookup-head strong{font-size:12px;color:#193960}
+.vdp-load-button{padding:9px 13px;background:#fff;color:#2261a5;border:1px solid #c9e0fb;border-radius:9px;font-size:11px;font-weight:750}
+.vdp-load-button:hover{background:#e8f5ff}
+.vdp-load-button:disabled{opacity:.6;cursor:wait}
+.vdp-lookup-field{display:grid;gap:6px;margin-top:10px;color:#304e75;font-size:11px;font-weight:700}
+.vdp-lookup-field select{width:100%;min-height:40px;padding:9px 11px;border-radius:9px;border:1px solid #d7deeb;background:white;color:#193960;min-width:0}
+.vdp-lookup-status{display:grid;gap:7px;margin-top:9px;font-size:11px;line-height:1.45;color:#237a59}
+.vdp-lookup .vdp-error{margin:10px 0 0;font-size:11px;line-height:1.5}
+@media(max-width:520px){.vdp-lookup{padding:11px}.vdp-lookup-head{align-items:flex-start}.vdp-lookup-head strong{max-width:190px}}
