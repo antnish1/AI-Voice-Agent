@@ -81,7 +81,7 @@ test("dealer users do not have a portal password change or self-reset flow",()=>
  assert.doesNotMatch(edge,/inviteUserByEmail|resetPasswordForEmail/);
  assert.match(ui,/issuedPassword/);
  assert.match(ui,/visible once/);
- assert.match(ui,/IT-controlled login password/);
+ assert.doesNotMatch(ui,/IT-controlled login password/);
 });
 
 test("password reset requires opening account details and explicit in-dialog action",()=>{
@@ -133,3 +133,11 @@ test("temporary password form supports optional custom password and email correc
  assert.match(edge,/password:issuedPassword,email_confirm:true/);
  assert.match(edge,/correctedEmail\?\{email:correctedEmail\}/);
 });
+
+ test("compact user management retains four KPIs and removes redundant controls",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx"),css=file("../src/app/globals.css");
+ assert.doesNotMatch(ui,/it-user-permission|Create User \(No Email\)|>Refresh<|it-user-search/);
+ assert.match(ui,/>Dealerships<.*>Dealer users<.*>Active accounts<.*>System permission</);
+ assert.match(ui,/setDirectoryView\(false\);await load\(\)/);
+ assert.match(css,/\.it-register-tabs button\[aria-pressed=true\].*background:var\(--teal/);
+ });
