@@ -4,11 +4,14 @@ import {useEffect,useMemo,useRef,useState} from "react";
 import {useRouter} from "next/navigation";
 import {createBrowserSupabase} from "@/lib/supabase/browser";
 import {signOut} from "@/app/login/actions";
+import {ThemeSwitcher} from "@/components/theme-preference";
+import {useNavigationLayout} from "@/components/navigation-layout-preference";
 
 type Props={userId:string;email:string;role:string;dealershipName:string;initialName:string;initialAvatarPath:string};
 const bucket="frontier-profile-avatars";
 export function ProfileMenu({userId,email,role,dealershipName,initialName,initialAvatarPath}:Props){
  const router=useRouter(),supabase=useMemo(()=>createBrowserSupabase(),[]);
+ const [navigationLayout,setNavigationLayout]=useNavigationLayout(userId);
  const [open,setOpen]=useState(false),[detailsExpanded,setDetailsExpanded]=useState(false),[passwordOpen,setPasswordOpen]=useState(false),[editOpen,setEditOpen]=useState(false);
  const [displayName,setDisplayName]=useState(initialName||email.split("@")[0]),[editName,setEditName]=useState(initialName||email.split("@")[0]);
  const [avatarPath,setAvatarPath]=useState(initialAvatarPath),[avatarUrl,setAvatarUrl]=useState("");
@@ -77,7 +80,16 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
    {detailsExpanded&&<div id="portal-profile-expanded-details" className="portal-profile-expanded"><dl className="portal-profile-facts"><div><dt>Email</dt><dd title={email}>{email}</dd></div><div><dt>Role</dt><dd>{role.replaceAll("_"," ")}</dd></div><div><dt>Status</dt><dd>Active</dd></div></dl><button type="button" className="portal-profile-edit-details" onClick={()=>{setEditName(displayName);setError("");setEditOpen(true);}}>Edit profile name <span aria-hidden="true">→</span></button></div>}
    {message&&<p role="status" className="portal-profile-success">{message}</p>}
    {error&&!passwordOpen&&!editOpen&&<p role="alert" className="portal-profile-error">{error}</p>}
-   <div className="portal-profile-actions"><button role="menuitem" type="button" onClick={()=>{setError("");setPassword("");setConfirm("");setPasswordOpen(true);}}>Reset Password <span>→</span></button><Link role="menuitem" href="/settings" onClick={()=>setOpen(false)}>Account Settings <span>→</span></Link><form action={signOut}><button role="menuitem" type="submit" className="portal-logout">Logout <span>↗</span></button></form></div>
+   <div className="portal-profile-actions"><button role="menuitem" type="button" onClick={()=>{setError("");setPassword("");setConfirm("");setPasswordOpen(true);}}>Reset Password <span>→</span></button><Link role="menuitem" href="/settings" onClick={()=>setOpen(false)}>Account Settings <span>→</span></Link><div className="portal-profile-appearance" aria-label="Appearance preferences">
+    <div className="portal-profile-appearance-group">
+     <span className="portal-profile-appearance-label">Appearance &amp; Layout</span>
+     <div className="portal-profile-layout-switch" role="radiogroup" aria-label="Navigation layout">
+      <label className={navigationLayout==="sidebar"?"selected":""}><input type="radio" name="profile-nav-layout" value="sidebar" checked={navigationLayout==="sidebar"} onChange={()=>setNavigationLayout("sidebar")}/>Sidebar</label>
+      <label className={navigationLayout==="topbar"?"selected":""}><input type="radio" name="profile-nav-layout" value="topbar" checked={navigationLayout==="topbar"} onChange={()=>setNavigationLayout("topbar")}/>Top Menu</label>
+     </div>
+    </div>
+    <div className="portal-profile-appearance-group portal-profile-theme-row"><span className="portal-profile-appearance-label">Theme</span><ThemeSwitcher/></div>
+   </div><form action={signOut}><button role="menuitem" type="submit" className="portal-logout">Logout <span>↗</span></button></form></div>
   </div>}
   {(passwordOpen||editOpen)&&<div className="portal-account-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget){setPasswordOpen(false);setEditOpen(false);}}}><section className="portal-account-modal" role="dialog" aria-modal="true" aria-label={passwordOpen?"Reset password":"Edit profile"}>
    <div className="portal-account-modal-head"><h2>{passwordOpen?"Reset Password":"Edit user details"}</h2><button type="button" aria-label="Close" onClick={()=>{setPasswordOpen(false);setEditOpen(false);setError("");}}>×</button></div>
