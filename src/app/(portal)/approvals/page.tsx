@@ -1,8 +1,10 @@
+import {redirect} from "next/navigation";
 import {requireMembership,canApprove} from "@/lib/auth";
 import {ApprovalsDirectory,type ApprovalRow} from "./approvals-directory";
 const PAGE_SIZE=10;
 export default async function Approvals({searchParams}:{searchParams:Promise<{tab?:string;q?:string;range?:string;page?:string}>}){
  const {supabase,membership}=await requireMembership();if(!membership)return null;
+ if(!canApprove(membership.role))redirect("/campaigns");
  const params=await searchParams;
  const id=membership.dealership_id;
  const tab=["approved","rejected"].includes(String(params.tab))?String(params.tab):"pending";

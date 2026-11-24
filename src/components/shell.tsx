@@ -59,7 +59,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     {!collapsed&&!narrowScreen&&<button type="button" className="collapse-control frontier-sidebar-collapse" onClick={()=>setCollapsed(true)} title="Collapse sidebar" aria-label="Collapse sidebar"><SidebarIcon name="chevrons-left" size={19}/></button>}
    </div>
    <nav className="frontier-sidebar-nav" aria-label="Main navigation">
-    {[...navigation,...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
+    {[...navigation.filter(item=>isItAdmin||!["/approvals","/agents"].includes(item.url)),...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
      const active=path===item.url||(item.url==="/campaigns"&&campaignActive);
      return <div className="frontier-nav-entry" key={item.url}>
        <div className={`frontier-nav-row ${active?"selected":""} ${item.url==="/campaigns"?"frontier-campaign-row":""}`}>{active&&<motion.span layoutId="frontier-active-nav" className="frontier-motion-active-nav" transition={reducedMotion?{duration:0}:motionTokens.spring} aria-hidden="true"/>}
@@ -75,7 +75,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
         </Link>
         {item.url==="/campaigns"&&<button type="button" className="frontier-campaign-toggle" aria-label={campaignsExpanded?"Collapse Campaigns submenu":"Expand Campaigns submenu"} aria-expanded={campaignsExpanded} onClick={()=>setCampaignsExpanded(s=>!s)}><SidebarIcon name="chevron-down" size={16}/></button>}
        </div>
-       {item.url==="/campaigns"&&campaignsExpanded&&!collapsed&&<div className="frontier-campaign-subnav"><Link href="/campaigns" onClick={closeMobile}>All Campaigns</Link><Link href="/campaigns/new" onClick={closeMobile}>Create Campaign</Link></div>}
+       {item.url==="/campaigns"&&campaignsExpanded&&!collapsed&&<div className="frontier-campaign-subnav"><Link href="/campaigns" onClick={closeMobile}>All Campaigns</Link>{isItAdmin&&<Link href="/campaigns/new" onClick={closeMobile}>Create Campaign</Link>}</div>}
       </div>;
     })}
    </nav>
@@ -113,7 +113,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
    </header>
 
    {isTopMenu&&<TopMenuNavigation
-    items={[...navigation,...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])]}
+    items={[...navigation.filter(item=>isItAdmin||!["/approvals"].includes(item.url)),...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])]}
     pendingApprovals={pendingApprovals} isItAdmin={isItAdmin}/>}
    <main className="main crm-main ref-main"><MotionRoute>{children}</MotionRoute></main>
   </div>
