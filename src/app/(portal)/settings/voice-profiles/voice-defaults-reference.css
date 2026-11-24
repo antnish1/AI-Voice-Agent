@@ -76,3 +76,27 @@ linear-gradient(125deg,#e8f4ff 0%,#edf4ff 50%,#dceeff 100%);}
 .vdp-lookup-status{display:grid;gap:7px;margin-top:9px;font-size:11px;line-height:1.45;color:#237a59}
 .vdp-lookup .vdp-error{margin:10px 0 0;font-size:11px;line-height:1.5}
 @media(max-width:520px){.vdp-lookup{padding:11px}.vdp-lookup-head{align-items:flex-start}.vdp-lookup-head strong{max-width:190px}}
+
+
+/* ROBO.jpeg from the repository: full-page background behind the real form. */
+.vdp-page {
+  background: #e9f5ff url("/ROBO.jpeg") center top / cover no-repeat;
+  min-height: calc(100dvh - 130px);
+  border-radius: 14px;
+  padding: 20px 17px 38px;
+}
+.vdp-page::before,
+.vdp-page::after { display: none; }
+.vdp-body { grid-template-columns: minmax(0, 70%) minmax(0, 30%); }
+.vdp-visual { display: none; }
+.vdp-card { background: rgba(255,255,255,.96); }
+@media (max-width: 950px) {
+  .vdp-page { background-position: 62% top; background-size: cover; padding: 16px 12px 28px; }
+  .vdp-body { display: block; }
+  .vdp-card { max-width: 760px; margin: 0 auto; }
+}
+@media (max-width: 600px) {
+  .vdp-page { background-position: 67% top; }
+  .vdp-header { padding-bottom: 16px; }
+  .vdp-card { background: rgba(255,255,255,.97); }
+}
