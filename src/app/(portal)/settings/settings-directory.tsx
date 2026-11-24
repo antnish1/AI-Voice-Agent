@@ -44,7 +44,7 @@ const settingsPanels:Record<Section,string>={
 export function SettingsDirectory({userId,email,role,dealership,displayName,phone,avatarPath}:Props){
  const supabase=useMemo(()=>createBrowserSupabase(),[]),router=useRouter();
  const canManageAccount=role==="super_admin";
- const visibleSections=canManageAccount?sections:sections.filter(item=>item.id!=="api"&&item.id!=="security");
+ const visibleSections=canManageAccount?sections:sections.filter(item=>!["organization","api","security","billing","advanced"].includes(item.id));
  const [navigationLayout,setNavigationLayout]=useNavigationLayout(userId);
  const [section,setSection]=useState<Section>("profile"),[name,setName]=useState(displayName||email.split("@")[0]),[mobile,setMobile]=useState(phone||""),[path,setPath]=useState(avatarPath),[avatarUrl,setAvatarUrl]=useState(""),[busy,setBusy]=useState(false),[error,setError]=useState(""),[notice,setNotice]=useState("");
  const [passwordOpen,setPasswordOpen]=useState(false),[newPassword,setNewPassword]=useState(""),[confirmPassword,setConfirmPassword]=useState("");
