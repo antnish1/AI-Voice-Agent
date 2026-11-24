@@ -51,7 +51,9 @@ Deno.serve(async(req)=>{
  mobile:String(byId.get(m.user_id)?.user_metadata?.mobile??""),
  employeeId:String(byId.get(m.user_id)?.user_metadata?.employee_id??""),
  post:String(byId.get(m.user_id)?.user_metadata?.post??""),
- passwordChangePending:byId.get(m.user_id)?.app_metadata?.must_change_password===true}));
+ passwordChangePending:byId.get(m.user_id)?.app_metadata?.must_change_password===true,
+ accountState:byId.get(m.user_id)?.app_metadata?.frontvox_account_state==="archived"?"archived":byId.get(m.user_id)?.app_metadata?.frontvox_account_state==="disabled"||Boolean(byId.get(m.user_id)?.banned_until&&Date.parse(byId.get(m.user_id)?.banned_until??"")>Date.now())?"disabled":"active",
+ originalEmail:String(byId.get(m.user_id)?.app_metadata?.frontvox_original_login_email??"")}));
   return json({dealerships:dealers??[],users:result},200,headers);
  }
  if(body.action==="create-dealership"){
@@ -103,22 +105,63 @@ Deno.serve(async(req)=>{
   }
   return json({ok:true,message:"Dealership user created. No email was sent. Share the issued password securely.",issuedPassword},201,headers);
  }
+ if(["account-dependencies","archive-user","archive-release-email","disable-login","enable-login","delete-user"].includes(body.action??"")){
+  const id=body.userId??"";
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)||id===IT_ID)return json({error:"Invalid dealership user."},400,headers);
+  const membershipRows=await admin.from("memberships").select("role").eq("user_id",id);
+  if(membershipRows.error||!membershipRows.data?.length||membershipRows.data.some(m=>m.role!=="management"))return json({error:"Only dealership viewer accounts may be managed."},403,headers);
+  const account=await admin.auth.admin.getUserById(id);
+  if(account.error||!account.data.user)return json({error:"Account not found."},404,headers);
+  const target=account.data.user;
+  const dependencies=await admin.rpc("frontvox_account_dependencies",{target_user:id});
+  if(dependencies.error||!Array.isArray(dependencies.data))return json({error:"Account protection checks unavailable. No changes were made."},503,headers);
+  if(body.action==="account-dependencies")return json({ok:true,dependencies:dependencies.data},200,headers);
+  const phrases:Record<string,string>={"archive-user":"ARCHIVE USER","archive-release-email":"RELEASE EMAIL","disable-login":"DISABLE LOGIN","enable-login":"ENABLE LOGIN","delete-user":"DELETE USER"};
+  if(body.confirm!==phrases[body.action??""])return json({error:"Exact account-action confirmation required."},400,headers);
+  if(body.action==="delete-user"){
+   if(dependencies.data.length)return json({error:"Protected records prevent permanent deletion. Archive or disable login instead.",dependencies:dependencies.data},409,headers);
+   const removed=await admin.auth.admin.deleteUser(id,false);
+   if(removed.error)return json({error:"Deletion refused by the database or Auth service. Recheck dependencies."},409,headers);
+   return json({ok:true,message:"Account identity deleted; no dealership or business record was removed."},200,headers);
+  }
+  const state=body.action==="enable-login"?"active":body.action==="disable-login"?(target.app_metadata?.frontvox_account_state==="archived"?"archived":"disabled"):"archived";
+  if(body.action==="enable-login"&&target.app_metadata?.frontvox_original_login_email)return json({error:"This archived account's login email was released. It cannot be re-enabled with that email."},409,headers);
+  if(body.action==="archive-release-email"&&(!target.email||target.app_metadata?.frontvox_original_login_email))return json({error:"No original login email remains to release."},409,headers);
+  const release=body.action==="archive-release-email";
+  const updates=await admin.auth.admin.updateUserById(id,{
+   ban_duration:state==="active"?"none":"876000h",
+   app_metadata:{...target.app_metadata,frontvox_account_state:state,frontvox_account_state_changed_at:new Date().toISOString(),...(release?{frontvox_original_login_email:target.email}:{})},
+   ...(release?{email:"retired-"+id+"@example.invalid",email_confirm:true}:{})
+  });
+  if(updates.error||!updates.data.user)return json({error:"Account status could not be changed."},500,headers);
+  const message=release?"Account archived and original login email released. History retained.":state==="archived"?"Account archived. History retained.":state==="disabled"?"Login disabled. Profile and history retained.":"Login enabled.";
+  return json({ok:true,message,accountState:state},200,headers);
+ }
  if(body.action==="reset"){
   // IT Super User authorization is enforced above for every account-management action.
   // This operation cannot be called by dealership users, even directly via HTTP.
-  if(body.confirm!=="RESET DEALERSHIP PASSWORD")return json({error:"Explicit IT password reset confirmation required."},400,headers);
+  if(body.confirm!=="RESET")return json({error:"Explicit IT password reset confirmation required."},400,headers);
   const id=body.userId??"";
   if(!/^[0-9a-f-]{36}$/i.test(id)||id===IT_ID)return json({error:"Invalid dealership user"},400,headers);
-  const row=await admin.from("memberships").select("role").eq("user_id",id).maybeSingle();
-  if(row.error||!row.data||row.data.role!=="management")return json({error:"Only assigned dealership viewer accounts can be reset."},403,headers);
+  const row=await admin.from("memberships").select("role").eq("user_id",id);
+  if(row.error||!row.data?.length||row.data.some(m=>m.role!=="management"))return json({error:"Only assigned dealership viewer accounts can be reset."},403,headers);
+  const target=await admin.auth.admin.getUserById(id);
+  if(target.error||!target.data.user||target.data.user.app_metadata?.frontvox_account_state==="archived"||target.data.user.app_metadata?.frontvox_account_state==="disabled"||(target.data.user.banned_until&&Date.parse(target.data.user.banned_until)>Date.now()))return json({error:"Enable the account before resetting its password."},409,headers);
   // IT-only password reset; no email and no dealership self-service.
   // Clear the legacy first-login flag to avoid trapping existing accounts.
-  const issuedPassword=makePassword();
+  if(body.password!==undefined&&typeof body.password!=="string")return json({error:"Invalid password."},400,headers);
+  if(body.email!==undefined&&typeof body.email!=="string")return json({error:"Invalid login email."},400,headers);
+  const requestedPassword=body.password??"";
+  if(requestedPassword&&(requestedPassword.length<8||new TextEncoder().encode(requestedPassword).length>72||!requestedPassword.trim()))return json({error:"Password must contain at least 8 characters and at most 72 UTF-8 bytes."},400,headers);
+  const correctedEmail=(body.email??"").trim().toLowerCase();
+  if(correctedEmail&&!validEmail(correctedEmail))return json({error:"Enter a valid login email."},400,headers);
+  const issuedPassword=requestedPassword||makePassword();
   const reset=await admin.auth.admin.updateUserById(id,{
-   password:issuedPassword,app_metadata:{must_change_password:false}
+   password:issuedPassword,email_confirm:true,app_metadata:{...target.data.user.app_metadata,must_change_password:false},
+   ...(correctedEmail?{email:correctedEmail}:{})
   });
-  if(reset.error)return json({error:"Could not reset temporary password."},500,headers);
-  return json({ok:true,message:"Password reset. No email sent. Share the new password securely.",issuedPassword},200,headers);
+  if(reset.error||!reset.data.user)return json({error:"Could not issue password. Check the email is not already in use and the password meets Auth requirements."},400,headers);
+  return json({ok:true,message:"Temporary password issued and login email confirmed. No email sent. Share securely.",issuedPassword,email:reset.data.user.email},200,headers);
  }
  return json({error:"Unsupported operation"},400,headers);
 });
