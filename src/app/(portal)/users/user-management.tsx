@@ -78,7 +78,7 @@ export function UserManagement(){
      <label>Full Name<input required minLength={2} maxLength={100} placeholder="Employee name" value={employee.name} onChange={e=>setEmployee(v=>({...v,name:e.target.value}))}/></label>
      <label>Role / Post<input required minLength={2} maxLength={100} placeholder="Service Manager, CRM Executive, etc." value={employee.post} onChange={e=>setEmployee(v=>({...v,post:e.target.value}))}/></label>
      <div className="it-user-permission"><strong>System permissions</strong><span>Dealership Viewer</span><p>Role / Post is a job title only; it does not grant campaign creation, approvals, uploads or administration.</p></div>
-     <div className="it-user-temporary"><strong>IT-controlled login password</strong><p>A unique strong password is generated and shown once after user creation. No invitation email is sent. Dealership users cannot change their password in FrontVox; only IT can reset it.</p></div>
+     <div className="it-user-temporary"><strong>IT-controlled login password</strong><p>The IT-configured default password is assigned to new dealership users. No invitation email is sent. Dealership users cannot change their password in FrontVox; only IT can reset it.</p></div>
      <button type="submit" disabled={loading||pending||!employee.dealershipId||!dealers.length}>{pending?"Creating…":"Create User (No Email)"}</button>
     </form>
    </section>
@@ -98,6 +98,6 @@ export function UserManagement(){
     {!visible.length&&<tr><td colSpan={7} className="it-user-empty">{loading?"Loading users…":"No dealership users found."}</td></tr>}
    </tbody></table></div>
   </section>}
-  <p className="it-user-footnote">Only IT Super Users can provision accounts. New users are restricted to their assigned dealership. Only IT can issue and reset unique passwords. Share credentials privately; no password invitation or reset emails are sent.</p>
+  <p className="it-user-footnote">Only IT Super Users can provision accounts. New users are restricted to their assigned dealership. Only IT can issue and reset passwords. Share credentials privately; no password invitation or reset emails are sent.</p>
  </div>;
 }

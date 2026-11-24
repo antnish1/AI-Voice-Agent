@@ -11,7 +11,7 @@ test("new user page is server-gated and excluded from dealership sidebar",()=>{
  assert.match(serverPage,/isItSuperUser/);assert.match(serverPage,/notFound\(\)/);
  assert.match(shell,/isItAdmin\?\[/);
 });
-test("no-email provisioning and IT-controlled unique account credentials are server-side",()=>{
+test("no-email provisioning and IT-controlled default account credentials are server-side",()=>{
  assert.match(edge,/admin\.auth\.admin\.createUser/);
  assert.match(edge,/email_confirm:true/);
  assert.match(edge,/action==="create-dealership"/);
@@ -19,6 +19,8 @@ test("no-email provisioning and IT-controlled unique account credentials are ser
  assert.doesNotMatch(edge,/inviteUserByEmail|resetPasswordForEmail/);
  assert.match(edge,/const makePassword=/);
  assert.match(edge,/crypto\.getRandomValues/);
+ assert.match(edge,/Deno\.env\.get\("DEALERSHIP_DEFAULT_PASSWORD"\)/);
+ assert.match(edge,/if\(!issuedPassword\)/);
  assert.doesNotMatch(edge,/DEFAULT_TEMP_PASSWORD|password:"12345678"/);
  assert.match(edge,/must_change_password:false/);
  assert.match(edge,/user\.id!==IT_ID/);
