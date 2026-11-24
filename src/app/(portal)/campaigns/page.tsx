@@ -3,6 +3,7 @@ import {requireMembership,canCreateCampaign} from "@/lib/auth";
 import {submitCampaign} from "./actions";
 import {isItSuperUser} from "@/lib/it-access";
 import "./campaigns-reference.css";
+import {AutoCampaignFilters} from "./auto-campaign-filters";
 
 type Filters={q?:string;status?:string;from?:string;to?:string};
 type Campaign={id:string;name:string;status:string;created_at:string};
@@ -34,7 +35,7 @@ function EmptyArt(){
  </svg>;
 }
 function CountsCard({kind,label,value}:{kind:"all"|"draft"|"pending";label:string;value:number}){
- return <div className={`fc-count-card fc-count-${kind}`}><span className="fc-count-icon"><CampaignIcon kind={kind}/></span><span className="fc-count-content"><span>{label}</span><strong>{value}</strong></span><span className="fc-count-arrow" aria-hidden="true">➜</span><span className="fc-count-wave" aria-hidden="true"/></div>;
+ return <div className={`fc-count-card fc-count-${kind}`}><span className="fc-count-icon"><CampaignIcon kind={kind}/></span><span className="fc-count-content"><span>{label}</span><strong>{value}</strong></span></div>;
 }
 function normalizeDate(input?:string){return input&&/^\d{4}-\d{2}-\d{2}$/.test(input)?input:"";}
 export default async function Campaigns({searchParams}:{searchParams?:Promise<Filters>}={}){
@@ -56,24 +57,22 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
  const filtered=!!(q||selectedStatus||from||to);
  return <div className="fc-campaign-page">
   <header className="fc-campaign-hero">
-   <div className="fc-hero-copy"><span className="fc-eyebrow">{"OUTBOUND OPERATIONS"}</span><h1>Campaigns</h1><p>{"Create and review calling campaign drafts for your dealership."}</p></div>
+   <div className="fc-hero-copy"><h1>Campaigns</h1></div>
    <HeaderWave/>
    <div className="fc-hero-actions">{itUser&&<Link href="/settings/voice-profiles" className="fc-voice-button"><CampaignIcon kind="voice"/> Voice Agent Defaults</Link>}{permitted&&<Link href="/campaigns/new" className="fc-primary-button"><span>＋</span> New Campaign</Link>}</div>
   </header>
-  <div className="fc-campaign-notice"><span className="fc-info-mark">i</span><span>{"Campaigns remain drafts until approved. Dealership users can create campaigns only for their own dealership; approvals, test calls and live launches require separate IT authorization."}</span></div>
   <div className="fc-campaign-stats"><CountsCard kind="all" label="Total Campaigns" value={total}/><CountsCard kind="draft" label="Drafts" value={drafts}/><CountsCard kind="pending" label="Awaiting Approval" value={pending}/></div>
   <section className="fc-campaign-list" aria-label="All campaigns">
    <div className="fc-list-toolbar"><h2><span className="fc-grid-icon"><CampaignIcon kind="grid"/></span> All Campaigns</h2>
-    <form className="fc-filters" method="get" action="/campaigns">
+    <AutoCampaignFilters>
      <label className="fc-search"><CampaignIcon kind="search"/><input type="search" name="q" aria-label="Search campaigns" placeholder="Search campaigns..." defaultValue={q}/></label>
      <label className="fc-status"><CampaignIcon kind="filter"/><select name="status" aria-label="Filter by status" defaultValue={selectedStatus}><option value="">All Status</option>{statuses.map(s=><option key={s} value={s}>{s.replaceAll("_"," ")}</option>)}</select></label>
-     <details className="fc-date-details"><summary><CampaignIcon kind="calendar"/> {from||to?"Date Range Set":"Select Date Range"} <span aria-hidden="true">⌄</span></summary><div className="fc-date-panel"><label>From<input name="from" type="date" defaultValue={from}/></label><label>To<input name="to" type="date" defaultValue={to}/></label><button type="submit">Apply Dates</button></div></details>
-     <button type="submit" className="fc-apply">Apply</button>
+     <details className="fc-date-details"><summary><CampaignIcon kind="calendar"/> {from||to?"Date Range Set":"Select Date Range"} <span aria-hidden="true">⌄</span></summary><div className="fc-date-panel"><label>From<input name="from" type="date" defaultValue={from}/></label><label>To<input name="to" type="date" defaultValue={to}/></label></div></details>
      {filtered&&<Link href="/campaigns" className="fc-clear">Clear</Link>}
-    </form>
+    </AutoCampaignFilters>
    </div>
    {shown.length?<div className="fc-tablewrap"><table className="crm-table"><thead><tr><th>Campaign</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>{shown.map(c=><tr key={c.id}><td><strong>{c.name}</strong><div className="fc-row-id">#{c.id.slice(0,8)}</div></td><td><span className={`status-pill ${c.status==="APPROVED"?"approved":c.status==="REJECTED"?"rejected":c.status==="PENDING_MANAGER_APPROVAL"?"pending":""}`}>{c.status.replaceAll("_"," ")}</span></td><td>{new Date(c.created_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</td><td>{canOperate?<div className="fc-row-actions"><Link className="btn-outline small" href={"/campaigns/"+c.id+"/outbound"}>Review / Start</Link>{c.status==="DRAFT"&&staged.has(c.id)?<form action={submitCampaign}><input type="hidden" name="dealership_id" value={membership.dealership_id}/><input type="hidden" name="campaign_id" value={c.id}/><button className="btn-soft small">Submit for review</button></form>:c.status==="DRAFT"?<span className="status-pill pending">Awaiting eligible Excel</span>:null}</div>:<Link className="btn-outline small" href={"/campaigns/"+c.id+"/view"}>View</Link>}</td></tr>)}</tbody></table><p className="fc-list-count">Showing {shown.length} of the latest {total} campaigns</p></div>:
-   <div className="fc-campaign-empty"><EmptyArt/><h3>{filtered?"No matching campaigns":"Start your first campaign"}</h3><p>{filtered?"Try another search, status, or date range.":"Create a campaign for your dealership with screened, consented recipients."}</p>{filtered?<Link href="/campaigns" className="fc-primary-button">Clear Filters</Link>:permitted?<Link href="/campaigns/new" className="fc-primary-button">＋ Create Campaign <span aria-hidden="true">→</span></Link>:null}</div>}
+   <div className="fc-campaign-empty"><EmptyArt/><h3>{filtered?"No matching campaigns":"Start your first campaign"}</h3>{filtered&&<p>Try another search, status, or date range.</p>}{filtered?<Link href="/campaigns" className="fc-primary-button">Clear Filters</Link>:permitted?<Link href="/campaigns/new" className="fc-primary-button">＋ Create Campaign <span aria-hidden="true">→</span></Link>:null}</div>}
   </section>
  </div>;
 }
