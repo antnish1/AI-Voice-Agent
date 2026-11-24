@@ -1,9 +1,11 @@
 import {requireMembership} from "@/lib/auth";
+import {isItSuperUser} from "@/lib/it-access";
 import {reportValues,phoneKey,type OperationalReport} from "@/lib/report-fields";
 import {ReportsDirectory} from "./reports-directory";
 export default async function Reports(){
- const {supabase,membership}=await requireMembership();if(!membership)return null;
+ const {supabase,membership,user,memberships}=await requireMembership();if(!membership)return null;
  const id=membership.dealership_id;
+ const dealershipView=!isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
  const [customers,campaigns,imports,pending,listed]=await Promise.all([
   supabase.from("customers").select("id",{count:"exact",head:true}).eq("dealership_id",id),
   supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id),
@@ -75,14 +77,23 @@ export default async function Reports(){
   const base=match?.[1].values??[];
   const person=byId.get(str(c.customer_id));
   const input=[str(p?.customer_name)||base[0]||str(person?.name),str(c.dialed_number)||base[1]||"",str(p?.vehicle_model)||base[2]||"",str(p?.registration_number)||base[3]||"",str(p?.service_type)||base[4]||"",str(p?.service_due)||base[5]||"",str(p?.last_service)||base[6]||"",base[7]||"",base[8]||"",base[9]||"",base[10]||""];
-  return {id:"call:"+str(c.id),callId:str(c.id),date:str(c.started_at),values:reportValues(input,c,p,operations(str(c.customer_id)))};
+  return {id:"call:"+str(c.id),callId:str(c.id),date:str(c.started_at),campaignId:campaign,values:reportValues(input,c,p,operations(str(c.customer_id)))};
  });
  for(const [k,row] of inputs)if(!matched.has(k)){
   const phone=phoneKey(row.values[1]);
   const p=phone?unique(prospects.filter(x=>phoneKey(x.mobile)===phone&&normalize(str(x.registration_number))===normalize(row.values[3]??""))):undefined;
   const person=phone?unique(people.filter(x=>phoneKey(x.mobile)===phone)):undefined;
-  serviceRecords.push({id:k,date:row.date,values:reportValues(row.values,undefined,p,operations(str(person?.id)))});
+  serviceRecords.push({id:k,date:row.date,campaignId:p?str(p.campaign_id):undefined,values:reportValues(row.values,undefined,p,operations(str(person?.id)))});
  }
  serviceRecords.sort((a,b)=>b.date.localeCompare(a.date));
- return <ReportsDirectory serviceRecords={serviceRecords} metrics={{customers:customers.count??0,campaigns:campaigns.count??0,imports:imports.count??0,pending:pending.count??0}} campaigns={listed.data??[]}/>;
+ // Keep campaign-specific records separate even when the same customer appears in several campaigns.
+ const campaignRecords:OperationalReport[]=serviceRecords.filter(r=>!!r.callId);
+ for(const prospect of prospects){
+  const campaignId=str(prospect.campaign_id),mobile=phoneKey(prospect.mobile);
+  if(campaignRecords.some(r=>r.campaignId===campaignId&&phoneKey(r.values[1])===mobile&&normalize(r.values[2]??"")===normalize(str(prospect.registration_number))))continue;
+  const person=mobile?unique(people.filter(x=>phoneKey(x.mobile)===mobile)):undefined;
+  const input=[str(prospect.customer_name),str(prospect.mobile),str(prospect.vehicle_model),str(prospect.registration_number),str(prospect.service_type),str(prospect.service_due),str(prospect.last_service),"","","",""];
+  campaignRecords.push({id:"campaign-prospect:"+str(prospect.id),campaignId,date:str(prospect.updated_at)||str(prospect.created_at),values:reportValues(input,undefined,prospect,operations(str(person?.id)))});
+ }
+ return <ReportsDirectory dealershipView={dealershipView} campaignRecords={campaignRecords} serviceRecords={serviceRecords} metrics={{customers:customers.count??0,campaigns:campaigns.count??0,imports:imports.count??0,pending:pending.count??0}} campaigns={listed.data??[]}/>;
 }
