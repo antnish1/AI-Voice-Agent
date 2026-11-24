@@ -14,7 +14,7 @@ export default async function OutboundPage({params}:{params:Promise<{id:string}>
   supabase.from("campaign_draft_configs").select("configuration").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
   supabase.from("campaign_recipient_batches").select("cohort_name,total_records,eligible_records,csv_sha256,object_path").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
   supabase.from("voice_campaign_launches").select("state,sarvam_campaign_id,sarvam_cohort_id").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
-  supabase.from("dealerships").select("name").eq("id",campaign.dealership_id).maybeSingle()
+  supabase.from("dealerships").select("name,email").eq("id",campaign.dealership_id).maybeSingle()
  ]);
  if(configs.error||batches.error||launches.error||dealer.error)throw Error("Unable to load campaign review.");
  let columns:string[]=[],rows:string[][]=[],recordError="";
@@ -29,5 +29,5 @@ export default async function OutboundPage({params}:{params:Promise<{id:string}>
  }
  const config=configs.data?.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start?:string;end?:string;days?:string[];from?:string;to?:string;cps?:number;max_retries?:number;retry_interval_minutes?:number}}|null;
  return <main><div className="page-head"><div><p className="eyebrow">FRONTVOX AI · CAMPAIGN REVIEW</p><h1>Review &amp; Start</h1></div><Link className="btn-outline small" href="/campaigns">Back to Campaigns</Link></div>
- <CampaignReview campaign={{id:campaign.id,name:campaign.name,status:campaign.status,dealershipId:campaign.dealership_id}} dealership={dealer.data?.name??"Assigned dealership"} config={config} batch={batches.data?{eligible_records:batches.data.eligible_records,total_records:batches.data.total_records}:null} launch={launches.data} columns={columns} rows={rows} recordError={recordError} liveEnabled={process.env.ENABLE_LIVE_CALLS==="true"}/></main>;
+ <CampaignReview campaign={{id:campaign.id,name:campaign.name,status:campaign.status,dealershipId:campaign.dealership_id}} dealership={dealer.data?.name??"Assigned dealership"} email={dealer.data?.email??""} config={config} batch={batches.data?{eligible_records:batches.data.eligible_records,total_records:batches.data.total_records}:null} launch={launches.data} columns={columns} rows={rows} recordError={recordError} liveEnabled={process.env.ENABLE_LIVE_CALLS==="true"}/></main>;
 }
