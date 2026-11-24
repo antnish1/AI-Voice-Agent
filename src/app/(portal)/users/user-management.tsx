@@ -33,7 +33,7 @@ export function UserManagement(){
  });};
  const reset=(account:Account)=>{
   if(!window.confirm("Reset "+account.name+" to the temporary password 12345678? No email will be sent and they must change it after login."))return;
-  setError("");setNotice("");startTransition(async()=>{try{const result=await call({action:"reset",userId:account.id});setNotice(result.message??"Temporary password reset.");await load();}
+  setError("");setNotice("");startTransition(async()=>{try{const result=await call({action:"reset",userId:account.id,confirm:"RESET DEALERSHIP PASSWORD"});setNotice(result.message??"Temporary password reset.");await load();}
    catch(e){setError(e instanceof Error?e.message:"Could not reset password.");}});
  };
  const visible=users.filter(u=>(u.email+" "+u.name+" "+u.dealership+" "+(u.employeeId??"")+" "+(u.post??"")).toLowerCase().includes(search.toLowerCase()));
@@ -79,7 +79,7 @@ export function UserManagement(){
    <div className="it-user-table-head"><div><h2>Dealership User Accounts</h2><p>Accounts are created directly without sending an invitation email.</p></div><button type="button" disabled={loading||pending} onClick={()=>void load()}>Refresh</button></div>
    <input className="it-user-search" aria-label="Search dealership users" placeholder="Search name, email, employee ID or dealership..." value={search} onChange={e=>setSearch(e.target.value)}/>
    <div className="tablewrap"><table><thead><tr><th>User</th><th>Dealership</th><th>Mobile</th><th>Employee ID</th><th>Role / Post</th><th>Account</th><th>Actions</th></tr></thead><tbody>
-    {visible.map(u=><tr key={u.id}><td><strong>{u.name||"Dealership User"}</strong><small>{u.email}</small></td><td>{u.dealership}</td><td>{u.mobile||"—"}</td><td>{u.employeeId||"—"}</td><td>{u.post||"—"}</td><td><span className={u.activated&&!u.passwordChangePending?"it-user-active":"it-user-invited"}>{!u.activated?"Pending setup":u.passwordChangePending?"Password change pending":"Ready"}</span></td><td><button type="button" onClick={()=>reset(u)} disabled={pending}>Reset password</button></td></tr>)}
+    {visible.map(u=><tr key={u.id}><td><strong>{u.name||"Dealership User"}</strong><small>{u.email}</small></td><td>{u.dealership}</td><td>{u.mobile||"—"}</td><td>{u.employeeId||"—"}</td><td>{u.post||"—"}</td><td><span className={u.activated&&!u.passwordChangePending?"it-user-active":"it-user-invited"}>{!u.activated?"Pending setup":u.passwordChangePending?"Password change pending":"Ready"}</span></td><td><button type="button" aria-label={"IT Super User: reset password for "+u.name} title="IT Super User only · Reset temporary password without email" onClick={()=>reset(u)} disabled={pending}>Reset password</button></td></tr>)}
     {!visible.length&&<tr><td colSpan={7} className="it-user-empty">{loading?"Loading users…":"No dealership users found."}</td></tr>}
    </tbody></table></div>
   </section>
