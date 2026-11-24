@@ -1,9 +1,10 @@
 "use client";
-import {useRef} from "react";
-type Props={name:string;dealership:string;status:string;created:string;approved:string;uploaded:number|null;eligible:number|null};
-export function CampaignDetailsPopup({name,dealership,status,created,approved,uploaded,eligible}:Props){
+import {useEffect,useRef} from "react";
+type Props={name:string;dealership:string;status:string;created:string;approved:string;autoOpen?:boolean};
+export function CampaignDetailsPopup({name,dealership,status,created,approved,autoOpen=false}:Props){
  const dialog=useRef<HTMLDialogElement>(null);
- const fields=[["Campaign name",name],["Dealership",dealership],["Created",created],["Approved",approved],["Uploaded recipients",uploaded??"Not staged"],["Eligible recipients",eligible??"Not staged"]];
+ useEffect(()=>{if(autoOpen&&!dialog.current?.open)dialog.current?.showModal();},[autoOpen]);
+ const fields=[["Campaign name",name],["Dealership",dealership],["Created",created],["Approved",approved]];
  return <><button type="button" className="btn-outline small" onClick={()=>dialog.current?.showModal()}>View</button>
  <dialog ref={dialog} aria-label="Campaign Details" className="fc-campaign-details-dialog" onClick={e=>{if(e.target===e.currentTarget)dialog.current?.close();}}>
  <section className="crm-panel" style={{margin:0,padding:24}}>
