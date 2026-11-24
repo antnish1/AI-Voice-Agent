@@ -83,3 +83,12 @@ test("dealer users do not have a portal password change or self-reset flow",()=>
  assert.match(ui,/visible once/);
  assert.match(ui,/IT-controlled login password/);
 });
+
+test("password reset requires opening account details and explicit in-dialog action",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ assert.match(ui,/onClick=\{\(\)=>openReset\(u\)\}/);
+ assert.match(ui,/ref=\{resetDialogRef\}/);
+ assert.match(ui,/onClick=\{\(\)=>reset\(selectedAccount\)\}/);
+ assert.match(ui,/onClose=\{clearReset\}/);
+ assert.doesNotMatch(ui,/window\.confirm/);
+});
