@@ -2,13 +2,15 @@ import Link from "next/link";
 import {CountUp} from "@/components/motion/count-up";
 import {CampaignActivityChart} from "@/components/motion/campaign-activity-chart";
 import {requireMembership,canPrepare} from "@/lib/auth";
+import {isItSuperUser} from "@/lib/it-access";
 
 type Campaign={id:string;name:string;status:string;created_at:string};
 type ImportBatch={id:string;filename:string;imported_rows:number;rejected_rows:number;created_at:string};
 const localDate=(date:string|Date)=>new Date(date).toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"});
 const formatted=(date:string)=>new Date(date).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Kolkata"});
 export default async function Dashboard({searchParams}:{searchParams:Promise<{days?:string}>}){
- const {supabase,user,membership}=await requireMembership();if(!membership)return null;
+ const {supabase,user,membership,memberships}=await requireMembership();if(!membership)return null;
+ const canManageCampaigns=isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
  const profileName=typeof user.user_metadata?.display_name==="string"?user.user_metadata.display_name.trim():"";
  const fallbackName=(user.email??"").split("@")[0]?.trim()||"there";
  const userName=(profileName||fallbackName).slice(0,80);
@@ -29,7 +31,7 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  const recent=(recentCampaigns.data??[]) as Campaign[];
  const imports=(recentImports.data??[]) as ImportBatch[];
  const daily=Array.from({length:days},(_,i)=>{const date=new Date(start);date.setDate(start.getDate()+i);const key=localDate(date);return {key,label:date.toLocaleDateString("en-IN",{month:"short",day:"numeric",timeZone:"Asia/Kolkata"}),count:(periodCampaigns.data??[]).filter(c=>localDate(c.created_at)===key).length};});
- const actions=[{icon:"+",label:"Create New Campaign",href:"/campaigns/new",tone:"mint"},{icon:"⇧",label:"Upload Customers",href:"/customers",tone:"blue"},{icon:"▤",label:"Upload Documents",href:"/documents",tone:"violet"},{icon:"◎",label:"Manage AI Agents",href:"/agents",tone:"green"}];
+ const actions=canManageCampaigns?[{icon:"+",label:"Create New Campaign",href:"/campaigns/new",tone:"mint"},{icon:"⇧",label:"Upload Customers",href:"/customers",tone:"blue"},{icon:"▤",label:"Upload Documents",href:"/documents",tone:"violet"},{icon:"◎",label:"Manage AI Agents",href:"/agents",tone:"green"}]:[{icon:"◫",label:"View Campaigns",href:"/campaigns",tone:"mint"},{icon:"♙",label:"View Customers",href:"/customers",tone:"blue"},{icon:"▤",label:"View Reports",href:"/reports",tone:"violet"},{icon:"◕",label:"View Call Logs",href:"/call-logs",tone:"green"}];
  const activity=[...recent.map(c=>({key:"c-"+c.id,title:c.status==="APPROVED"?"Campaign approved":c.status==="REJECTED"?"Campaign rejected":c.status==="PENDING_MANAGER_APPROVAL"?"Campaign submitted for approval":"Campaign draft created",detail:c.name,at:c.created_at,icon:"◫",tone:"mint"})),...imports.map(x=>({key:"i-"+x.id,title:"Customer list imported",detail:x.filename+" · "+x.imported_rows+" new",at:x.created_at,icon:"⇧",tone:"blue"}))].sort((a,b)=>Date.parse(b.at)-Date.parse(a.at)).slice(0,5);
  const hour=Number(new Intl.DateTimeFormat("en-GB",{hour:"numeric",hour12:false,timeZone:"Asia/Kolkata"}).format(new Date()));
  const greeting=hour<12?"Good Morning":hour<17?"Good Afternoon":"Good Evening";
@@ -39,7 +41,7 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  {name:"Pending Approvals",value:String(approvalCount.count??0),note:"Awaiting manager review",icon:"◷",tone:"amber"},
  {name:"Total Calls",value:"—",note:"Sarvam not connected",icon:"◕",tone:"blue"}];
  return <div className="ref-dashboard">
- <div className="ref-dashboard-heading"><div><h1>{greeting}, {userName}! <span aria-hidden="true">👋</span></h1><p>Here’s what’s happening with your AI voice campaigns today.</p></div><div className="ref-dashboard-heading-actions"><span className="ref-today-pill">▣ &nbsp; Today</span>{canPrepare(membership.role)&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div>
+ <div className="ref-dashboard-heading"><div><h1>{greeting}, {userName}! <span aria-hidden="true">👋</span></h1><p>Here’s what’s happening with your AI voice campaigns today.</p></div><div className="ref-dashboard-heading-actions"><span className="ref-today-pill">▣ &nbsp; Today</span>{canManageCampaigns&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div>
  <div className="ref-kpi-grid">{metrics.map(m=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}>{m.icon}</div><div><span className="ref-kpi-label">{m.name}</span><CountUp className="ref-kpi-value" value={m.value}/><small className="ref-kpi-note">{m.note}</small></div></article>)}</div>
  <div className="ref-dashboard-columns">
  <div className="ref-dashboard-left">
