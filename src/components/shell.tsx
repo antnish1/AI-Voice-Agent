@@ -59,7 +59,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     {!collapsed&&!narrowScreen&&<button type="button" className="collapse-control frontier-sidebar-collapse" onClick={()=>setCollapsed(true)} title="Collapse sidebar" aria-label="Collapse sidebar"><SidebarIcon name="chevrons-left" size={19}/></button>}
    </div>
    <nav className="frontier-sidebar-nav" aria-label="Main navigation">
-    {[...navigation.filter(item=>isItAdmin||!["/approvals"].includes(item.url)),...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
+    {[...navigation.filter(item=>isItAdmin||!["/approvals","/agents"].includes(item.url)),...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
      const active=path===item.url||(item.url==="/campaigns"&&campaignActive);
      return <div className="frontier-nav-entry" key={item.url}>
        <div className={`frontier-nav-row ${active?"selected":""} ${item.url==="/campaigns"?"frontier-campaign-row":""}`}>{active&&<motion.span layoutId="frontier-active-nav" className="frontier-motion-active-nav" transition={reducedMotion?{duration:0}:motionTokens.spring} aria-hidden="true"/>}
