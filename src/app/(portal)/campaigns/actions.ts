@@ -1,15 +1,15 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { requireMembership, canPrepare,canCreateCampaign } from "@/lib/auth";
-type WizardInput={dealershipId:string;name:string;configuration:{
+type WizardInput={dealershipId:string;name:string;period?:string;configuration:{
  description:string;agent_label:string;agent_version_label:string;telephony_label:string;outgoing_number_label:string;
  schedule:{start:string;end:string;days:string[];from:string;to:string;cps:number;max_retries:number;retry_interval_minutes:number};
  recipient_preview:{filename:string;total_rows:number;phone_column:string;preview_only:true};
 }};
-export async function saveWizardDraft(input:WizardInput):Promise<{error?:string;id?:string}>{
+export async function saveWizardDraft(input:WizardInput):Promise<{error?:string;id?:string;reference?:string}>{
  try{
   if(!input||typeof input.name!=="string"||input.name.trim().length<3||input.name.trim().length>120) return {error:"Campaign name must be 3–120 characters."};
-  const {supabase,membership}=await requireMembership();
+  const {supabase,membership}=await requireMembership(input.dealershipId);
   if(!membership||membership.dealership_id!==input.dealershipId||!canCreateCampaign(membership.role))return {error:"You may create drafts only for your assigned dealership."};
   const c=input.configuration,s=c?.schedule,r=c?.recipient_preview;
   if(!c||!s||!r||!Array.isArray(s.days)||s.days.some(d=>!["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].includes(d))||
@@ -27,9 +27,10 @@ export async function saveWizardDraft(input:WizardInput):Promise<{error?:string;
    recipient_preview:{filename:clean(r.filename),total_rows:r.total_rows,phone_column:clean(r.phone_column),preview_only:true},
    sarvam_connected:false,launch_enabled:false
   };
-  const {data,error}=await supabase.rpc("create_campaign_draft_with_config",{p_dealership_id:input.dealershipId,p_name:input.name.trim(),p_configuration:safe});
+  const {data,error}=input.period?await supabase.rpc("create_period_campaign_draft",{p_dealership_id:input.dealershipId,p_period:input.period,p_configuration:safe}):await supabase.rpc("create_campaign_draft_with_config",{p_dealership_id:input.dealershipId,p_name:input.name.trim(),p_configuration:safe});
   if(error)return {error:"Could not save draft. Please check database permissions and try again."};
   revalidatePath("/campaigns");revalidatePath("/dashboard");
+  if(input.period){const result=data as {id:string;reference:string}|null;if(!result?.id||!result.reference)return {error:"Campaign reference was not returned."};return result;}
   return {id:String(data)};
  }catch{return {error:"Could not save this campaign draft."};}
 }
@@ -57,9 +58,9 @@ export async function submitCampaign(form:FormData){
 }
 
 /** Minimal InsureIT-style creation. Settings are server-controlled, never inferred from an Excel sheet. */
-export async function createSimpleCampaign(dealershipId:string,filename:string,totalRows:number,description=""):Promise<{error?:string;id?:string}>{
+export async function createSimpleCampaign(dealershipId:string,filename:string,totalRows:number,description="",period?:string):Promise<{error?:string;id?:string;reference?:string}>{
  try {
-  const {supabase,membership}=await requireMembership();
+  const {supabase,membership}=await requireMembership(dealershipId);
   if(!membership||!canCreateCampaign(membership.role)||membership.dealership_id!==dealershipId)return {error:"You cannot create campaigns for another dealership."};
   if(!Number.isInteger(totalRows)||totalRows<1||totalRows>250)return {error:"Select 1–250 customer records per campaign."};
   if(typeof description!=="string"||description.length>200)return {error:"Description must be 200 characters or fewer."};
@@ -69,6 +70,7 @@ export async function createSimpleCampaign(dealershipId:string,filename:string,t
   const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
   const get=(name:string)=>Number(parts.find(x=>x.type===name)?.value??"0");
   const year=get("year"),month=get("month"),day=get("day");
+  if(!period||!/^\d{4}-(0[1-9]|1[0-2])-01$/.test(period)||Number(period.slice(0,4))<1900||Number(period.slice(0,4))>year)return {error:"Select a valid campaign month and year."};
   const startUtc=Date.UTC(year,month-1,day+1);
   const date=(value:number)=>new Date(value).toISOString().slice(0,10);
   const start=date(startUtc),end=date(startUtc+7*86400000);
@@ -79,7 +81,7 @@ export async function createSimpleCampaign(dealershipId:string,filename:string,t
   if(profileResult.error)return {error:"Dealership voice settings are not available. Apply the reviewed profile migration first."};
   const profile=profileResult.data?.active?profileResult.data:null;
   // A draft may be prepared without a verified profile. It cannot launch until\n  // IT confirms the voice agent, telephony connection, and all safeguards.
-  const draft=await saveWizardDraft({dealershipId,name,configuration:{
+  const draft=await saveWizardDraft({dealershipId,name,period,configuration:{
    description:description.trim()||"Service reminder calling",
    agent_label:profile?.agent_id??"",agent_version_label:profile?String(profile.app_version):"",telephony_label:profile?.connection_id??"",outgoing_number_label:profile?.caller_number??"",
    schedule:{start,end,days:["Mon","Tue","Wed","Thu","Fri","Sat"],from:"10:00",to:"18:00",cps:1,max_retries:0,retry_interval_minutes:60},
