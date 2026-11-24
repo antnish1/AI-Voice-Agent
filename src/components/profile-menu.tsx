@@ -11,6 +11,7 @@ type Props={userId:string;email:string;role:string;dealershipName:string;initial
 const bucket="frontier-profile-avatars";
 export function ProfileMenu({userId,email,role,dealershipName,initialName,initialAvatarPath}:Props){
  const router=useRouter(),supabase=useMemo(()=>createBrowserSupabase(),[]);
+ const canManageAccount=role==="super_admin";
  const [navigationLayout,setNavigationLayout]=useNavigationLayout(userId);
  const [open,setOpen]=useState(false),[detailsExpanded,setDetailsExpanded]=useState(false),[passwordOpen,setPasswordOpen]=useState(false),[editOpen,setEditOpen]=useState(false);
  const [displayName,setDisplayName]=useState(initialName||email.split("@")[0]),[editName,setEditName]=useState(initialName||email.split("@")[0]);
@@ -23,7 +24,7 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
  const initials=displayName.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase()||"U";
  const showError=(text:string)=>{setError(text);setMessage("");};
  const upload=async(file?:File)=>{
-  if(!file)return;setError("");setMessage("");
+  if(!canManageAccount||!file)return;setError("");setMessage("");
   if(!["image/jpeg","image/png","image/webp"].includes(file.type)){showError("Choose a JPG, PNG or WebP picture.");return;}
   if(file.size>5*1024*1024){showError("The selected image must be smaller than 5 MB.");return;}
   setBusy(true);
@@ -48,6 +49,7 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
   }catch(e){showError(e instanceof Error?e.message:"Unable to upload photo.");}finally{setBusy(false);if(fileInput.current)fileInput.current.value="";}
  };
  const saveName=async()=>{
+  if(!canManageAccount)return;
   const next=editName.trim().replace(/\s+/g," ");
   if(next.length<2||next.length>80){showError("Display name must be 2–80 characters.");return;}
   setBusy(true);setError("");
@@ -57,6 +59,7 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
   setDisplayName(next);setEditOpen(false);setMessage("Profile name updated.");router.refresh();
  };
  const savePassword=async()=>{
+  if(!canManageAccount)return;
   setError("");setMessage("");
   if(password.length<10){showError("New password must be at least 10 characters.");return;}
   if(password!==confirm){showError("The passwords do not match.");return;}
@@ -74,13 +77,13 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
   {open&&<div className="portal-profile-panel" role="menu" aria-label="Account menu">
    <div className="portal-profile-identity"><div className="portal-profile-picture">
     {avatar("portal-profile-avatar large")}
-    <button type="button" className="portal-profile-camera" title="Upload profile picture" aria-label="Add or change profile photo" disabled={busy} onClick={()=>fileInput.current?.click()}>📷</button>
+    {canManageAccount&&<button type="button" className="portal-profile-camera" title="Upload profile picture" aria-label="Add or change profile photo" disabled={busy} onClick={()=>fileInput.current?.click()}>📷</button>}
     <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={e=>void upload(e.target.files?.[0])}/>
    </div><div className="portal-profile-identity-copy"><strong>{displayName}</strong><button type="button" className="portal-profile-details-toggle" aria-expanded={detailsExpanded} aria-controls="portal-profile-expanded-details" onClick={()=>setDetailsExpanded(v=>!v)}>{detailsExpanded?"Hide user details":"View user details"}</button></div></div>
-   {detailsExpanded&&<div id="portal-profile-expanded-details" className="portal-profile-expanded"><dl className="portal-profile-facts"><div><dt>Email</dt><dd title={email}>{email}</dd></div><div><dt>Role</dt><dd>{role.replaceAll("_"," ")}</dd></div><div><dt>Status</dt><dd>Active</dd></div></dl><button type="button" className="portal-profile-edit-details" onClick={()=>{setEditName(displayName);setError("");setEditOpen(true);}}>Edit profile name <span aria-hidden="true">→</span></button></div>}
+   {detailsExpanded&&<div id="portal-profile-expanded-details" className="portal-profile-expanded"><dl className="portal-profile-facts"><div><dt>Email</dt><dd title={email}>{email}</dd></div><div><dt>Role</dt><dd>{role.replaceAll("_"," ")}</dd></div><div><dt>Status</dt><dd>Active</dd></div></dl>{canManageAccount&&<button type="button" className="portal-profile-edit-details" onClick={()=>{setEditName(displayName);setError("");setEditOpen(true);}}>Edit profile name <span aria-hidden="true">→</span></button>}</div>}
    {message&&<p role="status" className="portal-profile-success">{message}</p>}
    {error&&!passwordOpen&&!editOpen&&<p role="alert" className="portal-profile-error">{error}</p>}
-   <div className="portal-profile-actions"><button role="menuitem" type="button" onClick={()=>{setError("");setPassword("");setConfirm("");setPasswordOpen(true);}}>Reset Password <span>→</span></button><Link role="menuitem" href="/settings" onClick={()=>setOpen(false)}>Account Settings <span>→</span></Link><div className="portal-profile-appearance" aria-label="Appearance preferences">
+   <div className="portal-profile-actions">{canManageAccount&&<><button role="menuitem" type="button" onClick={()=>{setError("");setPassword("");setConfirm("");setPasswordOpen(true);}}>Reset Password <span>→</span></button><Link role="menuitem" href="/settings" onClick={()=>setOpen(false)}>Account Settings <span>→</span></Link></>}<div className="portal-profile-appearance" aria-label="Appearance preferences">
     <div className="portal-profile-appearance-group">
      <span className="portal-profile-appearance-label">Appearance &amp; Layout</span>
      <div className="portal-profile-layout-switch" role="radiogroup" aria-label="Navigation layout">
@@ -91,7 +94,7 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
     <div className="portal-profile-appearance-group portal-profile-theme-row"><span className="portal-profile-appearance-label">Theme</span><ThemeSwitcher/></div>
    </div><form action={signOut}><button role="menuitem" type="submit" className="portal-logout">Logout <span>↗</span></button></form></div>
   </div>}
-  {(passwordOpen||editOpen)&&<div className="portal-account-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget){setPasswordOpen(false);setEditOpen(false);}}}><section className="portal-account-modal" role="dialog" aria-modal="true" aria-label={passwordOpen?"Reset password":"Edit profile"}>
+  {canManageAccount&&(passwordOpen||editOpen)&&<div className="portal-account-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget){setPasswordOpen(false);setEditOpen(false);}}}><section className="portal-account-modal" role="dialog" aria-modal="true" aria-label={passwordOpen?"Reset password":"Edit profile"}>
    <div className="portal-account-modal-head"><h2>{passwordOpen?"Reset Password":"Edit user details"}</h2><button type="button" aria-label="Close" onClick={()=>{setPasswordOpen(false);setEditOpen(false);setError("");}}>×</button></div>
    {passwordOpen?<form onSubmit={e=>{e.preventDefault();void savePassword();}}><p>Choose a new password for your current FRONTIER account.</p><label>New password<input type="password" autoComplete="new-password" minLength={10} required value={password} onChange={e=>setPassword(e.target.value)} placeholder="Minimum 10 characters"/></label><label>Confirm password<input type="password" autoComplete="new-password" required value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="Re-enter new password"/></label>{error&&<p role="alert" className="portal-profile-error">{error}</p>}<div className="portal-account-modal-buttons"><button type="button" onClick={()=>setPasswordOpen(false)}>Cancel</button><button type="submit" disabled={busy}>{busy?"Saving…":"Update password"}</button></div></form>:
    <form onSubmit={e=>{e.preventDefault();void saveName();}}><p>Your display name appears on your profile. Permissions are managed separately by administrators.</p><label>Display name<input value={editName} maxLength={80} onChange={e=>setEditName(e.target.value)} required/></label><label>Email<input value={email} readOnly/></label>{error&&<p role="alert" className="portal-profile-error">{error}</p>}<div className="portal-account-modal-buttons"><button type="button" onClick={()=>setEditOpen(false)}>Cancel</button><button type="submit" disabled={busy}>{busy?"Saving…":"Save changes"}</button></div></form>}
