@@ -17,7 +17,7 @@ export default async function ViewCampaign({params}:{params:Promise<{id:string}>
   .eq("id",id).eq("dealership_id",scope).maybeSingle();
  if(error||!campaign)notFound();
  const {data:batch,error:batchError}=await supabase.from("campaign_recipient_batches")
-  .select("total_records,eligible_records,excluded_records,cohort_name")
+  .select("total_records,eligible_records,cohort_name")
   .eq("campaign_id",id).eq("dealership_id",scope).maybeSingle();
  if(batchError)throw new Error("Could not read campaign recipient summary.");
  const format=(date:string)=>new Date(date).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Kolkata"});
