@@ -14,6 +14,7 @@ import {SidebarIcon,type SidebarIconName} from "@/components/sidebar-icons";
 import {useNavigationLayout} from "@/components/navigation-layout-preference";
 import {TopMenuNavigation} from "@/components/top-menu-navigation";
 
+const dealershipHiddenRoutes=new Set(["/appointments","/call-logs","/callbacks","/pickup-drop","/documents"]);
 const navigation:Array<{name:string;url:string;icon:SidebarIconName}>=[
  {name:"Dashboard",url:"/dashboard",icon:"home"},
  {name:"Campaigns",url:"/campaigns",icon:"megaphone"},
@@ -59,7 +60,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     {!collapsed&&!narrowScreen&&<button type="button" className="collapse-control frontier-sidebar-collapse" onClick={()=>setCollapsed(true)} title="Collapse sidebar" aria-label="Collapse sidebar"><SidebarIcon name="chevrons-left" size={19}/></button>}
    </div>
    <nav className="frontier-sidebar-nav" aria-label="Main navigation">
-    {[...navigation.filter(item=>isItAdmin||!["/approvals","/agents"].includes(item.url)),...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
+    {[...navigation.filter(item=>isItAdmin||(!dealershipHiddenRoutes.has(item.url)&&!["/approvals","/agents"].includes(item.url))),...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
      const active=path===item.url||(item.url==="/campaigns"&&campaignActive);
      return <div className="frontier-nav-entry" key={item.url}>
        <div className={`frontier-nav-row ${active?"selected":""} ${item.url==="/campaigns"?"frontier-campaign-row":""}`}>{active&&<motion.span layoutId="frontier-active-nav" className="frontier-motion-active-nav" transition={reducedMotion?{duration:0}:motionTokens.spring} aria-hidden="true"/>}
@@ -113,7 +114,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
    </header>
 
    {isTopMenu&&<TopMenuNavigation
-    items={[...navigation.filter(item=>isItAdmin||!["/approvals"].includes(item.url)),...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])]}
+    items={[...navigation.filter(item=>isItAdmin||(!dealershipHiddenRoutes.has(item.url)&&!["/approvals","/agents"].includes(item.url))),...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])]}
     pendingApprovals={pendingApprovals} isItAdmin={isItAdmin}/>}
    <main className="main crm-main ref-main"><MotionRoute>{children}</MotionRoute></main>
   </div>
