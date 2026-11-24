@@ -62,3 +62,16 @@ linear-gradient(125deg,#e8f4ff 0%,#edf4ff 50%,#dceeff 100%);}
 @media(max-width:900px){.vdp-body{grid-template-columns:1fr}.vdp-visual{height:270px}.vdp-robot{width:min(340px,90%);height:270px}.vdp-card{max-width:850px}.vdp-header{flex-wrap:wrap}.vdp-heading h1{font-size:28px}}
 @media(max-width:650px){.vdp-heading{gap:12px}.vdp-brand-icon{height:58px;width:58px;border-radius:16px}.vdp-brand-icon svg{height:42px;width:42px}.vdp-heading h1{font-size:22px}.vdp-heading p{font-size:12px}.vdp-kicker{font-size:10px}.vdp-card-title{align-items:flex-start;gap:11px}.vdp-gear{height:52px;width:52px}.vdp-gear svg{width:29px;height:29px}.vdp-fields{grid-template-columns:1fr}.vdp-dealer,.vdp-agent,.vdp-version,.vdp-connection,.vdp-caller,.vdp-checkbox-info,.vdp-save{grid-column:1;grid-row:auto}.vdp-card{padding:17px}.vdp-card-title h2{font-size:16px}.vdp-card-title p{font-size:12px}.vdp-save{font-size:15px}.vdp-back{margin-left:auto}}
 @media(prefers-reduced-motion:reduce){.vdp-save{transition:none!important}}
+
+/* Read-only Sarvam profile import: distinct diagnostics, no implicit save. */
+.vdp-import{background:#f6fbff;border:1px solid #cfe5ff;border-radius:12px;padding:13px 14px;margin:0 0 20px}
+.vdp-import-head{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:#153763}
+.vdp-import-btn,.vdp-import-select button{background:white;color:#1766c9;border:1px solid #bddcff;border-radius:9px;padding:9px 12px;font-size:11px;font-weight:750;white-space:nowrap}
+.vdp-import-btn:disabled,.vdp-import-select button:disabled{opacity:.5;cursor:default}
+.vdp-import-notice,.vdp-import-ok{font-size:12px;line-height:1.65;border-radius:10px;padding:10px 12px;margin-top:10px}
+.vdp-import-notice{background:#fff2ee;color:#8d3c30}.vdp-import-ok{background:#eaf8ee;color:#205e39}
+.vdp-import-notice p,.vdp-import-ok p{margin:0 0 6px}
+.vdp-import-select{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.vdp-import-select label{font-weight:800}
+.vdp-import-select select{flex:1;min-width:190px;max-width:100%;padding:10px;border-radius:8px;border:1px solid #afd6f6;background:white;color:#123153}
+@media(max-width:650px){.vdp-import-head{align-items:flex-start;flex-direction:column}.vdp-import-select{align-items:stretch;flex-direction:column}}
