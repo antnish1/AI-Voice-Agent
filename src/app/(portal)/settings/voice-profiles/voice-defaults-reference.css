@@ -62,3 +62,17 @@ linear-gradient(125deg,#e8f4ff 0%,#edf4ff 50%,#dceeff 100%);}
 @media(max-width:900px){.vdp-body{grid-template-columns:1fr}.vdp-visual{height:270px}.vdp-robot{width:min(340px,90%);height:270px}.vdp-card{max-width:850px}.vdp-header{flex-wrap:wrap}.vdp-heading h1{font-size:28px}}
 @media(max-width:650px){.vdp-heading{gap:12px}.vdp-brand-icon{height:58px;width:58px;border-radius:16px}.vdp-brand-icon svg{height:42px;width:42px}.vdp-heading h1{font-size:22px}.vdp-heading p{font-size:12px}.vdp-kicker{font-size:10px}.vdp-card-title{align-items:flex-start;gap:11px}.vdp-gear{height:52px;width:52px}.vdp-gear svg{width:29px;height:29px}.vdp-fields{grid-template-columns:1fr}.vdp-dealer,.vdp-agent,.vdp-version,.vdp-connection,.vdp-caller,.vdp-checkbox-info,.vdp-save{grid-column:1;grid-row:auto}.vdp-card{padding:17px}.vdp-card-title h2{font-size:16px}.vdp-card-title p{font-size:12px}.vdp-save{font-size:15px}.vdp-back{margin-left:auto}}
 @media(prefers-reduced-motion:reduce){.vdp-save{transition:none!important}}
+
+
+/* Sarvam verification lookup — integrated into the reference-designed card. */
+.vdp-lookup{margin:-3px 0 19px;padding:12px 14px;background:#f4faff;border:1px solid #dbeaff;border-radius:12px}
+.vdp-lookup-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.vdp-lookup-head strong{font-size:12px;color:#193960}
+.vdp-load-button{padding:9px 13px;background:#fff;color:#2261a5;border:1px solid #c9e0fb;border-radius:9px;font-size:11px;font-weight:750}
+.vdp-load-button:hover{background:#e8f5ff}
+.vdp-load-button:disabled{opacity:.6;cursor:wait}
+.vdp-lookup-field{display:grid;gap:6px;margin-top:10px;color:#304e75;font-size:11px;font-weight:700}
+.vdp-lookup-field select{width:100%;min-height:40px;padding:9px 11px;border-radius:9px;border:1px solid #d7deeb;background:white;color:#193960;min-width:0}
+.vdp-lookup-status{display:grid;gap:7px;margin-top:9px;font-size:11px;line-height:1.45;color:#237a59}
+.vdp-lookup .vdp-error{margin:10px 0 0;font-size:11px;line-height:1.5}
+@media(max-width:520px){.vdp-lookup{padding:11px}.vdp-lookup-head{align-items:flex-start}.vdp-lookup-head strong{max-width:190px}}
