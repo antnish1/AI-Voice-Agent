@@ -3,7 +3,7 @@ import {useEffect,useState} from "react";
 
 export type ThemeChoice="light"|"dark"|"system";
 const KEY="frontvox-theme-preference";
-function parse(value:string|null):ThemeChoice {return value==="light"||value==="dark"||value==="system"?value:"system";}
+function parse(value:string|null):ThemeChoice {return value==="light"||value==="dark"||value==="system"?value:"light";}
 function apply(choice:ThemeChoice,systemDark:boolean){
  const isDark=choice==="dark"||(choice==="system"&&systemDark);
  document.documentElement.dataset.theme=isDark?"dark":"light";
@@ -25,7 +25,7 @@ export function ThemeController(){
  return null;
 }
 export function ThemeSwitcher(){
- const [choice,setChoice]=useState<ThemeChoice>("system");
+ const [choice,setChoice]=useState<ThemeChoice>("light");
  useEffect(()=>{
   const read=()=>setChoice(parse(window.localStorage.getItem(KEY)));
   read();window.addEventListener("storage",read);
