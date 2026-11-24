@@ -11,8 +11,12 @@ test("new user page is server-gated and excluded from dealership sidebar",()=>{
  assert.match(serverPage,/isItSuperUser/);assert.match(serverPage,/notFound\(\)/);
  assert.match(shell,/isItAdmin\?\[/);
 });
-test("activation, IT authorization and temporary password setup are server-side",()=>{
- assert.match(edge,/inviteUserByEmail/);
+test("no-email provisioning, IT authorization and temporary password setup are server-side",()=>{
+ assert.match(edge,/admin\.auth\.admin\.createUser/);
+ assert.match(edge,/email_confirm:true/);
+ assert.match(edge,/action==="create-dealership"/);
+ assert.match(edge,/action==="create-user"/);
+ assert.doesNotMatch(edge,/inviteUserByEmail|resetPasswordForEmail/);
  assert.match(edge,/DEFAULT_TEMP_PASSWORD="12345678"/);
  assert.match(edge,/must_change_password:true/);
  assert.match(edge,/user\.id!==IT_ID/);
@@ -31,4 +35,22 @@ test("new users cannot bypass first-login password setup using direct database r
  assert.match(sql,/frontier_password_setup_complete/);
  for(const policy of ["memberships_self_read","customers_membership_read","campaigns_membership_read","frontier_crm_documents_read"])assert.match(sql,new RegExp("alter policy "+policy,"i"));
  assert.match(access,/must_change_password === true/);
+});
+
+test("new dealership and user are separate, and user creation cannot create a dealership implicitly",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ assert.match(ui,/Create Dealership/);
+ assert.match(ui,/Create Dealership User/);
+ assert.match(ui,/create-dealership/);
+ assert.match(ui,/create-user/);
+ assert.doesNotMatch(ui,/Create new dealership/);
+ assert.match(edge,/Dealership does not exist\. Create it first\./);
+ assert.match(edge,/role:"management"/);
+ assert.match(edge,/employee_id:employeeId/);
+ assert.match(edge,/must_change_password:true/);
+});
+test("contact fields are additive and old dealership records remain",()=>{
+ const migration=file("../db/20261124_dealership_contact_details.sql");
+ for(const col of ["contact","mobile","contact_person","email"])assert.match(migration,new RegExp("add column if not exists "+col+" text"));
+ assert.doesNotMatch(migration,/drop table|truncate|delete from|alter column.*not null/i);
 });
