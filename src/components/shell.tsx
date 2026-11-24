@@ -75,7 +75,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
         </Link>
         {item.url==="/campaigns"&&<button type="button" className="frontier-campaign-toggle" aria-label={campaignsExpanded?"Collapse Campaigns submenu":"Expand Campaigns submenu"} aria-expanded={campaignsExpanded} onClick={()=>setCampaignsExpanded(s=>!s)}><SidebarIcon name="chevron-down" size={16}/></button>}
        </div>
-       {item.url==="/campaigns"&&campaignsExpanded&&!collapsed&&<div className="frontier-campaign-subnav"><Link href="/campaigns" onClick={closeMobile}>All Campaigns</Link><Link href="/campaigns/new" onClick={closeMobile}>Create Campaign</Link></div>}
+       {item.url==="/campaigns"&&campaignsExpanded&&!collapsed&&<div className="frontier-campaign-subnav"><Link href="/campaigns" onClick={closeMobile}>All Campaigns</Link>{isItAdmin&&<Link href="/campaigns/new" onClick={closeMobile}>Create Campaign</Link>}</div>}
       </div>;
     })}
    </nav>
