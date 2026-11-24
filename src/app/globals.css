@@ -1376,3 +1376,40 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 .frontier-dealer-switch{display:flex;align-items:center;gap:7px;max-width:260px;font-size:10px;color:#52708b;font-weight:650;white-space:nowrap}
 .frontier-dealer-switch select{min-width:100px;max-width:165px;width:100%;background:#f5fafc;color:#234967;border:1px solid #d9e7ed;border-radius:7px;padding:7px 9px;font-size:11px}
 @media(max-width:850px){.frontier-dealer-switch span{display:none}.frontier-dealer-switch select{max-width:116px}}
+
+/* Compact campaign creation popup: wider, but never taller. Scoped to the single-screen wizard. */
+.campaign-modal.fc-compact-campaign{width:min(940px,calc(100vw - 36px));max-height:min(88dvh,720px);border-radius:22px}
+.fc-compact-campaign .campaign-modal-header{padding:17px 24px 10px;align-items:center}
+.fc-compact-campaign .campaign-modal-header h2{margin:0;font-size:19px}
+.fc-compact-campaign .fc-compact-scroll{display:grid;gap:12px;padding:0 24px 10px;align-content:start}
+.fc-compact-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px;min-width:0}
+.fc-compact-fields .campaign-form-label{min-width:0}
+.fc-compact-fields .campaign-pill-input{width:100%;margin-top:7px;min-height:40px;padding:10px 14px}
+.fc-compact-excel-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.fc-compact-excel-head strong{font-size:13px;color:#313348}
+.fc-template-icon{width:37px;height:37px;padding:0;display:grid;place-items:center;border:1px solid #d8e4f5;border-radius:10px;background:#f6fbff;color:#1968bd}
+.fc-template-icon:hover{background:#e9f4ff;color:#0756a7}
+.fc-template-icon:focus-visible{outline:3px solid #82c5ff;outline-offset:2px}
+.fc-compact-campaign .fc-compact-upload{display:flex;align-items:center;justify-content:center;gap:12px;min-height:82px;padding:13px 18px;border-color:#d3c7ff;background:#faf8ff}
+.fc-compact-upload .fc-upload-symbol{font-size:23px;line-height:1;color:#7964cb}
+.fc-compact-upload strong{display:inline;font-size:13px;margin:0;color:#35334a}
+.fc-compact-upload small{font-size:11px;white-space:nowrap}
+.fc-compact-consent{display:flex;align-items:flex-start;gap:9px;color:#47425a;font-size:12px;line-height:1.4}
+.fc-compact-consent input{margin-top:1px;flex-shrink:0}
+.fc-compact-defaults{border:1px solid #dcf0ee;background:#f2faf9;color:#3a7776;border-radius:10px;padding:9px 12px;font-size:11px;line-height:1.5}
+.fc-compact-campaign .helper-banner{margin:0;padding:10px 12px;font-size:11px}
+.fc-compact-campaign .campaign-modal-footer{padding-top:13px;padding-bottom:15px}
+.fc-compact-campaign .fc-compact-preview{padding:11px 13px}
+.fc-compact-preview .panel-title{margin-bottom:8px}
+.fc-compact-preview .wizard-grid{gap:6px 20px}
+.fc-compact-preview .review-row{padding:6px 0}
+.fc-compact-preview-table{max-height:140px;overflow:auto;margin-top:6px}
+.fc-compact-preview-table th,.fc-compact-preview-table td{padding:7px 9px}
+@media(max-width:650px){
+ .campaign-modal.fc-compact-campaign{width:min(100%,540px);max-height:90dvh}
+ .fc-compact-campaign .campaign-modal-header{padding:14px 17px 9px}
+ .fc-compact-campaign .fc-compact-scroll{padding:0 17px 10px;gap:11px}
+ .fc-compact-fields{grid-template-columns:1fr;gap:10px}
+ .fc-compact-campaign .fc-compact-upload{flex-wrap:wrap;gap:6px;min-height:82px}
+ .fc-compact-upload small{width:100%;text-align:center}
+}

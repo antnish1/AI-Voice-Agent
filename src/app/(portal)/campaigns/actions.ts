@@ -58,12 +58,13 @@ export async function submitCampaign(form:FormData){
 }
 
 /** Minimal InsureIT-style creation. Settings are server-controlled, never inferred from an Excel sheet. */
-export async function createSimpleCampaign(dealershipId:string,filename:string,totalRows:number):Promise<{error?:string;id?:string}>{
+export async function createSimpleCampaign(dealershipId:string,filename:string,totalRows:number,description=""):Promise<{error?:string;id?:string}>{
  try {
   await requireItSuperUser();
   const {supabase,membership}=await requireMembership(dealershipId);
   if(!membership||!canPrepare(membership.role)||membership.dealership_id!==dealershipId)return {error:"You cannot create campaigns for this dealership."};
   if(!Number.isInteger(totalRows)||totalRows<1||totalRows>250)return {error:"Select 1–250 customer records per campaign."};
+  if(typeof description!=="string"||description.length>200)return {error:"Description must be 200 characters or fewer."};
   const {data:dealer,error}=await supabase.from("dealerships").select("name").eq("id",dealershipId).maybeSingle();
   if(error||!dealer?.name)return {error:"Could not verify the selected dealership."};
   // The date is based on IST, not the staff member's device clock. Start no sooner than tomorrow.
@@ -81,7 +82,7 @@ export async function createSimpleCampaign(dealershipId:string,filename:string,t
   const profile=profileResult.data?.active?profileResult.data:null;
   if(!profile)return {error:"This dealership needs a verified active Sarvam profile. Configure it in Voice Agent Defaults before creating a campaign."};
   const draft=await saveWizardDraft({dealershipId,name,configuration:{
-   description:"Service reminder calling; requires verified Sarvam agent, telephony and manager approval.",
+   description:description.trim()||"Service reminder calling",
    agent_label:profile?.agent_id??"",agent_version_label:profile?String(profile.app_version):"",telephony_label:profile?.connection_id??"",outgoing_number_label:profile?.caller_number??"",
    schedule:{start,end,days:["Mon","Tue","Wed","Thu","Fri","Sat"],from:"10:00",to:"18:00",cps:1,max_retries:0,retry_interval_minutes:60},
    recipient_preview:{filename,total_rows:totalRows,phone_column:"Mobile",preview_only:true}
