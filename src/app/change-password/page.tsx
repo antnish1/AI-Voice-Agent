@@ -14,7 +14,7 @@ export default function ChangePassword(){
   try{
    const supabase=createBrowserSupabase();
    const {data:{session}}=await supabase.auth.getSession();
-   if(!session)throw Error("Your activation link has expired. Sign in or request a new activation email.");
+   if(!session)throw Error("Your session expired. Sign in again using your temporary password.");
    const user=await supabase.auth.getUser();
    if(user.error||!user.data.user)throw Error("Unable to verify your session.");
    if(user.data.user.app_metadata?.must_change_password===true){
@@ -31,5 +31,5 @@ export default function ChangePassword(){
    router.replace("/dashboard");router.refresh();
   }catch(e){setError(e instanceof Error?e.message:"Unable to update password.");}finally{setPending(false);}
  }
- return <main className="login-page"><section className="login-card"><div className="logo">F</div><p className="eyebrow">FRONTIER GROUP</p><h1>Set your password</h1><p className="muted">Activate your dealership account by choosing your own password. Your temporary password cannot be reused.</p><form onSubmit={submit} className="form"><label>New password<input type="password" autoComplete="new-password" minLength={12} value={password} onChange={e=>setPassword(e.target.value)} required/></label><label>Confirm new password<input type="password" autoComplete="new-password" minLength={12} value={confirm} onChange={e=>setConfirm(e.target.value)} required/></label>{error&&<p role="alert" className="error">{error}</p>}<button type="submit" disabled={pending}>{pending?"Activating…":"Activate account & continue"}</button></form></section></main>;
+ return <main className="login-page"><section className="login-card"><div className="logo">F</div><p className="eyebrow">FRONTIER GROUP</p><h1>Set your password</h1><p className="muted">Before using FrontVox AI, replace your temporary password with a private password of at least 12 characters.</p><form onSubmit={submit} className="form"><label>New password<input type="password" autoComplete="new-password" minLength={12} value={password} onChange={e=>setPassword(e.target.value)} required/></label><label>Confirm new password<input type="password" autoComplete="new-password" minLength={12} value={confirm} onChange={e=>setConfirm(e.target.value)} required/></label>{error&&<p role="alert" className="error">{error}</p>}<button type="submit" disabled={pending}>{pending?"Updating…":"Change password & continue"}</button></form></section></main>;
 }
