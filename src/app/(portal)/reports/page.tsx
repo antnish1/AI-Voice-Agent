@@ -2,10 +2,26 @@ import {requireMembership} from "@/lib/auth";
 import {isItSuperUser} from "@/lib/it-access";
 import {reportValues,phoneKey,type OperationalReport} from "@/lib/report-fields";
 import {ReportsDirectory} from "./reports-directory";
+import type {TestCallReport} from "./test-call-reports";
 export default async function Reports(){
  const {supabase,membership,user,memberships}=await requireMembership();if(!membership)return null;
  const id=membership.dealership_id;
  const dealershipView=!isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
+ const testReports:TestCallReport[]=[];
+ let testLoadError=false;
+ if(!dealershipView){
+  // Test requests belong to IT, not the currently selected dealership. Existing RLS and ownership still apply.
+  for(let offset=0;;offset+=200){
+   const {data,error}=await supabase.from("voice_test_call_requests").select("id,phone_last4,agent_id,agent_version,connection_id,caller_number,status,created_at,sarvam_attempt_id").eq("user_id",user.id).order("created_at",{ascending:false}).order("id").range(offset,offset+199);
+   if(error){testLoadError=true;break;}
+   const batch=data??[];
+   const ids=batch.map(x=>x.sarvam_attempt_id).filter((v):v is string=>typeof v==="string"&&!!v);
+   const linked=ids.length?await supabase.from("voice_call_records").select("sarvam_attempt_id,status,duration_seconds,started_at,transcript").in("sarvam_attempt_id",ids):{data:[],error:null};
+   if(linked.error)testLoadError=true;
+   for(const t of batch){const matches=(linked.data??[]).filter(x=>x.sarvam_attempt_id===t.sarvam_attempt_id);const call=matches.length===1?matches[0]:undefined;testReports.push({...t,caller_number:t.caller_number?String(t.caller_number).slice(-4):null,outcome:call?.status??null,duration_seconds:call?.duration_seconds??null,started_at:call?.started_at??null,has_transcript:Array.isArray(call?.transcript)&&call.transcript.length>0});}
+   if(batch.length<200)break;
+  }
+ }
  const [customers,campaigns,imports,pending,listed]=await Promise.all([
   supabase.from("customers").select("id",{count:"exact",head:true}).eq("dealership_id",id),
   supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id),
@@ -95,5 +111,5 @@ export default async function Reports(){
   const input=[str(prospect.customer_name),str(prospect.mobile),str(prospect.vehicle_model),str(prospect.registration_number),str(prospect.service_type),str(prospect.service_due),str(prospect.last_service),"","","",""];
   campaignRecords.push({id:"campaign-prospect:"+str(prospect.id),campaignId,date:str(prospect.updated_at)||str(prospect.created_at),values:reportValues(input,undefined,prospect,operations(str(person?.id)))});
  }
- return <ReportsDirectory dealershipView={dealershipView} campaignRecords={campaignRecords} serviceRecords={serviceRecords} metrics={{customers:customers.count??0,campaigns:campaigns.count??0,imports:imports.count??0,pending:pending.count??0}} campaigns={listed.data??[]}/>;
+ return <ReportsDirectory testReports={testReports} testLoadError={testLoadError} dealershipView={dealershipView} campaignRecords={campaignRecords} serviceRecords={serviceRecords} metrics={{customers:customers.count??0,campaigns:campaigns.count??0,imports:imports.count??0,pending:pending.count??0}} campaigns={listed.data??[]}/>;
 }
