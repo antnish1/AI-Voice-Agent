@@ -102,7 +102,18 @@ drop policy if exists frontvox_dealership_cohort_upload on storage.objects;
 create policy frontvox_dealership_cohort_upload on storage.objects
 for insert to authenticated with check (
  bucket_id='frontvox-campaign-cohorts'
- and name ~ '^[0-9a-f-]{36}/[0-9a-f-]{36}/[0-9a-f]{64}\\.csv$'
+ and name ~ '^[0-9a-f-]{36}/[0-9a-f-]{36}/[0-9a-f]{64}[.]csv
+ and exists(
+  select 1 from public.campaigns c
+   where c.id::text=split_part(name,'/',2)
+    and c.dealership_id::text=split_part(name,'/',1)
+    and c.created_by=(select auth.uid())
+    and c.status='DRAFT'
+    and public.frontvox_can_create_own_draft(c.dealership_id)
+ )
+);
+commit;
+
  and exists(
   select 1 from public.campaigns c
    where c.id::text=split_part(name,'/',2)
