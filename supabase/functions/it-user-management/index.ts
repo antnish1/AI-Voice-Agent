@@ -2,7 +2,7 @@
 // The gateway uses service credentials internally; never put them in a browser bundle.
 import {createClient} from "npm:@supabase/supabase-js@2.58.0";
 
-const ALLOWED_ORIGINS=new Set(["https://frontier-ai-voice-crm.vercel.app"]);
+const ALLOWED_ORIGINS=new Set(["https://frontier-ai-voice-crm.vercel.app","https://frontier-ai-voice-crm-six.vercel.app"]);
 const IT_ID="5bd78ada-44f5-4045-a9fb-75c9dad69893";
 const DEFAULT_TEMP_PASSWORD="12345678";
 const json=(value:unknown,status=200,headers:Record<string,string>={})=>new Response(JSON.stringify(value),{status,headers:{"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store","Vary":"Origin",...headers}});
