@@ -21,6 +21,17 @@ $$;
 revoke all on function public.frontvox_can_create_own_draft(uuid) from public,anon;
 grant execute on function public.frontvox_can_create_own_draft(uuid) to authenticated;
 
+-- Dealership staff need SELECT access to their own active agent defaults
+-- to prepare a draft. Writing those defaults stays IT-only.
+drop policy if exists frontvox_dealership_voice_profile_read on public.dealership_voice_profiles;
+create policy frontvox_dealership_voice_profile_read on public.dealership_voice_profiles
+for select to authenticated using (
+ public.frontier_password_setup_complete()
+ and exists(select 1 from public.memberships m
+  where m.user_id=(select auth.uid())
+   and m.dealership_id=dealership_voice_profiles.dealership_id)
+);
+
 -- The draft-creation RPC is SECURITY INVOKER and needs ordinary INSERT
 -- privileges; row-level checks still determine exactly which tenant can write.
 grant insert on public.campaigns to authenticated;
