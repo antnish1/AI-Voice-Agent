@@ -43,15 +43,15 @@ revoke all on function private_campaign_reference.assign_reference() from public
 drop trigger if exists campaign_reference_assign on public.campaigns;
 create trigger campaign_reference_assign before insert or update on public.campaigns for each row execute function private_campaign_reference.assign_reference();
 create or replace function public.create_period_campaign_draft(p_dealership_id uuid,p_period date,p_configuration jsonb)
-returns uuid language plpgsql security invoker set search_path='' as $$
-declare v_id uuid;
+returns jsonb language plpgsql security invoker set search_path='' as $$
+declare v_id uuid; v_reference text;
 begin
  if p_period is null then raise exception 'Campaign period required'; end if;
  if p_configuration is null or jsonb_typeof(p_configuration)<>'object' or octet_length(p_configuration::text)>16000 then raise exception 'Invalid draft configuration'; end if;
  insert into public.campaigns(dealership_id,name,status,created_by,campaign_period)
- values(p_dealership_id,'Campaign draft','DRAFT',(select auth.uid()),p_period) returning id into v_id;
+ values(p_dealership_id,'Campaign draft','DRAFT',(select auth.uid()),p_period) returning id,campaign_reference into v_id,v_reference;
  insert into public.campaign_draft_configs(campaign_id,dealership_id,configuration) values(v_id,p_dealership_id,p_configuration);
- return v_id;
+ return jsonb_build_object('id',v_id,'reference',v_reference);
 end $$;
 revoke all on function public.create_period_campaign_draft(uuid,date,jsonb) from public, anon;
 grant execute on function public.create_period_campaign_draft(uuid,date,jsonb) to authenticated;
