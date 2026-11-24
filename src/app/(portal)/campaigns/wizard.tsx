@@ -24,7 +24,7 @@ function downloadBlob(blob:Blob,name:string) {
  const url=URL.createObjectURL(blob),anchor=document.createElement("a");anchor.href=url;anchor.download=name;anchor.click();
  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:Dealer[];initialDealershipId:string}){
+export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}:{dealerships:Dealer[];initialDealershipId:string;canOpenOutbound:boolean}){
  const router=useRouter();
  const [dealershipId,setDealershipId]=useState(initialDealershipId);
  const [description,setDescription]=useState("");
@@ -78,7 +78,7 @@ export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:De
     const response=await fetch("/api/sarvam/recipients",{method:"POST",body:form,cache:"no-store"});
     const data=await response.json();
     if(!response.ok||!data.ok){setError((data.error??"Could not stage recipient file.")+" The draft was retained; retrying will not create another draft.");return;}
-    router.push("/campaigns/"+id+"/outbound");router.refresh();
+    router.push("/campaigns/"+id+(canOpenOutbound?"/outbound":"/view"));router.refresh();
    }catch{setError("Upload failed. Your draft was retained; retry to securely stage the same file.");}
   });
  }
@@ -88,7 +88,7 @@ export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:De
    <div className="campaign-modal-scroll fc-compact-scroll">
     <div className="fc-compact-fields">
      <label className="campaign-form-label">Dealership <span>*</span>
-      <select className="campaign-pill-input" value={dealershipId} disabled={busy||!!existingDraft} onChange={e=>{setDealershipId(e.target.value);setPreview(null);setExistingDraft("");}}>
+      <select className="campaign-pill-input" value={dealershipId} disabled={busy||!!existingDraft||dealerships.length===1} onChange={e=>{setDealershipId(e.target.value);setPreview(null);setExistingDraft("");}}>
        {dealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}
       </select>
      </label>
@@ -96,7 +96,7 @@ export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:De
       <input className="campaign-pill-input" type="text" maxLength={200} placeholder="Optional campaign purpose" value={description} disabled={busy||!!existingDraft} onChange={e=>setDescription(e.target.value)}/>
      </label>
     </div>
-    {!profileReady&&<div className="helper-banner" role="status">This dealership does not yet have an active verified Sarvam profile. <a href="/settings/voice-profiles" style={{textDecoration:"underline"}}>Configure Voice Agent Defaults</a> once before creating campaigns.</div>}
+    {!profileReady&&<div className="helper-banner" role="status">You can save this campaign as a draft. {canOpenOutbound?<a href="/settings/voice-profiles" style={{textDecoration:"underline"}}>Configure Voice Agent Defaults</a>:"Your IT Super User must verify the Sarvam connection before any calls can be launched."}</div>}
     <div className="fc-compact-excel-head">
      <strong>Customer Excel</strong>
      <button type="button" className="fc-template-icon" title="Download Excel template" aria-label="Download Excel template" onClick={()=>downloadBlob(makeRecipientTemplate(),"FrontVox_Recipient_Template.xlsx")}>
@@ -119,7 +119,7 @@ export function CampaignWizard({dealerships,initialDealershipId}:{dealerships:De
     <div className="fc-compact-defaults">10:00–18:00 IST · Mon–Sat · 1 attempt/sec · No retries <span>· Saves as draft</span></div>
     {error&&<p role="alert" className="form-error">{error}</p>}
    </div>
-   <footer className="campaign-modal-footer"><button type="button" className="campaign-modal-back" onClick={()=>router.push("/campaigns")}>Cancel</button>{preview&&<span className="campaign-step-count">{preview.eligible} eligible</span>}<button type="button" disabled={busy||reading||!profileReady||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next">{busy?"Creating…":"Create & Check Details"}</button></footer>
+   <footer className="campaign-modal-footer"><button type="button" className="campaign-modal-back" onClick={()=>router.push("/campaigns")}>Cancel</button>{preview&&<span className="campaign-step-count">{preview.eligible} eligible</span>}<button type="button" disabled={busy||reading||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next">{busy?"Creating…":"Create Campaign Draft"}</button></footer>
   </section>
  </div>;
 }

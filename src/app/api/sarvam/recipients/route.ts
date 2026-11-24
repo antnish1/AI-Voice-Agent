@@ -1,16 +1,19 @@
 import {NextResponse} from "next/server";
-import {requireItSuperUser} from "@/lib/it-access";
+import {requireMembership} from "@/lib/auth";
+import {isItSuperUser} from "@/lib/it-access";
 import {prepareRecipients} from "@/lib/sarvam/recipient-validation";
 import {sha256} from "@/lib/sarvam/outbound-provider";
 export const runtime="nodejs";
 export async function POST(request:Request){
  try{
-  const {supabase,user}=await requireItSuperUser();
+  const {supabase,user,membership,memberships}=await requireMembership();
+  if(!membership)return NextResponse.json({error:"Assigned dealership access required."},{status:403});
+  const it=isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
   const form=await request.formData();
   const campaignId=String(form.get("campaignId")??"");
   if(!/^[0-9a-f-]{36}$/i.test(campaignId))return NextResponse.json({error:"Invalid campaign ID"},{status:400});
-  const {data:campaign,error:campaignError}=await supabase.from("campaigns").select("id,dealership_id,status").eq("id",campaignId).maybeSingle();
-  if(campaignError||!campaign||campaign.status!=="DRAFT")return NextResponse.json({error:"Only an authorized DRAFT campaign can accept recipients."},{status:403});
+  const {data:campaign,error:campaignError}=await supabase.from("campaigns").select("id,dealership_id,status,created_by").eq("id",campaignId).eq("dealership_id",membership.dealership_id).maybeSingle();
+  if(campaignError||!campaign||campaign.status!=="DRAFT"||(!it&&campaign.created_by!==user.id))return NextResponse.json({error:"You may upload recipients only to your own dealership drafts."},{status:403});
   const file=form.get("file");
   if(!(file instanceof File)||file.size>5*1024*1024||!file.size||!/\.csv$/i.test(file.name))
    return NextResponse.json({error:"Upload one CSV file (1 byte–5 MB)."},{status:400});
