@@ -118,3 +118,8 @@
 @media(max-width:1050px){.crm-app .it-user-single .it-create-user-form{grid-template-columns:repeat(2,minmax(0,1fr))}.crm-app .it-user-single .it-create-user-form>label:nth-child(n),.crm-app .it-user-single .it-create-user-form>button{grid-column:auto}}
 @media(max-width:760px){.crm-app .fc-list-toolbar .fc-filters{flex-wrap:wrap;flex-basis:100%}.crm-app .fc-list-toolbar .fc-search{flex:1 1 140px}}
 @media(max-width:580px){.crm-app .it-user-single .it-create-user-form{grid-template-columns:1fr}}
+
+/* Create Dealership: email and submit share the last row, aligned at field baseline. */
+.crm-app .it-dealer-dialog[aria-labelledby="create-dealer-title"] .it-user-form{align-items:end;gap:8px 10px}
+.crm-app .it-dealer-dialog[aria-labelledby="create-dealer-title"] .it-user-form>button{grid-column:auto;width:auto;justify-self:start;min-height:41px;margin:0;padding:10px 18px;white-space:nowrap}
+@media(max-width:580px){.crm-app .it-dealer-dialog[aria-labelledby="create-dealer-title"] .it-user-form>button{width:100%;justify-self:stretch}}
