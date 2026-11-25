@@ -1,0 +1,15 @@
+/* Native top-layer dialog bypasses transformed route ancestors. */
+.crm-app .call-details-dialog{position:fixed;inset:0;margin:auto;width:min(900px,calc(100vw - 32px));max-width:calc(100vw - 32px);max-height:calc(100dvh - 48px);box-sizing:border-box;border:1px solid #dbe5f1;border-radius:16px;padding:0;overflow:auto;background:var(--crisp-surface,#fff);color:var(--crisp-text,#173650);box-shadow:0 24px 70px #0b274a50}
+.call-details-dialog::backdrop{background:#12263c9c}
+.call-details-content{position:relative;padding:20px 24px}
+.call-details-content h2{margin:0 36px 14px 0;font-size:19px}
+.call-details-content h3{font-size:16px;margin:16px 0 6px}
+.call-details-content p{font-size:13px;line-height:1.6;overflow-wrap:anywhere;margin:8px 0}
+.crm-app .call-details-content .calllogs-detail-fields{grid-template-columns:repeat(3,minmax(0,1fr));gap:0 16px;padding:8px 14px;margin:12px 0}
+.call-details-content .calllogs-detail-fields>div{display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:3px;padding:10px 0;min-width:0;border-bottom:1px solid #dbe5f166}
+.call-details-content .calllogs-detail-fields dd{margin:0;text-align:left;font-size:12px;overflow-wrap:anywhere}
+.call-details-content .call-details-transcript{max-height:none;overflow:visible;margin:12px 0}
+.call-details-content .agent-modal-close{display:grid;place-items:center;line-height:1}
+.call-details-content .agent-modal-done{width:100%;margin-top:10px}
+@media(max-width:640px){.crm-app .call-details-content .calllogs-detail-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}.call-details-content{padding:16px}.crm-app .call-details-dialog{max-height:calc(100dvh - 24px)}}
+@media(max-width:360px){.crm-app .call-details-content .calllogs-detail-fields{grid-template-columns:1fr}}
