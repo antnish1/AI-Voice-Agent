@@ -25,7 +25,7 @@ export async function POST(request:Request){
   ]);
   if(batchError||configError||testError||!batch||!config||!test?.length)
    return NextResponse.json({error:"A locked recipient cohort, matching approved configuration and a recent test call are required."},{status:409});
-  const setup=config.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start?:string;end?:string;days?:string[];from?:string;to?:string}};
+  const setup=config.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start?:string;end?:string;days?:string[];from?:string;to?:string;retry_interval_minutes?:number}};
   const agent=String(input.agentId??""),version=Number(input.appVersion),connection=String(input.connectionId??""),sender=normalizePhone(String(input.callerNumber??""));
   if(!/^[\w.\-]{3,200}$/.test(agent)||!Number.isInteger(version)||version<1||
      !/^[\w.\-]{3,200}$/.test(connection)||!sender||
@@ -47,6 +47,8 @@ export async function POST(request:Request){
      istDate(end)!==setup.schedule?.end)
    return NextResponse.json({error:"Use the approved IST campaign dates, starting at least one hour from now, with a maximum 30-day period."},{status:400});
   const schedule=setup.schedule;
+  const interval=schedule?.retry_interval_minutes??30;
+  if(!Number.isInteger(interval)||interval<1||interval>10080)return NextResponse.json({error:"Approved retry interval is invalid."},{status:400});
   if(!schedule||!/^([01]\d|2[0-3]):[0-5]\d$/.test(schedule.from??"")||
      !/^([01]\d|2[0-3]):[0-5]\d$/.test(schedule.to??"")||
      (schedule.from??"")>=(schedule.to??"")||!schedule.days?.length||schedule.days.some(x=>!days[x]))
@@ -64,7 +66,7 @@ export async function POST(request:Request){
    name:campaign.name,description:"Approved FrontVox AI campaign",app_config:{
     app_id:agent,app_version:version,app_type:"agent",attempts_per_second:1,
     connection_configs:[{connection_id:connection,phone_numbers:[sender],weight:1}],
-    retry_config:{max_retries:0,retry_interval_minutes:30},
+    retry_config:{max_retries:0,retry_interval_minutes:interval},
     webhook_config:{webhook_id:process.env.SARVAM_STORED_WEBHOOK_ID}
    },
    start_timestamp:start.toISOString(),end_timestamp:end.toISOString(),
