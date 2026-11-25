@@ -286,3 +286,29 @@ html:has(.crm-app),body:has(.crm-app){width:100%;height:100%;margin:0;overflow:h
 .crm-app .review-actions .review-hold:hover:not(:disabled){background:#EAB308;color:#422006}
 .crm-app .review-actions .review-cancel{min-width:80px;background:var(--crisp-surface);color:var(--crisp-ink);border-color:var(--crisp-line)}
 @media(max-width:580px){.crm-app .review-schedule-dialog .review-schedule{grid-template-columns:1fr}.crm-app .review-actions{flex-wrap:wrap}}
+
+/* Schedule editor: opaque surface, strong selected states and no horizontal overflow. */
+.crm-app .review-schedule-dialog{box-sizing:border-box;width:min(760px,calc(100vw - 24px));max-width:calc(100vw - 24px);overflow-x:hidden;overflow-y:auto;background:#fff;color:#152d46;border-radius:14px;padding:0;border:1px solid #b9ccde}
+.crm-app .review-schedule-dialog>.crm-panel{box-sizing:border-box;width:100%;min-width:0;max-width:100%;margin:0;padding:16px;background:#fff;color:#152d46;box-shadow:none;border:0}
+.crm-app .review-schedule-dialog .panel-title{margin:-16px -16px 16px;padding:12px 16px;background:#164b78;color:#fff}
+.crm-app .review-schedule-dialog .panel-title h2{color:#fff;font-size:17px}
+.crm-app .review-schedule-dialog .review-pencil{background:#ffffff20;color:#fff;border-color:#ffffff66}
+.crm-app .review-schedule-dialog .review-value>span{color:#263e58;font-weight:700}
+.crm-app .review-schedule-dialog .review-value strong{color:#152d46}
+.crm-app .review-schedule-dialog .review-value input,.crm-app .review-schedule-dialog .review-period input{box-sizing:border-box;max-width:100%;min-width:0;width:100%;background:#fff;color:#152d46;border:1px solid #a8bfd4;border-radius:8px;padding:8px}
+.crm-app .review-period{grid-column:1/-1;min-width:0;background:#f1f6fb;border:1px solid #c5d6e6;padding:12px;border-radius:10px;display:grid;gap:10px}
+.crm-app .review-period h3{margin:0;font-size:13px;font-weight:750;color:#163750}
+.crm-app .review-period h3 span{font-weight:500;font-size:11px}
+.crm-app .review-period-row{display:grid;grid-template-columns:minmax(100px,1fr) auto minmax(0,1.2fr);align-items:center;gap:10px;min-width:0}
+.crm-app .review-period-row>strong{font-size:12px;color:#152d46}
+.crm-app .review-period-switch{display:flex;gap:3px;padding:3px;border-radius:24px;background:#dce6ef}
+.crm-app .review-period-switch button{padding:6px 12px;border-radius:20px;background:transparent;color:#29445f;font-size:12px;font-weight:650;white-space:nowrap}
+.crm-app .review-period-switch button[aria-pressed=true]{background:#17558c;color:#fff}
+.crm-app .review-period-result{font-size:12px;font-weight:700;overflow-wrap:anywhere}
+.crm-app .review-period-hint{font-size:11px;line-height:1.45;color:#29445f;margin:0}
+.crm-app .review-schedule-dialog .review-days button{background:#fff;border:1px solid #b3c5d6;color:#49637a;font-weight:650;opacity:1}
+.crm-app .review-schedule-dialog .review-days button[aria-pressed=true]{background:#17558c;color:#fff;border-color:#17558c;font-weight:750}
+.crm-app .review-schedule-dialog .review-edit-actions .btn-primary{width:auto;min-width:120px;background:#17558c;color:#fff}
+.crm-app .review-schedule-dialog .review-edit-actions .btn-outline{width:auto;color:#152d46}
+.crm-app .review-schedule-dialog .review-edit-actions small{color:#29445f;flex:1 1 180px}
+@media(max-width:580px){.crm-app .review-period-row{grid-template-columns:1fr auto}.crm-app .review-period-row>input,.crm-app .review-period-result{grid-column:1/-1}.crm-app .review-schedule-dialog .review-schedule{grid-template-columns:minmax(0,1fr)}}
