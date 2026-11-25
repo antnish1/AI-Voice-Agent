@@ -140,3 +140,13 @@
 .crm-app .agent-hero-heading{min-width:0}
 .crm-app .agent-card-status{gap:3px}
 @media(pointer:coarse){.crm-app .fc-review-start{min-height:44px}}
+
+/* Keep search adjacent to title and push status/date to the right. Use a single
+   keyboard focus indicator on the pill, not a nested outline on the select. */
+.crm-app .fc-list-toolbar .fc-status{margin-inline-start:auto;max-width:none}
+.crm-app .fc-list-toolbar .fc-status select{border:0;box-shadow:none;outline:none;background:transparent;max-width:210px;cursor:pointer}
+.crm-app .fc-list-toolbar .fc-status:has(select:focus-visible){outline:2px solid var(--crisp-accent);outline-offset:2px}
+.crm-app .fc-list-toolbar .fc-date-details>summary{list-style:none}
+.crm-app .fc-list-toolbar .fc-date-details>summary::marker{content:""}
+.crm-app .fc-list-toolbar .fc-date-details>summary::-webkit-details-marker{display:none}
+@media(max-width:760px){.crm-app .fc-list-toolbar .fc-status{margin-inline-start:auto}.crm-app .fc-list-toolbar .fc-status select{max-width:160px}}
