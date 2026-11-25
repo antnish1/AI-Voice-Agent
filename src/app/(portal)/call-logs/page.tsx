@@ -20,7 +20,7 @@ export default async function CallLogs(){
  const calls=rows.map(r=>{
   const output=r.output_variables&&typeof r.output_variables==="object"&&!Array.isArray(r.output_variables)?r.output_variables as Record<string,unknown>:{};
   const {output_variables,customer_id,...call}=r;
-  return {...call,customer_name:textValue(output.customer_name)||names.get(textValue(customer_id))||null} as CallRecord;
+  return {...call,customer_name:textValue(output.customer_name)||names.get(textValue(customer_id))||null,registration_number:textValue(output.registration_number)||null,vehicle_model:textValue(output.vehicle_model)||null,service_type:textValue(output.service_type)||null,call_summary:textValue(output.call_summary)||null,disposition:textValue(output.call_disposition)||null,next_action:textValue(output.next_sales_followup_action)||null} as CallRecord;
  });
  return <CallLogsDirectory calls={calls}/>;
 }
