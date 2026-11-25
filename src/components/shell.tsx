@@ -70,7 +70,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
         </Link>
         {item.url==="/campaigns"&&<button type="button" className="frontier-campaign-toggle" aria-label={campaignsExpanded?"Collapse Campaigns submenu":"Expand Campaigns submenu"} aria-expanded={campaignsExpanded} onClick={()=>{if(collapsed){setCollapsed(false);setCampaignsExpanded(true);}else setCampaignsExpanded(s=>!s);}}><SidebarIcon name="chevron-down" size={16}/></button>}
        </div>
-       {item.url==="/campaigns"&&campaignsExpanded&&!collapsed&&<div className="frontier-campaign-subnav"><Link href="/campaigns" onClick={closeMobile}>All Campaigns</Link>{isItAdmin&&<><Link href="/approvals" aria-current={path==="/approvals"?"page":undefined} onClick={closeMobile}>Approvals {pendingApprovals>0&&<span className="frontier-approval-badge">{pendingApprovals>99?"99+":pendingApprovals}</span>}</Link></>}<Link href="/campaigns/new" aria-current={path==="/campaigns/new"?"page":undefined} onClick={closeMobile}>Create Campaign</Link></div>}
+       {item.url==="/campaigns"&&campaignsExpanded&&!collapsed&&<div className="frontier-campaign-subnav"><Link href="/campaigns" onClick={closeMobile}>All Campaigns</Link><Link href="/campaigns/new" aria-current={path==="/campaigns/new"?"page":undefined} onClick={closeMobile}>Create Campaign</Link></div>}
       </div>;
     })}
    </nav>
