@@ -19,15 +19,15 @@ function VoiceBadge({type}:{type:"voice"|"performance"|"shield"}){
 export default async function Login({searchParams}:{searchParams:Promise<{error?:string}>}){
  const {error}=await searchParams;
  return <main className="fv-login">
-  <section className="fv-left" aria-label="FrontVox AI introduction">
+  <section className="fv-left" aria-label="Frontier Voice CRM introduction">
    <div className="fv-left-glow" aria-hidden="true"/>
-   <div className="fv-left-top" title="Frontier Voice Intelligence">
-    <img src="/autoreach-logo.png" alt="FrontVox AI" width={88} height={88}/>
+   <div className="fv-left-top" title="Frontier Voice CRM">
+    <img src="/autoreach-logo.png" alt="Frontier Voice CRM" width={88} height={88}/>
     <span className="fv-brand-separator" aria-hidden="true"/>
     <strong>FRONTIER<br/>GROUP</strong>
    </div>
    <div className="fv-left-content">
-    <h1 title="Frontier Voice Intelligence">FrontVox <em>AI</em></h1>
+    <h1 title="Frontier Voice CRM">Frontier <em>Voice CRM</em></h1>
     <h2>Secure dealership access</h2>
     <p>Smarter Conversations. Stronger Connections.</p>
     <div className="fv-pills">
@@ -42,14 +42,14 @@ export default async function Login({searchParams}:{searchParams:Promise<{error?
    </div>
    <div className="fv-left-wave-bottom" aria-hidden="true"/>
   </section>
-  <section className="fv-right" aria-label="Sign in to FrontVox AI">
+  <section className="fv-right" aria-label="Sign in to Frontier Voice CRM">
    <div className="fv-right-dots" aria-hidden="true"/>
    <div className="fv-right-ribbon" aria-hidden="true"/>
    <div className="fv-signin-card">
-    <div className="fv-login-icon" title="Frontier Voice Intelligence"><img src="/autoreach-logo.png" alt="FrontVox AI logo" width={104} height={104}/></div>
+    <div className="fv-login-icon" title="Frontier Voice CRM"><img src="/autoreach-logo.png" alt="Frontier Voice CRM logo" width={104} height={104}/></div>
     <p className="fv-overline">FRONTIER GROUP</p>
     <h2>Welcome Back!</h2>
-    <p className="fv-signin-subtitle">Sign in to your FrontVox AI account</p>
+    <p className="fv-signin-subtitle">Sign in to your Frontier Voice CRM account</p>
     {error&&<p className="fv-error" role="alert">Unable to sign in. Check your email and password.</p>}
     <form action={signIn} className="fv-login-form">
      <label className="fv-visually-hidden" htmlFor="fv-email">Email Address</label>

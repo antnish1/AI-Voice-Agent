@@ -98,7 +98,7 @@ export function TopMenuNavigation({items,pendingApprovals,isItAdmin}:{items:Item
      transition={{duration:reduce?0:.18,ease:motionTokens.ease}}
      onMouseEnter={()=>setOpen(active.url)}>
      <header className="frontier-mega-head">
-      <div><small>FRONTIER AI VOICE CRM</small><h2>{active.name}</h2><p>{menu.intro}</p></div>
+      <div><small>FRONTIER VOICE CRM</small><h2>{active.name}</h2><p>{menu.intro}</p></div>
       <Link href={active.url} onClick={close} className="frontier-mega-explore">Explore {active.name} <span aria-hidden="true">↗</span></Link>
      </header>
      <div className="frontier-mega-body">

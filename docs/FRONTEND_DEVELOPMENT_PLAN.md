@@ -1,4 +1,4 @@
-# Frontier AI Voice CRM — Approved Frontend/Backend Development Plan
+# Frontier Voice CRM — Approved Frontend/Backend Development Plan
 
 **Status:** Approved project requirements; implementation phased. **Only Frontier Group dealerships.**
 

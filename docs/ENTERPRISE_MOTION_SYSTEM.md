@@ -1,4 +1,4 @@
-# Frontier AI Voice CRM — Enterprise Motion System
+# Frontier Voice CRM — Enterprise Motion System
 
 Reusable components in `src/components/motion/`:
 
