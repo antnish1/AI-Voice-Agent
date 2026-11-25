@@ -1,5 +1,6 @@
 "use client";
 import {useState,useTransition,useEffect} from "react";
+import {createPortal} from "react-dom";
 import "./campaign-popup-white.css";
 import {useRouter} from "next/navigation";
 import {createSimpleCampaign} from "./actions";
@@ -27,6 +28,8 @@ function downloadBlob(blob:Blob,name:string) {
 }
 export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}:{dealerships:Dealer[];initialDealershipId:string;canOpenOutbound:boolean}){
  const router=useRouter();
+ const [modalHost,setModalHost]=useState<HTMLElement|null>(null);
+ useEffect(()=>{setModalHost(document.querySelector<HTMLElement>(".crm-app"));},[]);
  const [dealershipId,setDealershipId]=useState(initialDealershipId);
  const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit"}).formatToParts(new Date());
  const currentYear=Number(today.find(p=>p.type==="year")?.value??"2026");
@@ -86,8 +89,9 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
    }catch{setError("Upload failed. Your draft was retained; retry to securely stage the same file.");}
   });
  }
- if(success)return <div className="campaign-modal-overlay"><section className="campaign-modal fc-success-campaign" role="dialog" aria-modal="true" aria-labelledby="campaign-success-title"><div className="fc-success-tick" aria-hidden="true">✓</div><h2 id="campaign-success-title">Campaign Created Successfully</h2><p>Unique Campaign ID</p><strong className="fc-success-reference">{reference}</strong><div className="fc-success-status"><span>Status</span><span className="status-pill">Pending</span></div><div className="fc-success-actions"><button type="button" className="btn-outline" onClick={async()=>{try{await navigator.clipboard.writeText(reference);setCopied(true);}catch{setCopied(false);}}}>{copied?"Copied":"Copy Campaign ID"}</button><button type="button" className="btn-primary" onClick={()=>{router.push(canOpenOutbound?"/campaigns/"+existingDraft+"/outbound":"/campaigns?view="+encodeURIComponent(existingDraft));router.refresh();}}>View Campaign</button></div></section></div>;
- return <div className="campaign-modal-overlay" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)router.push("/campaigns");}}>
+ if(!modalHost)return null;
+ if(success)return createPortal(<div className="campaign-modal-overlay"><section className="campaign-modal fc-success-campaign" role="dialog" aria-modal="true" aria-labelledby="campaign-success-title"><div className="fc-success-tick" aria-hidden="true">✓</div><h2 id="campaign-success-title">Campaign Created Successfully</h2><p>Unique Campaign ID</p><strong className="fc-success-reference">{reference}</strong><div className="fc-success-status"><span>Status</span><span className="status-pill">Pending</span></div><div className="fc-success-actions"><button type="button" className="btn-outline" onClick={async()=>{try{await navigator.clipboard.writeText(reference);setCopied(true);}catch{setCopied(false);}}}>{copied?"Copied":"Copy Campaign ID"}</button><button type="button" className="btn-primary" onClick={()=>{router.push(canOpenOutbound?"/campaigns/"+existingDraft+"/outbound":"/campaigns?view="+encodeURIComponent(existingDraft));router.refresh();}}>View Campaign</button></div></section></div>,modalHost);
+ return createPortal(<div className="campaign-modal-overlay" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)router.push("/campaigns");}}>
   <section className="campaign-modal fc-compact-campaign" role="dialog" aria-modal="true" aria-labelledby="campaign-dialog-title">
    <header className="campaign-modal-header"><div><h2 id="campaign-dialog-title">Create AI Calling Campaign</h2></div><button type="button" className="campaign-modal-close" aria-label="Close" onClick={()=>router.push("/campaigns")}>×</button></header>
    <div className="campaign-modal-scroll fc-compact-scroll">
@@ -123,5 +127,5 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
    </div>
    <footer className="campaign-modal-footer"><button type="button" className="campaign-modal-back" onClick={()=>router.push("/campaigns")}>Cancel</button>{preview&&<span className="campaign-step-count">{preview.eligible} eligible</span>}<button type="button" disabled={busy||reading||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next">{busy?"Creating…":"Create Campaign"}</button></footer>
   </section>
- </div>;
+ </div>,modalHost);
 }

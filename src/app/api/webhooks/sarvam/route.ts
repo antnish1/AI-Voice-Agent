@@ -66,7 +66,9 @@ export async function POST(req:NextRequest){
   sarvam_interaction_id:textOf(payload.interaction_id,200)||null,dialed_number:phone||null,
   ...common
  };
- const {error:saveError}=await admin.from("voice_call_records").upsert(record,{onConflict:"dealership_id,sarvam_attempt_id"});
+ const existing=record.sarvam_interaction_id?await admin.from("voice_call_records").select("id").eq("dealership_id",link.dealership_id).eq("sarvam_interaction_id",record.sarvam_interaction_id).maybeSingle():{data:null,error:null};
+ if(existing.error)return fail(503,"Interaction reconciliation unavailable");
+ const {error:saveError}=existing.data?await admin.from("voice_call_records").update(record).eq("id",existing.data.id).eq("dealership_id",link.dealership_id):await admin.from("voice_call_records").upsert(record,{onConflict:"dealership_id,sarvam_attempt_id"});
  if(saveError)return fail(503,"Unable to persist verified call result");
  // Receipt is secondary to the uniquely keyed, idempotent call record.
  const digest=new Uint8Array(await crypto.subtle.digest("SHA-256",encoder.encode(raw)));
