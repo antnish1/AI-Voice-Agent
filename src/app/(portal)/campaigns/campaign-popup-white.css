@@ -1,0 +1,23 @@
+.campaign-modal.fc-compact-campaign{background:#fff;color:#18334e}
+.fc-compact-campaign :is(.campaign-modal-header,.campaign-modal-footer,.fc-compact-scroll){background:#fff}
+.fc-compact-campaign .campaign-form-label{color:#34465b;font-weight:650}
+.fc-compact-campaign .campaign-pill-input{background:#fff;border:1px solid #cbd5e1;color:#18334e;border-radius:9px}
+.fc-compact-campaign .campaign-pill-input::placeholder{color:#64748b}
+.fc-compact-campaign .campaign-pill-input:focus{border-color:#008b98;box-shadow:0 0 0 3px #008b981a}
+.fc-compact-campaign .campaign-pill-input:disabled{background:#fff;color:#52677b}
+.fc-compact-campaign .fc-compact-upload{background:#fff;border:1px dashed #94a3b8;border-radius:12px}
+.fc-compact-campaign .fc-compact-upload:hover{background:#fff;border-color:#008b98}
+.fc-compact-campaign .fc-upload-symbol{color:#008b98}
+.fc-compact-campaign :is(.fc-compact-upload strong,.fc-compact-excel-head strong,.fc-compact-consent){color:#243b53}
+.fc-compact-campaign .fc-compact-upload small{color:#52677b}
+.fc-compact-campaign .fc-template-text{width:auto;min-height:37px;height:auto;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 12px;background:#fff;border:1px solid #cbd5e1;color:#087784;font-size:12px;font-weight:650;white-space:nowrap}
+.fc-compact-campaign .fc-template-text:hover{background:#fff;border-color:#008b98;color:#006875}
+.fc-compact-campaign .campaign-modal-back{background:#fff;border:1px solid #cbd5e1;color:#34465b;border-radius:9px}
+.fc-compact-campaign .campaign-modal-back:hover{background:#f8fafc;color:#18334e}
+.fc-compact-campaign .campaign-modal-next{background:#008b98;color:#fff;border-radius:9px;box-shadow:none}
+.fc-compact-campaign .campaign-modal-next:hover{background:#006e79}
+.fc-compact-campaign .campaign-modal-next:disabled{background:#94a3b8;color:#fff;opacity:1;cursor:not-allowed}
+.fc-compact-campaign .fc-compact-preview,.fc-compact-campaign .fc-compact-preview .review-row,.fc-compact-campaign .fc-compact-preview-table :is(th,td){background:#fff}
+.fc-compact-campaign .fc-compact-consent input{accent-color:#008b98}
+:root[data-theme="dark"] .campaign-modal.fc-compact-campaign,:root[data-theme="dark"] .fc-compact-campaign :is(.campaign-modal-header,.campaign-modal-footer,.fc-compact-scroll,.campaign-pill-input,.fc-compact-upload,.fc-template-text,.campaign-modal-back,.fc-compact-preview,.fc-compact-preview .review-row,.fc-compact-preview-table th,.fc-compact-preview-table td){background:#14243a;border-color:#40566f;color:#dce9f7}
+:root[data-theme="dark"] .fc-compact-campaign :is(.campaign-form-label,.fc-compact-upload strong,.fc-compact-excel-head strong,.fc-compact-consent,.fc-compact-upload small){color:#dce9f7}
