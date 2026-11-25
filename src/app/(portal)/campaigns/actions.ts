@@ -90,3 +90,12 @@ export async function createSimpleCampaign(dealershipId:string,filename:string,t
   return draft;
  }catch{return {error:"Could not create campaign draft."};}
 }
+
+export async function saveReviewSchedule(id:string,dealershipId:string,schedule:{start:string;end:string;days:string[];from:string;to:string;cps:number;max_retries:number;retry_interval_minutes:number}):Promise<{error?:string}>{
+ try{
+ const {requireItSuperUser}=await import("@/lib/it-access");const {supabase}=await requireItSuperUser();
+ const {error}=await supabase.rpc("frontvox_save_review_schedule",{p_campaign:id,p_dealership:dealershipId,p_schedule:schedule});
+ if(error)return {error:"Schedule could not be saved. Check the dates, calling hours and draft status."};
+ revalidatePath("/campaigns/"+id+"/outbound");return {};
+ }catch{return {error:"Unable to save schedule."};}
+}
