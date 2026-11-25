@@ -41,11 +41,22 @@ export async function POST(request:Request){
    const get=(part:string)=>parts.find(p=>p.type===part)?.value??"";
    return get("year")+"-"+get("month")+"-"+get("day");
   };
-  if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime())||
-     start.getTime()<Date.now()+3600000||end.getTime()<=start.getTime()||end.getTime()>start.getTime()+30*86400000||
-     istDate(start)!==setup.schedule?.start||
-     istDate(end)!==setup.schedule?.end)
-   return NextResponse.json({error:"Use the approved IST campaign dates, starting at least one hour from now, with a maximum 30-day period."},{status:400});
+  const scheduleError=(error:string)=>NextResponse.json({error},{status:400});
+  const editHint="Close this popup, click the pencil icon in Schedule, update the dates or calling hours, and save before trying Start again.";
+  const formatIst=(date:Date)=>new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit",hour12:true}).format(date)+" IST";
+  if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime()))
+   return scheduleError("Start or end date/time is missing or invalid. "+editHint);
+  const now=Date.now();
+  if(start.getTime()<now+3600000){
+   const earliest=new Date(Math.ceil((now+3600000)/60000)*60000);
+   return scheduleError((start.getTime()<=now?"The scheduled start time has already passed: ":"The scheduled start time is less than one hour away: ")+formatIst(start)+". Choose a start time of "+formatIst(earliest)+" or later. "+editHint);
+  }
+  if(end.getTime()<=start.getTime())
+   return scheduleError("The campaign end date/time must be later than its start date/time. "+editHint);
+  if(end.getTime()>start.getTime()+30*86400000)
+   return scheduleError("The campaign cannot run for more than 30 days. Choose an end time no later than "+formatIst(new Date(start.getTime()+30*86400000))+". "+editHint);
+  if(istDate(start)!==setup.schedule?.start||istDate(end)!==setup.schedule?.end)
+   return scheduleError("The selected dates do not match the saved campaign schedule. Reload the page and verify the saved dates before starting again.");
   const schedule=setup.schedule;
   const interval=schedule?.retry_interval_minutes??30;
   if(!Number.isInteger(interval)||interval<1||interval>10080)return NextResponse.json({error:"Approved retry interval is invalid."},{status:400});
