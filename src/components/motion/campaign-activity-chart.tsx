@@ -19,7 +19,7 @@ export function CampaignActivityChart({daily,days}:{daily:Day[];days:number}){
       animate={{scaleY:1,opacity:1}}
       whileHover={reduced?undefined:{scaleX:1.06}}
       transition={{duration:reduced?0:.56,delay:reduced?0:Math.min(i*.024,.35),ease:motionTokens.ease}}/>
-    <AnimatePresence>{active===d.key&&<motion.div className="frontier-chart-tooltip"
+    <AnimatePresence>{active===d.key&&<motion.div className="frontier-chart-tooltip" style={{left:i===0?"0":i===daily.length-1?"100%":"50%",x:i===0?"0%":i===daily.length-1?"-100%":"-50%"}}
       initial={reduced?false:{opacity:0,y:6,scale:.95}} animate={{opacity:1,y:0,scale:1}}
       exit={{opacity:0,y:3,scale:.97}} transition={{duration:reduced?0:.16}}
       role="status"><strong>{d.count}</strong><span>{d.label}</span></motion.div>}</AnimatePresence>
