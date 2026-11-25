@@ -100,3 +100,21 @@
  .crm-app .review-actions button{min-height:40px}
 }
 @media(pointer:coarse){.crm-app :is(.fc-voice-button,.fc-primary-button,.review-actions button,.frontier-reference-sidebar .frontier-nav-link){min-height:44px}}
+
+/* Campaign title and search adjacent; status/date stay on the same desktop row. */
+.crm-app .fc-list-toolbar{justify-content:flex-start;gap:12px}
+.crm-app .fc-list-toolbar .fc-filters{justify-content:flex-start;flex:1 1 auto;flex-wrap:nowrap;width:auto;min-width:0}
+.crm-app .fc-list-toolbar .fc-search{flex:0 1 200px;width:200px;min-width:120px}
+.crm-app .fc-list-toolbar .fc-status{flex:0 1 auto;min-width:0}
+.crm-app .fc-list-toolbar .fc-date-details{flex:none}
+.crm-app .fc-list-toolbar .fc-status select{width:auto;min-width:0;max-width:160px}
+.crm-app .fc-list-toolbar .fc-clear{white-space:nowrap}
+/* Create User directly after Role / Post; three fields on first row, four on second. */
+.crm-app .it-user-single .it-create-user-form{grid-template-columns:repeat(12,minmax(0,1fr));align-items:end;gap:8px 10px}
+.crm-app .it-user-single .it-create-user-form>label:nth-child(-n+3){grid-column:span 4}
+.crm-app .it-user-single .it-create-user-form>label:nth-child(4),.crm-app .it-user-single .it-create-user-form>label:nth-child(5){grid-column:span 3}
+.crm-app .it-user-single .it-create-user-form>label:nth-child(6){grid-column:span 4}
+.crm-app .it-user-single .it-create-user-form>button{grid-column:span 2;width:100%;min-height:41px;margin:0;white-space:nowrap;padding-inline:8px}
+@media(max-width:1050px){.crm-app .it-user-single .it-create-user-form{grid-template-columns:repeat(2,minmax(0,1fr))}.crm-app .it-user-single .it-create-user-form>label:nth-child(n),.crm-app .it-user-single .it-create-user-form>button{grid-column:auto}}
+@media(max-width:760px){.crm-app .fc-list-toolbar .fc-filters{flex-wrap:wrap;flex-basis:100%}.crm-app .fc-list-toolbar .fc-search{flex:1 1 140px}}
+@media(max-width:580px){.crm-app .it-user-single .it-create-user-form{grid-template-columns:1fr}}
