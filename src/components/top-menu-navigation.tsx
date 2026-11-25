@@ -18,8 +18,8 @@ const menus:Record<string,Menu>={
   link("Reports","Explore verified CRM reports","/reports","chart")],secondary:[]},
  "/campaigns":{intro:"Prepare, review and manage campaigns",featured:[
   link("All Campaigns","Browse drafts and campaign statuses","/campaigns","megaphone"),
-  link("Create Campaign","Prepare a new campaign draft","/campaigns/new","megaphone")],secondary:[
-  link("Approvals","Review submitted campaigns","/approvals","check-square")]},
+  link("Approvals","Review submitted campaigns","/approvals","check-square"),
+  link("Create Campaign","Prepare a new campaign draft","/campaigns/new","megaphone")],secondary:[]},
  "/agents":{intro:"Manage the voice-agent workspace",featured:[
   link("AI Voice Agents","View available voice agents","/agents","wave"),
   link("Campaigns","See campaigns using agents","/campaigns","megaphone")],secondary:[]},
@@ -46,8 +46,7 @@ const menus:Record<string,Menu>={
   link("Documents","View uploaded documents","/documents","documents"),
   link("Customers","Find customer records","/customers","user-square")],secondary:[]},
  "/reports":{intro:"Explore business and service reporting",featured:[
-  link("Reports","View business summaries","/reports","chart"),
-  link("Call Logs","Review actual call records","/call-logs","phone")],secondary:[]},
+  link("Reports","View business summaries and service records","/reports","chart")],secondary:[]},
  "/settings":{intro:"Configure your personal CRM workspace",featured:[
   link("Settings","Profile and appearance preferences","/settings","settings")],secondary:[]},
  "/users":{intro:"Manage authorized staff access",featured:[
@@ -64,14 +63,14 @@ export function TopMenuNavigation({items,pendingApprovals,isItAdmin}:{items:Item
  const menu=open?menus[open]:undefined;
  const secondary=menu?.secondary??[];
  const selected=isItAdmin?secondary:secondary.filter(x=>x.href!=="/users");
- const featured=isItAdmin?(menu?.featured??[]):(menu?.featured??[]).filter(x=>x.href!=="/campaigns/new");
+ const featured=isItAdmin?(menu?.featured??[]):(menu?.featured??[]).filter(x=>!["/campaigns/new","/approvals"].includes(x.href));
  const close=()=>setOpen(null);
  return <nav className="frontier-top-navigation frontier-mega-navigation" aria-label="Main navigation"
   onMouseLeave={close}
   onKeyDown={e=>{if(e.key==="Escape"){close();(e.target as HTMLElement).blur();}}}>
   <div className="frontier-top-navigation-scroll">
    {items.map(item=>{
-    const isCurrent=pathname===item.url||(item.url==="/campaigns"&&pathname.startsWith("/campaigns/"));
+    const isCurrent=pathname===item.url||(item.url==="/campaigns"&&(pathname.startsWith("/campaigns/")||(isItAdmin&&pathname==="/approvals")));
     return <div className={`frontier-top-nav-entry ${isCurrent?"active":""}`} key={item.url}
        onMouseEnter={()=>setOpen(item.url)}
        onFocusCapture={()=>setOpen(item.url)}>
@@ -107,7 +106,7 @@ export function TopMenuNavigation({items,pendingApprovals,isItAdmin}:{items:Item
       <section aria-label="Main destinations"><h3>QUICK ACCESS</h3>
        <div className="frontier-mega-links">{featured.map(item=><Link className="frontier-mega-link" href={item.href} key={item.href} onClick={close}>
         <span className="frontier-mega-link-icon"><SidebarIcon name={item.icon} size={20}/></span>
-        <span className="frontier-mega-link-text"><strong>{item.label}</strong><small>{item.description}</small></span>
+        <span className="frontier-mega-link-text"><strong>{item.label}{item.href==="/approvals"&&pendingApprovals>0&&<span className="frontier-top-approval-badge">{pendingApprovals>99?"99+":pendingApprovals}</span>}</strong><small>{item.description}</small></span>
         <span className="frontier-mega-arrow" aria-hidden="true">→</span>
        </Link>)}</div>
       </section>
