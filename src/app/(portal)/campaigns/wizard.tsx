@@ -1,5 +1,6 @@
 "use client";
 import {useState,useTransition,useEffect} from "react";
+import "./campaign-popup-white.css";
 import {useRouter} from "next/navigation";
 import {createSimpleCampaign} from "./actions";
 import {excelToRows,makeRecipientTemplate,rowsToCsv} from "@/lib/campaign-excel";
@@ -104,8 +105,8 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
     </div>
     <div className="fc-compact-excel-head">
      <strong>Customer Excel</strong>
-     <button type="button" className="fc-template-icon" title="Download Excel template" aria-label="Download Excel template" onClick={()=>downloadBlob(makeRecipientTemplate(),"FrontVox_Recipient_Template.xlsx")}>
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+     <button type="button" className="fc-template-icon fc-template-text" title="Download Excel template" aria-label="Download Excel template" onClick={()=>downloadBlob(makeRecipientTemplate(),"FrontVox_Recipient_Template.xlsx")}>
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><span>Download Template</span>
      </button>
     </div>
     <label className="upload-zone fc-compact-upload"><span aria-hidden="true" className="fc-upload-symbol">⇧</span><strong>{reading?"Checking file…":"Upload Excel / CSV"}</strong><small>Up to 5 MB</small><input type="file" accept=".xlsx,.csv" disabled={busy||reading||!!existingDraft} style={{display:"none"}} onChange={e=>void chooseFile(e.target.files?.[0])}/></label>
