@@ -18,7 +18,6 @@ const menus:Record<string,Menu>={
   link("Reports","Explore verified CRM reports","/reports","chart")],secondary:[]},
  "/campaigns":{intro:"Prepare, review and manage campaigns",featured:[
   link("All Campaigns","Browse drafts and campaign statuses","/campaigns","megaphone"),
-  link("Approvals","Review submitted campaigns","/approvals","check-square"),
   link("Create Campaign","Prepare a new campaign draft","/campaigns/new","megaphone")],secondary:[]},
  "/agents":{intro:"Manage the voice-agent workspace",featured:[
   link("AI Voice Agents","View available voice agents","/agents","wave"),
