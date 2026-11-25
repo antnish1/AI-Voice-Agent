@@ -1,0 +1,40 @@
+/* Dashboard only: one continuous KPI surface, no tinted cards. */
+.ref-dashboard .ref-kpi-joined{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;background:#fff;border:1px solid #d7e1eb;border-radius:12px;box-shadow:0 2px 8px #14314a08;overflow:hidden;margin-bottom:16px}
+.ref-dashboard .ref-kpi-joined .ref-kpi-card{background:#fff;border:0;border-radius:0;box-shadow:none;transform:none;min-height:100px;padding:16px;gap:10px}
+.ref-dashboard .ref-kpi-joined .ref-kpi-card+.ref-kpi-card{border-left:1px solid #e0e7ef}
+.ref-dashboard .ref-kpi-joined .ref-kpi-card:after{content:none}
+.ref-dashboard .ref-kpi-joined .ref-kpi-card>div:last-child{min-width:0}
+.ref-dashboard .ref-kpi-label{font-size:12px;font-weight:650;color:#354d66}
+.ref-dashboard .ref-kpi-value{font-size:28px;font-weight:800;color:#122b43}
+.ref-dashboard .ref-kpi-note{font-size:11px;color:#52677b;line-height:1.35}
+.ref-dashboard .ref-dashboard-heading h1{font-size:25px;font-weight:800;color:#122b43}
+.ref-dashboard .ref-dashboard-heading p{font-size:13px;color:#52677b}
+.ref-dashboard .ref-dashboard-panel{border-color:#d7e1eb;border-radius:12px;padding:18px;box-shadow:0 2px 8px #14314a08}
+.ref-dashboard .ref-panel-header h2{font-size:16px;color:#18334e}
+.ref-dashboard .ref-panel-header p,.ref-dashboard .ref-table-footnote,.ref-dashboard .ref-dashboard-safety{font-size:12px;color:#52677b}
+.ref-dashboard .ref-panel-header>a{font-size:12px;font-weight:650;color:#08738b}
+.ref-dashboard .ref-dashboard-columns{grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:16px}
+.ref-dashboard .ref-dashboard-right{display:flex;align-items:stretch}
+.ref-dashboard .ref-activity{flex:1}
+.ref-dashboard .ref-chart-grid span{border-color:#cbd9e5}
+.ref-dashboard .ref-chart-bar{background:#278dcc}
+.ref-dashboard .ref-chart-footer i{background:#278dcc}
+.ref-dashboard .ref-chart-column small,.ref-dashboard .ref-chart-footer,.ref-dashboard .ref-chart-empty{color:#52677b;font-size:11px}
+.ref-dashboard .ref-campaign-table{font-size:12px}
+.ref-dashboard .ref-campaign-table th{background:#edf3f8;color:#354d66;font-size:11px;font-weight:700}
+.ref-dashboard .ref-campaign-table td{color:#40586e;border-color:#e2e9ef}
+.ref-dashboard .ref-campaign-table td strong{font-size:12px;color:#18334e}
+.ref-dashboard .ref-campaign-table td small,.ref-dashboard .ref-activity-item p,.ref-dashboard .ref-activity-item time{font-size:11px;color:#52677b}
+.ref-dashboard .ref-activity-item strong{font-size:13px;color:#18334e}
+.ref-dashboard .ref-activity-empty,.ref-dashboard .ref-table-empty{color:#52677b}
+@media(max-width:1250px){.ref-dashboard .ref-kpi-joined{grid-template-columns:repeat(5,minmax(0,1fr))}.ref-dashboard .ref-kpi-joined .ref-kpi-card{padding:12px 8px;gap:7px}.ref-dashboard .ref-kpi-icon{width:32px;height:32px;font-size:17px}}
+@media(max-width:960px){.ref-dashboard .ref-dashboard-columns{grid-template-columns:1fr}.ref-dashboard .ref-kpi-joined{grid-template-columns:repeat(3,minmax(0,1fr))}.ref-dashboard .ref-kpi-joined .ref-kpi-card:nth-child(4){border-left:0}.ref-dashboard .ref-kpi-joined .ref-kpi-card:nth-child(n+4){border-top:1px solid #e0e7ef}}
+@media(max-width:600px){.ref-dashboard .ref-kpi-joined{grid-template-columns:repeat(2,minmax(0,1fr))}.ref-dashboard .ref-kpi-joined .ref-kpi-card:nth-child(n){border-left:0;border-top:1px solid #e0e7ef}.ref-dashboard .ref-kpi-joined .ref-kpi-card:nth-child(-n+2){border-top:0}.ref-dashboard .ref-kpi-joined .ref-kpi-card:nth-child(even){border-left:1px solid #e0e7ef}.ref-dashboard .ref-kpi-joined .ref-kpi-card:last-child{grid-column:1/-1}.ref-dashboard .ref-dashboard-panel{padding:12px}}
+/* Preserve readable dark mode instead of forcing a light surface into it. */
+:root[data-theme="dark"] .ref-dashboard .ref-kpi-joined,:root[data-theme="dark"] .ref-dashboard .ref-kpi-joined .ref-kpi-card,:root[data-theme="dark"] .ref-dashboard .ref-dashboard-panel{background:#14243a;border-color:#354b63}
+:root[data-theme="dark"] .ref-dashboard :is(.ref-kpi-value,.ref-dashboard-heading h1,.ref-panel-header h2,.ref-campaign-table td strong,.ref-activity-item strong){color:#edf6ff}
+:root[data-theme="dark"] .ref-dashboard :is(.ref-kpi-label,.ref-kpi-note,.ref-dashboard-heading p,.ref-panel-header p,.ref-table-footnote,.ref-dashboard-safety,.ref-chart-column small,.ref-chart-footer,.ref-chart-empty,.ref-campaign-table td,.ref-campaign-table td small,.ref-activity-item p,.ref-activity-item time,.ref-activity-empty,.ref-table-empty){color:#b8cadc}
+:root[data-theme="dark"] .ref-dashboard .ref-campaign-table th{background:#1e344c;color:#dce9f7}
+:root[data-theme="dark"] .ref-dashboard .ref-chart-grid span{border-color:#40566f}
+:root[data-theme="dark"] .ref-dashboard .ref-campaign-table td{border-color:#354b63}
+:root[data-theme="dark"] .ref-dashboard .ref-panel-header>a{color:#71d5e4}
