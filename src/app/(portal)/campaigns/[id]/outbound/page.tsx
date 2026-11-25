@@ -28,6 +28,6 @@ export default async function OutboundPage({params}:{params:Promise<{id:string}>
   }catch{columns=[];rows=[];recordError="Unable to verify the locked recipient file. Launch is unavailable.";}
  }
  const config=configs.data?.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start?:string;end?:string;days?:string[];from?:string;to?:string;cps?:number;max_retries?:number;retry_interval_minutes?:number}}|null;
- return <main><div className="page-head"><div><p className="eyebrow">FRONTVOX AI · CAMPAIGN REVIEW</p><h1>Review &amp; Start</h1></div><Link className="btn-outline small" href="/campaigns">Back to Campaigns</Link></div>
+ return <main className="review-reference-page"><div className="page-head"><div><h1>Review &amp; Start</h1><p>Review your campaign details and schedule before launching.</p></div><Link className="btn-outline small" href="/campaigns">← &nbsp; Back to Campaigns</Link></div>
  <CampaignReview campaign={{id:campaign.id,name:campaign.name,status:campaign.status,dealershipId:campaign.dealership_id}} dealership={dealer.data?.name??"Assigned dealership"} email={dealer.data?.email??""} config={config} batch={batches.data?{eligible_records:batches.data.eligible_records,total_records:batches.data.total_records}:null} launch={launches.data} columns={columns} rows={rows} recordError={recordError} liveEnabled={process.env.ENABLE_LIVE_CALLS==="true"}/></main>;
 }
