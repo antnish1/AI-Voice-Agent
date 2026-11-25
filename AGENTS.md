@@ -125,3 +125,6 @@ User explicitly designated the following as the only release target for Frontier
 - Before every approved release, verify the canonical domain's project ID, exact Git commit, production target and READY status. Verify the domain points to that deployment; a preview or other account's successful build is insufficient. Never claim deployment success without this evidence.
 - PR #60 proposes an IT-configured initial dealership password via server-only `DEALERSHIP_DEFAULT_PASSWORD`. Never commit the value in this public repository. Do not deploy the updated provisioning function before the required private configuration exists. Existing accounts and IT-only reset behavior remain unchanged unless separately authorized.
 - This section supersedes historical infrastructure target references. It is not blanket authorization to merge/deploy future changes without user approval.
+
+## Verified custom production domain
+- `https://ai.insureit.tech` is an additional verified domain on the same canonical antnish1 Vercel project. Keep it and `https://frontier-ai-voice-crm.vercel.app` in the exact-origin allowlist for browser-facing Supabase functions. Never use wildcard CORS for privileged endpoints. Preserve authentication and IT-only authorization. Verify both domains after releases.

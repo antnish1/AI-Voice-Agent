@@ -2,7 +2,7 @@
 // The gateway uses service credentials internally; never put them in a browser bundle.
 import {createClient} from "npm:@supabase/supabase-js@2.58.0";
 
-const ALLOWED_ORIGINS=new Set(["https://frontier-ai-voice-crm.vercel.app","https://frontier-ai-voice-crm-six.vercel.app"]);
+const ALLOWED_ORIGINS=new Set(["https://ai.insureit.tech","https://frontier-ai-voice-crm.vercel.app","https://frontier-ai-voice-crm-six.vercel.app"]);
 const IT_ID="5bd78ada-44f5-4045-a9fb-75c9dad69893";
 // Generate a separate credential for each account; shared passwords are not safe
 // when dealership users cannot change their own passwords.
