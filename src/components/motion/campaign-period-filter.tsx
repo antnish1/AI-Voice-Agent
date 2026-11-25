@@ -1,9 +1,9 @@
 "use client";
-import {useRouter} from "next/navigation";
+import {useRouter,useSearchParams} from "next/navigation";
 import {useEffect,useState} from "react";
 
 export function CampaignPeriodFilter({period,from,to,today}:{period:string;from:string;to:string;today:string}){
- const router=useRouter();
+ const router=useRouter();const searchParams=useSearchParams();
  const [selected,setSelected]=useState(period);
  const [start,setStart]=useState(from);
  const [end,setEnd]=useState(to);
@@ -12,8 +12,8 @@ export function CampaignPeriodFilter({period,from,to,today}:{period:string;from:
  const selectedLabel=options.find(option=>option.value===selected)?.label??"All Time";
  const valid=start!==""&&end!==""&&start<=end&&end<=today;
  function navigate(value:string){
-  const params=new URLSearchParams({period:value});
-  if(value==="custom"){params.set("from",start);params.set("to",end);}
+  const params=new URLSearchParams(searchParams.toString());params.set("chartPeriod",value);params.delete("chartFrom");params.delete("chartTo");
+  if(value==="custom"){params.set("chartFrom",start);params.set("chartTo",end);}
   router.push("/dashboard?"+params.toString(),{scroll:false});
  }
  return <form className="ref-date-filters campaign-period-filter" onSubmit={e=>{e.preventDefault();if(selected==="custom"&&valid)navigate(selected);}}>
