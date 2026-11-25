@@ -12,5 +12,6 @@ import "./theme-portal.css";
 import "./profile-menu-appearance.css";
 import "./portal-crisp.css";
 import "./portal-compact.css";
+import "./campaign-status-colours.css";
 export const metadata: Metadata = { title: "Frontier Voice CRM", description: "AI-powered dealership voice CRM by Frontier Group", icons: { icon: "/autoreach-logo.png?v=79e52e1", shortcut: "/autoreach-logo.png?v=79e52e1", apple: "/autoreach-logo.png?v=79e52e1" } };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en"><body><ThemeController/>{children}</body></html>; }
