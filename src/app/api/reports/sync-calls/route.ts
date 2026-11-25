@@ -23,7 +23,7 @@ export async function POST(request:Request){
  if(!url||!key)return reply({error:"Result synchronization is not configured."},503);
  const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
  let body:Record<string,unknown>;try{body=await request.json();}catch{return reply({error:"Invalid request"},400);}
- const kind=body.kind,id=str(body.id),offset=Number(body.offset??0);
+ const kind=body.kind,id=str(body.id),offset=Number(body.offset??0);const phase=body.phase==="interactions"?"interactions":"attempts";
  if(!["test","campaign"].includes(String(kind))||!/^[a-f0-9-]{36}$/i.test(id)||!Number.isSafeInteger(offset)||offset<0)return reply({error:"Invalid sync scope"},400);
  try{
   let agent="",field="",value="",start="",dealer="",requestId="";
@@ -37,10 +37,27 @@ export async function POST(request:Request){
    agent=data.agent_id;field="campaign_id";value=data.sarvam_campaign_id;dealer=data.dealership_id;const earliest=await admin.from("voice_call_records").select("started_at").eq("dealership_id",dealer).eq("sarvam_campaign_id",value).eq("agent_id",agent).not("started_at","is",null).order("started_at").limit(1).maybeSingle();if(earliest.error)throw Error("Historical date lookup failed");start=new Date(Math.min(new Date(data.created_at).getTime(),new Date(earliest.data?.started_at??data.created_at).getTime())-86400000).toISOString();
   }
   const end=new Date().toISOString();
-  const page=await list(agent,"attempts",field,value,start,end,offset);
+  const page=await list(agent,phase,field,value,start,end,offset);
   let saved=0,inserted=0,updated=0;
   for(const a of page.items){
-   if(str(a[field])!==value||!str(a.attempt_id))continue;
+   if(str(a[field])!==value)continue;
+   if(phase==="interactions"){
+    const interaction=str(a.interaction_id);
+    if(!interaction)continue;
+    const transcript=Array.isArray(a.interaction_transcript)?a.interaction_transcript.map(object).filter((t):t is Record<string,unknown>=>!!t&&["agent","user"].includes(str(t.role))&&typeof t.en_text==="string").map(t=>({role:str(t.role),en_text:str(t.en_text).slice(0,4000)})):[];
+    const output=object(a.output_agent_variables)??object(a.agent_variables);
+    if(kind==="campaign"){
+     const existing=await admin.from("voice_call_records").select("id,agent_id,sarvam_campaign_id,output_variables").eq("dealership_id",dealer).eq("sarvam_interaction_id",interaction).maybeSingle();
+     if(existing.error||existing.data&&(existing.data.agent_id!==agent||existing.data.sarvam_campaign_id!==value))throw Error("Interaction scope conflict");
+     if(!existing.data)continue;
+     const fields={...(transcript.length?{transcript}:{}),...(output?{output_variables:{...object(existing.data.output_variables),...output}}:{}),last_synced_at:new Date().toISOString()};
+     const {error}=await admin.from("voice_call_records").update(fields).eq("id",existing.data.id).eq("dealership_id",dealer);if(error)throw Error("Interaction update failed");
+    }else{
+     const {error}=await admin.from("voice_test_call_results").update({...(transcript.length?{transcript}:{}),last_synced_at:new Date().toISOString()}).eq("request_id",requestId).eq("interaction_id",interaction);if(error)throw Error("Test interaction update failed");
+    }
+    saved++;updated++;continue;
+   }
+   if(!str(a.attempt_id))continue;
    if(kind==="test"&&str(a.campaign_id))continue;
    const interaction=str(a.interaction_id);
    const record={status:statusOf(a.connectivity_status),duration_seconds:typeof a.duration_in_seconds==="number"&&Number.isFinite(a.duration_in_seconds)?Math.max(0,Math.round(a.duration_in_seconds)):null,started_at:iso(a.start_datetime),ended_at:iso(a.end_datetime),last_synced_at:new Date().toISOString()};
@@ -56,6 +73,6 @@ export async function POST(request:Request){
    }
    saved++;
   }
-  return reply({ok:true,saved,inserted,updated,nextOffset:page.more?offset+50:null});
+  return reply({ok:true,saved,inserted,updated,nextOffset:page.more?offset+50:null,nextPhase:!page.more&&phase==="attempts"?"interactions":null});
  }catch{return reply({error:"Sarvam synchronization unavailable. Check provider access and retry later."},502);}
 }
