@@ -1,4 +1,4 @@
-# FrontVox AI — outbound integration release checklist (23 November 2026)
+# Frontier Voice CRM — outbound integration release checklist (23 November 2026)
 
 This branch implements three **server-side gated** operations; code availability **does not mean production has been enabled or that calls have been placed**. API contracts were checked against the Sarvam Voice Agents documentation. Existing logos/UI, authentication, dealership boundaries and unrelated products are unchanged.
 
