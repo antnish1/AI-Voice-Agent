@@ -175,3 +175,41 @@
 .crm-app .crm-operations>.tablewrap{flex:1;min-height:180px}
 .crm-app .docs-ref>.docs-grid{flex:1;align-content:start}
 @media(max-width:760px){.crm-app .ref-dashboard>.ref-dashboard-columns,.crm-app .settings-ref>.settings-ref-layout{align-items:start}.crm-app .it-user-page>.it-user-list,.crm-app .campaign-review>.review-panel:has(>.review-record-head){min-height:200px}}
+
+/* Keep search adjacent to title and push status/date to the right. Use a single
+   keyboard focus indicator on the pill, not a nested outline on the select. */
+.crm-app .fc-list-toolbar .fc-status{margin-inline-start:auto;max-width:none}
+.crm-app .fc-list-toolbar .fc-status select{border:0;box-shadow:none;outline:none;background:transparent;max-width:210px;cursor:pointer}
+.crm-app .fc-list-toolbar .fc-status:has(select:focus-visible){outline:2px solid var(--crisp-accent);outline-offset:2px}
+.crm-app .fc-list-toolbar .fc-date-details>summary{list-style:none}
+.crm-app .fc-list-toolbar .fc-date-details>summary::marker{content:""}
+.crm-app .fc-list-toolbar .fc-date-details>summary::-webkit-details-marker{display:none}
+@media(max-width:760px){.crm-app .fc-list-toolbar .fc-status{margin-inline-start:auto}.crm-app .fc-list-toolbar .fc-status select{max-width:160px}}
+
+/* Route motion establishes a containing block for fixed descendants. Dialogs
+   now mount directly in the stable app shell, centered in the viewport. */
+.crm-app > .campaign-modal-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto;z-index:120}
+.crm-app > .campaign-modal-overlay > .campaign-modal{margin:0;max-height:calc(100dvh - 24px);flex-shrink:1;min-height:0}
+.crm-app > .campaign-modal-overlay > .fc-compact-campaign{max-height:min(720px,calc(100dvh - 24px))}
+.crm-app > .campaign-modal-overlay .campaign-modal-scroll{min-height:0;overflow-y:auto}
+
+/* Campaign details: compact, native centered dialog with clear dismissal. */
+.crm-app .fc-campaign-details-dialog{width:min(560px,calc(100vw - 24px));margin:auto;padding:0;border:1px solid var(--crisp-line,#cbd8e4);border-radius:16px;background:var(--crisp-surface,#fff);color:var(--crisp-ink,#122b43)}
+.fc-details-surface{padding:0;background:var(--crisp-surface,#fff);color:var(--crisp-ink,#122b43)}
+.fc-details-heading{display:flex;align-items:center;gap:12px;padding:16px;background:linear-gradient(110deg,#14365f,#176f98);color:#fff}
+.fc-details-emblem{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:12px;background:#ffffff24}.fc-details-emblem svg{width:24px;height:24px}
+.fc-details-heading h2{font-size:18px;font-weight:750;margin:0;color:#fff}.fc-details-heading p{font-size:11px;margin:3px 0 0;color:#e0edf7}
+.fc-details-close{margin-left:auto;background:transparent;color:#fff;border:1px solid #ffffff55;border-radius:8px;width:32px;height:32px;font-size:20px;line-height:1;cursor:pointer}
+.fc-details-identity{margin:12px 12px 0;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--crisp-line,#cbd8e4);border-radius:10px;background:var(--crisp-header,#e7eef6)}
+.fc-details-identity>div{display:grid;gap:4px;min-width:0}.fc-details-identity>div>span{font-size:11px;color:var(--crisp-muted,#52677b)}.fc-details-identity strong{font-size:16px;overflow-wrap:anywhere}
+.fc-details-grid{display:grid;grid-template-columns:1fr 1fr;margin:12px;gap:8px}.fc-details-grid>div{display:flex;gap:9px;align-items:center;padding:10px;border:1px solid var(--crisp-line,#cbd8e4);border-radius:9px;min-width:0}.fc-details-grid>div:first-child{grid-column:1/-1}.fc-details-grid>div>div{min-width:0}.fc-details-field-icon{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:8px;background:var(--crisp-header,#e7eef6);color:var(--crisp-accent,#08738b)}.fc-details-field-icon svg{width:17px;height:17px}.fc-details-grid dt{font-size:11px;color:var(--crisp-muted,#52677b)}.fc-details-grid dd{margin:4px 0 0;font-weight:700;font-size:13px;overflow-wrap:anywhere}
+.fc-details-footer{display:flex;justify-content:flex-end;padding:10px 12px;border-top:1px solid var(--crisp-line,#cbd8e4)}.fc-details-ok{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:100px;min-height:40px;border:0;border-radius:9px;background:linear-gradient(110deg,#14365f,#205f9f);color:#fff;font-weight:700;cursor:pointer}.fc-details-ok svg{width:16px;height:16px}.fc-details-ok:hover{background:#14365f}
+@media(max-width:400px){.fc-details-grid{grid-template-columns:1fr}.fc-details-identity{flex-wrap:wrap}}
+
+/* Two rows of details and a full-width confirmation button. */
+.crm-app .fc-details-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px}
+.crm-app .fc-details-grid>div:first-child{grid-column:auto;margin:0;padding:10px;align-items:center;justify-content:flex-start}
+.crm-app .fc-details-identity>div{gap:3px;width:100%}
+.crm-app .fc-details-identity dd{margin:0;font-size:13px}
+.crm-app .fc-details-identity .status-pill{justify-self:start;white-space:normal;overflow-wrap:anywhere}
+.crm-app .fc-details-ok{width:100%}
