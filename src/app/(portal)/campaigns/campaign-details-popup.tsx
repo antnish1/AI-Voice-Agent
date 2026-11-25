@@ -1,12 +1,12 @@
 "use client";
 import {useEffect,useRef} from "react";
 type Props={name:string;dealership:string;status:string;created:string;approved:string;autoOpen?:boolean};
-export function CampaignDetailsPopup({name,dealership,status,created,approved,autoOpen=false}:Props){
+export function CampaignDetailsPopup({name,dealership,status,created,autoOpen=false}:Props){
  const dialog=useRef<HTMLDialogElement>(null);
  useEffect(()=>{if(autoOpen&&!dialog.current?.open)dialog.current?.showModal();},[autoOpen]);
- const fields=[["Dealership",dealership,"building"],["Created",created,"calendar"],["Approved",approved,"check"]];
+ const fields=[["Dealership",dealership,"building"],["Created",created,"calendar"]];
  const close=()=>dialog.current?.close();
- const tone=status==="APPROVED"?"approved":status==="REJECTED"?"rejected":status==="PENDING_MANAGER_APPROVAL"?"pending":"";
+ const tone=status==="Ongoing"||status==="Complete"?"approved":status==="Reject"?"rejected":"pending";
  return <><button type="button" className="btn-outline small" onClick={()=>dialog.current?.showModal()}>View</button>
  <dialog ref={dialog} aria-label="Campaign Details" className="fc-campaign-details-dialog" onClick={e=>{if(e.target===e.currentTarget)close();}}>
  <section className="fc-details-surface">

@@ -99,3 +99,5 @@ export async function saveReviewSchedule(id:string,dealershipId:string,schedule:
  revalidatePath("/campaigns/"+id+"/outbound");return {};
  }catch{return {error:"Unable to save schedule."};}
 }
+
+export async function setUnlaunchedCampaignState(id:string,dealershipId:string,decision:"PAUSED"|"REJECTED"){const {requireItSuperUser}=await import("@/lib/it-access");const {supabase,user}=await requireItSuperUser();if(!["PAUSED","REJECTED"].includes(decision))throw Error("Invalid action");const {data,error}=await supabase.from("campaigns").update({status:decision,approved_by:decision==="REJECTED"?user.id:null,approved_at:decision==="REJECTED"?new Date().toISOString():null}).eq("id",id).eq("dealership_id",dealershipId).in("status",["DRAFT","PENDING","PENDING_MANAGER_APPROVAL","APPROVED","PAUSED"]).select("id");if(error||!data?.length)throw Error("Campaign cannot be changed, or has already launched.");revalidatePath("/campaigns");revalidatePath("/campaigns/"+id+"/outbound");}
