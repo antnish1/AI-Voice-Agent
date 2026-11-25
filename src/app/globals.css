@@ -1560,3 +1560,7 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 .calllogs-expanded-table .calllogs-datetime{font-variant-numeric:tabular-nums;gap:3px}.calllogs-expanded-table .calllogs-datetime small{white-space:nowrap}
 
 .crm-app .calllogs-reference .calllogs-expanded-table :is(th,td):nth-child(2){padding-right:5px}.crm-app .calllogs-reference .calllogs-expanded-table :is(th,td):nth-child(3){padding-left:5px}
+
+/* Borderless Call Logs cells; keep the table card and header background. */
+.crm-app .calllogs-reference .calllogs-expanded-table :is(th,td){border:0!important;box-shadow:none}
+.crm-app .calllogs-reference .calllogs-expanded-table :is(thead,tbody,tr){border:0!important;box-shadow:none}
