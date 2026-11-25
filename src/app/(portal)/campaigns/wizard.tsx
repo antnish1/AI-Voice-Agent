@@ -28,7 +28,6 @@ function downloadBlob(blob:Blob,name:string) {
 export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}:{dealerships:Dealer[];initialDealershipId:string;canOpenOutbound:boolean}){
  const router=useRouter();
  const [dealershipId,setDealershipId]=useState(initialDealershipId);
- const [description,setDescription]=useState("");
  const today=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit"}).formatToParts(new Date());
  const currentYear=Number(today.find(p=>p.type==="year")?.value??"2026");
  const [month,setMonth]=useState(today.find(p=>p.type==="month")?.value??"01"),[year,setYear]=useState(String(currentYear));
@@ -70,7 +69,7 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
   startTransition(async()=>{
    let id=existingDraft;
    if(!id){
-    const created=await createSimpleCampaign(dealershipId,preview.filename,preview.total,description,year+"-"+month+"-01");
+    const created=await createSimpleCampaign(dealershipId,preview.filename,preview.total,"",year+"-"+month+"-01");
     if(!created.id){setError(created.error??"Could not create campaign.");return;}
     id=created.id;setExistingDraft(id);setReference(created.reference??"");
    }
@@ -99,9 +98,7 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
       </select>
      </label>}
      <div className="campaign-form-label">Campaign Month &amp; Year <span>*</span><div className="fc-period-fields"><select aria-label="Campaign month" className="campaign-pill-input" value={month} disabled={busy||!!existingDraft} onChange={e=>setMonth(e.target.value)}>{months.map((m,i)=><option key={m} value={String(i+1).padStart(2,"0")}>{m}</option>)}</select><select aria-label="Campaign year" className="campaign-pill-input" value={year} disabled={busy||!!existingDraft} onChange={e=>setYear(e.target.value)}>{Array.from({length:currentYear-1899},(_,i)=>currentYear-i).map(y=><option key={y} value={y}>{y}</option>)}</select></div></div>
-     <label className="campaign-form-label">Description
-      <input className="campaign-pill-input" type="text" maxLength={200} placeholder="Optional campaign purpose" value={description} disabled={busy||!!existingDraft} onChange={e=>setDescription(e.target.value)}/>
-     </label>
+     
     </div>
     <div className="fc-compact-excel-head">
      <strong>Customer Excel</strong>
