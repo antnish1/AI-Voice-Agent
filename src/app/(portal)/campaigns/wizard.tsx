@@ -106,7 +106,7 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
     </div>
     <div className="fc-compact-excel-head">
      <strong>Customer Excel</strong>
-     <button type="button" className="fc-template-icon fc-template-text" title="Download Excel template" aria-label="Download Excel template" onClick={()=>downloadBlob(makeRecipientTemplate(),"FrontVox_Recipient_Template.xlsx")}>
+     <button type="button" className="fc-template-icon fc-template-text" title="Download Excel template" aria-label="Download Excel template" onClick={()=>downloadBlob(makeRecipientTemplate(),"Frontier_Voice_CRM_Recipient_Template.xlsx")}>
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><span>Download Template</span>
      </button>
     </div>
