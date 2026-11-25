@@ -2,7 +2,7 @@
 import {useCallback,useEffect,useRef,useState,useTransition} from "react";
 import {createBrowserSupabase} from "@/lib/supabase/browser";
 
-type Dealer={id:string;name:string;contact?:string|null;mobile?:string|null;contact_person?:string|null;email?:string|null};
+type Dealer={id:string;name:string;address?:string|null;contact?:string|null;mobile?:string|null;contact_person?:string|null;email?:string|null};
 type Account={id:string;email:string;name:string;dealershipId:string;dealership:string;role:string;activated:boolean;mobile?:string;employeeId?:string;post?:string;passwordChangePending?:boolean;accountState?:AccountState;originalEmail?:string};
 type AccountState="active"|"disabled"|"archived";
 type LifecycleAction="archive-user"|"archive-release-email"|"disable-login"|"enable-login"|"delete-user";
@@ -20,7 +20,7 @@ async function call(action:Record<string,unknown>):Promise<Result>{
  if(!response.ok)throw new Error(body.error??"Request failed.");
  return body;
 }
-const emptyDealership={name:"",contact:"",mobile:"",contactPerson:"",email:""};
+const emptyDealership={name:"",address:"",mobile:"",contactPerson:"",email:""};
 const emptyUser={dealershipId:"",mobile:"",email:"",employeeId:"",name:"",post:""};
 export function UserManagement(){
  const [dealers,setDealers]=useState<Dealer[]>([]),[users,setUsers]=useState<Account[]>([]);
@@ -85,7 +85,7 @@ export function UserManagement(){
     {error&&<p role="alert" className="it-user-error">{error}</p>}
     <form className="it-user-form" onSubmit={makeDealer}>
      <label>Dealership Name<input required minLength={3} maxLength={100} placeholder="Frontier MG Noida" value={dealership.name} onChange={e=>setDealership(v=>({...v,name:e.target.value}))}/></label>
-     <label>Contact (office / landline)<input required maxLength={22} type="tel" placeholder="Office contact number" value={dealership.contact} onChange={e=>setDealership(v=>({...v,contact:e.target.value}))}/></label>
+     <label>Address<input required minLength={3} maxLength={500} autoComplete="street-address" placeholder="Dealership address" value={dealership.address} onChange={e=>setDealership(v=>({...v,address:e.target.value}))}/></label>
      <label>Mobile No.<input required maxLength={20} type="tel" placeholder="10-digit Indian mobile" value={dealership.mobile} onChange={e=>setDealership(v=>({...v,mobile:e.target.value}))}/></label>
      <label>Contact Person<input required minLength={2} maxLength={100} placeholder="Contact person's name" value={dealership.contactPerson} onChange={e=>setDealership(v=>({...v,contactPerson:e.target.value}))}/></label>
      <label>Email<input required type="email" maxLength={254} placeholder="dealership@example.com" value={dealership.email} onChange={e=>setDealership(v=>({...v,email:e.target.value}))}/></label>
@@ -138,7 +138,7 @@ export function UserManagement(){
   <div className="it-user-creation-grid it-user-single">
    <section className="it-user-card">
     <h2>Create Dealership User</h2>
-    <form className="it-user-form" onSubmit={makeUser}>
+    <form className="it-user-form it-create-user-form" onSubmit={makeUser}>
      <label>Dealership<select required value={employee.dealershipId} onChange={e=>setEmployee(v=>({...v,dealershipId:e.target.value}))}><option value="">Select dealership</option>{dealers.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></label>
      <label>Mobile No.<input required type="tel" maxLength={20} placeholder="10-digit Indian mobile" value={employee.mobile} onChange={e=>setEmployee(v=>({...v,mobile:e.target.value}))}/></label>
      <label>Email<input required type="email" maxLength={254} placeholder="employee@dealership.com" value={employee.email} onChange={e=>setEmployee(v=>({...v,email:e.target.value}))}/></label>
@@ -152,8 +152,8 @@ export function UserManagement(){
   <div className="it-register-tabs" role="group" aria-label="Select register"><button type="button" aria-pressed={!directoryView} onClick={()=>setDirectoryView(false)}>Dealership User Accounts</button><button type="button" aria-pressed={directoryView} onClick={()=>setDirectoryView(true)}>Dealership Directory</button></div>
   {directoryView ? <section className="it-user-card it-user-list it-full-width">
    <div className="it-user-table-head"><div><h2>Dealership Directory</h2></div></div>
-   <div className="tablewrap"><table><thead><tr><th>Dealership</th><th>Contact</th><th>Mobile</th><th>Contact Person</th><th>Email</th></tr></thead><tbody>
-   {dealers.map(d=><tr key={d.id}><td><strong>{d.name}</strong></td><td>{d.contact??"—"}</td><td>{d.mobile??"—"}</td><td>{d.contact_person??"—"}</td><td>{d.email??"—"}</td></tr>)}
+   <div className="tablewrap"><table><thead><tr><th>Dealership</th><th>Address</th><th>Mobile</th><th>Contact Person</th><th>Email</th></tr></thead><tbody>
+   {dealers.map(d=><tr key={d.id}><td><strong>{d.name}</strong></td><td>{d.address??"—"}</td><td>{d.mobile??"—"}</td><td>{d.contact_person??"—"}</td><td>{d.email??"—"}</td></tr>)}
    {!dealers.length&&<tr><td colSpan={5} className="it-user-empty">{loading?"Loading…":"No dealerships found."}</td></tr>}
    </tbody></table></div>
   </section> : <section className="it-user-card it-user-list it-full-width">
