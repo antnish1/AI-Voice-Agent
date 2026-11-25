@@ -104,3 +104,6 @@
  .frontier-reference-sidebar .frontier-sidebar-nav .frontier-nav-link{color:#102d43}
  .frontier-reference-sidebar .frontier-motion-active-nav{border-color:#087a87}
 }
+
+/* Frontier brand subtitle follows the red logo palette. */
+.frontier-reference-sidebar .frontier-sidebar-brand .frontier-brand-text small{color:#d32f2f!important}
