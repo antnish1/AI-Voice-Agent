@@ -125,3 +125,6 @@ User explicitly designated the following as the only release target for Frontier
 - Before every approved release, verify the canonical domain's project ID, exact Git commit, production target and READY status. Verify the domain points to that deployment; a preview or other account's successful build is insufficient. Never claim deployment success without this evidence.
 - PR #60 proposes an IT-configured initial dealership password via server-only `DEALERSHIP_DEFAULT_PASSWORD`. Never commit the value in this public repository. Do not deploy the updated provisioning function before the required private configuration exists. Existing accounts and IT-only reset behavior remain unchanged unless separately authorized.
 - This section supersedes historical infrastructure target references. It is not blanket authorization to merge/deploy future changes without user approval.
+
+## Shared portal vertical layout
+All authenticated pages for IT Super User and dealership accounts must use the available viewport height in both sidebar and top-menu layouts. Grow primary content panels when records are sparse; keep data rows, forms, KPIs and controls compact. Keep pagination at the bottom where applicable and allow natural scrolling for long content. Do not stretch dialogs or change permissions to achieve layout parity.
