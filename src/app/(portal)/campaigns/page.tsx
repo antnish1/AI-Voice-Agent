@@ -4,6 +4,7 @@ import {requireMembership,canCreateCampaign} from "@/lib/auth";
 import {isItSuperUser} from "@/lib/it-access";
 import "./campaigns-reference.css";
 import {CampaignDetailsPopup} from "./campaign-details-popup";
+import {CampaignActionToast} from "./campaign-action-toast";
 import {AutoCampaignFilters} from "./auto-campaign-filters";
 
 type Filters={q?:string;status?:string;from?:string;to?:string;view?:string};
@@ -63,7 +64,7 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
  const canOperate=isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
  const itUser=isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
  const filtered=!!(q||selectedStatus||from||to);
- return <div className="fc-campaign-page">
+ return <div className="fc-campaign-page"><CampaignActionToast/>
   <header className="fc-campaign-hero">
    <div className="fc-hero-copy"><h1>Campaigns</h1></div>
    <HeaderWave/>

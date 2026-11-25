@@ -80,3 +80,14 @@
  .settings-ref .frontier-appearance-theme-half{flex-wrap:nowrap;justify-content:space-between}
 }
 .settings-ref .frontier-appearance-theme-half>span{text-transform:uppercase;white-space:nowrap}
+
+/* Keep equal halves, align both control groups beside their headings. */
+.settings-ref .frontier-appearance-layout-half{gap:24px}
+.settings-ref .frontier-appearance-theme-half{justify-content:flex-start;gap:24px;padding-left:18px}
+.settings-ref .frontier-appearance-theme-half .frontier-theme-title{display:flex;align-items:center;gap:8px;flex:0 0 auto;margin:0;white-space:nowrap}
+.settings-ref .frontier-theme-title svg{flex:none}
+.settings-ref .frontier-theme-title h3{margin:0;font-size:16px;font-weight:750;text-transform:none}
+.settings-ref .frontier-appearance-theme-half .frontvox-theme-fieldset{flex:0 0 auto;margin:0;min-width:0}
+@container (min-width:1040px){.settings-ref .frontier-appearance-layout-half{gap:clamp(16px,2cqw,32px);flex-wrap:wrap}.settings-ref .frontier-appearance-theme-half{justify-content:flex-start;gap:clamp(16px,2cqw,32px)}.settings-ref .frontier-theme-title h3{font-size:clamp(13px,1.15cqw,16px)}}
+@container (max-width:780px){.settings-ref .frontier-appearance-layout-half,.settings-ref .frontier-appearance-theme-half{gap:12px}}
+@media(max-width:760px){.settings-ref .frontier-appearance-theme-half{padding-left:0;gap:16px}}
