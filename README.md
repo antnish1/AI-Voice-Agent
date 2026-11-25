@@ -1,4 +1,4 @@
-# Frontier AI Voice CRM
+# Frontier Voice CRM
 
 ## Current development status
 
@@ -18,7 +18,7 @@ Never use real customer records until RLS and security tests are verified. Do no
 
 ---
 
-# Frontier AI Voice CRM
+# Frontier Voice CRM
 
 Standalone multi-dealership AI calling CRM for **Frontier Group dealerships**. Sarvam Samvaad powers calls; this portal handles imports, campaign preparation, manager approval, follow-up work and reporting.
 
