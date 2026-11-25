@@ -34,11 +34,11 @@ export async function POST(request:Request){
   }else{
    const {data,error}=await ctx.supabase.from("voice_campaign_links").select("agent_id,sarvam_campaign_id,dealership_id,created_at").eq("campaign_id",id).maybeSingle();
    if(error||!data)return reply({error:"No linked Sarvam campaign"},404);
-   agent=data.agent_id;field="campaign_id";value=data.sarvam_campaign_id;dealer=data.dealership_id;start=new Date(new Date(data.created_at).getTime()-3600000).toISOString();
+   agent=data.agent_id;field="campaign_id";value=data.sarvam_campaign_id;dealer=data.dealership_id;const earliest=await admin.from("voice_call_records").select("started_at").eq("dealership_id",dealer).eq("sarvam_campaign_id",value).eq("agent_id",agent).not("started_at","is",null).order("started_at").limit(1).maybeSingle();if(earliest.error)throw Error("Historical date lookup failed");start=new Date(Math.min(new Date(data.created_at).getTime(),new Date(earliest.data?.started_at??data.created_at).getTime())-86400000).toISOString();
   }
   const end=new Date().toISOString();
   const page=await list(agent,"attempts",field,value,start,end,offset);
-  let saved=0;
+  let saved=0,inserted=0,updated=0;
   for(const a of page.items){
    if(str(a[field])!==value||!str(a.attempt_id))continue;
    if(kind==="test"&&str(a.campaign_id))continue;
@@ -47,12 +47,15 @@ export async function POST(request:Request){
    if(kind==="test"){
     const {error}=await admin.from("voice_test_call_results").upsert({request_id:requestId,interaction_id:interaction||null,...record},{onConflict:"request_id"});if(error)throw Error("Save failed");
    }else{
-    const existing=interaction?await admin.from("voice_call_records").select("id").eq("dealership_id",dealer).eq("sarvam_interaction_id",interaction).maybeSingle():{data:null,error:null};if(existing.error)throw Error("Duplicate lookup failed");
-    const fields={dealership_id:dealer,sarvam_campaign_id:value,sarvam_attempt_id:str(a.attempt_id),agent_id:agent,sarvam_interaction_id:interaction||null,dialed_number:str(a.user_contact)||null,...record};
-    const {error}=existing.data?await admin.from("voice_call_records").update(fields).eq("id",existing.data.id).eq("dealership_id",dealer):await admin.from("voice_call_records").upsert(fields,{onConflict:"dealership_id,sarvam_attempt_id"});if(error)throw Error("Save failed");
+    const existing=interaction?await admin.from("voice_call_records").select("id,sarvam_campaign_id,agent_id,sarvam_attempt_id,output_variables").eq("dealership_id",dealer).eq("sarvam_interaction_id",interaction).maybeSingle():{data:null,error:null};if(existing.error)throw Error("Duplicate lookup failed");if(existing.data&&(existing.data.sarvam_campaign_id!==value||existing.data.agent_id!==agent))throw Error("Interaction scope conflict");
+    const byAttempt=await admin.from("voice_call_records").select("id,sarvam_campaign_id,agent_id,sarvam_interaction_id,output_variables").eq("dealership_id",dealer).eq("sarvam_attempt_id",str(a.attempt_id)).maybeSingle();
+    if(byAttempt.error||byAttempt.data&&(byAttempt.data.sarvam_campaign_id!==value||byAttempt.data.agent_id!==agent||interaction&&byAttempt.data.sarvam_interaction_id&&byAttempt.data.sarvam_interaction_id!==interaction)||existing.data&&byAttempt.data&&existing.data.id!==byAttempt.data.id)throw Error("Attempt identity conflict");
+    const prior=existing.data??byAttempt.data;
+    const fields={dealership_id:dealer,sarvam_campaign_id:value,sarvam_attempt_id:str(a.attempt_id),agent_id:agent,...(interaction?{sarvam_interaction_id:interaction}:{}),...(str(a.user_contact)?{dialed_number:str(a.user_contact)}:{}),...(record.status!=="other"||!prior?{status:record.status}:{}),...(record.duration_seconds!==null?{duration_seconds:record.duration_seconds}:{}),...(record.started_at?{started_at:record.started_at}:{}),...(record.ended_at?{ended_at:record.ended_at}:{}),last_synced_at:record.last_synced_at};
+    const {error}=prior?await admin.from("voice_call_records").update(fields).eq("id",prior.id).eq("dealership_id",dealer):await admin.from("voice_call_records").insert(fields);if(error)throw Error("Save failed");if(prior)updated++;else inserted++;
    }
    saved++;
   }
-  return reply({ok:true,saved,nextOffset:page.more?offset+50:null});
+  return reply({ok:true,saved,inserted,updated,nextOffset:page.more?offset+50:null});
  }catch{return reply({error:"Sarvam synchronization unavailable. Check provider access and retry later."},502);}
 }
