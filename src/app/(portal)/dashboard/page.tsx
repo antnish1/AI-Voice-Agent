@@ -40,7 +40,7 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  {name:"Pending Approvals",value:String(approvalCount.count??0),note:"Awaiting manager review",icon:"◷",tone:"amber"},
  {name:"Total Calls",value:"—",note:"Sarvam not connected",icon:"◕",tone:"blue"}];
  return <div className="ref-dashboard">
- <div className="ref-dashboard-heading"><div><h1>{greeting}, {userName}! <span aria-hidden="true">👋</span></h1><p>Here’s what’s happening with your AI voice campaigns today.</p></div><div className="ref-dashboard-heading-actions"><span className="ref-today-pill">▣ &nbsp; Today</span>{canCreate&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div>
+ <div className="ref-dashboard-heading"><div><h1>{greeting}, {userName}! <span aria-hidden="true">👋</span></h1></div><div className="ref-dashboard-heading-actions"><span className="ref-today-pill">▣ &nbsp; Today</span>{canCreate&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div>
  <div className="ref-kpi-grid ref-kpi-joined" aria-label="Dashboard key metrics">{metrics.map(m=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}>{m.icon}</div><div><span className="ref-kpi-label">{m.name}</span><CountUp className="ref-kpi-value" value={m.value}/><small className="ref-kpi-note">{m.note}</small></div></article>)}</div>
  <div className="ref-dashboard-columns">
  <div className="ref-dashboard-left">
