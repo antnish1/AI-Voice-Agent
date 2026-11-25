@@ -1,4 +1,4 @@
-# AGENTS.md — Frontier AI Voice CRM + Kajal Agent Handoff
+# AGENTS.md — Frontier Voice CRM + Kajal Agent Handoff
 
 > Maintainer instructions for future coding/voice-agent assistants. Current agreed requirements take priority over old experimental drafts. **This repository is PUBLIC**: never commit customer lists, phone numbers, call recordings, transcripts containing private data, API keys or production credentials.
 
@@ -116,7 +116,7 @@ These are operational reference points, not blanket permission to deploy, call c
 
 ## M. Canonical production target — mandatory (24 November 2026)
 
-User explicitly designated the following as the only release target for Frontier / FrontVox AI CRM:
+User explicitly designated the following as the only release target for Frontier / Frontier Voice CRM:
 - GitHub: `antnish1/AI-Voice-Agent`, production branch `main`; feature branches and reviewed PRs remain the development workflow.
 - Vercel account/team: `antnish1s-projects` (antnish1), project `frontier-ai-voice-crm`, ID `prj_51k5pHkUt6ZRbcaf2kS798fT2KL9`.
 - Verified canonical domain: `https://frontier-ai-voice-crm.vercel.app`; User Management: `/users`.
@@ -163,3 +163,6 @@ Historical linking must verify existing dealership, campaign and agent ownership
 
 ### Table design reversal
 - User requested reverting PR #102. Restore the pre-#102 Uploaded Excel Records styling without reverting unrelated schedule, pagination, or later changes. The separate spacious table styling is no longer the intended design.
+
+## Product branding update (25 November 2026)
+- All user-facing product branding must read Frontier Voice CRM, including sidebar, top menu, sign-in, browser titles, accessibility labels and new export names. Preserve the approved logo and favicon, canonical project/domain, database identifiers, storage buckets and external integration identifiers.
