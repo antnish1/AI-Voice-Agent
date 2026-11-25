@@ -1498,3 +1498,14 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 .fc-period-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}.fc-period-fields select{min-width:0;width:100%}.fc-success-campaign{max-width:460px;padding:28px;text-align:center}.fc-success-tick{display:grid;place-items:center;background:#e1f5ee;color:#009b70;width:64px;height:64px;border-radius:50%;font-size:34px;margin:0 auto 16px}.fc-success-campaign h2{font-size:20px;margin:0 0 10px}.fc-success-campaign p{font-size:13px;color:#718ba1;margin:0 0 8px}.fc-success-reference{display:block;font-size:24px;color:#078d9b;overflow-wrap:anywhere}.fc-success-status{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #e1eaf3;margin-top:24px;padding:16px 0}.fc-success-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fc-success-actions button{width:100%}@keyframes fc-success-pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}@media(prefers-reduced-motion:no-preference){.fc-success-campaign,.fc-success-tick{animation:fc-success-pop .3s ease-out both}}
 
 .reports-category-card{text-align:left;cursor:pointer;width:100%;transition:border-color .18s ease,box-shadow .18s ease}.reports-category-card[aria-pressed=true]{border-color:#078d9b;box-shadow:0 0 0 1px #078d9b}.reports-category-card:hover{border-color:#078d9b}.reports-category-card:focus-visible{outline:2px solid #078d9b;outline-offset:2px}
+
+/* Call Logs: data-driven daily bars and a single dropdown border. */
+.calllogs-real-bars{position:absolute;inset:8px 8px 0;display:flex;align-items:stretch;gap:12px;overflow-x:auto;padding:12px 4px 0}
+.calllogs-day{flex:1 0 72px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;min-width:72px}
+.calllogs-bar-group{display:flex;align-items:flex-end;justify-content:center;gap:6px;height:calc(100% - 18px);width:100%}
+.calllogs-real-bar{position:relative;width:min(26px,24%);border-radius:5px 5px 0 0;flex-shrink:0;transition:height .25s ease}
+.calllogs-real-bar span{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:650;color:inherit;font-variant-numeric:tabular-nums}
+.calllogs-day small{font-size:10px;color:inherit;white-space:nowrap}
+.calllogs-reference .calllogs-dropdown select,.calllogs-reference .calllogs-dropdown select:focus,.calllogs-reference .calllogs-dropdown select:focus-visible{border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;max-width:180px;min-width:0}
+.calllogs-reference .calllogs-dropdown:focus-within{border-color:#0c98a6;box-shadow:none;outline:none}
+@media(prefers-reduced-motion:reduce){.calllogs-real-bar{transition:none}}
