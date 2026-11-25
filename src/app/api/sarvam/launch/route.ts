@@ -13,8 +13,8 @@ export async function POST(request:Request){
   const id=String(input.campaignId??"");
   if(!/^[\da-f-]{36}$/i.test(id))return NextResponse.json({error:"Invalid campaign ID"},{status:400});
   const {data:campaign,error:campaignError}=await supabase.from("campaigns").select("id,name,dealership_id,status,approved_by,approved_at").eq("id",id).maybeSingle();
-  if(campaignError||!campaign||campaign.status!=="APPROVED"||!campaign.approved_by||!campaign.approved_at)
-   return NextResponse.json({error:"A manager-approved local campaign is required before launching."},{status:403});
+  if(campaignError||!campaign||!["DRAFT","PENDING","PENDING_MANAGER_APPROVAL","PAUSED","APPROVED"].includes(campaign.status))
+   return NextResponse.json({error:"A pending or held local campaign is required before launching."},{status:403});
   if(input.confirm!=="LAUNCH "+campaign.name||input.reviewedTestResult!==true)return NextResponse.json({error:"Exact campaign confirmation and explicit reviewed-test acknowledgment are required."},{status:400});
   const [{data:batch,error:batchError},{data:config,error:configError},{data:test,error:testError}]=await Promise.all([
    supabase.from("campaign_recipient_batches").select("*").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
@@ -73,10 +73,7 @@ export async function POST(request:Request){
    allowed_schedule:{timezone:"Asia/Kolkata",allowed_start_time:schedule.from,allowed_end_time:schedule.to,allowed_days:schedule.days.map(x=>days[x])}
   };
   const configHash=sha256(JSON.stringify(launchBody));
-  const {data:reservation,error:reserveError}=await supabase.from("voice_campaign_launches").insert({
-   campaign_id:id,dealership_id:campaign.dealership_id,recipient_sha256:batch.csv_sha256,
-   config_sha256:configHash,state:"creating",initiated_by:user.id
-  }).select("campaign_id").single();
+  const {data:reservation,error:reserveError}=await supabase.rpc("frontvox_reserve_direct_launch",{p_campaign:id,p_dealer:campaign.dealership_id,p_expected_config:config.configuration,p_recipient_hash:batch.csv_sha256,p_config_hash:configHash});
   if(reserveError||!reservation)return NextResponse.json({error:"This campaign already has a launch attempt. Check its state; do not retry blindly."},{status:409});
   let providerId="";
   try{
@@ -99,7 +96,7 @@ export async function POST(request:Request){
     name:batch.cohort_name,users:prepared.users
    });
    if(typeof streamed.cohort_id!=="string"||!streamed.cohort_id)throw Error("Provider did not acknowledge cohort");
-   const {error:statusError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitted",sarvam_cohort_id:streamed.cohort_id,updated_at:new Date().toISOString()}).eq("campaign_id",id);
+   const {error:statusError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitted",provider_status:"scheduled",sarvam_cohort_id:streamed.cohort_id,updated_at:new Date().toISOString()}).eq("campaign_id",id);
    if(statusError)throw Error("Could not persist cohort state");
    return NextResponse.json({ok:true,campaignId:providerId,cohortId:streamed.cohort_id,cohortStatus:streamed.status??"processing",message:"Sarvam accepted campaign and recipient cohort. Confirm processing status before the scheduled dialing window."});
   }catch{
