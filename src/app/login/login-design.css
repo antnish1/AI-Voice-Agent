@@ -1,4 +1,4 @@
-/* FrontVox AI login — scoped to .fv-login; no dashboard, logo or global layout changes. */
+/* Frontier Voice CRM login — scoped to .fv-login; no dashboard, logo or global layout changes. */
 .fv-login{--fv-blue:#063a79;--fv-navy:#00265c;--fv-electric:#08e0ed;display:grid;grid-template-columns:minmax(0,50%) minmax(0,50%);min-height:100dvh;overflow:hidden;background:#eaf3ff;color:#0a2854;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
 .fv-login *{box-sizing:border-box}
 .fv-left{position:relative;min-height:700px;isolation:isolate;overflow:hidden;padding:clamp(34px,4.4vw,72px) clamp(28px,5vw,80px);background:radial-gradient(ellipse at 80% 3%,#2fb1dc99 0%,transparent 39%),radial-gradient(ellipse at 7% 96%,#1474d9 0%,transparent 40%),linear-gradient(132deg,#06447f 0%,#00306f 43%,#001e50 80%,#07529a 100%);color:#fff}
@@ -412,3 +412,8 @@
 @media(min-width:801px) and (max-height:619px){
   .fv-signin-card{height:auto;justify-content:flex-start}
 }
+
+/* Longer approved product name must wrap rather than overflow. */
+.fv-left-content h1{white-space:normal;font-size:clamp(36px,4.5vw,70px);overflow-wrap:normal;line-height:1.08}
+.fv-left-content h1 em{display:inline-block;max-width:100%}
+@media(max-width:800px){.fv-left-content h1{font-size:clamp(34px,7vw,54px)}}
