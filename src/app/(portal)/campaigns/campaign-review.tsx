@@ -1,7 +1,6 @@
 "use client";
 import {useState,useRef} from "react";
 import {useRouter} from "next/navigation";
-import Link from "next/link";
 import {setUnlaunchedCampaignState,saveReviewSchedule} from "./actions";
 import "./campaign-review.css";
 import {campaignDisplayStatus} from "@/lib/campaign-display-status";
@@ -36,11 +35,12 @@ export function CampaignReview({campaign,dealership,email,config,batch,launch,co
   else if(action==="start"&&resumeReady){const res=await fetch("/api/sarvam/campaign-status",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({campaignId:campaign.id,action:"resume",confirm:"RESUME CAMPAIGN"})});const data=await res.json();if(!res.ok||!data.ok)throw Error(data.error??"Unable to resume campaign.");setMessage(data.message??"Resume accepted.");}
   else if(ready&&reviewed){const res=await fetch("/api/sarvam/launch",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({campaignId:campaign.id,agentId:config?.agent_label,appVersion:Number(config?.agent_version_label),connectionId:config?.telephony_label,callerNumber:config?.outgoing_number_label,startAt:new Date(start+":00+05:30").toISOString(),endAt:new Date(end+":00+05:30").toISOString(),confirm:"LAUNCH "+campaign.name,reviewedTestResult:true})});const data=await res.json();if(!res.ok||!data.ok)throw Error(data.error??"Launch failed.");setMessage(data.message??"Launch accepted.");}
   else throw Error("Campaign is not ready to start.");
-  dialog.current?.close();router.refresh();
+  dialog.current?.close();router.replace("/campaigns");router.refresh();
  }catch(e){setError(e instanceof Error?e.message:"Action failed.");}finally{setBusy(false);}}
  const startAllowed=!editing&&(resumeReady||ready);
+ const displayStatus=campaignDisplayStatus(campaign.status,launch?.provider_status);
  return <div className="campaign-review">
- <section className="crm-panel review-panel review-summary"><div className="review-title-row"><h1>Review &amp; Start</h1><Link className="btn-outline small" href="/campaigns">Back to Campaigns</Link></div><div className="review-details">{[["Dealership Name",dealership],["Email",email||"Not configured"],["Campaign ID",campaign.name]].map(([k,v],i)=><div key={k}><i className={"review-summary-icon icon-"+i} aria-hidden="true">{["◇","▤","▦"][i]}</i><div><span>{k}</span><strong>{v}</strong></div></div>)}<span className="status-pill">{campaignDisplayStatus(campaign.status,launch?.provider_status)}</span></div></section>
+ <section className="crm-panel review-panel review-summary"><div className="review-title-row"><h1>Review &amp; Start</h1><span className={"status-pill review-status-"+displayStatus.toLowerCase()}>{displayStatus}</span></div><div className="review-details">{[["Dealership Name",dealership],["Email",email||"Not configured"],["Campaign ID",campaign.name]].map(([k,v],i)=><div key={k}><i className={"review-summary-icon icon-"+i} aria-hidden="true">{["◇","▤","▦"][i]}</i><div><span>{k}</span><strong>{v}</strong></div></div>)}</div></section>
  <section className="crm-panel review-panel review-schedule-panel"><div className="panel-title"><h2><span aria-hidden="true">▣</span> Schedule</h2><button className="review-pencil" type="button" aria-label="Edit schedule" title={editable?"Edit schedule":"Launched or rejected schedules are locked"} disabled={!editable||busy||editing} onClick={()=>{setDraft(schedule);setStartMode("custom");setEndMode("custom");setEditing(true);setError("");scheduleDialog.current?.showModal();}}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="m16 3 5 5-12 12-6 1 1-6zM14 5l5 5"/></svg></button></div>
  <div className="review-schedule">
  <div className="review-value"><span>Start Date &amp; Time (IST)</span><strong className="review-date">▣ &nbsp; {schedule.start||"—"} {schedule.from}</strong></div>
