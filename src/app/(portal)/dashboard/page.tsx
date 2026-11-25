@@ -44,20 +44,18 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  <div className="ref-kpi-grid ref-kpi-joined" aria-label="Dashboard key metrics">{metrics.map(m=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}>{m.icon}</div><div><span className="ref-kpi-label">{m.name}</span><CountUp className="ref-kpi-value" value={m.value}/><small className="ref-kpi-note">{m.note}</small></div></article>)}</div>
  <div className="ref-dashboard-columns">
  <div className="ref-dashboard-left">
-  <section className="ref-dashboard-panel ref-performance"><div className="ref-panel-header"><div><h2><span className="ref-heading-icon">▥</span> Campaign Performance</h2><p>Campaigns created during this period; call outcomes are not connected yet.</p></div><div className="ref-date-filters"><span className="ref-selected-period">Last {days} days</span><div className="ref-range-links"><Link aria-current={days===7?"true":undefined} href="/dashboard?days=7">7D</Link><Link aria-current={days===14?"true":undefined} href="/dashboard?days=14">14D</Link><Link aria-current={days===30?"true":undefined} href="/dashboard?days=30">30D</Link></div></div></div>
+  <section className="ref-dashboard-panel ref-performance"><div className="ref-panel-header"><div><h2><span className="ref-heading-icon">▥</span> Campaign Performance</h2></div><div className="ref-date-filters"><span className="ref-selected-period">Last {days} days</span><div className="ref-range-links"><Link aria-current={days===7?"true":undefined} href="/dashboard?days=7">7D</Link><Link aria-current={days===14?"true":undefined} href="/dashboard?days=14">14D</Link><Link aria-current={days===30?"true":undefined} href="/dashboard?days=30">30D</Link></div></div></div>
    <CampaignActivityChart daily={daily} days={days}/>
    <div className="ref-chart-footer"><span><i/> Campaign drafts created</span><span>{(periodCampaigns.data??[]).length} records in selected period</span></div>
    {(periodCampaigns.data??[]).length===0&&<p className="ref-chart-empty">No campaigns created in this period. Charts will update with real data.</p>}
   </section>
   <section className="ref-dashboard-panel ref-recent-campaigns"><div className="ref-panel-header"><h2><span className="ref-heading-icon">◫</span> Recent Campaigns</h2><Link href="/campaigns">View All</Link></div>
    <div className="tablewrap"><table className="ref-campaign-table"><thead><tr><th>Campaign Name</th><th>Agent</th><th>Type</th><th>Contacts</th><th>Status</th><th>Calls</th><th>Success Rate</th><th>Actions</th></tr></thead><tbody>{recent.length?recent.map(c=><tr key={c.id}><td><strong>{c.name}</strong><small>{formatted(c.created_at)}</small></td><td>—</td><td>Planned</td><td>—</td><td><span className={"ref-campaign-status status-"+c.status.toLowerCase()}>{c.status.replaceAll("_"," ")}</span></td><td>—</td><td>—</td><td><Link href="/campaigns" aria-label={"View campaign "+c.name}>•••</Link></td></tr>):<tr><td colSpan={8} className="ref-table-empty">No campaigns yet. Create a draft to see it here.</td></tr>}</tbody></table></div>
-   <p className="ref-table-footnote">Agent, recipient and call outcomes will appear once verified integrations are connected.</p>
   </section>
  </div>
  <div className="ref-dashboard-right">
   <section className="ref-dashboard-panel ref-activity"><div className="ref-panel-header"><h2><span className="ref-heading-icon">◷</span> Recent Activity</h2><Link href="/campaigns">View All</Link></div><div className="ref-activity-list">{activity.length?activity.map(item=><div className="ref-activity-item" key={item.key}><span className={"ref-activity-icon tone-"+item.tone}>{item.icon}</span><div><strong>{item.title}</strong><p>{item.detail}</p></div><time dateTime={item.at}>{formatted(item.at)}</time></div>):<div className="ref-activity-empty">No recent campaign or import activity.</div>}</div></section>
  </div>
  </div>
- <p className="ref-dashboard-safety">FRONTIER CRM setup mode · Campaign launching and test calls remain disabled until Sarvam integration is explicitly authorized.</p>
  </div>;
 }
