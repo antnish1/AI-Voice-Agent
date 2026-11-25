@@ -150,3 +150,10 @@
 .crm-app .fc-list-toolbar .fc-date-details>summary::marker{content:""}
 .crm-app .fc-list-toolbar .fc-date-details>summary::-webkit-details-marker{display:none}
 @media(max-width:760px){.crm-app .fc-list-toolbar .fc-status{margin-inline-start:auto}.crm-app .fc-list-toolbar .fc-status select{max-width:160px}}
+
+/* Route motion establishes a containing block for fixed descendants. Dialogs
+   now mount directly in the stable app shell, centered in the viewport. */
+.crm-app > .campaign-modal-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto;z-index:120}
+.crm-app > .campaign-modal-overlay > .campaign-modal{margin:0;max-height:calc(100dvh - 24px);flex-shrink:1;min-height:0}
+.crm-app > .campaign-modal-overlay > .fc-compact-campaign{max-height:min(720px,calc(100dvh - 24px))}
+.crm-app > .campaign-modal-overlay .campaign-modal-scroll{min-height:0;overflow-y:auto}
