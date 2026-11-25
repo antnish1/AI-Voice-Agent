@@ -230,3 +230,12 @@
 .crm-app .reports-sync-result{display:flex;justify-content:flex-end;margin:0 0 8px}
 .crm-app .reports-action-message{display:inline-block;max-width:100%;margin:4px 0 0;padding:5px 9px;border:1px solid var(--crisp-line,#cbd8e4);border-radius:6px;background:var(--crisp-surface,#fff);color:var(--crisp-ink,#122b43);font-size:11px;line-height:1.4;overflow-wrap:anywhere}
 @media(max-width:760px){.crm-app .reports-compact-actions{justify-content:flex-start;margin-left:0}.crm-app .reports-import-form{grid-template-columns:1fr}.crm-app .reports-import-form>.reports-import-confirm{grid-column:auto}.crm-app .reports-import-submit{justify-self:end}}
+
+/* Dealership users already know their own dealership; use four full-width columns. */
+.crm-app .fc-dealer-campaign-table{min-width:480px}
+.crm-app .fc-dealer-campaign-table col:nth-child(1){width:40%}
+.crm-app .fc-dealer-campaign-table col:nth-child(2){width:22%}
+.crm-app .fc-dealer-campaign-table col:nth-child(3){width:22%}
+.crm-app .fc-dealer-campaign-table col:nth-child(4){width:16%}
+.crm-app .fc-details-heading .fc-details-close{display:grid;place-items:center;box-sizing:border-box;padding:0;flex:0 0 32px;margin-block:0;line-height:1}
+.crm-app .fc-details-close svg{display:block;flex:none;margin:0}
