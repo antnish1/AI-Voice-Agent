@@ -1517,21 +1517,20 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 
 /* Expanded call logs: compact readable records and locally scrollable wide table. */
 .calllogs-table-card .tablewrap{max-width:100%;overflow:auto;max-height:650px}
-.calllogs-table.calllogs-expanded-table{min-width:1510px;table-layout:fixed;font-size:11px}
+.calllogs-table.calllogs-expanded-table{min-width:1320px;table-layout:fixed;font-size:11px}
 .calllogs-expanded-table thead th{position:sticky;top:0;z-index:2}
 .calllogs-expanded-table :is(th,td){padding:8px 9px;vertical-align:middle;overflow-wrap:anywhere}
 .calllogs-expanded-table th:nth-child(1){width:54px}
-.calllogs-expanded-table th:nth-child(2){width:174px}
-.calllogs-expanded-table th:nth-child(3){width:110px}
+.calllogs-expanded-table th:nth-child(2){width:142px}
+.calllogs-expanded-table th:nth-child(3){width:100px}
 .calllogs-expanded-table th:nth-child(4){width:145px}
 .calllogs-expanded-table th:nth-child(5){width:155px}
 .calllogs-expanded-table th:nth-child(6){width:135px}
 .calllogs-expanded-table th:nth-child(7){width:95px}
 .calllogs-expanded-table th:nth-child(8){width:65px}
 .calllogs-expanded-table th:nth-child(9){width:210px}
-.calllogs-expanded-table th:nth-child(10){width:170px}
-.calllogs-expanded-table th:nth-child(11){width:140px}
-.calllogs-expanded-table th:nth-child(12){width:66px}
+.calllogs-expanded-table th:nth-child(10){width:140px}
+.calllogs-expanded-table th:nth-child(11){width:66px}
 .calllogs-customer{display:grid;gap:4px;line-height:1.35}
 .calllogs-customer strong{font-weight:650}
 .calllogs-customer small{font-size:10px;color:#657c95;font-variant-numeric:tabular-nums}
@@ -1550,7 +1549,7 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 /* Expanded call logs must override the shared nowrap table defaults. */
 .crm-app .calllogs-reference .calllogs-table-card{min-width:0;max-width:100%}
 .crm-app .calllogs-reference .calllogs-table-card .tablewrap{width:100%;min-width:0;max-width:100%;overflow:auto}
-.crm-app .calllogs-reference table.calllogs-expanded-table{table-layout:fixed;width:100%;min-width:1610px}
+.crm-app .calllogs-reference table.calllogs-expanded-table{table-layout:fixed;width:100%;min-width:1320px}
 .crm-app .calllogs-reference .calllogs-expanded-table tbody td{white-space:normal;overflow-wrap:anywhere;word-break:normal;overflow:hidden;text-overflow:clip;line-height:1.45;vertical-align:middle}
 .crm-app .calllogs-reference .calllogs-expanded-table thead th{white-space:normal;overflow-wrap:normal}
 .crm-app .calllogs-reference .calllogs-expanded-table .calllogs-customer{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
@@ -1559,3 +1558,5 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 .crm-app .calllogs-reference .calllogs-expanded-table .calllogs-status-highlight{white-space:nowrap;max-width:100%;font-size:10px}
 
 .calllogs-expanded-table .calllogs-datetime{font-variant-numeric:tabular-nums;gap:3px}.calllogs-expanded-table .calllogs-datetime small{white-space:nowrap}
+
+.crm-app .calllogs-reference .calllogs-expanded-table :is(th,td):nth-child(2){padding-right:5px}.crm-app .calllogs-reference .calllogs-expanded-table :is(th,td):nth-child(3){padding-left:5px}
