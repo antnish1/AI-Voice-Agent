@@ -50,3 +50,12 @@
 
 .campaign-review .review-actions{display:flex;justify-content:flex-end;align-items:center;flex-wrap:wrap;gap:9px;padding:12px 16px;border-radius:16px;box-shadow:0 7px 22px #18385b0a}.review-actions button{display:inline-flex;justify-content:center;align-items:center;gap:8px;width:auto;min-width:78px;min-height:42px;padding:10px 18px;border-radius:12px;font-size:12px;white-space:nowrap}.review-actions .review-hold{color:#1a3558;border:1px solid #d5dfed;background:#fff}.review-actions .review-reject{color:#ce2020;border:1px solid #ffc2c2;background:#fff3f3}.review-actions .btn-primary{min-width:132px;background:linear-gradient(110deg,#14365f,#205f9f);color:#fff;border:1px solid transparent;box-shadow:0 6px 14px #1c4d8520}.review-actions button:disabled{opacity:.5;cursor:not-allowed}
 .campaign-review .review-actions{background:#fff;margin-top:0}
+
+.crm-app .review-summary .review-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--crisp-line,#dce2f0)}
+.crm-app .review-title-row h1{font-size:24px;margin:0;color:inherit;font-weight:800}
+.crm-app .review-pencil{display:grid;place-items:center;padding:0;line-height:1;flex:none}
+.crm-app .review-pencil svg{display:block;margin:0}
+.crm-app .review-actions .review-reject{background:#dc2626;color:#fff;border-color:#dc2626}
+.crm-app .review-actions .review-reject:hover:not(:disabled){background:#b91c1c;color:#fff}
+.crm-app .review-reference-page,.crm-app .campaign-review,.crm-app .review-panel,.crm-app .review-table{min-width:0;max-width:100%}
+.crm-app .review-table{overflow-x:auto}
