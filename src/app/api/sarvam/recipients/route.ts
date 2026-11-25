@@ -37,6 +37,8 @@ export async function POST(request:Request){
    eligible_records:prepared.eligible,uploaded_by:user.id
   },{onConflict:"campaign_id"});
   if(dbError)return NextResponse.json({error:"Could not lock the staged cohort. Check the campaign and migration."},{status:409});
+  const {data:finalized,error:finalizeError}=await supabase.from("campaigns").update({status:"PENDING"}).eq("id",campaignId).eq("dealership_id",campaign.dealership_id).eq("status","DRAFT").select("id");
+  if(finalizeError||!finalized?.length)return NextResponse.json({error:"Recipient file staged but campaign could not be marked pending."},{status:409});
   return NextResponse.json({ok:true,eligible:prepared.eligible,excluded:prepared.excluded,sha256:digest,staged:true},{headers:{"Cache-Control":"no-store"}});
  }catch(e){return NextResponse.json({error:e instanceof Error&&/recipient|CSV|column|Row|mapping|consent|DNC|phone/i.test(e.message)?e.message:"Recipient staging failed."},{status:400});}
 }
