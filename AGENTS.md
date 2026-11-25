@@ -160,3 +160,6 @@ Historical linking must verify existing dealership, campaign and agent ownership
 - PR #96 remains open at this checkpoint: clearer specific date validation errors with actionable IST guidance. Do not claim deployed until merged and verified.
 - User explicitly requested configurable Sarvam retries: max 0–20, retry interval, per-attempt customization, Busy/No Answer/Failed/Short Duration/Provider Error/Internal Error conditions. **Not implemented as of this checkpoint.** Main still uses one attempt per second and zero automatic retries. Verify official API schema, database RPC validation, safe consent/opt-out handling, per-attempt limits, provider error semantics and auditability before implementing; retain safe zero default and never silently enable retries on existing campaigns. UI-only controls are insufficient.
 - Before releases, verify CI against the exact final head, resolve substantive review findings, and obtain explicit merge/deploy authorization. Confirm canonical Vercel production deployment READY and alias; do not equate GitHub merge with live deployment.
+
+### Table design reversal
+- User requested reverting PR #102. Restore the pre-#102 Uploaded Excel Records styling without reverting unrelated schedule, pagination, or later changes. The separate spacious table styling is no longer the intended design.
