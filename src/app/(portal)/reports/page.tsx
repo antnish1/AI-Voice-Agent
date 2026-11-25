@@ -61,7 +61,7 @@ export default async function Reports(){
   all("customer_import_rows","id,customer_id,batch_id,row_number,source_data,status"),
   all("campaign_prospects","id,campaign_id,customer_name,mobile,vehicle_model,registration_number,service_type,service_due,last_service,follow_up_at,call_summary,next_action,created_at,updated_at"),
   all("customer_import_batches","id,created_at"),
-  all("voice_call_records","id,customer_id,sarvam_campaign_id,sarvam_attempt_id,dialed_number,status,duration_seconds,started_at"),
+  all("voice_call_records","id,customer_id,sarvam_campaign_id,sarvam_attempt_id,dialed_number,status,duration_seconds,started_at,output_variables"),
   all("voice_campaign_links","id,campaign_id,sarvam_campaign_id"),
   all("crm_appointments","id,customer_id,status,appointment_at,updated_at"),
   all("crm_callbacks","id,customer_id,status,requested_at,updated_at"),
