@@ -1,0 +1,12 @@
+/* Shared campaign lifecycle palette; scoped so call outcomes and unrelated statuses are unchanged. */
+:is(.campaign-status-badge,.ref-activity-icon)[class*="campaign-status-"]{
+ background:var(--campaign-status-bg)!important;
+ color:var(--campaign-status-fg)!important;
+ border-color:transparent!important;
+}
+.campaign-status-badge{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:700;line-height:1.35;white-space:nowrap}
+.campaign-status-pending{--campaign-status-bg:#fff1d5;--campaign-status-fg:#865406}
+.campaign-status-ongoing{--campaign-status-bg:#e9ddfb;--campaign-status-fg:#6735ad}
+.campaign-status-complete{--campaign-status-bg:#ddf5e8;--campaign-status-fg:#146d40}
+.campaign-status-reject{--campaign-status-bg:#fde5e8;--campaign-status-fg:#b62840}
+.campaign-status-hold{--campaign-status-bg:#e5edf9;--campaign-status-fg:#315d9c}

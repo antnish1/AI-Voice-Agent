@@ -166,3 +166,6 @@ Historical linking must verify existing dealership, campaign and agent ownership
 
 ## Product branding update (25 November 2026)
 - All user-facing product branding must read Frontier Voice CRM, including sidebar, top menu, sign-in, browser titles, accessibility labels and new export names. Preserve the approved logo and favicon, canonical project/domain, database identifiers, storage buckets and external integration identifiers.
+
+## Campaign status colour standard
+- Use displayed lifecycle status (not raw database status) to choose pill colours across campaign lists, dashboard, details, review and creation confirmation: Pending amber, Ongoing purple, Complete green, Reject red, Hold blue. Match dashboard campaign activity icons. Keep call outcome palette separate. Do not change lifecycle semantics for a visual update.
