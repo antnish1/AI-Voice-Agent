@@ -7,7 +7,7 @@ import {CampaignDetailsPopup} from "./campaign-details-popup";
 import {AutoCampaignFilters} from "./auto-campaign-filters";
 
 type Filters={q?:string;status?:string;from?:string;to?:string;view?:string};
-type Campaign={id:string;name:string;status:string;created_at:string;approved_at:string|null};
+type Campaign={dealership_id:string;id:string;name:string;status:string;created_at:string;approved_at:string|null};
 
 function CampaignIcon({kind}:{kind:"all"|"draft"|"pending"|"grid"|"search"|"filter"|"calendar"|"voice"}){
  const shapes:Record<typeof kind,React.ReactNode>={
@@ -41,12 +41,13 @@ function CountsCard({kind,label,value}:{kind:"all"|"draft"|"pending";label:strin
 function normalizeDate(input?:string){return input&&/^\d{4}-\d{2}-\d{2}$/.test(input)?input:"";}
 export default async function Campaigns({searchParams}:{searchParams?:Promise<Filters>}={}){
  const {supabase,membership,user,memberships}=await requireMembership();if(!membership)return null;
- const {data,error}=await supabase.from("campaigns").select("id,name,status,created_at,approved_at").eq("dealership_id",membership.dealership_id).order("created_at",{ascending:false}).limit(100);
+ const {data,error}=await supabase.from("campaigns").select("id,name,status,created_at,approved_at,dealership_id").eq("dealership_id",membership.dealership_id).order("created_at",{ascending:false}).limit(100);
  if(error)throw new Error("Could not read campaigns.");
  const campaigns=(data??[]) as Campaign[];
+ const dealershipName=membership.dealerships?.name??"Assigned dealership";
  const params=await (searchParams??Promise.resolve({} as Filters));
  const requested=typeof params.view==="string"&&/^[a-f0-9-]{36}$/i.test(params.view)?params.view:"";
- if(requested&&!campaigns.some(c=>c.id===requested)){const {data:extra,error:extraError}=await supabase.from("campaigns").select("id,name,status,created_at,approved_at").eq("dealership_id",membership.dealership_id).eq("id",requested).maybeSingle();if(extraError)throw new Error("Could not read campaign.");if(extra)campaigns.unshift(extra as Campaign); }
+ if(requested&&!campaigns.some(c=>c.id===requested)){const {data:extra,error:extraError}=await supabase.from("campaigns").select("id,name,status,created_at,approved_at,dealership_id").eq("dealership_id",membership.dealership_id).eq("id",requested).maybeSingle();if(extraError)throw new Error("Could not read campaign.");if(extra)campaigns.unshift(extra as Campaign); }
  const batchResult=campaigns.length?await supabase.from("campaign_recipient_batches").select("campaign_id,eligible_records").eq("dealership_id",membership.dealership_id).in("campaign_id",campaigns.map(x=>x.id)):null;
  if(batchResult?.error)throw new Error("Could not read staged campaign recipients.");
  const formatDate=(value:string)=>new Date(value).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Kolkata"});
@@ -56,7 +57,7 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
  const statuses=["DRAFT","PENDING_MANAGER_APPROVAL","APPROVED","REJECTED","ACTIVE","PAUSED","COMPLETED"];
  const selectedStatus=statuses.includes(status)?status:"";
  const viewId=typeof filters.view==="string"&&/^[a-f0-9-]{36}$/i.test(filters.view)?filters.view:"";
- const shown=campaigns.filter(c=>(!q||c.name.toLowerCase().includes(q.toLowerCase())||c.id.toLowerCase().includes(q.toLowerCase()))&&(!selectedStatus||c.status===selectedStatus)&&(!from||c.created_at.slice(0,10)>=from)&&(!to||c.created_at.slice(0,10)<=to));
+ const shown=campaigns.filter(c=>(!q||c.name.toLowerCase().includes(q.toLowerCase())||c.id.toLowerCase().includes(q.toLowerCase())||dealershipName.toLowerCase().includes(q.toLowerCase()))&&(!selectedStatus||c.status===selectedStatus)&&(!from||c.created_at.slice(0,10)>=from)&&(!to||c.created_at.slice(0,10)<=to));
  const permitted=canCreateCampaign(membership.role);
  const canOperate=isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
  const itUser=isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
@@ -73,11 +74,11 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
     <AutoCampaignFilters>
      <label className="fc-search"><CampaignIcon kind="search"/><input type="search" name="q" aria-label="Search campaigns" placeholder="Search campaigns..." defaultValue={q}/></label>
      <label className="fc-status"><CampaignIcon kind="filter"/><select name="status" aria-label="Filter by status" defaultValue={selectedStatus}><option value="">All Status</option>{statuses.map(s=><option key={s} value={s}>{s.replaceAll("_"," ")}</option>)}</select></label>
-     <details className="fc-date-details"><summary><CampaignIcon kind="calendar"/> {from||to?"Date Range Set":"Select Date Range"} <span aria-hidden="true">⌄</span></summary><div className="fc-date-panel"><label>From<input name="from" type="date" defaultValue={from}/></label><label>To<input name="to" type="date" defaultValue={to}/></label></div></details>
+     <details className="fc-date-details"><summary><CampaignIcon kind="calendar"/> {from||to?"Date Range Set":"Date Range"} <span aria-hidden="true">⌄</span></summary><div className="fc-date-panel"><label>From<input name="from" type="date" defaultValue={from}/></label><label>To<input name="to" type="date" defaultValue={to}/></label></div></details>
      {filtered&&<Link href="/campaigns" className="fc-clear">Clear</Link>}
     </AutoCampaignFilters>
    </div>
-   {shown.length?<div className="fc-tablewrap"><table className="crm-table"><thead><tr><th>Campaign</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>{shown.map(c=><tr key={c.id}><td><strong>{c.name}</strong><div className="fc-row-id">#{c.id.slice(0,8)}</div></td><td><span className={`status-pill ${c.status==="APPROVED"?"approved":c.status==="REJECTED"?"rejected":c.status==="PENDING_MANAGER_APPROVAL"?"pending":""}`}>{c.status.replaceAll("_"," ")}</span></td><td>{new Date(c.created_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</td><td>{canOperate?<div className="fc-row-actions"><Link className="btn-outline small" href={"/campaigns/"+c.id+"/outbound"}>Review / Start</Link>{c.status==="DRAFT"&&staged.has(c.id)?<form action={submitCampaign}><input type="hidden" name="dealership_id" value={membership.dealership_id}/><input type="hidden" name="campaign_id" value={c.id}/><button className="btn-soft small">Submit for review</button></form>:c.status==="DRAFT"?<span className="status-pill pending">Awaiting eligible Excel</span>:null}</div>:<CampaignDetailsPopup name={c.name} dealership={membership.dealerships?.name??"Assigned dealership"} status={c.status} created={formatDate(c.created_at)} approved={c.approved_at?formatDate(c.approved_at):"Not approved"} autoOpen={viewId===c.id}/>}</td></tr>)}</tbody></table><p className="fc-list-count">Showing {shown.length} of the latest {total} campaigns</p></div>:
+   {shown.length?<div className="fc-tablewrap"><table className="crm-table"><thead><tr><th>Campaign</th><th>Dealership</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>{shown.map(c=><tr key={c.id}><td><strong>{c.name}</strong><div className="fc-row-id">#{c.id.slice(0,8)}</div></td><td>{dealershipName}</td><td><span className={`status-pill ${c.status==="APPROVED"?"approved":c.status==="REJECTED"?"rejected":c.status==="PENDING_MANAGER_APPROVAL"?"pending":""}`}>{c.status.replaceAll("_"," ")}</span></td><td>{new Date(c.created_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</td><td>{canOperate?<div className="fc-row-actions"><Link className="btn-outline small" href={"/campaigns/"+c.id+"/outbound"}>Review / Start</Link>{c.status==="DRAFT"&&staged.has(c.id)?<form action={submitCampaign}><input type="hidden" name="dealership_id" value={membership.dealership_id}/><input type="hidden" name="campaign_id" value={c.id}/><button className="btn-soft small">Submit for review</button></form>:c.status==="DRAFT"?<span className="status-pill pending">Awaiting eligible Excel</span>:null}</div>:<CampaignDetailsPopup name={c.name} dealership={membership.dealerships?.name??"Assigned dealership"} status={c.status} created={formatDate(c.created_at)} approved={c.approved_at?formatDate(c.approved_at):"Not approved"} autoOpen={viewId===c.id}/>}</td></tr>)}</tbody></table><p className="fc-list-count">Showing {shown.length} of the latest {total} campaigns</p></div>:
    <div className="fc-campaign-empty"><EmptyArt/><h3>{filtered?"No matching campaigns":"Start your first campaign"}</h3>{filtered&&<p>Try another search, status, or date range.</p>}{filtered?<Link href="/campaigns" className="fc-primary-button">Clear Filters</Link>:permitted?<Link href="/campaigns/new" className="fc-primary-button">＋ Create Campaign <span aria-hidden="true">→</span></Link>:null}</div>}
   </section>
  </div>;

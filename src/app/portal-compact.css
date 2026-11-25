@@ -1,0 +1,125 @@
+/* Compact authenticated portal: one consistent gutter and content-driven heights.
+   No universal margin/padding reset: preserve form usability, focus rings, scrolling,
+   responsive grids, dashboard design and intentional button hit areas. */
+.crm-app{--compact-edge:8px;--compact-gap:8px;--compact-pad:10px}
+.crm-app .crm-main.ref-main{width:100%;max-width:none;margin:0;padding:var(--compact-edge) var(--compact-edge) 12px}
+.crm-app .crm-topbar.ref-topbar{height:auto;min-height:54px;padding:5px 10px;gap:10px}
+.crm-app .frontier-top-navigation-scroll{padding:4px 8px}
+.crm-app .frontier-reference-sidebar.ref-sidebar{padding:8px 6px}
+.crm-app .frontier-reference-sidebar .frontier-sidebar-brand.ref-brand{min-height:46px;margin:0 0 6px;padding:0 4px}
+.crm-app .frontier-reference-sidebar .frontier-sidebar-nav{margin:2px 0 0}
+.crm-app .frontier-reference-sidebar .frontier-nav-link{padding:6px 8px;min-height:34px}
+.crm-app .frontier-reference-sidebar .frontier-sidebar-bottom{padding:5px 0 0;min-height:0}
+.crm-app :is(.fc-campaign-page,.agent-directory,.customers-reference,.approvals-reference,.reports-ref,.calllogs-reference,.settings-ref,.docs-ref){margin:0}
+.crm-app :is(.page-head,.ref-dashboard-heading,.agent-page-hero,.customers-ref-header,.reports-ref-heading,.calllogs-ref-heading,.it-user-heading,.settings-ref-hero,.docs-hero){margin:0 0 var(--compact-gap);gap:var(--compact-gap)}
+.crm-app :is(.page-head h1,.ref-dashboard-heading h1,.agent-hero-heading h1,.customers-header-heading h1,.reports-ref-heading h1,.calllogs-heading-left h1,.it-user-heading h1,.settings-ref-hero h1,.docs-hero h1){margin-top:0;margin-bottom:4px}
+.crm-app :is(.content-grid,.metric-grid,.agent-stats-grid,.agent-card-grid,.customers-stats,.approvals-stats,.reports-ref-kpis,.reports-ref-chart-grid,.calllogs-stats,.settings-ref-card-grid,.it-user-grid,.it-user-creation-grid,.docs-stats,.docs-grid,.crm-ops-stats,.wizard-grid){gap:var(--compact-gap)}
+.crm-app :is(.metric-grid,.agent-stats-grid,.customers-stats,.approvals-stats,.reports-ref-kpis,.reports-ref-chart-grid,.calllogs-stats,.docs-stats,.it-user-stats){margin:0 0 var(--compact-gap)}
+.crm-app :is(.crm-panel,.panel,.stat,.reports-ref-chart,.calllogs-chart-card,.it-user-card,.settings-ref-card,.settings-ref-profile-card,.settings-ref-other-panel,.frontier-layout-settings,.crm-operations,.vdp-card,.customers-mini-card,.docs-grid article){padding:var(--compact-pad)}
+.crm-app :is(.panel-title,.reports-ref-panel-head,.calllogs-panel-title,.customers-list-title,.it-user-table-head){margin-bottom:8px;gap:8px}
+.crm-app :is(.panel,.crm-operations,.frontier-layout-settings){margin-top:8px;margin-bottom:8px}
+.crm-app :is(.metric-card,.agent-stat-card,.customers-stat,.approvals-stat,.reports-ref-kpi,.calllogs-stat,.docs-stat){min-height:0;padding:9px 12px;gap:8px}
+.crm-app .metric-value{margin:6px 0 2px}
+.crm-app .it-user-stats{padding:4px 0}
+.crm-app .it-user-stats article{padding:7px 10px}
+.crm-app :is(.customers-toolbar,.reports-ref-toolbar,.calllogs-table-top,.docs-toolbar,.crm-ops-toolbar){margin:6px 0;gap:6px}
+.crm-app :is(.crm-table,.customers-data-table,.approvals-table,.reports-ref-table,.calllogs-table,.it-user-list,.crm-ops-table,.docs-table) :is(th,td){padding:8px 9px}
+.crm-app :is(.reports-ref-table-footer,.approvals-table-footer,.calllogs-table-footer,.docs-pagination,.customers-pagination,.review-pagination){padding:6px 9px;gap:6px}
+.crm-app :is(.crm-table,.customers-data-table,.approvals-table,.reports-ref-table,.calllogs-table,.it-user-list,.crm-ops-table,.docs-table) td small{margin-top:3px}
+.crm-app :is(.customers-card-grid,.docs-grid){padding:8px}
+.crm-app :is(.empty-state,.fc-campaign-empty,.agent-no-results){min-height:0;padding:20px 12px}
+.crm-app :is(.reports-ref-empty-row,.customers-ref-empty,.it-user-empty,.crm-ops-empty,.docs-empty,.calllogs-table .calllogs-empty-row){padding:18px 10px!important}
+.crm-app .fc-campaign-hero{min-height:64px;margin:0 0 8px;padding:8px 10px;gap:10px;align-items:center}
+.crm-app .fc-hero-copy{padding:0}
+.crm-app .fc-hero-copy h1{margin:0;font-size:30px}
+.crm-app .fc-campaign-wave{height:64px;top:0}
+.crm-app .fc-hero-actions{gap:8px}
+.crm-app :is(.fc-voice-button,.fc-primary-button){padding:9px 14px;min-height:34px}
+.crm-app .fc-campaign-notice{margin:0 0 8px;padding:8px 10px;min-height:0}
+.crm-app .fc-campaign-stats{margin:0 0 8px;padding:4px 0}
+.crm-app .fc-count-card{min-height:52px;padding:7px 12px;gap:9px}
+.crm-app .fc-campaign-list{min-height:0;margin:0}
+.crm-app .fc-list-toolbar{min-height:0;padding:8px 10px;gap:8px;flex-direction:row;align-items:center;flex-wrap:wrap}
+.crm-app .fc-filters{gap:6px;flex:0 1 auto;width:auto;min-width:0}
+.crm-app .fc-search{width:180px;min-width:130px}
+.crm-app .fc-status{max-width:190px}
+.crm-app .fc-status select{min-width:0;max-width:150px;width:auto}
+.crm-app :is(.fc-search,.fc-status,.fc-date-details>summary){height:34px;padding-inline:9px}
+.crm-app .fc-tablewrap{padding-bottom:0}
+.crm-app .fc-list-count{margin:6px 10px}
+.crm-app .fc-row-id{margin-top:3px}
+.crm-app .fc-row-actions{gap:6px}
+.crm-app .fc-empty-art{height:112px}
+.crm-app .review-reference-page{padding:0}
+.crm-app .review-reference-page .page-head{margin-bottom:8px}
+.crm-app .review-reference-page .page-head>div:after{margin-top:5px}
+.crm-app .campaign-review{gap:8px}
+.crm-app .campaign-review .review-panel{padding:10px 12px;margin:0}
+.crm-app .review-details>div{gap:8px;padding-inline:10px}
+.crm-app .review-details>div:first-child{padding-left:0}
+.crm-app .review-schedule{gap:8px 12px}
+.crm-app .review-value{gap:4px}
+.crm-app .review-record-head{margin-bottom:8px;gap:8px}
+.crm-app .campaign-review .review-actions{padding:8px 10px;gap:6px;margin:0}
+.crm-app .review-actions button{min-height:38px;padding:8px 13px}
+.crm-app .review-note{margin:4px 0 0}
+.crm-app .agent-page-controls{padding:6px 0;margin-bottom:8px;gap:6px}
+.crm-app .agent-hero-banner{height:82px;padding:8px 12px}
+.crm-app :is(.agent-preview-card,.agent-custom-card){min-height:0;padding:12px 10px}
+.crm-app .agent-card-actions{margin-top:6px;padding-top:6px}
+.crm-app .approvals-hero{min-height:72px;margin:0 0 8px;padding:8px 12px}
+.crm-app .docs-hero{min-height:72px;padding:8px 12px}
+.crm-app .docs-upload-panel{min-height:0;padding:10px 12px;margin-bottom:8px}
+.crm-app .settings-ref-profile-card{margin-bottom:8px}
+.crm-app .settings-ref-profile-content{margin-top:8px;gap:10px}
+.crm-app .settings-ref-other-panel{min-height:0}
+.crm-app .settings-ref-unavailable{min-height:100px}
+.crm-app :is(.it-user-form,.it-user-creation-grid .it-user-form,.crm-ops-form,.crm-ops-update){gap:8px 10px}
+.crm-app :is(.it-user-card>p,.it-user-table-head p){margin-bottom:8px}
+.crm-app :is(.crm-ops-stats,.crm-ops-form){margin:8px 0}
+.crm-app :is(.crm-ops-form,.crm-ops-update,.crm-ops-stats>div){padding:10px}
+.crm-app .ref-dashboard .ref-kpi-joined{margin-bottom:8px}
+.crm-app .ref-dashboard .ref-kpi-joined .ref-kpi-card{min-height:0;padding:10px;gap:8px}
+.crm-app .ref-dashboard .ref-dashboard-columns{gap:8px}
+.crm-app .ref-dashboard .ref-dashboard-panel{padding:10px 12px}
+.crm-app .ref-dashboard .ref-campaign-table :is(th,td){padding:8px 9px}
+.crm-app :is(.campaign-modal,.customers-modal,.approvals-modal,.reports-ref-modal,.agent-preview-modal,.settings-ref-modal,.document-modal){padding:12px}
+.crm-app .campaign-modal-header{padding:10px 12px 6px}
+.crm-app .campaign-modal-scroll{padding:0 12px 6px}
+.crm-app .campaign-modal-footer{padding:8px 12px}
+.crm-app .fc-compact-campaign .fc-compact-scroll{gap:8px;padding:0 12px 6px}
+.crm-app .fc-compact-campaign .campaign-modal-header,.crm-app .fc-compact-campaign .campaign-modal-footer{padding:8px 12px}
+@media(max-width:760px){
+ .crm-app{--compact-edge:6px;--compact-gap:6px;--compact-pad:9px}
+ .crm-app .crm-topbar.ref-topbar{min-height:52px;padding:5px 8px}
+ .crm-app .fc-campaign-hero{display:flex;flex-wrap:wrap;align-items:center}
+ .crm-app .fc-hero-actions{margin-top:0;flex-wrap:wrap}
+ .crm-app .fc-filters{width:100%;justify-content:flex-start}
+ .crm-app .fc-search{flex:1 1 140px;max-width:100%}
+ .crm-app .review-details>div{padding-inline:0}
+ .crm-app .review-actions button{min-height:40px}
+}
+@media(pointer:coarse){.crm-app :is(.fc-voice-button,.fc-primary-button,.review-actions button,.frontier-reference-sidebar .frontier-nav-link){min-height:44px}}
+
+/* Campaign title and search adjacent; status/date stay on the same desktop row. */
+.crm-app .fc-list-toolbar{justify-content:flex-start;gap:12px}
+.crm-app .fc-list-toolbar .fc-filters{justify-content:flex-start;flex:1 1 auto;flex-wrap:nowrap;width:auto;min-width:0}
+.crm-app .fc-list-toolbar .fc-search{flex:0 1 200px;width:200px;min-width:120px}
+.crm-app .fc-list-toolbar .fc-status{flex:0 1 auto;min-width:0}
+.crm-app .fc-list-toolbar .fc-date-details{flex:none}
+.crm-app .fc-list-toolbar .fc-status select{width:auto;min-width:0;max-width:160px}
+.crm-app .fc-list-toolbar .fc-clear{white-space:nowrap}
+/* Create User directly after Role / Post; three fields on first row, four on second. */
+.crm-app .it-user-single .it-create-user-form{grid-template-columns:repeat(12,minmax(0,1fr));align-items:end;gap:8px 10px}
+.crm-app .it-user-single .it-create-user-form>label:nth-child(-n+3){grid-column:span 4}
+.crm-app .it-user-single .it-create-user-form>label:nth-child(4),.crm-app .it-user-single .it-create-user-form>label:nth-child(5){grid-column:span 3}
+.crm-app .it-user-single .it-create-user-form>label:nth-child(6){grid-column:span 4}
+.crm-app .it-user-single .it-create-user-form>button{grid-column:span 2;width:100%;min-height:41px;margin:0;white-space:nowrap;padding-inline:8px}
+@media(max-width:1050px){.crm-app .it-user-single .it-create-user-form{grid-template-columns:repeat(2,minmax(0,1fr))}.crm-app .it-user-single .it-create-user-form>label:nth-child(n),.crm-app .it-user-single .it-create-user-form>button{grid-column:auto}}
+@media(max-width:760px){.crm-app .fc-list-toolbar .fc-filters{flex-wrap:wrap;flex-basis:100%}.crm-app .fc-list-toolbar .fc-search{flex:1 1 140px}}
+@media(max-width:580px){.crm-app .it-user-single .it-create-user-form{grid-template-columns:1fr}}
+
+/* Create Dealership: email and submit share the last row, aligned at field baseline. */
+.crm-app .it-dealer-dialog[aria-labelledby="create-dealer-title"] .it-user-form{align-items:end;gap:8px 10px}
+.crm-app .it-dealer-dialog[aria-labelledby="create-dealer-title"] .it-user-form>button{grid-column:auto;width:auto;justify-self:start;min-height:41px;margin:0;padding:10px 18px;white-space:nowrap}
+@media(max-width:580px){.crm-app .it-dealer-dialog[aria-labelledby="create-dealer-title"] .it-user-form>button{width:100%;justify-self:stretch}}

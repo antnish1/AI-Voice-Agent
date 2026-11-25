@@ -2,7 +2,7 @@
 // The gateway uses service credentials internally; never put them in a browser bundle.
 import {createClient} from "npm:@supabase/supabase-js@2.58.0";
 
-const ALLOWED_ORIGINS=new Set(["https://frontier-ai-voice-crm.vercel.app","https://frontier-ai-voice-crm-six.vercel.app"]);
+const ALLOWED_ORIGINS=new Set(["https://frontier-ai-voice-crm.vercel.app","https://frontier-ai-voice-crm-six.vercel.app","https://ai.insureit.tech"]);
 const IT_ID="5bd78ada-44f5-4045-a9fb-75c9dad69893";
 // Generate a separate credential for each account; shared passwords are not safe
 // when dealership users cannot change their own passwords.
@@ -21,7 +21,7 @@ const publicKey=Deno.env.get("SUPABASE_ANON_KEY")??"";
 const admin=createClient(authUrl,serviceKey,{auth:{autoRefreshToken:false,persistSession:false}});
 const auth=createClient(authUrl,publicKey,{auth:{autoRefreshToken:false,persistSession:false}});
 type Input={action?:string;email?:string;name?:string;dealershipId?:string;password?:string;userId?:string;confirm?:string;
- contact?:string;mobile?:string;contactPerson?:string;employeeId?:string;post?:string};
+ address?:string;contact?:string;mobile?:string;contactPerson?:string;employeeId?:string;post?:string};
 Deno.serve(async(req)=>{
  const origin=req.headers.get("origin")??"";
  const headers=ALLOWED_ORIGINS.has(origin)?{"Access-Control-Allow-Origin":origin,"Access-Control-Allow-Headers":"authorization,apikey,content-type","Access-Control-Allow-Methods":"POST,OPTIONS"}:{};
@@ -40,7 +40,7 @@ Deno.serve(async(req)=>{
  const {data:membership,error:memError}=await admin.from("memberships").select("id").eq("user_id",user.id).eq("role","super_admin").limit(1);
  if(memError||!membership?.length)return json({error:"IT Super User membership required"},403,headers);
  if(body.action==="list"){
-  const {data:dealers,error:dealersError}=await admin.from("dealerships").select("id,name,contact,mobile,contact_person,email").order("name").limit(500);
+  const {data:dealers,error:dealersError}=await admin.from("dealerships").select("id,name,address,contact,mobile,contact_person,email").order("name").limit(500);
   if(dealersError)return json({error:"Unable to load dealerships"},500,headers);
   const {data:rows,error:rowsError}=await admin.from("memberships").select("user_id,dealership_id,role,dealerships(name)").order("dealership_id").limit(500);
   if(rowsError)return json({error:"Unable to load memberships"},500,headers);
@@ -58,11 +58,11 @@ Deno.serve(async(req)=>{
  }
  if(body.action==="create-dealership"){
   const name=(body.name??"").trim().replace(/\s+/g," ");
-  const contact=(body.contact??"").trim(),mobile=(body.mobile??"").trim().replace(/[\s()-]/g,"");
+  const address=(body.address??"").trim(),contact=(body.contact??"").trim(),mobile=(body.mobile??"").trim().replace(/[\s()-]/g,"");
   const contactPerson=(body.contactPerson??"").trim().replace(/\s+/g," ");
   const email=(body.email??"").trim().toLowerCase();
   if(name.length<3||name.length>100)return json({error:"Dealership name must be 3–100 characters."},400,headers);
-  if(!validContact(contact))return json({error:"Enter a valid dealership contact number."},400,headers);
+  if(address.length<3||address.length>500){if(body.address!==undefined||!validContact(contact))return json({error:"Enter a dealership address (3–500 characters)."},400,headers);}
   if(!validMobile(mobile))return json({error:"Enter a valid dealership mobile number."},400,headers);
   if(contactPerson.length<2||contactPerson.length>100)return json({error:"Contact person must be 2–100 characters."},400,headers);
   if(!validEmail(email))return json({error:"Enter a valid dealership email address."},400,headers);
@@ -70,10 +70,10 @@ Deno.serve(async(req)=>{
   if(existing.error)return json({error:"Could not verify dealership name."},503,headers);
   if(existing.data?.length)return json({error:"A dealership with this name already exists."},409,headers);
   const created=await admin.from("dealerships").insert({
-   name,contact,mobile:mobile.startsWith("+")?mobile:mobile.startsWith("91")?"+"+mobile:"+91"+mobile,
+   name,address:address||null,contact:contact||null,mobile:mobile.startsWith("+")?mobile:mobile.startsWith("91")?"+"+mobile:"+91"+mobile,
    contact_person:contactPerson,email
   }).select("id").single();
-  if(created.error)return json({error:"Unable to create dealership. Check the contact-field migration."},500,headers);
+  if(created.error)return json({error:"Unable to create dealership. Check the dealership address migration."},500,headers);
   return json({ok:true,message:"Dealership created. You can now create its user account; no email was sent."},201,headers);
  }
  if(body.action==="create-user"){
