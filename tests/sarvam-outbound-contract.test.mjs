@@ -45,7 +45,15 @@ test("provider calls are default-off with explicit server-only switches",()=>{
  assert.match(testRoute,/p_connection_id:connection/);
  assert.match(testRoute,/p_caller_number:outgoing/);
  assert.match(launch,/callingEnabled\("campaign"\)/);
- assert.match(launch,/status!=="APPROVED"/);
+ assert.match(launch,/requireItSuperUser\(\)/);
+ assert.match(launch,/frontvox_reserve_direct_launch/);
+ assert.match(launch,/reviewedTestResult!==true/);
+ assert.ok(launch.indexOf('frontvox_reserve_direct_launch')<launch.indexOf('await sarvamPost'));
+ const migration=readFileSync("db/20261125_direct_campaign.sql","utf8");
+ assert.match(migration,/for update/i);
+ assert.match(migration,/Configuration changed/);
+ assert.match(migration,/insert into public\.voice_campaign_launches/);
+ assert.match(migration,/auth\.uid\(\) is distinct from/);
  assert.match(launch,/csv_sha256/);
  assert.match(launch,/needs_reconciliation/);
  assert.match(launch,/attempt.agent_version===version/);
