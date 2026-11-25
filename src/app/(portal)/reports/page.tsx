@@ -101,7 +101,9 @@ export default async function Reports(){
  const testAttemptIds=new Set(testReports.map(t=>t.sarvam_attempt_id).filter(Boolean));
  const serviceRecords:OperationalReport[]=calls.filter(c=>!testAttemptIds.has(str(c.sarvam_attempt_id))).map(c=>{
   const phone=phoneKey(c.dialed_number);
-  const campaign=linkMap.get(str(c.sarvam_campaign_id));
+  const external=str(c.sarvam_campaign_id);
+  const campaign=linkMap.get(external)||(external?"historical:"+dealerId+":"+external:undefined);
+  if(campaign&&external&&!linkMap.has(external)&&!listed.some(x=>x.id===campaign))listed.push({id:campaign,name:external==="MG-Remainin-348e8be3-4718"?"MG Remaining november":external,status:"HISTORICAL",created_at:str(c.started_at),dealership_id:dealerId});
   const p=campaign&&phone?unique(prospects.filter(x=>str(x.campaign_id)===campaign&&phoneKey(x.mobile)===phone)):undefined;
   const candidates=phone?inputs.filter(([,x])=>phoneKey(x.values[1])===phone):[];
   const match=p&&str(p.registration_number)?unique(candidates.filter(([,x])=>normalize(x.values[3])===normalize(str(p.registration_number)))):unique(candidates);
