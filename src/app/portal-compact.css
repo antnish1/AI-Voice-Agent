@@ -256,3 +256,10 @@ html:has(.crm-app),body:has(.crm-app){width:100%;height:100%;margin:0;overflow:h
 .crm-app :is(.tablewrap,.fc-tablewrap,.review-table){min-width:0;max-width:100%;overflow-x:auto}
 .crm-app .fc-dealer-campaign-table{min-width:0}
 @media(max-width:760px){.crm-app .fc-dealer-campaign-table{min-width:480px}.crm-app .crm-workspace{width:100%}}
+
+/* Call logs: wider search and compact numbered pagination. */
+.crm-app .calllogs-search-controls{min-width:0;max-width:100%}
+.crm-app .calllogs-search-controls .calllogs-search{width:340px;max-width:100%;min-width:0}
+.crm-app .calllogs-search input{width:100%;min-width:0}
+.crm-app .calllogs-paginator{display:flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:flex-end}
+@media(max-width:760px){.crm-app .calllogs-search-controls{width:100%}.crm-app .calllogs-search-controls .calllogs-search{width:100%}.crm-app .calllogs-table-footer{flex-wrap:wrap;gap:8px}}
