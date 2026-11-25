@@ -1,4 +1,4 @@
-# Frontier AI Voice CRM — Operational integration status (21 November 2026)
+# Frontier Voice CRM — Operational integration status (21 November 2026)
 
 ## Implemented now
 - Production CRM user/dealership authentication, IT-only user provisioning and view-only dealership roles.
