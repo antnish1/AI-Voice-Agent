@@ -14,7 +14,7 @@ import {SidebarIcon,type SidebarIconName} from "@/components/sidebar-icons";
 import {useNavigationLayout} from "@/components/navigation-layout-preference";
 import {TopMenuNavigation} from "@/components/top-menu-navigation";
 
-const dealershipHiddenRoutes=new Set(["/appointments","/call-logs","/callbacks","/pickup-drop","/documents"]);
+const dealershipHiddenRoutes=new Set(["/appointments","/customers","/callbacks","/pickup-drop","/documents"]);
 const navigation:Array<{name:string;url:string;icon:SidebarIconName}>=[
  {name:"Dashboard",url:"/dashboard",icon:"home"},
  {name:"Campaigns",url:"/campaigns",icon:"megaphone"},
