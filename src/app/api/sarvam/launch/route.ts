@@ -63,7 +63,7 @@ export async function POST(request:Request){
   if(prepared.eligible!==batch.eligible_records||prepared.excluded!==0)
    return NextResponse.json({error:"Recipient counts do not match the locked approved cohort."},{status:409});
   const launchBody={
-   name:campaign.name,description:"Approved FrontVox AI campaign",app_config:{
+   name:campaign.name,description:"Approved Frontier Voice CRM campaign",app_config:{
     app_id:agent,app_version:version,app_type:"agent",attempts_per_second:1,
     connection_configs:[{connection_id:connection,phone_numbers:[sender],weight:1}],
     retry_config:{max_retries:0,retry_interval_minutes:interval},
