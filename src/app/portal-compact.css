@@ -140,3 +140,19 @@
 .crm-app .agent-hero-heading{min-width:0}
 .crm-app .agent-card-status{gap:3px}
 @media(pointer:coarse){.crm-app .fc-review-start{min-height:44px}}
+
+/* Fill available workspace height without stretching actual data rows.
+   Long content retains normal page scrolling, including mobile and top-menu layouts. */
+.crm-app .crm-workspace{min-height:100dvh;display:flex;flex-direction:column;min-width:0}
+.crm-app .crm-main.ref-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.crm-app .frontier-motion-route{flex:1;display:flex;flex-direction:column;min-width:0}
+.crm-app .frontier-motion-route>:is(.fc-campaign-page,.customers-reference,.reports-ref,.approvals-reference,.agent-directory,.calllogs-reference,.docs-ref){flex:1;display:flex;flex-direction:column;min-width:0}
+.crm-app :is(.fc-campaign-page,.customers-reference,.reports-ref,.approvals-reference,.calllogs-reference)>:is(.fc-campaign-list,.customers-list-panel,.reports-ref-table-card,.approvals-table-panel,.calllogs-table-card){flex:1;display:flex;flex-direction:column;min-width:0;min-height:240px}
+.crm-app .fc-campaign-list>.fc-tablewrap{flex:1;display:flex;flex-direction:column;padding-bottom:0}
+.crm-app .fc-campaign-list>.fc-tablewrap>.fc-list-count{margin-top:auto;padding-top:10px}
+.crm-app .fc-campaign-list>.fc-campaign-empty{flex:1}
+.crm-app :is(.customers-list-panel,.reports-ref-table-card,.approvals-table-panel,.calllogs-table-card)>:is(.tablewrap,.customers-card-grid){flex:1;min-height:0;align-content:start}
+.crm-app :is(.customers-list-panel,.reports-ref-table-card,.approvals-table-panel,.calllogs-table-card)>:is(footer,.customers-pagination,.reports-ref-table-footer,.approvals-table-footer){margin-top:auto}
+.crm-app :is(.fc-tablewrap,.customers-list-panel,.reports-ref-table-card,.approvals-table-panel,.calllogs-table-card) table{height:auto;flex:none}
+.crm-app .customers-import-history{flex:none}
+@media(max-width:760px){.crm-app :is(.fc-campaign-list,.customers-list-panel,.reports-ref-table-card,.approvals-table-panel,.calllogs-table-card){min-height:200px}}
