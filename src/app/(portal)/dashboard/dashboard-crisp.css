@@ -43,7 +43,7 @@
 .crm-app .campaign-period-filter :is(select,input){height:32px;border:1px solid #d4e0ed;border-radius:7px;background:var(--crisp-panel,#fff);color:inherit;font-size:11px;padding:4px 8px;max-width:100%;min-width:0}
 .crm-app .campaign-period-filter .campaign-period-select-wrap{position:relative;display:inline-grid;grid-template-columns:max-content;flex:0 0 auto;max-width:100%;color:inherit;font-size:12px;font-weight:600;line-height:1.4}
 .crm-app .campaign-period-filter .campaign-period-select-measure{grid-area:1/1;visibility:hidden;pointer-events:none;white-space:nowrap;padding:0 30px;border:1px solid transparent;height:32px;box-sizing:border-box;font:inherit;letter-spacing:normal}
-.crm-app .campaign-period-filter .campaign-period-select-wrap select{grid-area:1/1;width:100%;min-width:0;max-width:none;box-sizing:border-box;appearance:none;-webkit-appearance:none;cursor:pointer;text-align:center;text-align-last:center;white-space:nowrap;text-overflow:clip;padding:4px 30px;font:inherit;letter-spacing:normal}
+.crm-app .campaign-period-filter .campaign-period-select-wrap select{display:block;grid-area:1/1;width:100%;min-width:0;max-width:none;box-sizing:border-box;appearance:none;-webkit-appearance:none;cursor:pointer;text-align:center;text-align-last:center;white-space:nowrap;text-overflow:clip;padding:4px 30px;font:inherit;letter-spacing:normal}
 .crm-app .campaign-period-filter .campaign-period-select-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none}
 .crm-app .campaign-period-filter .campaign-period-select-wrap select:focus-visible{outline:2px solid #078d9b;outline-offset:2px}
 .crm-app .campaign-period-filter button{min-height:32px}
