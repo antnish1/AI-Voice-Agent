@@ -1564,3 +1564,5 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 /* Borderless Call Logs cells; keep the table card and header background. */
 .crm-app .calllogs-reference .calllogs-expanded-table :is(th,td){border:0!important;box-shadow:none}
 .crm-app .calllogs-reference .calllogs-expanded-table :is(thead,tbody,tr){border:0!important;box-shadow:none}
+
+.crm-app .calllogs-paginator{display:flex;align-items:center;gap:10px}.crm-app .calllogs-paginator .calllogs-page-count{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;min-width:44px;text-align:center}.crm-app .calllogs-paginator button{width:34px;height:34px;padding:0;display:grid;place-items:center;font-size:20px;line-height:1}
