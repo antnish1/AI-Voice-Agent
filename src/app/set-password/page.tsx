@@ -8,7 +8,7 @@ export default async function SetPassword({ searchParams }: { searchParams: Prom
   if (!user) redirect("/login?error=invalid_link");
   const { error } = await searchParams;
   return <div className="login-page"><div className="login-card">
-    <div className="logo">F</div><p className="eyebrow">FRONTIER GROUP</p>
+    <div className="logo"><img src="/autoreach-logo.png" alt="FrontVox AI" width={48} height={48} style={{objectFit:"contain",width:"100%",height:"100%"}}/></div><p className="eyebrow">FRONTIER GROUP</p>
     <h1>Set your password</h1>
     <p className="muted">Complete your secure invitation for {user.email ?? "your account"}.</p>
     {error && <p className="error" role="alert">Passwords must match, contain 12–128 characters, and meet your project's password requirements.</p>}
