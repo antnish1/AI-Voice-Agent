@@ -25,9 +25,8 @@ export async function POST(request:Request){
   const path=sarvamPath("campaigns","/"+encodeURIComponent(launch.sarvam_campaign_id));
   const provider=await sarvamGet(path);
   const status=String(provider.status??"").toLowerCase();
-  if(action==="pause"&&status==="paused"||action==="resume"&&status==="active")
-   return NextResponse.json({ok:true,providerStatus:status,message:"Sarvam campaign is already in the requested state."});
-  if(action==="pause"&&status!=="active"||action==="resume"&&status!=="paused")
+  if(action==="pause"&&status==="paused"||action==="resume"&&status==="active"){const {error}=await supabase.from("voice_campaign_launches").update({provider_status:status}).eq("campaign_id",campaignId);if(error)throw Error("Status could not be saved");return NextResponse.json({ok:true,providerStatus:status,message:"Sarvam campaign is already in the requested state."});}
+  if(action==="pause"&&!["active","scheduled"].includes(status)||action==="resume"&&status!=="paused")
    return NextResponse.json({error:"Sarvam reports "+(status||"an unknown state")+". The requested transition is not available."},{status:409});
   const {data:reservation,error:reservationError}=await supabase.from("voice_campaign_control_events").insert({
    campaign_id:campaignId,dealership_id:campaign.dealership_id,action,status:"pending",initiated_by:user.id,provider_status:status
@@ -42,6 +41,7 @@ export async function POST(request:Request){
     status:"confirmed",provider_status:expected,updated_at:new Date().toISOString()
    }).eq("id",reservation.id).eq("status","pending");
    if(logError)throw Error("Provider accepted action but audit update failed.");
+   const {error:syncError}=await supabase.from("voice_campaign_launches").update({provider_status:expected}).eq("campaign_id",campaignId);if(syncError)throw Error("Could not save confirmed status");
    return NextResponse.json({ok:true,providerStatus:state||"accepted",message:"Sarvam accepted the campaign "+action+" request. Check the provider status to confirm no further calls are being queued."});
   }catch{
    await supabase.from("voice_campaign_control_events").update({status:"unknown",updated_at:new Date().toISOString()}).eq("id",reservation.id);
@@ -49,3 +49,5 @@ export async function POST(request:Request){
   }
  }catch{return NextResponse.json({error:"Could not authorize campaign lifecycle action."},{status:403});}
 }
+
+export async function GET(request:Request){try{const {supabase}=await requireItSuperUser();const id=new URL(request.url).searchParams.get("campaignId")??"";if(!/^[a-f0-9-]{36}$/i.test(id))return NextResponse.json({error:"Invalid campaign ID"},{status:400});const {data:l,error}=await supabase.from("voice_campaign_launches").select("sarvam_campaign_id").eq("campaign_id",id).maybeSingle();if(error||!l?.sarvam_campaign_id)return NextResponse.json({error:"No provider campaign"},{status:404});const result=await sarvamGet(sarvamPath("campaigns","/"+encodeURIComponent(l.sarvam_campaign_id)));const status=String(result.status??"").toLowerCase();if(!["scheduled","active","paused","completed","cancelled","canceled","in_progress"].includes(status))return NextResponse.json({error:"Unrecognized provider status"},{status:409});const {error:save}=await supabase.from("voice_campaign_launches").update({provider_status:status}).eq("campaign_id",id);if(save)throw Error();return NextResponse.json({ok:true,providerStatus:status});}catch{return NextResponse.json({error:"Unable to verify provider status"},{status:502});}}
