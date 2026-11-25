@@ -12,7 +12,7 @@ const statusOf=(v:unknown)=>({connected:"answered",busy:"busy",no_answer:"no_ans
 const object=(v:unknown)=>v&&typeof v==="object"&&!Array.isArray(v)?v as Record<string,unknown>:null;
 async function list(agent:string,kind:"attempts"|"interactions",field:string,value:string,start:string,end:string,offset=0){
  const {org,workspace}=requireProviderConfig();
- const params=new URLSearchParams({start_datetime:start,end_datetime:end,filter_conditions:JSON.stringify([{field,operator:"equals",value}]),limit:"50",offset:String(offset)});
+ const params=new URLSearchParams({start_datetime:start,end_datetime:end,filter_conditions:JSON.stringify([{field,operator:"equals",value}]),limit:"50",offset:String(offset),...(kind==="interactions"?{include_transcript:"true"}:{})});
  const result=await sarvamGet("/api/analytics/v1/"+org+"/"+workspace+"/"+encodeURIComponent(agent)+"/"+kind+"?"+params);
  if(!Array.isArray(result.items))throw Error("Invalid analytics response");
  return {items:result.items.map(object).filter((x):x is Record<string,unknown>=>!!x),more:typeof result.next_page_uri==="string"&&!!result.next_page_uri};
@@ -47,7 +47,9 @@ export async function POST(request:Request){
    if(kind==="test"){
     const {error}=await admin.from("voice_test_call_results").upsert({request_id:requestId,interaction_id:interaction||null,...record},{onConflict:"request_id"});if(error)throw Error("Save failed");
    }else{
-    const {error}=await admin.from("voice_call_records").upsert({dealership_id:dealer,sarvam_campaign_id:value,sarvam_attempt_id:str(a.attempt_id),agent_id:agent,sarvam_interaction_id:interaction||null,dialed_number:str(a.user_contact)||null,...record},{onConflict:"dealership_id,sarvam_attempt_id"});if(error)throw Error("Save failed");
+    const existing=interaction?await admin.from("voice_call_records").select("id").eq("dealership_id",dealer).eq("sarvam_interaction_id",interaction).maybeSingle():{data:null,error:null};if(existing.error)throw Error("Duplicate lookup failed");
+    const fields={dealership_id:dealer,sarvam_campaign_id:value,sarvam_attempt_id:str(a.attempt_id),agent_id:agent,sarvam_interaction_id:interaction||null,dialed_number:str(a.user_contact)||null,...record};
+    const {error}=existing.data?await admin.from("voice_call_records").update(fields).eq("id",existing.data.id).eq("dealership_id",dealer):await admin.from("voice_call_records").upsert(fields,{onConflict:"dealership_id,sarvam_attempt_id"});if(error)throw Error("Save failed");
    }
    saved++;
   }

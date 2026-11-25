@@ -1,0 +1,19 @@
+export type HistoricalRow={interaction:string;campaign:string;agent:string;phone:string;status:string;duration:number;started:string;ended:string|null;transcript:{role:string;en_text:string}[];output:Record<string,string>};
+export function parseHistoricalCsv(raw:string){
+ const rows:string[][]=[];let row:string[]=[],cell="",quoted=false;const data=raw.replace(/^\uFEFF/,"");
+ for(let i=0;i<data.length;i++){const c=data[i];if(c==='"'){if(quoted&&data[i+1]==='"'){cell+='"';i++;}else if(quoted)quoted=false;else if(!cell)quoted=true;else throw Error("Invalid CSV quoting.");}else if(c===","&&!quoted){row.push(cell);cell="";}else if((c==="\n"||c==="\r")&&!quoted){if(c==="\r"&&data[i+1]==="\n")i++;row.push(cell);if(row.some(Boolean))rows.push(row);row=[];cell="";}else cell+=c;}
+ if(quoted)throw Error("Unclosed CSV quotation.");row.push(cell);if(row.some(Boolean))rows.push(row);
+ const headers=rows.shift()??[];if(rows.length<1||rows.length>500||new Set(headers).size!==headers.length||rows.some(r=>r.length!==headers.length))throw Error("Expected 1–500 well-formed rows with unique headers.");
+ for(const k of ["interaction_id","campaign_id","app_id","user_contact","is_debug_call","channel_direction","start_datetime","duration_in_seconds","end_reason","transcript_en"])if(!headers.includes(k))throw Error("Missing column: "+k);
+ const seen=new Set<string>();
+ const date=(v:string,timezone:string)=>{if(!v)return null;const m=v.match(/^([A-Za-z]{3}) (\d{1,2}), (\d{4}), (\d{1,2}):(\d{2}):(\d{2}) (AM|PM)$/);if(!m)throw Error("Unsupported CSV date format.");const mon=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].indexOf(m[1])+1;if(!mon)throw Error("Invalid month.");const d=new Date(`${m[3]}-${String(mon).padStart(2,"0")}-${m[2].padStart(2,"0")}T${String(Number(m[4])%12+(m[7]==="PM"?12:0)).padStart(2,"0")}:${m[5]}:${m[6]}${timezone}`);if(!Number.isFinite(d.getTime()))throw Error("Invalid date.");return d.toISOString();};
+ return {rows:rows.map(r=>Object.fromEntries(headers.map((k,i)=>[k,r[i]]))),convert(timezone:string):HistoricalRow[]{if(!["+05:30","+00:00"].includes(timezone))throw Error("Choose source timezone.");return rows.map(r=>{
+ const x=Object.fromEntries(headers.map((k,i)=>[k,r[i]]));const interaction=x.interaction_id,agent=x.app_id,campaign=x.campaign_id,phone=x.user_contact;
+ if(!/^\d{8}\/[A-Za-z0-9._:-]{1,180}$/.test(interaction)||!agent||agent.length>200||!campaign||campaign.length>200||!/^\+?[1-9]\d{9,14}$/.test(phone)||x.is_debug_call!=="0"||x.channel_direction!=="outbound"||seen.has(interaction))throw Error("Invalid, duplicate, debug or non-outbound interaction.");
+ seen.add(interaction);const duration=Number(x.duration_in_seconds),started=date(x.start_datetime,timezone);if(!started||!x.duration_in_seconds.trim()||!Number.isFinite(duration)||duration<0||duration>86400)throw Error("Invalid duration or start date.");
+ const output=Object.fromEntries(Object.entries(x).filter(([k,v])=>k.startsWith("agent_variables.")&&v!=="").map(([k,v])=>[k.slice(16),v]));
+ const transcript:HistoricalRow["transcript"]=[];for(const line of x.transcript_en.split(/\r?\n/)){const m=line.match(/^(Agent|User):\s*(.*)$/);if(m)transcript.push({role:m[1]==="Agent"?"agent":"user",en_text:m[2]});else if(transcript.length)transcript[transcript.length-1].en_text+="\n"+line;}
+ const status=x.end_reason==="VOICEMAIL"||output.call_disposition==="VOICEMAIL_NO_ANSWER"?"no_answer":transcript.some(t=>t.role==="user"&&t.en_text.trim())?"answered":"other";
+ return {interaction,agent,campaign,phone,status,duration:Math.round(duration),started,ended:date(x.end_datetime,timezone),transcript,output:{...output,source:"sarvam_csv",source_timezone_offset:timezone,provider_end_reason:x.end_reason,provider_failure_reason:x.failure_reason??"",usage_cost:x.usage_cost??"",telephony_cost:x.telephony_cost??"",duration_exact_seconds:x.duration_in_seconds}};
+ });}};
+}
