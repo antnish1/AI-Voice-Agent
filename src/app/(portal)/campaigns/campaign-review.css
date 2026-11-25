@@ -59,3 +59,16 @@
 .crm-app .review-actions .review-reject:hover:not(:disabled){background:#b91c1c;color:#fff}
 .crm-app .review-reference-page,.crm-app .campaign-review,.crm-app .review-panel,.crm-app .review-table{min-width:0;max-width:100%}
 .crm-app .review-table{overflow-x:auto}
+
+/* Uploaded Excel Records: spacious, readable, reference-inspired grid.
+   Preserve every uploaded column and the existing keyboard-scrollable wrapper. */
+.crm-app .campaign-review .review-table{border:0;border-radius:10px;background:transparent}
+.crm-app .campaign-review .review-table .crm-table{width:100%;min-width:100%;border-collapse:separate;border-spacing:2px 4px;table-layout:auto;margin:0}
+.crm-app .campaign-review .review-table .crm-table thead th{position:sticky;top:0;z-index:1;background:#dce9fc;color:#10294e;font-size:12px;font-weight:750;line-height:1.45;letter-spacing:0;text-transform:none;white-space:normal;overflow-wrap:normal;text-align:center;vertical-align:middle;padding:14px 12px;min-width:82px;border:1px solid #d2e1f6;border-radius:7px}
+.crm-app .campaign-review .review-table .crm-table tbody td{background:#fff;color:#162c49;font-size:12px;line-height:1.5;text-align:center;vertical-align:middle;padding:14px 12px;min-width:82px;max-width:240px;white-space:normal;overflow-wrap:anywhere;overflow:visible;text-overflow:clip;border:1px solid #e0e8f2;border-radius:4px}
+.crm-app .campaign-review .review-table .crm-table :is(th,td):first-child{min-width:36px;width:36px;padding-inline:8px}
+.crm-app .campaign-review .review-table .crm-table :is(th,td):nth-child(2){min-width:120px}
+.crm-app .campaign-review .review-table .crm-table tbody td:nth-child(2){white-space:nowrap}
+.crm-app .campaign-review .review-table .crm-table tbody td[colspan]{text-align:left}
+.crm-app .campaign-review .review-record-head{margin-bottom:12px;gap:12px}
+.crm-app .campaign-review .review-table:focus-visible{outline:2px solid #17558c;outline-offset:2px}
