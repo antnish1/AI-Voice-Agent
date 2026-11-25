@@ -61,7 +61,7 @@ export default async function Reports(){
   all("customer_import_rows","id,customer_id,batch_id,row_number,source_data,status"),
   all("campaign_prospects","id,campaign_id,customer_name,mobile,vehicle_model,registration_number,service_type,service_due,last_service,follow_up_at,call_summary,next_action,created_at,updated_at"),
   all("customer_import_batches","id,created_at"),
-  all("voice_call_records","id,customer_id,sarvam_campaign_id,sarvam_attempt_id,dialed_number,status,duration_seconds,started_at,output_variables"),
+  all("voice_call_records","id,customer_id,sarvam_campaign_id,sarvam_attempt_id,agent_id,dialed_number,status,duration_seconds,started_at,output_variables"),
   all("voice_campaign_links","id,campaign_id,sarvam_campaign_id"),
   all("crm_appointments","id,customer_id,status,appointment_at,updated_at"),
   all("crm_callbacks","id,customer_id,status,requested_at,updated_at"),
@@ -101,7 +101,9 @@ export default async function Reports(){
  const testAttemptIds=new Set(testReports.map(t=>t.sarvam_attempt_id).filter(Boolean));
  const serviceRecords:OperationalReport[]=calls.filter(c=>!testAttemptIds.has(str(c.sarvam_attempt_id))).map(c=>{
   const phone=phoneKey(c.dialed_number);
-  const campaign=linkMap.get(str(c.sarvam_campaign_id));
+  const external=str(c.sarvam_campaign_id);
+  const campaign=linkMap.get(external)||(external?"historical:"+dealerId+":"+external:undefined);
+  if(campaign&&external&&!linkMap.has(external)&&!listed.some(x=>x.id===campaign))listed.push({id:campaign,name:external==="MG-Remainin-348e8be3-4718"?"MG Remaining november":external,status:"HISTORICAL",created_at:str(c.started_at),dealership_id:dealerId});
   const p=campaign&&phone?unique(prospects.filter(x=>str(x.campaign_id)===campaign&&phoneKey(x.mobile)===phone)):undefined;
   const candidates=phone?inputs.filter(([,x])=>phoneKey(x.values[1])===phone):[];
   const match=p&&str(p.registration_number)?unique(candidates.filter(([,x])=>normalize(x.values[3])===normalize(str(p.registration_number)))):unique(candidates);
@@ -109,7 +111,8 @@ export default async function Reports(){
   const base=match?.[1].values??[];
   const person=byId.get(str(c.customer_id));
   const input=[str(p?.customer_name)||base[0]||str(person?.name),str(c.dialed_number)||base[1]||"",str(p?.vehicle_model)||base[2]||"",str(p?.registration_number)||base[3]||"",str(p?.service_type)||base[4]||"",str(p?.service_due)||base[5]||"",str(p?.last_service)||base[6]||"",base[7]||"",base[8]||"",base[9]||"",base[10]||""];
-  return {id:"call:"+str(c.id),callId:str(c.id),date:str(c.started_at),campaignId:campaign,values:reportValues(input,c,p,operations(str(c.customer_id)))};
+  const vars=c.output_variables&&typeof c.output_variables==="object"&&!Array.isArray(c.output_variables)?c.output_variables as Record<string,unknown>:{};
+  return {id:"call:"+str(c.id),callId:str(c.id),agentId:str(c.agent_id),agentName:str(vars.agent_name)||(str(c.agent_id)==="Conversatio-95f7d6e8-61a2"?"Kajal":""),agentVersion:str(vars.agent_version)||str(vars.app_version),date:str(c.started_at),campaignId:campaign,values:reportValues(input,c,p,operations(str(c.customer_id)))};
  });
  for(const [k,row] of inputs)if(!matched.has(k)){
   const phone=phoneKey(row.values[1]);
