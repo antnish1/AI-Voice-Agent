@@ -20,12 +20,6 @@ const navigation:Array<{name:string;url:string;icon:SidebarIconName}>=[
  {name:"Campaigns",url:"/campaigns",icon:"megaphone"},
  {name:"AI Voice Agents",url:"/agents",icon:"wave"},
  {name:"Customers",url:"/customers",icon:"user-square"},
- {name:"Approvals",url:"/approvals",icon:"check-square"},
- {name:"Call Logs",url:"/call-logs",icon:"phone"},
- {name:"Appointments",url:"/appointments",icon:"calendar"},
- {name:"Callbacks",url:"/callbacks",icon:"callback"},
- {name:"Pickup & Drop",url:"/pickup-drop",icon:"truck"},
- {name:"Documents",url:"/documents",icon:"documents"},
  {name:"Reports",url:"/reports",icon:"chart"},
  {name:"Settings",url:"/settings",icon:"settings"}
 ];
@@ -47,9 +41,9 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
  };
  const hideTooltip=()=>setTooltip(null);
  useEffect(()=>{hideTooltip();},[collapsed,narrowScreen,path]);
- const campaignActive=path==="/campaigns"||path.startsWith("/campaigns/");
+ const campaignActive=path==="/campaigns"||path.startsWith("/campaigns/")||(isItAdmin&&path==="/approvals");
  const closeMobile=()=>setMobile(false);
- useEffect(()=>{setCampaignsExpanded(false);setMobile(false);},[path,navigationLayout]);
+ useEffect(()=>{setCampaignsExpanded(campaignActive);setMobile(false);},[path,navigationLayout,campaignActive]);
  return <div className={`app crm-app reference-app ${collapsed?"nav-collapsed":""} ${mobile?"nav-open":""} ${isTopMenu?"frontier-top-layout":""}`}>
   {!isTopMenu&&<motion.aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar" animate={{width:narrowScreen?224:collapsed?68:224}} transition={reducedMotion?{duration:0}:motionTokens.spring}>
    <div className="brand crm-brand ref-brand frontier-sidebar-brand" title="Frontier Voice Intelligence">
@@ -74,9 +68,9 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
          <span className="nav-label">{item.name}</span>
          {item.url==="/approvals"&&pendingApprovals>0&&<span className="frontier-approval-badge" title={`${pendingApprovals} campaigns awaiting approval`}>{pendingApprovals>99?"99+":pendingApprovals}</span>}
         </Link>
-        {item.url==="/campaigns"&&<button type="button" className="frontier-campaign-toggle" aria-label={campaignsExpanded?"Collapse Campaigns submenu":"Expand Campaigns submenu"} aria-expanded={campaignsExpanded} onClick={()=>setCampaignsExpanded(s=>!s)}><SidebarIcon name="chevron-down" size={16}/></button>}
+        {item.url==="/campaigns"&&<button type="button" className="frontier-campaign-toggle" aria-label={campaignsExpanded?"Collapse Campaigns submenu":"Expand Campaigns submenu"} aria-expanded={campaignsExpanded} onClick={()=>{if(collapsed){setCollapsed(false);setCampaignsExpanded(true);}else setCampaignsExpanded(s=>!s);}}><SidebarIcon name="chevron-down" size={16}/></button>}
        </div>
-       {item.url==="/campaigns"&&campaignsExpanded&&!collapsed&&<div className="frontier-campaign-subnav"><Link href="/campaigns" onClick={closeMobile}>All Campaigns</Link>{isItAdmin&&<Link href="/campaigns/new" onClick={closeMobile}>Create Campaign</Link>}</div>}
+       {item.url==="/campaigns"&&campaignsExpanded&&!collapsed&&<div className="frontier-campaign-subnav"><Link href="/campaigns" onClick={closeMobile}>All Campaigns</Link>{isItAdmin&&<><Link href="/approvals" aria-current={path==="/approvals"?"page":undefined} onClick={closeMobile}>Approvals {pendingApprovals>0&&<span className="frontier-approval-badge">{pendingApprovals>99?"99+":pendingApprovals}</span>}</Link><Link href="/campaigns/new" onClick={closeMobile}>Create Campaign</Link></>}</div>}
       </div>;
     })}
    </nav>
