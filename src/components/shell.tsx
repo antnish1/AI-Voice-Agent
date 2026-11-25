@@ -20,6 +20,7 @@ const navigation:Array<{name:string;url:string;icon:SidebarIconName}>=[
  {name:"Campaigns",url:"/campaigns",icon:"megaphone"},
  {name:"AI Voice Agents",url:"/agents",icon:"wave"},
  {name:"Customers",url:"/customers",icon:"user-square"},
+ {name:"Call Logs",url:"/call-logs",icon:"phone"},
  {name:"Reports",url:"/reports",icon:"chart"},
  {name:"Settings",url:"/settings",icon:"settings"}
 ];
