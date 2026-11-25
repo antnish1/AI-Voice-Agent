@@ -31,6 +31,7 @@ export async function POST(request:Request){
    const {data,error}=await ctx.supabase.from("voice_test_call_requests").select("id,agent_id,sarvam_attempt_id,created_at").eq("id",id).eq("user_id",ctx.user.id).maybeSingle();
    if(error||!data||!data.sarvam_attempt_id)return reply({error:"Test request unavailable"},404);
    agent=data.agent_id;field="attempt_id";value=data.sarvam_attempt_id;requestId=data.id;start=new Date(new Date(data.created_at).getTime()-3600000).toISOString();
+   if(phase==="interactions"){const prior=await admin.from("voice_test_call_results").select("interaction_id").eq("request_id",requestId).maybeSingle();if(prior.error)throw Error("Result lookup failed");if(!prior.data?.interaction_id)return reply({ok:true,saved:0,nextOffset:null,nextPhase:null,reason:"No verified interaction ID"});field="interaction_id";value=prior.data.interaction_id;}
   }else{
    const {data,error}=await ctx.supabase.from("voice_campaign_links").select("agent_id,sarvam_campaign_id,dealership_id,created_at").eq("campaign_id",id).maybeSingle();
    if(error||!data)return reply({error:"No linked Sarvam campaign"},404);
@@ -42,6 +43,7 @@ export async function POST(request:Request){
   for(const a of page.items){
    if(str(a[field])!==value)continue;
    if(phase==="interactions"){
+    if(kind==="test"&&str(a.campaign_id))continue;
     const interaction=str(a.interaction_id);
     if(!interaction)continue;
     const transcript=Array.isArray(a.interaction_transcript)?a.interaction_transcript.map(object).filter((t):t is Record<string,unknown>=>!!t&&["agent","user"].includes(str(t.role))&&typeof t.en_text==="string").map(t=>({role:str(t.role),en_text:str(t.en_text).slice(0,4000)})):[];
@@ -62,7 +64,8 @@ export async function POST(request:Request){
    const interaction=str(a.interaction_id);
    const record={status:statusOf(a.connectivity_status),duration_seconds:typeof a.duration_in_seconds==="number"&&Number.isFinite(a.duration_in_seconds)?Math.max(0,Math.round(a.duration_in_seconds)):null,started_at:iso(a.start_datetime),ended_at:iso(a.end_datetime),last_synced_at:new Date().toISOString()};
    if(kind==="test"){
-    const {error}=await admin.from("voice_test_call_results").upsert({request_id:requestId,interaction_id:interaction||null,...record},{onConflict:"request_id"});if(error)throw Error("Save failed");
+    const prior=await admin.from("voice_test_call_results").select("interaction_id,status").eq("request_id",requestId).maybeSingle();if(prior.error||prior.data?.interaction_id&&interaction&&prior.data.interaction_id!==interaction)throw Error("Test identity conflict");
+    const {error}=await admin.from("voice_test_call_results").upsert({request_id:requestId,status:record.status==="other"&&prior.data?prior.data.status:record.status,...(interaction?{interaction_id:interaction}:{}),...(record.duration_seconds!==null?{duration_seconds:record.duration_seconds}:{}),...(record.started_at?{started_at:record.started_at}:{}),...(record.ended_at?{ended_at:record.ended_at}:{}),last_synced_at:record.last_synced_at},{onConflict:"request_id"});if(error)throw Error("Save failed");
    }else{
     const existing=interaction?await admin.from("voice_call_records").select("id,sarvam_campaign_id,agent_id,sarvam_attempt_id,output_variables").eq("dealership_id",dealer).eq("sarvam_interaction_id",interaction).maybeSingle():{data:null,error:null};if(existing.error)throw Error("Duplicate lookup failed");if(existing.data&&(existing.data.sarvam_campaign_id!==value||existing.data.agent_id!==agent))throw Error("Interaction scope conflict");
     const byAttempt=await admin.from("voice_call_records").select("id,sarvam_campaign_id,agent_id,sarvam_interaction_id,output_variables").eq("dealership_id",dealer).eq("sarvam_attempt_id",str(a.attempt_id)).maybeSingle();
@@ -73,6 +76,6 @@ export async function POST(request:Request){
    }
    saved++;
   }
-  return reply({ok:true,saved,inserted,updated,nextOffset:page.more?offset+50:null,nextPhase:!page.more&&phase==="attempts"?"interactions":null});
+  return reply({ok:true,saved,inserted,updated,...(kind==="test"&&saved===0&&!page.more?{reason:"No matching provider result found"}:{}),nextOffset:page.more?offset+50:null,nextPhase:!page.more&&phase==="attempts"?"interactions":null});
  }catch{return reply({error:"Sarvam synchronization unavailable. Check provider access and retry later."},502);}
 }
