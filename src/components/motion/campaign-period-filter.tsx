@@ -1,12 +1,13 @@
 "use client";
 import {useRouter} from "next/navigation";
-import {useState} from "react";
+import {useEffect,useState} from "react";
 
 export function CampaignPeriodFilter({period,from,to,today}:{period:string;from:string;to:string;today:string}){
  const router=useRouter();
  const [selected,setSelected]=useState(period);
  const [start,setStart]=useState(from);
  const [end,setEnd]=useState(to);
+ useEffect(()=>{setSelected(period);setStart(from);setEnd(to);},[period,from,to]);
  const valid=start!==""&&end!==""&&start<=end&&end<=today;
  function navigate(value:string){
   const params=new URLSearchParams({period:value});
