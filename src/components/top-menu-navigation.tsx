@@ -63,7 +63,7 @@ export function TopMenuNavigation({items,pendingApprovals,isItAdmin}:{items:Item
  const menu=open?menus[open]:undefined;
  const secondary=menu?.secondary??[];
  const selected=isItAdmin?secondary:secondary.filter(x=>x.href!=="/users");
- const featured=isItAdmin?(menu?.featured??[]):(menu?.featured??[]).filter(x=>!["/campaigns/new","/approvals"].includes(x.href));
+ const featured=isItAdmin?(menu?.featured??[]):(menu?.featured??[]).filter(x=>x.href!=="/approvals");
  const close=()=>setOpen(null);
  return <nav className="frontier-top-navigation frontier-mega-navigation" aria-label="Main navigation"
   onMouseLeave={close}
