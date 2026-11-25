@@ -38,3 +38,10 @@
 :root[data-theme="dark"] .ref-dashboard .ref-chart-grid span{border-color:#40566f}
 :root[data-theme="dark"] .ref-dashboard .ref-campaign-table td{border-color:#354b63}
 :root[data-theme="dark"] .ref-dashboard .ref-panel-header>a{color:#71d5e4}
+
+.dashboard-period-filter{position:relative;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.dashboard-period-select{display:flex;align-items:center;gap:8px;padding:0 11px;min-height:36px;border:1px solid #dbe5ef;border-radius:9px;background:#fff;color:#35516d}.dashboard-period-select select{border:0;background:transparent;color:inherit;box-shadow:none;font-size:12px;font-weight:650;padding:6px 4px;min-width:105px}.dashboard-period-select:focus-within{outline:2px solid #0b8298;outline-offset:1px}.dashboard-period-custom{display:flex;align-items:end;gap:8px;flex-wrap:wrap}.dashboard-period-custom label{display:grid;gap:3px;font-size:11px}.dashboard-period-custom input{min-width:0;max-width:140px;padding:5px}.dashboard-period-custom button{padding:7px 12px;font-size:12px}:root[data-theme="dark"] .dashboard-period-select{background:#20364c;border-color:#40566f;color:#d6e6f5}
+
+/* Keep the complete hover card inside the chart, not above its clipping boundary. */
+.ref-dashboard .ref-chart-column.frontier-chart-column{position:relative;isolation:auto}
+.ref-dashboard .frontier-chart-tooltip{top:8px;bottom:auto;z-index:20;max-width:150px;min-width:100px}
+.ref-dashboard .ref-chart-area{overflow:visible}

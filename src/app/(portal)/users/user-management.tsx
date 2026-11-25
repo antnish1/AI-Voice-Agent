@@ -163,6 +163,5 @@ export function UserManagement(){
     {!users.length&&<tr><td colSpan={8} className="it-user-empty">{loading?"Loading users…":"No dealership users found."}</td></tr>}
    </tbody></table></div>
   </section>}
-  <p className="it-user-footnote">Only IT Super Users can provision accounts. New users are restricted to their assigned dealership. Only IT can issue and reset passwords. Share credentials privately; no password invitation or reset emails are sent.</p>
  </div>;
 }
