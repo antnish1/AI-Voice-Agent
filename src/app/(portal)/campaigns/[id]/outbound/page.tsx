@@ -12,7 +12,7 @@ export default async function OutboundPage({params}:{params:Promise<{id:string}>
  const [configs,batches,launches,dealer]=await Promise.all([
   supabase.from("campaign_draft_configs").select("configuration").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
   supabase.from("campaign_recipient_batches").select("cohort_name,total_records,eligible_records,csv_sha256,object_path").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
-  supabase.from("voice_campaign_launches").select("state,sarvam_campaign_id,sarvam_cohort_id").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
+  supabase.from("voice_campaign_launches").select("state,sarvam_campaign_id,sarvam_cohort_id,provider_status").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
   supabase.from("dealerships").select("name,email").eq("id",campaign.dealership_id).maybeSingle()
  ]);
  if(configs.error||batches.error||launches.error||dealer.error)throw Error("Unable to load campaign review.");
