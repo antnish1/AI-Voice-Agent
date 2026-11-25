@@ -24,7 +24,7 @@ export async function POST(request:Request){
     .gte("created_at",new Date(Date.now()-86400000).toISOString()).limit(20)
   ]);
   if(batchError||configError||testError||!batch||!config||!test?.length)
-   return NextResponse.json({error:"A locked recipient cohort, matching approved configuration and a recent test call are required."},{status:409});
+   return NextResponse.json({error:"A locked recipient cohort, matching approved configuration and a recent test call from AI Voice Agents are required."},{status:409});
   const setup=config.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start?:string;end?:string;days?:string[];from?:string;to?:string}};
   const agent=String(input.agentId??""),version=Number(input.appVersion),connection=String(input.connectionId??""),sender=normalizePhone(String(input.callerNumber??""));
   if(!/^[\w.\-]{3,200}$/.test(agent)||!Number.isInteger(version)||version<1||
@@ -34,7 +34,7 @@ export async function POST(request:Request){
    return NextResponse.json({error:"Agent, committed version, connection and caller number must exactly match the approved campaign draft."},{status:400});
   if(!test.some(attempt=>attempt.agent_id===agent&&attempt.agent_version===version&&
     attempt.connection_id===connection&&attempt.caller_number===sender))
-   return NextResponse.json({error:"The recent test-call attempt must use the approved agent version, telephony connection and caller number. Re-test this exact setup before launch."},{status:409});
+   return NextResponse.json({error:"The recent test-call attempt must use the approved agent version, telephony connection and caller number. Re-test this exact setup from AI Voice Agents before launch."},{status:409});
   const start=new Date(String(input.startAt??"")),end=new Date(String(input.endAt??""));
   const istDate=(date:Date)=>{
    const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
@@ -70,6 +70,7 @@ export async function POST(request:Request){
    start_timestamp:start.toISOString(),end_timestamp:end.toISOString(),
    allowed_schedule:{timezone:"Asia/Kolkata",allowed_start_time:schedule.from,allowed_end_time:schedule.to,allowed_days:schedule.days.map(x=>days[x])}
   };
+  // Recipient phone numbers are exclusively derived from the verified locked Excel-derived CSV, never a launch form field.
   const configHash=sha256(JSON.stringify(launchBody));
   const {data:reservation,error:reserveError}=await supabase.from("voice_campaign_launches").insert({
    campaign_id:id,dealership_id:campaign.dealership_id,recipient_sha256:batch.csv_sha256,
