@@ -18,16 +18,19 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  const {days:rangeInput}=await searchParams;
  const days=rangeInput==="30"?30:rangeInput==="14"?14:7;
  const start=new Date();start.setDate(start.getDate()-days+1);start.setHours(0,0,0,0);
- const [customerCount,campaignCount,approvalCount,approvedCount,recentCampaigns,periodCampaigns,recentImports]=await Promise.all([
+ const [customerCount,campaignCount,approvalCount,approvedCount,recentCampaigns,periodCampaigns,recentImports,callCount,answeredCount,activeCount]=await Promise.all([
   supabase.from("customers").select("id",{count:"exact",head:true}).eq("dealership_id",id),
   supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id),
   supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id).eq("status","PENDING_MANAGER_APPROVAL"),
   supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id).eq("status","APPROVED"),
   supabase.from("campaigns").select("id,name,status,created_at").eq("dealership_id",id).order("created_at",{ascending:false}).limit(7),
   supabase.from("campaigns").select("id,created_at").eq("dealership_id",id).gte("created_at",start.toISOString()).order("created_at",{ascending:false}).limit(1000),
-  supabase.from("customer_import_batches").select("id,filename,imported_rows,rejected_rows,created_at").eq("dealership_id",id).order("created_at",{ascending:false}).limit(6)
+  supabase.from("customer_import_batches").select("id,filename,imported_rows,rejected_rows,created_at").eq("dealership_id",id).order("created_at",{ascending:false}).limit(6),
+  supabase.from("voice_call_records").select("id",{count:"exact",head:true}).eq("dealership_id",id),
+  supabase.from("voice_call_records").select("id",{count:"exact",head:true}).eq("dealership_id",id).eq("status","answered"),
+  supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id).eq("status","ACTIVE")
  ]);
- if([customerCount,campaignCount,approvalCount,approvedCount,recentCampaigns,periodCampaigns,recentImports].some(x=>x.error))throw new Error("Could not load dealership dashboard.");
+ if([customerCount,campaignCount,approvalCount,approvedCount,recentCampaigns,periodCampaigns,recentImports,callCount,answeredCount,activeCount].some(x=>x.error))throw new Error("Could not load dealership dashboard.");
  const recent=(recentCampaigns.data??[]) as Campaign[];
  const imports=(recentImports.data??[]) as ImportBatch[];
  const daily=Array.from({length:days},(_,i)=>{const date=new Date(start);date.setDate(start.getDate()+i);const key=localDate(date);return {key,label:date.toLocaleDateString("en-IN",{month:"short",day:"numeric",timeZone:"Asia/Kolkata"}),count:(periodCampaigns.data??[]).filter(c=>localDate(c.created_at)===key).length};});
@@ -36,9 +39,9 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  const greeting=hour<12?"Good Morning":hour<17?"Good Afternoon":"Good Evening";
  const metrics=[{name:"Total Customers",value:String(customerCount.count??0),note:"Dealership records",icon:"♙",tone:"blue"},
  {name:"Total Campaigns",value:String(campaignCount.count??0),note:"All campaign states",icon:"◫",tone:"mint"},
- {name:"Active Campaigns",value:"0",note:"Live calling disabled",icon:"▶",tone:"violet"},
+ {name:"Active Campaigns",value:String(activeCount.count??0),note:"Active campaign records",icon:"▶",tone:"violet"},
  {name:"Pending Approvals",value:String(approvalCount.count??0),note:"Awaiting manager review",icon:"◷",tone:"amber"},
- {name:"Total Calls",value:"—",note:"Sarvam not connected",icon:"◕",tone:"blue"}];
+ {name:"Total Calls",value:String(callCount.count??0),note:String(answeredCount.count??0)+" answered",icon:"◕",tone:"blue"}];
  return <div className="ref-dashboard">
  <div className="ref-dashboard-heading"><div><h1>{greeting}, {userName}! <span aria-hidden="true">👋</span></h1></div><div className="ref-dashboard-heading-actions"><span className="ref-today-pill">▣ &nbsp; Today</span>{canCreate&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div>
  <div className="ref-kpi-grid ref-kpi-joined" aria-label="Dashboard key metrics">{metrics.map(m=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}>{m.icon}</div><div><span className="ref-kpi-label">{m.name}</span><CountUp className="ref-kpi-value" value={m.value}/><small className="ref-kpi-note">{m.note}</small></div></article>)}</div>
