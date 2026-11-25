@@ -10,9 +10,9 @@ export async function GET(request:Request){
   const {data:test,error}=await supabase.from("voice_test_call_requests").select("sarvam_attempt_id").eq("id",id).eq("user_id",user.id).maybeSingle();
   if(error||!test)return NextResponse.json({error:"Record unavailable"},{status:404,headers});
   if(!test.sarvam_attempt_id)return NextResponse.json({transcript:[]},{headers});
-  const {data:call,error:callError}=await supabase.from("voice_test_call_results").select("transcript").eq("request_id",id).maybeSingle();
+  const {data:call,error:callError}=await supabase.from("voice_test_call_results").select("transcript,interaction_id,status,duration_seconds,started_at").eq("request_id",id).maybeSingle();
   if(callError)return NextResponse.json({error:"Call details unavailable"},{status:404,headers});
   const transcript=Array.isArray(call?.transcript)?call.transcript.filter((t:unknown):t is {role:string;en_text:string}=>!!t&&typeof t==="object"&&"role" in t&&"en_text" in t&&typeof t.en_text==="string"&&(t.role==="agent"||t.role==="user")):[];
-  return NextResponse.json({transcript},{headers});
+  return NextResponse.json({transcript,interactionId:call?.interaction_id??null,outcome:call?.status??null,duration:call?.duration_seconds??null,startedAt:call?.started_at??null},{headers});
  }catch{return NextResponse.json({error:"Not authorized"},{status:403,headers});}
 }
