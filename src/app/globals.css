@@ -1547,3 +1547,14 @@ button.settings-ref-card-action:hover{background:#f8fbfd}
 :root[data-theme="dark"] .calllogs-customer small,:root[data-theme="dark"] .calllogs-detail-fields dt{color:#a9bdd2}
 :root[data-theme="dark"] .calllogs-detail-fields{border-color:#40566f}
 :root[data-theme="dark"] .calllogs-expanded-table .calllogs-view-icon{background:#233e59;color:#b7d9f7}
+
+/* Expanded call logs must override the shared nowrap table defaults. */
+.crm-app .calllogs-reference .calllogs-table-card{min-width:0;max-width:100%}
+.crm-app .calllogs-reference .calllogs-table-card .tablewrap{width:100%;min-width:0;max-width:100%;overflow:auto}
+.crm-app .calllogs-reference table.calllogs-expanded-table{table-layout:fixed;width:100%;min-width:1730px}
+.crm-app .calllogs-reference .calllogs-expanded-table tbody td{white-space:normal;overflow-wrap:anywhere;word-break:normal;overflow:hidden;text-overflow:clip;line-height:1.45;vertical-align:middle}
+.crm-app .calllogs-reference .calllogs-expanded-table thead th{white-space:normal;overflow-wrap:normal}
+.crm-app .calllogs-reference .calllogs-expanded-table .calllogs-customer{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.crm-app .calllogs-reference .calllogs-expanded-table .calllogs-customer strong{min-width:0;white-space:normal;overflow-wrap:anywhere}
+.crm-app .calllogs-reference .calllogs-expanded-table .calllogs-two-line{white-space:normal;max-width:100%;min-width:0;overflow:hidden;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.crm-app .calllogs-reference .calllogs-expanded-table .calllogs-status-highlight{white-space:nowrap;max-width:100%;font-size:10px}
