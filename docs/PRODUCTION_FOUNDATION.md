@@ -1,7 +1,7 @@
 # Next.js + Supabase production foundation (development, not deployed)
 
 ## Setup
-1. Create a NEW Supabase project dedicated to Frontier AI Voice CRM; do NOT use any existing InsureIT database.
+1. Create a NEW Supabase project dedicated to Frontier Voice CRM; do NOT use any existing InsureIT database.
 2. Review and run `db/production-foundation.sql` against that project in a controlled environment; validate RLS, grants, and tests before real records.
 3. Create invited users in Supabase Auth (no public sign-up), then manually assign their UUID and dealership UUID to `memberships` using an administrator-only SQL session. The SQL does not create users or seed passwords.
 4. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in local `.env.local`; never commit it. Leave `ENABLE_LIVE_CALLS=false`.
