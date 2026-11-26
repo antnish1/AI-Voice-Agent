@@ -92,7 +92,27 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
   });
  }
  if(!modalHost)return null;
- if(success)return createPortal(<div className="campaign-modal-overlay"><section className="campaign-modal fc-success-campaign" role="dialog" aria-modal="true" aria-labelledby="campaign-success-title"><div className="fc-success-tick" aria-hidden="true">✓</div><h2 id="campaign-success-title">Campaign Created Successfully</h2><p>Unique Campaign ID</p><strong className="fc-success-reference">{reference}</strong><div className="fc-success-status"><span>Status</span><span className="status-pill campaign-status-badge campaign-status-pending">Pending</span></div><div className="fc-success-actions"><button type="button" className="btn-outline" onClick={async()=>{try{await navigator.clipboard.writeText(reference);setCopied(true);}catch{setCopied(false);}}}>{copied?"Copied":"Copy Campaign ID"}</button><button type="button" className="btn-primary" onClick={()=>{router.push(canOpenOutbound?"/campaigns/"+existingDraft+"/outbound":"/campaigns?view="+encodeURIComponent(existingDraft));router.refresh();}}>View Campaign</button></div></section></div>,modalHost);
+ if(success)return createPortal(
+  <div className="campaign-modal-overlay">
+   <section className="campaign-modal fc-success-campaign fc-success-reference-modal" role="dialog" aria-modal="true" aria-labelledby="campaign-success-title" aria-describedby="campaign-success-description">
+    <div className="fc-success-tick" aria-hidden="true">✓</div>
+    <h2 id="campaign-success-title">Campaign Created Successfully</h2>
+    <div className="fc-success-reference-status" id="campaign-success-description">
+     <span>Your AI calling campaign is ready.</span>
+     <span className="status-pill campaign-status-badge campaign-status-pending">Pending</span>
+    </div>
+    <div className="fc-success-reference-card">
+     <div className="fc-success-reference-info"><span>UNIQUE CAMPAIGN ID</span><strong className="fc-success-reference">{reference}</strong></div>
+     <button type="button" className="fc-success-copy-icon" aria-label={copied?"Campaign ID copied":"Copy campaign ID"} title={copied?"Copied":"Copy campaign ID"} onClick={async()=>{try{await navigator.clipboard.writeText(reference);setCopied(true);}catch{setCopied(false);}}}>
+      {copied?<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>:<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>}
+     </button>
+    </div>
+    <div className="fc-success-actions">
+     <button type="button" className="fc-success-cancel" onClick={()=>{router.push("/campaigns");router.refresh();}}>Cancel</button>
+     <button type="button" className="fc-success-view" onClick={()=>{router.push(canOpenOutbound?"/campaigns/"+existingDraft+"/outbound":"/campaigns?view="+encodeURIComponent(existingDraft));router.refresh();}}>View Campaign <span aria-hidden="true">→</span></button>
+    </div>
+   </section>
+  </div>,modalHost);
  return createPortal(<div className="campaign-modal-overlay" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)router.push("/campaigns");}}>
   <section className="campaign-modal fc-compact-campaign fc-reference-create" role="dialog" aria-modal="true" aria-labelledby="campaign-dialog-title">
    <header className="campaign-modal-header fc-reference-create-header"><span className="fc-create-phone-icon" aria-hidden="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m7.4 2.8 3 3a2 2 0 0 1 .4 2.3l-1 1.9a15 15 0 0 0 4.2 4.2l1.9-1a2 2 0 0 1 2.3.4l3 3a2 2 0 0 1 .1 2.7c-1.7 2-3.8 2.6-6.4 1.9C8.9 19.7 4.3 15.1 2.6 9.1 1.9 6.5 2.5 4.4 4.5 2.7a2 2 0 0 1 2.9.1Z"/><path d="M14 4a6 6 0 0 1 6 6m-6-3a3 3 0 0 1 3 3"/></svg></span><div><h2 id="campaign-dialog-title">Create AI Calling Campaign</h2><p>Upload customer data to create a campaign.</p></div></header>
