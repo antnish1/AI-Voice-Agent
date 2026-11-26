@@ -4,6 +4,10 @@ import {createClient} from "npm:@supabase/supabase-js@2.58.0";
 
 const ALLOWED_ORIGINS=new Set(["https://frontier-ai-voice-crm.vercel.app","https://frontier-ai-voice-crm-six.vercel.app","https://ai.insureit.tech"]);
 const IT_ID="5bd78ada-44f5-4045-a9fb-75c9dad69893";
+// Strict allowlist for accounts IT may manage; other roles, mixed-role accounts,
+// and super_admin remain protected even when users invoke this API directly.
+const isManageableDealershipRole=(role:string)=>role==="management"||role==="dealership_manager";
+const canManageMemberships=(rows:{role:string}[]|null|undefined)=>Boolean(rows?.length)&&rows.every(row=>isManageableDealershipRole(row.role));
 // Generate a separate credential for each account; shared passwords are not safe
 // when dealership users cannot change their own passwords.
 const makePassword=()=>{
@@ -109,7 +113,7 @@ Deno.serve(async(req)=>{
   const id=body.userId??"";
   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)||id===IT_ID)return json({error:"Invalid dealership user."},400,headers);
   const membershipRows=await admin.from("memberships").select("role").eq("user_id",id);
-  if(membershipRows.error||!membershipRows.data?.length||membershipRows.data.some(m=>m.role!=="management"))return json({error:"Only dealership viewer accounts may be managed."},403,headers);
+  if(membershipRows.error||!membershipRows.data?.length||!canManageMemberships(membershipRows.data))return json({error:"Only eligible dealership management accounts may be managed."},403,headers);
   const account=await admin.auth.admin.getUserById(id);
   if(account.error||!account.data.user||account.data.user.app_metadata?.frontvox_account_state==="archived")return json({error:"Editable account not found."},404,headers);
   if([body.name,body.mobile,body.employeeId,body.post].some(v=>typeof v!=="string"))return json({error:"Invalid user details."},400,headers);
@@ -123,7 +127,7 @@ Deno.serve(async(req)=>{
   const id=body.userId??"";
   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)||id===IT_ID)return json({error:"Invalid dealership user."},400,headers);
   const membershipRows=await admin.from("memberships").select("role").eq("user_id",id);
-  if(membershipRows.error||!membershipRows.data?.length||membershipRows.data.some(m=>m.role!=="management"))return json({error:"Only dealership viewer accounts may be managed."},403,headers);
+  if(membershipRows.error||!membershipRows.data?.length||!canManageMemberships(membershipRows.data))return json({error:"Only eligible dealership management accounts may be managed."},403,headers);
   const account=await admin.auth.admin.getUserById(id);
   if(account.error||!account.data.user)return json({error:"Account not found."},404,headers);
   const target=account.data.user;
@@ -158,7 +162,7 @@ Deno.serve(async(req)=>{
   const id=body.userId??"";
   if(!/^[0-9a-f-]{36}$/i.test(id)||id===IT_ID)return json({error:"Invalid dealership user"},400,headers);
   const row=await admin.from("memberships").select("role").eq("user_id",id);
-  if(row.error||!row.data?.length||row.data.some(m=>m.role!=="management"))return json({error:"Only assigned dealership viewer accounts can be reset."},403,headers);
+  if(row.error||!row.data?.length||!canManageMemberships(row.data))return json({error:"Only eligible dealership management accounts can be reset."},403,headers);
   const target=await admin.auth.admin.getUserById(id);
   if(target.error||!target.data.user||target.data.user.app_metadata?.frontvox_account_state==="archived"||target.data.user.app_metadata?.frontvox_account_state==="disabled"||(target.data.user.banned_until&&Date.parse(target.data.user.banned_until)>Date.now()))return json({error:"Enable the account before resetting its password."},409,headers);
   // IT-only password reset; no email and no dealership self-service.

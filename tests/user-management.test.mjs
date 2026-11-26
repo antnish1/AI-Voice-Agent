@@ -66,10 +66,24 @@ test("only the verified IT Super User can reset a dealership viewer password",()
  assert.match(edge,/user\.id!==IT_ID/);
  assert.match(edge,/membership.*super_admin/);
  assert.match(edge,/body\.confirm!=="RESET"/);
- assert.match(edge,/row\.data\.some\(m=>m\.role!=="management"\)/);
+ assert.match(edge,/!canManageMemberships\(row\.data\)/);
  assert.match(ui,/confirm:resetConfirm/);
  assert.match(edge,/must_change_password:false/);
  assert.doesNotMatch(edge,/inviteUserByEmail|resetPasswordForEmail/);
+});
+
+test("IT can manage dealership_manager and management accounts, never privileged or mixed roles",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ assert.match(ui,/isManageableDealershipRole\(u\.role\)/);
+ assert.match(ui,/role==="management"\|\|role==="dealership_manager"/);
+ assert.match(edge,/const isManageableDealershipRole=\(role:string\)=>role==="management"\|\|role==="dealership_manager"/);
+ assert.match(edge,/rows\.every\(row=>isManageableDealershipRole\(row\.role\)\)/);
+ assert.match(edge,/!canManageMemberships\(membershipRows\.data\)/);
+ assert.match(edge,/!canManageMemberships\(row\.data\)/);
+ assert.doesNotMatch(edge,/\.some\(m=>m\.role!=="management"\)/);
+ assert.match(edge,/user\.id!==IT_ID/);
+ assert.match(edge,/body\.confirm!==phrases/);
+ assert.match(edge,/if\(dependencies\.data\.length\)return json/);
 });
 
 test("dealer users do not have a portal password change or self-reset flow",()=>{
@@ -95,7 +109,7 @@ test("password reset requires opening account details and explicit in-dialog act
 
 test("account lifecycle operations are IT-only, explicit, and fail closed on missing protection checks",()=>{
  const ui=file("../src/app/(portal)/users/user-management.tsx"),migration=file("../db/20261124_account_lifecycle.sql");
- assert.match(edge,/membershipRows\.data\.some\(m=>m\.role!=="management"\)/);
+ assert.match(edge,/!canManageMemberships\(membershipRows\.data\)/);
  assert.match(edge,/id===IT_ID/);
  assert.match(edge,/admin\.rpc\("frontvox_account_dependencies"/);
  assert.match(edge,/dependencies\.error\|\|!Array\.isArray\(dependencies\.data\)/);
@@ -134,12 +148,14 @@ test("temporary password form supports optional custom password and email correc
  assert.match(edge,/correctedEmail\?\{email:correctedEmail\}/);
 });
 
- test("compact user management retains four KPIs and removes redundant controls",()=>{
- const ui=file("../src/app/(portal)/users/user-management.tsx"),css=file("../src/app/globals.css");
- assert.doesNotMatch(ui,/it-user-permission|Create User \(No Email\)|>Refresh<|it-user-search/);
+ test("compact user management keeps KPIs and combines user accounts with directory",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ assert.doesNotMatch(ui,/it-user-permission|Create User \(No Email\)|>Refresh<|it-user-search|it-register-tabs|directoryView/);
  assert.match(ui,/>Dealerships<.*>Dealer users<.*>Active accounts<.*>System permission</);
- assert.match(ui,/setDirectoryView\(false\);await load\(\)/);
- assert.match(css,/\.it-register-tabs button\[aria-pressed=true\].*background:var\(--teal/);
+ assert.match(ui,/View dealership details/);
+ assert.match(ui,/d\.address\|\|"—"/);
+ assert.match(ui,/d\.contact_person\|\|"—"/);
+ assert.match(ui,/dealers\.filter\(d=>!users\.some\(u=>u\.dealershipId===d\.id\)\)/);
  });
 
  test("user management exposes separate password and accessible action icons",()=>{
