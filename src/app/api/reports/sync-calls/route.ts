@@ -1,3 +1,4 @@
+import {analyticsTranscript,preferTranscript} from "@/lib/sarvam/transcript";
 import {NextResponse} from "next/server";
 import {createClient} from "@supabase/supabase-js";
 import {requireItSuperUser} from "@/lib/it-access";
@@ -46,16 +47,17 @@ export async function POST(request:Request){
     if(kind==="test"&&str(a.campaign_id))continue;
     const interaction=str(a.interaction_id);
     if(!interaction)continue;
-    const transcript=Array.isArray(a.interaction_transcript)?a.interaction_transcript.map(object).filter((t):t is Record<string,unknown>=>!!t&&["agent","user"].includes(str(t.role))&&typeof t.en_text==="string").map(t=>({role:str(t.role),en_text:str(t.en_text).slice(0,4000)})):[];
+    const transcript=analyticsTranscript(a);
     const output=object(a.output_agent_variables)??object(a.agent_variables);
     if(kind==="campaign"){
-     const existing=await admin.from("voice_call_records").select("id,agent_id,sarvam_campaign_id,output_variables").eq("dealership_id",dealer).eq("sarvam_interaction_id",interaction).maybeSingle();
+     const existing=await admin.from("voice_call_records").select("id,agent_id,sarvam_campaign_id,output_variables,transcript").eq("dealership_id",dealer).eq("sarvam_interaction_id",interaction).maybeSingle();
      if(existing.error||existing.data&&(existing.data.agent_id!==agent||existing.data.sarvam_campaign_id!==value))throw Error("Interaction scope conflict");
      if(!existing.data)continue;
-     const fields={...(transcript.length?{transcript}:{}),...(output?{output_variables:{...object(existing.data.output_variables),...output}}:{}),last_synced_at:new Date().toISOString()};
+     const fields={...(transcript.length?{transcript:preferTranscript(existing.data.transcript,transcript)}:{}),...(output?{output_variables:{...object(existing.data.output_variables),...output}}:{}),last_synced_at:new Date().toISOString()};
      const {error}=await admin.from("voice_call_records").update(fields).eq("id",existing.data.id).eq("dealership_id",dealer);if(error)throw Error("Interaction update failed");
     }else{
-     const {error}=await admin.from("voice_test_call_results").update({...(transcript.length?{transcript}:{}),last_synced_at:new Date().toISOString()}).eq("request_id",requestId).eq("interaction_id",interaction);if(error)throw Error("Test interaction update failed");
+     const previous=await admin.from("voice_test_call_results").select("transcript").eq("request_id",requestId).eq("interaction_id",interaction).maybeSingle();if(previous.error)throw Error("Test transcript lookup failed");
+     const {error}=await admin.from("voice_test_call_results").update({...(transcript.length?{transcript:preferTranscript(previous.data?.transcript,transcript)}:{}),last_synced_at:new Date().toISOString()}).eq("request_id",requestId).eq("interaction_id",interaction);if(error)throw Error("Test interaction update failed");
     }
     saved++;updated++;continue;
    }

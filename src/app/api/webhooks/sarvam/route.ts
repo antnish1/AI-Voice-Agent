@@ -1,3 +1,4 @@
+import {normalizeTranscript,preferTranscript} from "@/lib/sarvam/transcript";
 import {NextRequest,NextResponse} from "next/server";
 import {createClient} from "@supabase/supabase-js";
 
@@ -11,10 +12,7 @@ type SarvamPayload={
 };
 function textOf(value:unknown,max=200){return typeof value==="string"?value.slice(0,max):"";}
 function iso(value:unknown){if(typeof value!=="string"||!value)return null;const d=new Date(value);return Number.isFinite(d.getTime())?d.toISOString():null;}
-function safeTranscript(value:unknown){
- if(!Array.isArray(value))return null;
- return value.slice(0,150).filter(t=>t&&typeof t==="object"&&["agent","user"].includes(t.role)&&typeof t.en_text==="string").map(t=>({role:t.role,en_text:t.en_text.slice(0,1000)}));
-}
+function safeTranscript(value:unknown){return normalizeTranscript(value).slice(0,150);}
 export async function POST(req:NextRequest){
  const secret=process.env.SARVAM_WEBHOOK_SIGNING_SECRET;
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -46,12 +44,14 @@ export async function POST(req:NextRequest){
  const status=connectivity==="connected"?"answered":connectivity==="busy"?"busy":connectivity==="no_answer"?"no_answer":connectivity==="failed"||completion==="failed"?"failed":"other";
  const duration=typeof payload.duration==="number"&&Number.isFinite(payload.duration)?Math.max(0,Math.min(86400,Math.round(payload.duration))):null;
  const output=payload.output_agent_variables&&typeof payload.output_agent_variables==="object"&&!Array.isArray(payload.output_agent_variables)?payload.output_agent_variables:null;
- const common={status,duration_seconds:duration,started_at:iso(payload.start_datetime),ended_at:iso(payload.end_datetime),transcript:safeTranscript(payload.interaction_transcript),output_variables:output,last_synced_at:new Date().toISOString()};
+ const common={status,duration_seconds:duration,started_at:iso(payload.start_datetime),ended_at:iso(payload.end_datetime),output_variables:output,last_synced_at:new Date().toISOString()};
  if(!campaign){
   const {data:test,error}=await admin.from("voice_test_call_requests").select("id,agent_id").eq("sarvam_attempt_id",attempt).maybeSingle();
   if(error)return fail(503,"Test attempt lookup unavailable");
   if(!test||test.agent_id!==agent)return fail(422,"Unlinked test attempt");
-  const {error:save}=await admin.from("voice_test_call_results").upsert({request_id:test.id,interaction_id:textOf(payload.interaction_id)||null,...common},{onConflict:"request_id"});
+  const prior=await admin.from("voice_test_call_results").select("transcript,interaction_id").eq("request_id",test.id).maybeSingle();if(prior.error||prior.data?.interaction_id&&prior.data.interaction_id!==textOf(payload.interaction_id))return fail(503,"Test transcript reconciliation unavailable");
+  const transcript=preferTranscript(prior.data?.transcript,safeTranscript(payload.interaction_transcript));
+  const {error:save}=await admin.from("voice_test_call_results").upsert({request_id:test.id,interaction_id:textOf(payload.interaction_id)||null,...common,...(transcript.length?{transcript}:{})},{onConflict:"request_id"});
   if(save)return fail(503,"Unable to persist test result");
   return NextResponse.json({ok:true},{headers:{"Cache-Control":"no-store"}});
  }
@@ -66,9 +66,11 @@ export async function POST(req:NextRequest){
   sarvam_interaction_id:textOf(payload.interaction_id,200)||null,dialed_number:phone||null,
   ...common
  };
- const existing=record.sarvam_interaction_id?await admin.from("voice_call_records").select("id").eq("dealership_id",link.dealership_id).eq("sarvam_interaction_id",record.sarvam_interaction_id).maybeSingle():{data:null,error:null};
+ const existing=record.sarvam_interaction_id?await admin.from("voice_call_records").select("id,transcript").eq("dealership_id",link.dealership_id).eq("sarvam_interaction_id",record.sarvam_interaction_id).maybeSingle():{data:null,error:null};
  if(existing.error)return fail(503,"Interaction reconciliation unavailable");
- const {error:saveError}=existing.data?await admin.from("voice_call_records").update(record).eq("id",existing.data.id).eq("dealership_id",link.dealership_id):await admin.from("voice_call_records").upsert(record,{onConflict:"dealership_id,sarvam_attempt_id"});
+ const prior=await admin.from("voice_call_records").select("id,transcript,sarvam_interaction_id").eq("dealership_id",link.dealership_id).eq("sarvam_attempt_id",attempt).maybeSingle();if(prior.error||existing.data&&prior.data&&existing.data.id!==prior.data.id||prior.data?.sarvam_interaction_id&&record.sarvam_interaction_id&&prior.data.sarvam_interaction_id!==record.sarvam_interaction_id)return fail(503,"Attempt reconciliation unavailable");
+ const transcript=preferTranscript(existing.data?.transcript??prior.data?.transcript,safeTranscript(payload.interaction_transcript));const savedRecord={...record,...(transcript.length?{transcript}:{})};
+ const {error:saveError}=existing.data?await admin.from("voice_call_records").update(savedRecord).eq("id",existing.data.id).eq("dealership_id",link.dealership_id):await admin.from("voice_call_records").upsert(savedRecord,{onConflict:"dealership_id,sarvam_attempt_id"});
  if(saveError)return fail(503,"Unable to persist verified call result");
  // Receipt is secondary to the uniquely keyed, idempotent call record.
  const digest=new Uint8Array(await crypto.subtle.digest("SHA-256",encoder.encode(raw)));
