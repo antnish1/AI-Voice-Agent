@@ -178,3 +178,22 @@ dialog.it-dealer-enable-dialog .it-dealer-disable-warning svg{color:#159a76}
 dialog.it-dealer-enable-dialog .it-dealer-disable-actions button[type="submit"]:not(:disabled){background:#079b83;border-color:#079b83;color:#fff}
 dialog.it-dealer-enable-dialog .it-dealer-disable-actions button[type="submit"]:not(:disabled):hover{background:#078874}
 :root[data-theme="dark"] dialog.it-dealer-enable-dialog .it-dealer-disable-icon{background:#1b4b3c;color:#71e3be}
+
+
+/* Destructive dealership confirmation: match reference's red icon, warning and two-button footer. */
+dialog.it-dealer-delete-dialog .it-dealer-disable-icon{background:#fff0f0;color:#d63136}
+dialog.it-dealer-delete-dialog .it-dealer-disable-heading{margin-bottom:21px}
+dialog.it-dealer-delete-dialog .it-dealer-disable-name{margin-bottom:20px}
+dialog.it-dealer-delete-dialog .it-dealer-delete-warning{display:flex;align-items:flex-start;gap:11px;background:#fff0f0;padding:16px 15px;border-radius:11px;margin-bottom:23px}
+dialog.it-dealer-delete-dialog .it-dealer-delete-warning svg{flex:none;width:22px;height:22px;color:#da3439;margin-top:2px}
+dialog.it-dealer-delete-dialog .it-dealer-delete-warning>div{min-width:0}
+dialog.it-dealer-delete-dialog .it-dealer-delete-warning strong{display:block;color:#b52b30;font-size:15px;font-weight:750;margin-bottom:6px}
+dialog.it-dealer-delete-dialog .it-dealer-delete-warning p{color:#a65053;font-size:13px;line-height:1.45;margin:0}
+dialog.it-dealer-delete-dialog .it-dealer-disable-form label{margin-bottom:29px}
+dialog.it-dealer-delete-dialog .it-dealer-disable-actions button[type="submit"]:not(:disabled){background:#cf3035;border-color:#cf3035;color:#fff}
+dialog.it-dealer-delete-dialog .it-dealer-disable-actions button[type="submit"]:not(:disabled):hover{background:#b52229}
+:root[data-theme="dark"] dialog.it-dealer-delete-dialog .it-dealer-disable-icon{background:#4b252b;color:#ffa1a6}
+:root[data-theme="dark"] dialog.it-dealer-delete-dialog .it-dealer-delete-warning{background:#47282e}
+:root[data-theme="dark"] dialog.it-dealer-delete-dialog .it-dealer-delete-warning strong{color:#ffb5b8}
+:root[data-theme="dark"] dialog.it-dealer-delete-dialog .it-dealer-delete-warning p{color:#f0bec0}
+@media(max-width:560px){dialog.it-dealer-delete-dialog .it-dealer-delete-warning strong{font-size:14px}}
