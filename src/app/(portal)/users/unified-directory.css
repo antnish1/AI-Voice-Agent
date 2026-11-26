@@ -56,3 +56,12 @@
 .it-edit-form .it-edit-form-actions button:focus-visible{outline:3px solid #06a5ad;outline-offset:2px}
 :root[data-theme="dark"] .it-edit-form .it-edit-form-actions .it-edit-cancel{background:#263b50;color:#d7e9f6;border-color:#50677e}
 :root[data-theme="dark"] .it-edit-form .it-edit-form-actions .it-edit-cancel:hover:not(:disabled){background:#36536a}
+
+
+/* User records: center all columns except the User column, including headers and actions. */
+#it-panel-users table th:not(:first-child),
+#it-panel-users table td:not(:first-child){text-align:center}
+#it-panel-users table th:first-child,
+#it-panel-users table td:first-child{text-align:left}
+#it-panel-users .it-row-actions{justify-content:center}
+#it-panel-users table td:not(:first-child)>button{display:inline-flex;align-items:center;justify-content:center}
