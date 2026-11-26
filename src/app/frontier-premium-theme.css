@@ -43,3 +43,20 @@
 .fv-login :is(button[type=submit],.fv-login-submit),.login-card button[type=submit]{background:var(--frontier-red)!important;background-image:none!important;color:#fff!important}
 .fv-login :is(button[type=submit],.fv-login-submit):hover:not(:disabled),.login-card button[type=submit]:hover:not(:disabled){background:var(--frontier-red-deep)!important}
 .fv-login :is(input,button,a):focus-visible,.login-card :is(input,button,a):focus-visible{outline-color:var(--frontier-red)}
+
+/* Remaining shared action surfaces, wizard controls and neutral secondary controls. */
+:root:not([data-theme="dark"]) .crm-app{--teal:#D71920;--blue:#B91C24}
+.crm-app :is(.it-user-form>button,.it-register-tabs button[aria-pressed=true],.portal-account-modal-buttons button:last-child,.agent-custom-card button,.docs-upload-main button){background:var(--frontier-red)!important;color:white!important;border-color:var(--frontier-red)!important}
+:root:not([data-theme="dark"]) .crm-app :is(.customers-button-outline,.customers-search button,.customers-row-actions button:not(.delete),.approvals-search button,.appointments-calendar-nav button,.reports-ref-filter-button,.reports-ref-table td button,.settings-ref-api-actions button,.docs-upload-quick button,.docs-row-actions button:not(.delete),.it-user-table-head button,.it-user-list td button,.crm-ops-table td button,.crm-ops-toolbar button,.frontvox-pagination button){background:#F5F6F8;color:#343943;border-color:#E0E2E6}
+:root:not([data-theme="dark"]) .crm-app :is(.customers-button-outline,.customers-search button,.customers-row-actions button:not(.delete),.approvals-search button,.appointments-calendar-nav button,.reports-ref-filter-button,.reports-ref-table td button,.settings-ref-api-actions button,.docs-upload-quick button,.docs-row-actions button:not(.delete),.it-user-table-head button,.it-user-list td button,.crm-ops-table td button,.crm-ops-toolbar button,.frontvox-pagination button):hover:not(:disabled){background:#FFF1F2;color:#B91C24}
+:root:not([data-theme="dark"]) .crm-app :is(.ref-kpi-card.tone-blue,.ref-kpi-card.tone-mint,.ref-kpi-card.tone-violet,.ref-kpi-card.tone-amber){background:#fff}
+:root:not([data-theme="dark"]) .crm-app .pd-requests-panel>header nav button.active{background:#D71920!important;color:#fff!important;border-color:#D71920!important}
+:root:not([data-theme="dark"]) .crm-app .frontier-reference-sidebar .frontier-help-card{background:#fff!important;color:#20242D!important;border-color:#E0E2E6}
+:root:not([data-theme="dark"]) .crm-app .frontier-reference-sidebar .frontier-help-icon{background:#FFF1F2!important;color:#B91C24!important}
+:root:not([data-theme="dark"]) .crm-app .frontier-reference-sidebar .frontier-help-text small{color:#646B75}
+:root:not([data-theme="dark"]) .crm-app .frontier-reference-sidebar .frontier-help-details{background:#F5F6F8;color:#343943}
+:root:not([data-theme="dark"]) .crm-app :is(.reports-ref-kpis .reports-category-card,.calllogs-stats .calllogs-category-card)[aria-pressed=true] :is(.reports-ref-kpi-icon,.calllogs-stat-icon){background:#FFF1F2;color:#B91C24}
+:root:not([data-theme="dark"]) .crm-app .campaign-modal .helper-banner{background:#F5F6F8;border-color:#E0E2E6;color:#343943}
+:root:not([data-theme="dark"]) .crm-app :is(.agent-hero-banner,.appointments-hero-banner,.cb-hero-banner,.pd-hero-banner) :is(strong,p){color:#20242D}
+:root:not([data-theme="dark"]) .crm-app .agent-waveform{color:#D7192040}
+:root:not([data-theme="dark"]) .crm-app .vdp-visual{filter:grayscale(1)}
