@@ -71,7 +71,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
         </Link>
         {item.url==="/campaigns"&&<button type="button" className="frontier-campaign-toggle" aria-label={campaignsExpanded?"Collapse Campaigns submenu":"Expand Campaigns submenu"} aria-expanded={campaignsExpanded} onClick={()=>{if(collapsed){setCollapsed(false);setCampaignsExpanded(true);}else setCampaignsExpanded(s=>!s);}}><SidebarIcon name="chevron-down" size={16}/></button>}
        </div>
-       {item.url==="/campaigns"&&campaignsExpanded&&!collapsed&&<div className="frontier-campaign-subnav"><Link href="/campaigns" aria-current={path==="/campaigns"?"page":undefined} onClick={closeMobile}>All Campaigns</Link><Link href="/campaigns/new" aria-current={path==="/campaigns/new"||path.startsWith("/campaigns/new/")?"page":undefined} onClick={closeMobile}>Create Campaign</Link></div>}
+       {item.url==="/campaigns"&&campaignsExpanded&&!collapsed&&<div className="frontier-campaign-subnav"><Link href="/campaigns" aria-current={path==="/campaigns"?"page":undefined} onClick={closeMobile}><SidebarIcon name="documents" size={15}/><span>All Campaigns</span></Link><Link href="/campaigns/new" aria-current={path==="/campaigns/new"||path.startsWith("/campaigns/new/")?"page":undefined} onClick={closeMobile}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 7v10M7 12h10"/></svg><span>Create Campaign</span></Link></div>}
       </div>;
     })}
    </nav>
