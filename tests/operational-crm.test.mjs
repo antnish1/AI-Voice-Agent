@@ -68,3 +68,15 @@ test("Sarvam connection accepts documented string IDs and reports provider diagn
  assert.match(health,/method:"GET"/);
  assert.doesNotMatch(health,/JSON\.stringify\(\{.*key/);
 });
+
+test("IT campaign visibility is global while dealership users stay scoped",()=>{
+ const page=source("../src/app/(portal)/campaigns/page.tsx");
+ const dashboard=source("../src/app/(portal)/dashboard/page.tsx");
+ const logs=source("../src/app/(portal)/call-logs/page.tsx");
+ assert.match(page,/const scope=itUser\?selectedDealer:membership\.dealership_id/);
+ assert.match(page,/if\(scope\)query=query\.eq\("dealership_id",scope\)/);
+ assert.match(page,/nameFor\(c\.dealership_id\)/);
+ assert.match(page,/All Dealerships/);
+ assert.match(dashboard,/itUser\?supabase\.from\("campaigns"\).*?\.eq\("dealership_id",id\)/);
+ assert.match(logs,/if\(!itUser\)query=query\.eq\("dealership_id",membership\.dealership_id\)/);
+});
