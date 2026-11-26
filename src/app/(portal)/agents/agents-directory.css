@@ -68,3 +68,43 @@ dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:bl
 .configured-agent-panel button:focus-visible{outline:2px solid #007d84;outline-offset:3px}
 @media(max-width:760px){.configured-agent-panel{padding:18px}.configured-agent-header{gap:15px;margin-bottom:15px}.configured-agent-avatar{width:84px;height:84px;flex-basis:84px}.configured-agent-header h2{font-size:28px}.configured-agent-header h2 span{font-size:17px;padding:5px 10px}.configured-agent-header p{font-size:14px}.configured-agent-summary{gap:9px}.configured-agent-summary>div{font-size:13px;justify-content:flex-start}.configured-agent-primary{font-size:14px;padding:9px 13px;min-height:44px}.configured-agent-columns{gap:9px}.configured-agent-field{gap:8px}.configured-agent-field-card{padding:0 9px;border-radius:16px}.configured-agent-field-icon{width:37px;height:37px;flex-basis:37px}.configured-agent-field-icon svg{width:19px;height:19px}.configured-agent-field-text>span{font-size:13px}.configured-agent-field-text strong{font-size:13px}.configured-agent-copy{width:25px;flex-basis:25px}.configured-agent-copy svg{width:20px;height:20px}.configured-agent-x{width:36px;height:36px;right:12px;top:12px}}
 @media(max-width:540px){dialog.configured-agent-dialog{border-radius:24px}.configured-agent-columns{grid-template-columns:1fr}.configured-agent-summary{align-items:stretch;flex-direction:column}.configured-agent-summary>div{min-height:42px}.configured-agent-summary>.configured-agent-primary{align-self:flex-end}.configured-agent-header p svg{width:20px}.configured-agent-header h2{font-size:25px;gap:7px}.configured-agent-avatar{width:66px;height:66px;flex-basis:66px}.configured-agent-avatar>span{width:19px;height:19px;border-width:3px}.configured-agent-wave{height:105px}.configured-agent-footer .configured-agent-primary{min-width:94px}}
+
+/* Wider AI Voice Agents workspace and KPI-driven filtering. */
+.crm-app .agent-directory{margin:0 -10px;max-width:none;width:calc(100% + 20px)}
+.crm-app .agent-directory .agent-stats-grid{gap:15px;margin-bottom:18px}
+.crm-app .agent-directory .agent-stat-card{appearance:none;-webkit-appearance:none;font:inherit;text-align:left;cursor:pointer;min-width:0;min-height:108px;padding:18px 20px;gap:14px;border-radius:14px;transition:border-color .18s,box-shadow .18s,transform .18s}
+.crm-app .agent-directory .agent-stat-card .agent-stat-icon{height:49px;width:49px;flex-basis:49px}
+.crm-app .agent-directory .agent-stat-card div>span{font-size:12px;font-weight:700}
+.crm-app .agent-directory .agent-stat-card strong{font-size:28px}
+.crm-app .agent-directory .agent-stat-card small{font-size:11px}
+.crm-app .agent-directory .agent-stat-card>svg{width:66px;pointer-events:none}
+.crm-app .agent-directory .agent-stat-card:hover{border-color:#4fa6d1;box-shadow:0 6px 20px #1b567d1d;transform:translateY(-2px)}
+.crm-app .agent-directory .agent-stat-card.agent-stat-selected{border-color:#0894ad;box-shadow:0 0 0 2px #0894ad35,0 5px 18px #16769d19;background:linear-gradient(120deg,#f0fcff,#fff)}
+.crm-app .agent-directory .agent-stat-card:focus-visible{outline:3px solid #0e9ac7;outline-offset:3px}
+.crm-app .agent-directory .agent-page-controls{padding:16px 0;margin-bottom:15px;gap:12px}
+.crm-app .agent-directory .agent-list-search{flex:1 1 350px;max-width:none;min-height:43px}
+.crm-app .agent-directory .agent-page-controls select{min-height:43px;max-width:210px;min-width:145px;font-size:12px}
+.crm-app .agent-directory .agent-page-controls button{min-height:43px;font-size:12px;padding:10px 17px}
+.crm-app .agent-directory .agent-card-grid{gap:16px}
+.crm-app .agent-directory .agent-preview-card{min-height:215px;padding:21px 18px 16px;border-radius:14px}
+.crm-app .agent-directory .agent-card-content{margin-top:0;min-height:96px;gap:14px}
+.crm-app .agent-directory .agent-card-portrait{width:82px;height:82px;flex:0 0 82px}
+.crm-app .agent-directory .agent-card-copy h3{font-size:15px}
+.crm-app .agent-directory .agent-card-copy p{font-size:12px;line-height:1.55}
+.crm-app .agent-directory .agent-card-actions button{font-size:11px}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-stat-card.agent-stat-selected{background:linear-gradient(120deg,#184458,#1c3147);border-color:#30bdc5;box-shadow:0 0 0 2px #2ac2c540}
+@media(max-width:1100px){
+ .crm-app .agent-directory .agent-stat-card{padding:14px 12px;gap:9px;min-height:96px}
+ .crm-app .agent-directory .agent-stat-card .agent-stat-icon{height:39px;width:39px;flex-basis:39px}
+ .crm-app .agent-directory .agent-stat-card small{font-size:10px}
+ .crm-app .agent-directory .agent-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:760px){
+ .crm-app .agent-directory{margin:0;width:100%}
+ .crm-app .agent-directory .agent-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .crm-app .agent-directory .agent-card-grid{grid-template-columns:1fr}
+ .crm-app .agent-directory .agent-list-search{flex-basis:100%}
+ .crm-app .agent-directory .agent-page-controls select{flex:1 1 42%;max-width:none}
+ .crm-app .agent-directory .agent-preview-card{min-height:205px}
+}
+@media(prefers-reduced-motion:reduce){.crm-app .agent-directory .agent-stat-card{transition:none}.crm-app .agent-directory .agent-stat-card:hover{transform:none}}
