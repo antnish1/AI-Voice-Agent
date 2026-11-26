@@ -94,22 +94,25 @@ function EmptyAgentArtwork(){
 export function AgentsDirectory({profiles,loadError,headerAction}:{profiles:Profile[];loadError:boolean;headerAction:ReactNode}){
  const actual=useMemo(()=>{const groups=new Map<string,Profile[]>();for(const p of profiles){if(!p.agent_id)continue;const list=groups.get(p.agent_id)??[];list.push(p);groups.set(p.agent_id,list);}return Array.from(groups,([id,list]):Agent=>{const active=list.some(p=>p.active);const versions=Array.from(new Set(list.map(p=>p.app_version))).sort((a,b)=>b-a);return {id:"configured:"+id,name:id==="Conversatio-95f7d6e8-61a2"?"Kajal":id,version:versions.map(v=>"v"+v).join(", "),category:"Service",status:active?"Active":"Inactive",recommended:false,description:id==="Conversatio-95f7d6e8-61a2"?"AI voice agent for dealership service calls.":"Saved Sarvam voice configuration",portrait:"woman",tone:"blue",profiles:list};});},[profiles]);
  const agents=useMemo(()=>[...actual,...previews],[actual]);
- const [search,setSearch]=useState(""),[status,setStatus]=useState("all"),[category,setCategory]=useState("all"),[version,setVersion]=useState("all"),[selected,setSelected]=useState<Agent|null>(null);
- const filtered=useMemo(()=>agents.filter(a=>(a.name+" "+a.description+" "+a.version+" "+(a.profiles?.map(p=>p.name+" "+p.agent_id+" "+p.caller_number).join(" ")??"")).toLowerCase().includes(search.trim().toLowerCase())&&(status==="all"||a.status===status)&&(category==="all"||a.category===category)&&(version==="all"||a.version===version)),[agents,search,status,category,version]);
- const clear=()=>{setSearch("");setStatus("all");setCategory("all");setVersion("all");};
+ const [search,setSearch]=useState(""),[kpiFilter,setKpiFilter]=useState<"all"|"total"|"active"|"inactive"|"recommended">("all"),[category,setCategory]=useState("all"),[version,setVersion]=useState("all"),[selected,setSelected]=useState<Agent|null>(null);
+ const filtered=useMemo(()=>agents.filter(a=>{
+  const matchesKpi=kpiFilter==="all"||(!!a.profiles&&(kpiFilter==="total"||(kpiFilter==="active"&&a.status==="Active")||(kpiFilter==="inactive"&&a.status==="Inactive")||(kpiFilter==="recommended"&&a.recommended)));
+  return matchesKpi&&(a.name+" "+a.description+" "+a.version+" "+(a.profiles?.map(p=>p.name+" "+p.agent_id+" "+p.caller_number).join(" ")??"")).toLowerCase().includes(search.trim().toLowerCase())&&(category==="all"||a.category===category)&&(version==="all"||a.version===version);
+ }),[agents,search,kpiFilter,category,version]);
+ const clear=()=>{setSearch("");setKpiFilter("all");setCategory("all");setVersion("all");};
+ const selectKpi=(filter:"total"|"active"|"inactive"|"recommended")=>setKpiFilter(current=>current===filter?"all":filter);
  return <div className="agent-directory">
   <div className="agent-page-hero"><div className="agent-hero-heading"><div className="agent-hero-icon"><Icon name="sound" size={26}/></div><div><h1>AI Voice Agents</h1></div></div>
    {headerAction}
   </div>
   {loadError&&<p role="alert">Saved agent configurations could not be loaded.</p>}
   <div className="agent-stats-grid">{[
-   {label:"Total Agents",number:loadError?"—":String(actual.length),note:"Configured agents",icon:"users",tone:"blue"},
-   {label:"Active Agents",number:loadError?"—":String(actual.filter(a=>a.status==="Active").length),note:"Active configuration",icon:"check",tone:"green"},
-   {label:"Inactive Agents",number:loadError?"—":String(actual.filter(a=>a.status==="Inactive").length),note:"Inactive configuration",icon:"pause",tone:"purple"},
-   {label:"Recommended",number:loadError?"—":String(actual.filter(a=>a.recommended).length),note:"Configured agents only",icon:"star",tone:"orange"}
-  ].map(m=><article className={"agent-stat-card agent-tone-"+m.tone} key={m.label}><span className="agent-stat-icon"><Icon name={m.icon} size={23}/></span><div><span>{m.label}</span><strong>{m.number}</strong><small>{m.note}</small></div><svg viewBox="0 0 85 35" aria-hidden="true"><path d="M1 25Q12 4 24 19T46 13T68 19T84 6" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M1 25Q12 4 24 19T46 13T68 19T84 6V35H1Z" fill="currentColor" opacity=".06"/></svg></article>)}</div>
+   {label:"Total Agents",filter:"total" as const,number:loadError?"—":String(actual.length),note:"Configured agents",icon:"users",tone:"blue"},
+   {label:"Active Agents",filter:"active" as const,number:loadError?"—":String(actual.filter(a=>a.status==="Active").length),note:"Active configuration",icon:"check",tone:"green"},
+   {label:"Inactive Agents",filter:"inactive" as const,number:loadError?"—":String(actual.filter(a=>a.status==="Inactive").length),note:"Inactive configuration",icon:"pause",tone:"purple"},
+   {label:"Recommended",filter:"recommended" as const,number:loadError?"—":String(actual.filter(a=>a.recommended).length),note:"Configured agents only",icon:"star",tone:"orange"}
+  ].map(m=><button type="button" className={"agent-stat-card agent-tone-"+m.tone+(kpiFilter===m.filter?" agent-stat-selected":"")} key={m.label} aria-pressed={kpiFilter===m.filter} aria-label={"Show "+m.label.toLowerCase()+" ("+m.number+")"} onClick={()=>selectKpi(m.filter)}><span className="agent-stat-icon"><Icon name={m.icon} size={23}/></span><div><span>{m.label}</span><strong>{m.number}</strong><small>{m.note}</small></div><svg viewBox="0 0 85 35" aria-hidden="true"><path d="M1 25Q12 4 24 19T46 13T68 19T84 6" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M1 25Q12 4 24 19T46 13T68 19T84 6V35H1Z" fill="currentColor" opacity=".06"/></svg></button>)}</div>
   <div className="agent-page-controls"><label className="agent-list-search"><Icon name="search"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search agents..." aria-label="Search agents"/></label>
-   <select value={status} onChange={e=>setStatus(e.target.value)} aria-label="Filter agent status"><option value="all">All Status</option><option value="Active">Active</option><option value="Inactive">Inactive</option></select>
    <select value={category} onChange={e=>setCategory(e.target.value)} aria-label="Filter category"><option value="all">All Categories</option>{["Support","Sales","Service","Marketing","Feedback"].map(x=><option key={x}>{x}</option>)}</select>
    <select value={version} onChange={e=>setVersion(e.target.value)} aria-label="Filter version"><option value="all">All Versions</option>{Array.from(new Set(agents.map(a=>a.version))).map(x=><option key={x}>{x}</option>)}</select>
    <button type="button" className="agent-refresh" onClick={clear}><Icon name="refresh"/> Reset</button><button type="button" className="agent-create-disabled" disabled title="Agent creation will become available after Sarvam connection"><Icon name="plus"/> Create Agent</button>
@@ -121,7 +124,7 @@ export function AgentsDirectory({profiles,loadError,headerAction}:{profiles:Prof
     <div className="agent-empty-content">
      <EmptyAgentArtwork/>
      <h2>{agents.length===0?"No agents yet":"No matching agents"}</h2>
-     <p>{agents.length===0?"Your AI voice agents will appear here once they are added.":"No agents match your current filters. Try a different name, category, version or status."}</p>
+     <p>{agents.length===0?"Your AI voice agents will appear here once they are added.":kpiFilter!=="all"?"No configured agents match this KPI selection. Choose another card or reset your filters.":"No agents match your current search, category or version filters."}</p>
      {agents.length>0&&<button className="agent-empty-clear" type="button" onClick={clear}>Clear filters</button>}
     </div>
    </section>}
