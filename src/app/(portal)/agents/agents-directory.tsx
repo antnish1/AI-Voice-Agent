@@ -1,5 +1,5 @@
 "use client";
-import {useMemo,useState,type ReactNode} from "react";
+import {useMemo,useState,useEffect,useRef,type ReactNode} from "react";
 import "./agents-directory.css";
 type Profile={dealership_id:string;name:string;agent_id:string;app_version:number;connection_id:string;caller_number:string;active:boolean};
 type Agent={id:string;name:string;version:string;category:string;status:"Active"|"Inactive";recommended:boolean;description:string;portrait:"woman"|"man"|"glasses"|"megaphone"|"robot";tone:string;profiles?:Profile[]};
@@ -43,8 +43,29 @@ function Portrait({kind}:{kind:Agent["portrait"]}){
  {kind==="glasses"&&<g stroke="#29384d" fill="none" strokeWidth="2.2"><rect x="37" y="47" rx="7" width="22" height="18"/><rect x="62" y="47" rx="7" width="22" height="18"/><path d="M59 53h3M37 52l-6-2M84 52l7-2"/></g>}
  </svg>;
 }
-function ProfileDetails({profiles}:{profiles:Profile[]}){
- return <div className="agent-real-profiles">{profiles.map(p=><dl className="agent-real-details" key={p.dealership_id+":"+p.app_version+":"+p.connection_id}><div><dt>Dealership</dt><dd>{p.name}</dd></div><div><dt>Sarvam Agent ID</dt><dd>{p.agent_id}</dd></div><div><dt>Committed Agent Version</dt><dd>{p.app_version}</dd></div><div><dt>Telephony Connection ID / Name</dt><dd>{p.connection_id}</dd></div><div><dt>Connected Caller Number</dt><dd>{p.caller_number}</dd></div></dl>)}</div>;
+function DetailGlyph({name}:{name:string}){
+ const paths:Record<string,ReactNode>={copy:<><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h3"/></>,layers:<><path d="m12 3 10 5-10 5L2 8zM2 12l10 5 10-5M2 16l10 5 10-5"/></>,phone:<path d="M5 3h4l2 5-3 2c2 3 3 4 6 6l2-3 5 2v4c0 2-2 2-4 2C9 19 5 15 3 7c0-2 0-4 2-4z"/>,code:<path d="m8 6-6 6 6 6m8-12 6 6-6 6m-2-15-4 18"/>,headset:<><path d="M3 13v-2a9 9 0 0 1 18 0v2M3 13h4v7H5a2 2 0 0 1-2-2zm18 0h-4v7h2a2 2 0 0 0 2-2zM17 20q0 2-5 2"/></>,close:<path d="m6 6 12 12M18 6 6 18"/>,check:<path d="m5 12 4 4 10-10"/>};
+ return name==="users"?<Icon name="users" size={24}/>:<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
+}
+function ConfiguredAgentDetails({agent,onClose}:{agent:Agent;onClose:()=>void}){
+ const dialog=useRef<HTMLDialogElement>(null);
+ const [copied,setCopied]=useState(""),[copyError,setCopyError]=useState("");
+ useEffect(()=>{const node=dialog.current;node?.showModal();return ()=>{if(node?.open)node.close();};},[]);
+ const profiles=agent.profiles??[];
+ const fields=(p:Profile)=>[{label:"Sarvam Agent ID",value:p.agent_id,icon:"layers"},{label:"Connected Caller Number",value:p.caller_number,icon:"users"},{label:"Telephony Connection ID",value:p.connection_id,icon:"phone"},{label:"Committed Agent Version",value:String(p.app_version),icon:"code"}];
+ async function copy(value:string,key:string){setCopyError("");setCopied("");try{await navigator.clipboard.writeText(value);setCopied(key);}catch{setCopyError("Clipboard unavailable. Select and copy the text manually.");}}
+ const all=profiles.map(p=>["Dealership: "+p.name,...fields(p).map(f=>f.label+": "+f.value)].join("\n")).join("\n\n");
+ return <dialog ref={dialog} className="configured-agent-dialog" aria-labelledby="configured-agent-title" onCancel={e=>{e.preventDefault();onClose();}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+  <section className="configured-agent-panel">
+   <div className="configured-agent-wave top" aria-hidden="true"><i/><i/><i/></div><div className="configured-agent-wave bottom" aria-hidden="true"><i/><i/><i/></div>
+   <button type="button" className="configured-agent-x" aria-label="Close agent details" onClick={onClose}><DetailGlyph name="close"/></button>
+   <header className="configured-agent-header"><div className="configured-agent-avatar"><Portrait kind={agent.portrait}/>{agent.status==="Active"&&<span title="Active saved configuration"/>}</div><div><h2 id="configured-agent-title">{agent.name} <span>{agent.version}</span></h2><p><Icon name="sound" size={28}/> Configured Sarvam agent</p></div></header>
+   <div className="configured-agent-summary"><div><DetailGlyph name="headset"/><span>{agent.description}</span></div><button type="button" className="configured-agent-primary" onClick={()=>void copy(all,"all")}><DetailGlyph name={copied==="all"?"check":"copy"}/>{copied==="all"?"Copied":"Copy All"}</button></div>
+   {profiles.map((p,i)=><div className="configured-agent-group" key={p.dealership_id+":"+p.app_version+":"+i}>{profiles.length>1&&<h3>{p.name}</h3>}<div className="configured-agent-columns">{[fields(p).slice(0,2),fields(p).slice(2)].map((column,j)=><div className="configured-agent-field-card" key={j}>{column.map(f=>{const key=i+":"+f.label;return <div className="configured-agent-field" key={f.label}><span className="configured-agent-field-icon"><DetailGlyph name={f.icon}/></span><div className="configured-agent-field-text"><span>{f.label}</span><strong>{f.value}</strong></div><button type="button" className="configured-agent-copy" aria-label={"Copy "+f.label} title={"Copy "+f.label} onClick={()=>void copy(f.value,key)}><DetailGlyph name={copied===key?"check":"copy"}/></button></div>})}</div>)}</div></div>)}
+   <footer className="configured-agent-footer"><span className="configured-agent-footnote" title="Saved CRM configuration; live provider status and connection name not independently verified">{copyError|| (copied?"Copied to clipboard": "Saved configuration · "+profiles.map(p=>p.name).join(", "))}</span><button type="button" className="configured-agent-primary" onClick={onClose}>Close</button></footer>
+   <span className="configured-agent-sr" role="status">{copyError|| (copied?"Copied to clipboard":"")}</span>
+  </section>
+ </dialog>;
 }
 function AgentCard({agent,onDetails}:{agent:Agent;onDetails:(a:Agent)=>void}){
  const inUse=!!agent.profiles&&agent.status==="Active";
@@ -82,6 +103,7 @@ export function AgentsDirectory({profiles,loadError,headerAction}:{profiles:Prof
   <div className="agent-card-grid">{filtered.map(a=><AgentCard agent={a} key={a.id} onDetails={setSelected}/>)}
   {filtered.length===0&&<div className="agent-no-results"><strong>No matching agents</strong><p>Try a different name, category, version or status.</p><button onClick={clear} type="button">Clear filters</button></div>}
   <aside className="agent-custom-card"><div><h3>Create Your Own<br/>AI Voice Agent</h3><p>Customize instructions, voice and behaviour for your business needs.</p><button type="button" disabled title="Agent creation requires Sarvam API">Create Agent <Icon name="arrow" size={13}/></button></div><div className="agent-custom-art"><div className="agent-mic-glow"/><span aria-hidden="true">🎙</span></div></aside></div>
-  {selected&&<div className="agent-preview-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null);}}><section role="dialog" aria-modal="true" aria-label={selected.name+" details"} className="agent-preview-modal"><button type="button" aria-label="Close agent details" className="agent-modal-close" onClick={()=>setSelected(null)}>×</button><div className="agent-modal-title"><span className={"agent-card-portrait tone-"+selected.tone}><Portrait kind={selected.portrait}/></span><div><h2>{selected.name}</h2><span>{selected.profiles?"Configured Sarvam agent":"Illustrative agent"} · {selected.version}</span></div></div><p>{selected.description}</p>{selected.profiles?<><ProfileDetails profiles={selected.profiles}/><p className="muted">Saved CRM configuration; live Sarvam status and connection name are not independently verified.</p></>:<><dl><div><dt>Category</dt><dd>{selected.category}</dd></div><div><dt>Reference status</dt><dd>{selected.status} (sample only)</dd></div><div><dt>Sarvam connection</dt><dd>Not connected</dd></div></dl><div className="agent-preview-warning">Agent versions, sample playback and campaign selection will be enabled only after the Sarvam API is connected.</div></>}<button type="button" onClick={()=>setSelected(null)} className="agent-modal-done">Close</button></section></div>}
+  {selected?.profiles&&<ConfiguredAgentDetails key={selected.id} agent={selected} onClose={()=>setSelected(null)}/>}
+  {selected&&!selected.profiles&&<div className="agent-preview-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null);}}><section role="dialog" aria-modal="true" aria-label={selected.name+" details"} className="agent-preview-modal"><button type="button" aria-label="Close agent details" className="agent-modal-close" onClick={()=>setSelected(null)}>×</button><div className="agent-modal-title"><span className={"agent-card-portrait tone-"+selected.tone}><Portrait kind={selected.portrait}/></span><div><h2>{selected.name}</h2><span>{selected.profiles?"Configured Sarvam agent":"Illustrative agent"} · {selected.version}</span></div></div><p>{selected.description}</p><dl><div><dt>Category</dt><dd>{selected.category}</dd></div><div><dt>Reference status</dt><dd>{selected.status} (sample only)</dd></div><div><dt>Sarvam connection</dt><dd>Not connected</dd></div></dl><div className="agent-preview-warning">Agent versions, sample playback and campaign selection will be enabled only after the Sarvam API is connected.</div><button type="button" onClick={()=>setSelected(null)} className="agent-modal-done">Close</button></section></div>}
  </div>;
 }
