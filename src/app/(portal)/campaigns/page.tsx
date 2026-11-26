@@ -8,7 +8,7 @@ import {CampaignDetailsPopup} from "./campaign-details-popup";
 import {CampaignActionToast} from "./campaign-action-toast";
 import {AutoCampaignFilters} from "./auto-campaign-filters";
 
-type Filters={q?:string;status?:string;from?:string;to?:string;view?:string};
+type Filters={dealership?:string;q?:string;status?:string;from?:string;to?:string;view?:string};
 type Campaign={dealership_id:string;id:string;name:string;status:string;created_at:string;approved_at:string|null};
 
 function CampaignIcon({kind}:{kind:"all"|"draft"|"pending"|"grid"|"search"|"filter"|"calendar"|"voice"}){
@@ -43,16 +43,32 @@ function CountsCard({kind,label,value}:{kind:"all"|"draft"|"pending";label:strin
 function normalizeDate(input?:string){return input&&/^\d{4}-\d{2}-\d{2}$/.test(input)?input:"";}
 export default async function Campaigns({searchParams}:{searchParams?:Promise<Filters>}={}){
  const {supabase,membership,user,memberships}=await requireMembership();if(!membership)return null;
- const {data,error}=await supabase.from("campaigns").select("id,name,status,created_at,approved_at,dealership_id").eq("dealership_id",membership.dealership_id).order("created_at",{ascending:false}).limit(100);
- if(error)throw new Error("Could not read campaigns.");
- const campaigns=(data??[]) as Campaign[];
- const dealershipName=membership.dealerships?.name??"Assigned dealership";
+ const itUser=isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
  const params=await (searchParams??Promise.resolve({} as Filters));
- const requested=typeof params.view==="string"&&/^[a-f0-9-]{36}$/i.test(params.view)?params.view:"";
- if(requested&&!campaigns.some(c=>c.id===requested)){const {data:extra,error:extraError}=await supabase.from("campaigns").select("id,name,status,created_at,approved_at,dealership_id").eq("dealership_id",membership.dealership_id).eq("id",requested).maybeSingle();if(extraError)throw new Error("Could not read campaign.");if(extra)campaigns.unshift(extra as Campaign); }
+ const dealerOptions:{id:string;name:string}[]=[];
+ if(itUser){for(let offset=0;;offset+=500){const {data,error}=await supabase.from("dealerships").select("id,name").order("id").range(offset,offset+499);if(error)throw Error("Could not load dealerships.");dealerOptions.push(...(data??[]));if((data??[]).length<500)break;}dealerOptions.sort((a,b)=>a.name.localeCompare(b.name));}
+ const selectedDealer=itUser&&dealerOptions.some(d=>d.id===params.dealership)?params.dealership!:"";
+ const dealerNames=new Map(dealerOptions.map(d=>[d.id,d.name]));
+ const dealershipName=membership.dealerships?.name??"Assigned dealership";
+ const nameFor=(id:string)=>itUser?(dealerNames.get(id)??"Dealership unavailable"):dealershipName;
+ const scope=itUser?selectedDealer:membership.dealership_id;
+ const campaigns:Campaign[]=[];
+ for(let offset=0;;offset+=500){
+  let query=supabase.from("campaigns").select("id,name,status,created_at,approved_at,dealership_id");
+  if(scope)query=query.eq("dealership_id",scope);
+  const {data,error}=await query.order("created_at",{ascending:false}).order("id").range(offset,offset+499);
+  if(error)throw Error("Could not read campaigns.");
+  campaigns.push(...(data??[]) as Campaign[]);if((data??[]).length<500)break;
+ }
  const formatDate=(value:string)=>new Date(value).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Kolkata"});
- const {data:launches,error:launchError}=await supabase.from("voice_campaign_launches").select("campaign_id,provider_status").eq("dealership_id",membership.dealership_id);
- if(launchError)throw Error("Could not load campaign lifecycle status.");
+ const launches:{campaign_id:string;provider_status:string|null}[]=[];
+ for(let offset=0;;offset+=500){
+  let query=supabase.from("voice_campaign_launches").select("campaign_id,provider_status");
+  if(scope)query=query.eq("dealership_id",scope);
+  const {data,error}=await query.order("campaign_id").range(offset,offset+499);
+  if(error)throw Error("Could not load campaign lifecycle status.");
+  launches.push(...(data??[]));if((data??[]).length<500)break;
+ }
  const byCampaign=new Map((launches??[]).map(l=>[l.campaign_id,l.provider_status]));
  const display=(c:Campaign)=>campaignDisplayStatus(c.status,byCampaign.get(c.id));
  const total=campaigns.length,drafts=campaigns.filter(c=>display(c)==="Ongoing").length,pending=campaigns.filter(c=>display(c)==="Pending").length;
@@ -60,11 +76,10 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
  const statuses:readonly string[]=campaignStatuses;
  const selectedStatus=statuses.includes(status)?status:"";
  const viewId=typeof filters.view==="string"&&/^[a-f0-9-]{36}$/i.test(filters.view)?filters.view:"";
- const shown=campaigns.filter(c=>(!q||c.name.toLowerCase().includes(q.toLowerCase())||c.id.toLowerCase().includes(q.toLowerCase())||(isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"")&&dealershipName.toLowerCase().includes(q.toLowerCase())))&&(!selectedStatus||display(c)===selectedStatus)&&(!from||c.created_at.slice(0,10)>=from)&&(!to||c.created_at.slice(0,10)<=to));
+ const shown=campaigns.filter(c=>(!q||c.name.toLowerCase().includes(q.toLowerCase())||c.id.toLowerCase().includes(q.toLowerCase())||(itUser&&nameFor(c.dealership_id).toLowerCase().includes(q.toLowerCase())))&&(!selectedStatus||display(c)===selectedStatus)&&(!from||c.created_at.slice(0,10)>=from)&&(!to||c.created_at.slice(0,10)<=to));
  const permitted=canCreateCampaign(membership.role);
- const canOperate=isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
- const itUser=isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
- const filtered=!!(q||selectedStatus||from||to);
+ const canOperate=itUser;
+ const filtered=!!(q||selectedStatus||from||to||selectedDealer);
  return <div className="fc-campaign-page"><CampaignActionToast/>
   <header className="fc-campaign-hero">
    <div className="fc-hero-copy"><h1>Campaigns</h1></div>
@@ -76,11 +91,12 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
    <div className="fc-list-toolbar"><h2><span className="fc-grid-icon"><CampaignIcon kind="grid"/></span> All Campaigns</h2>
     <AutoCampaignFilters>
      <label className="fc-search"><CampaignIcon kind="search"/><input type="search" name="q" aria-label="Search campaigns" placeholder="Search campaigns..." defaultValue={q}/></label>
+     {itUser&&<label className="fc-status"><select name="dealership" aria-label="Filter by dealership" defaultValue={selectedDealer}><option value="">All Dealerships</option>{dealerOptions.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></label>}
      <label className="fc-status"><CampaignIcon kind="filter"/><select name="status" aria-label="Filter by status" defaultValue={selectedStatus}><option value="">All Status</option>{statuses.map(s=><option key={s} value={s}>{s}</option>)}</select></label>
      <details className="fc-date-details"><summary><CampaignIcon kind="calendar"/> {from||to?"Date Range Set":"Date Range"}</summary><div className="fc-date-panel"><label>From<input name="from" type="date" defaultValue={from}/></label><label>To<input name="to" type="date" defaultValue={to}/></label></div></details>
     </AutoCampaignFilters>
    </div>
-   {shown.length?<div className="fc-tablewrap"><table className={"crm-table fc-full-campaign-table"+(!itUser?" fc-dealer-campaign-table":"")}><colgroup><col/>{itUser&&<col/>}<col/><col/><col/></colgroup><thead><tr><th>Campaign</th>{itUser&&<th>Dealership</th>}<th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>{shown.map(c=><tr key={c.id}><td><strong>{c.name}</strong><div className="fc-row-id">#{c.id.slice(0,8)}</div></td>{itUser&&<td>{dealershipName}</td>}<td><span className={`status-pill campaign-status-badge campaign-status-${display(c).toLowerCase()}`}>{display(c)}</span></td><td>{new Date(c.created_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</td><td>{canOperate?<div className="fc-row-actions"><Link className="fc-review-start" href={"/campaigns/"+c.id+"/outbound"}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M9 12l3 3 7-8M19 12v7H5V5h10"/></svg> Review / Start</Link></div>:<CampaignDetailsPopup name={c.name} dealership={membership.dealerships?.name??"Assigned dealership"} status={display(c)} created={formatDate(c.created_at)} approved={c.approved_at?formatDate(c.approved_at):"Not approved"} autoOpen={viewId===c.id}/>}</td></tr>)}</tbody></table><p className="fc-list-count">Showing {shown.length} of the latest {total} campaigns</p></div>:
+   {shown.length?<div className="fc-tablewrap"><table className={"crm-table fc-full-campaign-table"+(!itUser?" fc-dealer-campaign-table":"")}><colgroup><col/>{itUser&&<col/>}<col/><col/><col/></colgroup><thead><tr><th>Campaign</th>{itUser&&<th>Dealership</th>}<th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>{shown.map(c=><tr key={c.id}><td><strong>{c.name}</strong><div className="fc-row-id">#{c.id.slice(0,8)}</div></td>{itUser&&<td>{nameFor(c.dealership_id)}</td>}<td><span className={`status-pill campaign-status-badge campaign-status-${display(c).toLowerCase()}`}>{display(c)}</span></td><td>{new Date(c.created_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</td><td>{canOperate?<div className="fc-row-actions"><Link className="fc-review-start" href={"/campaigns/"+c.id+"/outbound"}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M9 12l3 3 7-8M19 12v7H5V5h10"/></svg> Review / Start</Link></div>:<CampaignDetailsPopup name={c.name} dealership={membership.dealerships?.name??"Assigned dealership"} status={display(c)} created={formatDate(c.created_at)} approved={c.approved_at?formatDate(c.approved_at):"Not approved"} autoOpen={viewId===c.id}/>}</td></tr>)}</tbody></table><p className="fc-list-count">Showing {shown.length} of {total} campaigns</p></div>:
    <EmptyState kind="campaigns" title={filtered?"No matching campaigns":"No campaigns yet"} description={filtered?"Try another search, status, or date range.":"Your campaigns will appear here once created."} action={filtered?<Link href="/campaigns">Clear filters</Link>:permitted?<Link href="/campaigns/new">Create Campaign</Link>:undefined}/>}
   </section>
  </div>;
