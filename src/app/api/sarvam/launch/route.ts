@@ -25,7 +25,7 @@ export async function POST(request:Request){
   ]);
   if(batchError||configError||testError||!batch||!config||!test?.length)
    return NextResponse.json({error:"A locked recipient cohort, matching approved configuration and a recent test call from AI Voice Agents are required."},{status:409});
-  const setup=config.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start?:string;end?:string;days?:string[];from?:string;to?:string;retry_interval_minutes?:number}};
+  const setup=config.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start_mode?:"now"|"custom";start?:string;end?:string;days?:string[];from?:string;to?:string;retry_interval_minutes?:number}};
   const agent=String(input.agentId??""),version=Number(input.appVersion),connection=String(input.connectionId??""),sender=normalizePhone(String(input.callerNumber??""));
   if(!/^[\w.\-]{3,200}$/.test(agent)||!Number.isInteger(version)||version<1||
      !/^[\w.\-]{3,200}$/.test(connection)||!sender||
@@ -35,18 +35,19 @@ export async function POST(request:Request){
   if(!test.some(attempt=>attempt.agent_id===agent&&attempt.agent_version===version&&
     attempt.connection_id===connection&&attempt.caller_number===sender))
    return NextResponse.json({error:"The recent test-call attempt must use the approved agent version, telephony connection and caller number. Re-test this exact setup from AI Voice Agents before launch."},{status:409});
-  const start=new Date(String(input.startAt??"")),end=new Date(String(input.endAt??""));
+  const schedule=setup.schedule;
+  const approvedStart=new Date((schedule?.start??"")+"T"+(schedule?.from??"")+":00+05:30"),end=new Date((schedule?.end??"")+"T"+(schedule?.to??"")+":00+05:30");
+  const start=new Date(Math.max(approvedStart.getTime(),schedule?.start_mode==="now"?Date.now()+120000:approvedStart.getTime()));
   const istDate=(date:Date)=>{
    const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
    const get=(part:string)=>parts.find(p=>p.type===part)?.value??"";
    return get("year")+"-"+get("month")+"-"+get("day");
   };
   if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime())||
-     start.getTime()<Date.now()+3600000||end.getTime()<=start.getTime()||end.getTime()>start.getTime()+30*86400000||
-     istDate(start)!==setup.schedule?.start||
+     start.getTime()<Date.now()||end.getTime()<=start.getTime()||end.getTime()>start.getTime()+30*86400000||
+     (schedule?.start_mode!=="now"&&istDate(start)!==setup.schedule?.start)||
      istDate(end)!==setup.schedule?.end)
-   return NextResponse.json({error:"Use the approved IST campaign dates, starting at least one hour from now, with a maximum 30-day period."},{status:400});
-  const schedule=setup.schedule;
+   return NextResponse.json({error:"Use a valid approved IST schedule with a future end time and a maximum 30-day period. For immediate calling select Now."},{status:400});
   const interval=schedule?.retry_interval_minutes??30;
   if(!Number.isInteger(interval)||interval<1||interval>10080)return NextResponse.json({error:"Approved retry interval is invalid."},{status:400});
   if(!schedule||!/^([01]\d|2[0-3]):[0-5]\d$/.test(schedule.from??"")||

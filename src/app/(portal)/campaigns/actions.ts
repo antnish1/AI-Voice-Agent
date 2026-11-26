@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { requireMembership, canPrepare,canCreateCampaign } from "@/lib/auth";
 type WizardInput={dealershipId:string;name:string;period?:string;configuration:{
  description:string;agent_label:string;agent_version_label:string;telephony_label:string;outgoing_number_label:string;
- schedule:{start:string;end:string;days:string[];from:string;to:string;cps:number;max_retries:number;retry_interval_minutes:number};
+ schedule:{start_mode?:"now"|"custom";start:string;end:string;days:string[];from:string;to:string;cps:number;max_retries:number;retry_interval_minutes:number};
  recipient_preview:{filename:string;total_rows:number;phone_column:string;preview_only:true};
 }};
 export async function saveWizardDraft(input:WizardInput):Promise<{error?:string;id?:string;reference?:string}>{
