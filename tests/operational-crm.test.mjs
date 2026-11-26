@@ -78,5 +78,5 @@ test("IT campaign visibility is global while dealership users stay scoped",()=>{
  assert.match(page,/nameFor\(c\.dealership_id\)/);
  assert.match(page,/All Dealerships/);
  assert.match(dashboard,/itUser\?q:q\.eq\("dealership_id",id\)/);
- assert.match(logs,/itUser\?q:q\.eq\("dealership_id",membership\.dealership_id\)/);
+ assert.match(logs,/if\(!itUser\)query=query\.eq\("dealership_id",membership\.dealership_id\)/);
 });
