@@ -21,7 +21,6 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  const userName=(profileName||fallbackName).slice(0,80);
  const id=membership.dealership_id;
  const itUser=isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
- const scope=<T extends {eq:(column:string,value:string)=>T}>(q:T):T=>itUser?q:q.eq("dealership_id",id);
  const params=await searchParams;
  const {days:rangeInput}=params;
  const period=["all","mtd","today","90","custom"].includes(params.period??"")?params.period!:"all";
@@ -46,7 +45,7 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
   const rows:{id:string;created_at:string}[]=[];
   if(chartInvalid)return {data:rows,error:null};
   for(let offset=0;;offset+=500){
-   let q=scope(supabase.from("campaigns").select("id,created_at")).lt("created_at",shift(chartTo,1)+"T00:00:00+05:30");
+   let q=(itUser?supabase.from("campaigns").select("id,created_at"):supabase.from("campaigns").select("id,created_at").eq("dealership_id",id)).lt("created_at",shift(chartTo,1)+"T00:00:00+05:30");
    if(chartFrom)q=q.gte("created_at",chartFrom+"T00:00:00+05:30");
    const result=await q.order("created_at",{ascending:true}).order("id",{ascending:true}).range(offset,offset+499);
    if(result.error)return {data:rows,error:result.error};
@@ -55,18 +54,18 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
   }
  };
  const [customerCount,campaignCount,approvalCount,approvedCount,recentCampaigns,periodCampaigns,recentImports,callCount,answeredCount,activeCount,providerCount,recentLaunches]=await Promise.all([
-  scoped(scope(supabase.from("customers").select("id",{count:"exact",head:true}))),
-  scoped(scope(supabase.from("campaigns").select("id",{count:"exact",head:true}))),
-  scoped(scope(supabase.from("campaigns").select("id",{count:"exact",head:true})).in("status",["DRAFT","PENDING","PENDING_MANAGER_APPROVAL"])),
-  scoped(scope(supabase.from("campaigns").select("id",{count:"exact",head:true})).eq("status","APPROVED")),
-  scoped(scope(supabase.from("campaigns").select("id,name,status,created_at"))).order("created_at",{ascending:false}).limit(7),
+  scoped((itUser?supabase.from("customers").select("id",{count:"exact",head:true}):supabase.from("customers").select("id",{count:"exact",head:true}).eq("dealership_id",id))),
+  scoped((itUser?supabase.from("campaigns").select("id",{count:"exact",head:true}):supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id))),
+  scoped((itUser?supabase.from("campaigns").select("id",{count:"exact",head:true}):supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id)).in("status",["DRAFT","PENDING","PENDING_MANAGER_APPROVAL"])),
+  scoped((itUser?supabase.from("campaigns").select("id",{count:"exact",head:true}):supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id)).eq("status","APPROVED")),
+  scoped((itUser?supabase.from("campaigns").select("id,name,status,created_at"):supabase.from("campaigns").select("id,name,status,created_at").eq("dealership_id",id))).order("created_at",{ascending:false}).limit(7),
   fetchPeriod(),
-  scoped(scope(supabase.from("customer_import_batches").select("id,filename,imported_rows,rejected_rows,created_at"))).order("created_at",{ascending:false}).limit(6),
-  scoped(scope(supabase.from("voice_call_records").select("id",{count:"exact",head:true})),"started_at"),
-  scoped(scope(supabase.from("voice_call_records").select("id",{count:"exact",head:true})).eq("status","answered"),"started_at"),
-  scoped(scope(supabase.from("voice_campaign_launches").select("campaign_id,campaigns!inner(created_at)",{count:"exact",head:true})).in("provider_status",["active","scheduled","in_progress"]),"campaigns.created_at"),
-  scoped(scope(supabase.from("voice_campaign_launches").select("campaign_id,campaigns!inner(created_at)",{count:"exact",head:true})).in("provider_status",["active","scheduled","in_progress","paused","ended","completed","cancelled","canceled"]),"campaigns.created_at"),
-  scope(supabase.from("voice_campaign_launches").select("campaign_id,provider_status"))
+  scoped((itUser?supabase.from("customer_import_batches").select("id,filename,imported_rows,rejected_rows,created_at"):supabase.from("customer_import_batches").select("id,filename,imported_rows,rejected_rows,created_at").eq("dealership_id",id))).order("created_at",{ascending:false}).limit(6),
+  scoped((itUser?supabase.from("voice_call_records").select("id",{count:"exact",head:true}):supabase.from("voice_call_records").select("id",{count:"exact",head:true}).eq("dealership_id",id)),"started_at"),
+  scoped((itUser?supabase.from("voice_call_records").select("id",{count:"exact",head:true}):supabase.from("voice_call_records").select("id",{count:"exact",head:true}).eq("dealership_id",id)).eq("status","answered"),"started_at"),
+  scoped((itUser?supabase.from("voice_campaign_launches").select("campaign_id,campaigns!inner(created_at)",{count:"exact",head:true}):supabase.from("voice_campaign_launches").select("campaign_id,campaigns!inner(created_at)",{count:"exact",head:true}).eq("dealership_id",id)).in("provider_status",["active","scheduled","in_progress"]),"campaigns.created_at"),
+  scoped((itUser?supabase.from("voice_campaign_launches").select("campaign_id,campaigns!inner(created_at)",{count:"exact",head:true}):supabase.from("voice_campaign_launches").select("campaign_id,campaigns!inner(created_at)",{count:"exact",head:true}).eq("dealership_id",id)).in("provider_status",["active","scheduled","in_progress","paused","ended","completed","cancelled","canceled"]),"campaigns.created_at"),
+  (itUser?supabase.from("voice_campaign_launches").select("campaign_id,provider_status"):supabase.from("voice_campaign_launches").select("campaign_id,provider_status").eq("dealership_id",id))
  ]);
  if([customerCount,campaignCount,approvalCount,approvedCount,recentCampaigns,periodCampaigns,recentImports,callCount,answeredCount,activeCount,providerCount,recentLaunches].some(x=>x.error))throw new Error("Could not load dealership dashboard.");
  const recent=(recentCampaigns.data??[]) as Campaign[];
