@@ -109,20 +109,20 @@ export function UserManagement(){
     </div>
    </div>}
   </dialog>
-  <dialog ref={dealerActionDialog} className={"it-dealer-dialog"+(dealerMode==="disable"?" it-dealer-disable-dialog":"")} aria-labelledby="dealer-action-title" onClose={()=>setDealerTarget(null)} onCancel={e=>{if(pending)e.preventDefault();}}>
-      {dealerTarget&&dealerMode==="disable"?<section className="it-dealer-disable-panel">
+  <dialog ref={dealerActionDialog} className={"it-dealer-dialog"+(dealerMode==="disable"?" it-dealer-disable-dialog":dealerMode==="enable"?" it-dealer-disable-dialog it-dealer-enable-dialog":"")} aria-labelledby="dealer-action-title" onClose={()=>setDealerTarget(null)} onCancel={e=>{if(pending)e.preventDefault();}}>
+      {dealerTarget&&(dealerMode==="disable"||dealerMode==="enable")?<section className="it-dealer-disable-panel">
     <header className="it-dealer-disable-heading">
      <span className="it-dealer-disable-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18M5 21V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v15M9 8h2m-2 4h2m6-3h2a2 2 0 0 1 2 2v10"/></svg></span>
-     <div><h2 id="dealer-action-title">Disable Dealership</h2><p>Confirm your action</p></div>
+     <div><h2 id="dealer-action-title">{dealerMode==="enable"?"Enable Dealership":"Disable Dealership"}</h2><p>Confirm your action</p></div>
     </header>
     <form className="it-dealer-disable-form" onSubmit={saveDealerAction}>
      <div className="it-dealer-disable-name"><span>DEALERSHIP NAME</span><strong>{dealerTarget.name}</strong></div>
-     <div className="it-dealer-disable-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m12 3 10 18H2L12 3Z"/><path d="M12 9v5m0 3h.01"/></svg><p>Disable this unused dealership. Linked users, records or documents prevent disabling.</p></div>
-     <label htmlFor="it-disable-dealership-confirm">Type <strong>DISABLE DEALERSHIP</strong> to confirm.
-      <input id="it-disable-dealership-confirm" placeholder="DISABLE DEALERSHIP" autoComplete="off" spellCheck={false} value={dealerConfirm} onChange={e=>setDealerConfirm(e.target.value)}/>
+     <div className="it-dealer-disable-warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m12 3 10 18H2L12 3Z"/><path d="M12 9v5m0 3h.01"/></svg><p>{dealerMode==="enable"?"Allow new records and user assignments to this dealership.":"Disable this unused dealership. Linked users, records or documents prevent disabling."}</p></div>
+     <label htmlFor="it-dealership-confirm">Type <strong>{dealerMode==="enable"?"ENABLE DEALERSHIP":"DISABLE DEALERSHIP"}</strong> to confirm.
+      <input id="it-dealership-confirm" placeholder={dealerMode==="enable"?"ENABLE DEALERSHIP":"DISABLE DEALERSHIP"} autoComplete="off" spellCheck={false} value={dealerConfirm} onChange={e=>setDealerConfirm(e.target.value)}/>
      </label>
      {dealerError&&<p role="alert" className="it-user-error">{dealerError}</p>}
-     <div className="it-dealer-disable-actions"><button type="button" className="it-dealer-disable-cancel" disabled={pending} onClick={()=>dealerActionDialog.current?.close()}>Cancel</button><button type="submit" disabled={pending||dealerConfirm!=="DISABLE DEALERSHIP"}>{pending?"Saving…":"Confirm Disable"}</button></div>
+     <div className="it-dealer-disable-actions"><button type="button" className="it-dealer-disable-cancel" disabled={pending} onClick={()=>dealerActionDialog.current?.close()}>Cancel</button><button type="submit" disabled={pending||dealerConfirm!==(dealerMode==="enable"?"ENABLE DEALERSHIP":"DISABLE DEALERSHIP")}>{pending?"Saving…":dealerMode==="enable"?"Confirm Enable":"Confirm Disable"}</button></div>
     </form>
    </section>:dealerTarget&&<section className="it-user-card"><div className="it-user-table-head"><h2 id="dealer-action-title">{dealerMode==="edit"?"Edit Dealership":dealerMode==="disable"?"Disable Dealership":dealerMode==="enable"?"Enable Dealership":"Delete Dealership"}</h2><button type="button" disabled={pending} onClick={()=>dealerActionDialog.current?.close()}>Close ×</button></div>
    <form className="it-user-form" onSubmit={saveDealerAction}>
