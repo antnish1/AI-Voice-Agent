@@ -158,10 +158,12 @@ export function UserManagement(){
     </form>
    </section>
   </div>
+  <section className="it-account-tab-section" aria-label="Account directory navigation">
   <div className="it-account-table-tabs" role="tablist" aria-label="User management tables">
    <button type="button" id="it-tab-users" role="tab" aria-controls="it-panel-users" aria-selected={activeTable==="users"} onClick={()=>setActiveTable("users")}>Dealership User Accounts</button>
    <button type="button" id="it-tab-dealerships" role="tab" aria-controls="it-panel-dealerships" aria-selected={activeTable==="dealerships"} onClick={()=>setActiveTable("dealerships")}>Dealership Accounts</button>
   </div>
+  </section>
   {activeTable==="users"&&<section id="it-panel-users" role="tabpanel" aria-labelledby="it-tab-users" className="it-user-card it-user-list it-full-width">
    <div className="it-user-table-head"><h2>Dealership User Accounts</h2><div className="it-directory-search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" aria-label="Search dealership users" placeholder="Search users..." value={userSearch} onChange={e=>setUserSearch(e.target.value)}/></div></div>
    <div className="tablewrap"><table><thead><tr><th>User</th><th>Dealership</th><th>Mobile</th><th>Employee ID</th><th>Role / Post</th><th>Account</th><th>Password Set</th><th>Action</th></tr></thead><tbody>
