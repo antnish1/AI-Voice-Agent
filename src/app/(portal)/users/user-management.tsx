@@ -108,7 +108,7 @@ export function UserManagement(){
      <label>Mobile No.<input type="tel" maxLength={20} value={edit.mobile} onChange={e=>setEdit(v=>({...v,mobile:e.target.value}))}/></label>
      <label>Employee ID<input maxLength={40} value={edit.employeeId} onChange={e=>setEdit(v=>({...v,employeeId:e.target.value}))}/></label>
      <label>Role / Post<input maxLength={100} value={edit.post} onChange={e=>setEdit(v=>({...v,post:e.target.value}))}/></label>
-     <p>Login email changes remain in Password Set. Dealership assignment and system permissions are unchanged.</p><button type="submit" disabled={pending}>{pending?"Saving…":"Save changes"}</button>
+     <div className="it-edit-form-actions"><button type="button" className="it-edit-cancel" disabled={pending} onClick={()=>resetDialogRef.current?.close()}>Cancel</button><button type="submit" disabled={pending}>{pending?"Saving…":"Save changes"}</button></div>
     </form>}
     {accountMode==="password"&&<section className="it-reset-action it-reset-expandable">
      <div className="it-reset-action-head"><div><strong>IT Super User · Temporary password</strong><p>Reset the password and confirm this account's login email. Optionally correct the email before resetting.</p></div><button type="button" disabled={pending||(!resetExpanded&&Boolean(resetPassword))||Boolean(selectedAccount.accountState&&selectedAccount.accountState!=="active")} onClick={()=>{if(resetExpanded){clearResetFields();}else{setResetExpanded(true);setResetError("");}}}>{resetExpanded?"Close":"Reset password"}</button></div>
