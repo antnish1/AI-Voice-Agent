@@ -1,0 +1,12 @@
+.crm-app .crm-empty-state{--empty-cloud:#e7f2fc;--empty-paper:#eff6ff;--empty-edge:#a9c8ea;--empty-symbol:#079bad;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:300px;padding:24px 16px;text-align:center;white-space:normal;box-sizing:border-box;width:100%;background:transparent}
+.crm-app .crm-empty-art{width:210px;height:148px;max-width:100%;flex:none}
+.crm-app .crm-empty-state h3{font-size:19px;font-weight:800;color:var(--crisp-ink,#122b43);margin:0;line-height:1.3}
+.crm-app .crm-empty-state p{font-size:13px;font-weight:400;color:var(--crisp-muted,#52677b);line-height:1.5;margin:0;max-width:470px}
+.crm-app .crm-empty-action{margin-top:7px}
+.crm-app .crm-empty-action :is(button,a){display:inline-flex;align-items:center;justify-content:center;min-height:38px;border:0;border-radius:9px;padding:9px 18px;background:#087e91;color:white;font-weight:700;font-size:12px;text-decoration:none;cursor:pointer}
+.crm-app .crm-empty-action :is(button,a):hover{background:#066778}
+.crm-app .crm-empty-action :is(button,a):focus-visible{outline:2px solid var(--crisp-accent,#087e91);outline-offset:3px}
+.crm-app .crm-empty-state.crm-empty-compact{min-height:175px;padding:12px;gap:5px}.crm-app .crm-empty-compact .crm-empty-art{width:115px;height:80px}.crm-app .crm-empty-compact h3{font-size:15px}.crm-app .crm-empty-compact p{font-size:11px}
+.crm-app :is(.customers-card-grid,.docs-grid)>.crm-empty-state{grid-column:1/-1}
+:root[data-theme="dark"] .crm-app .crm-empty-state{--empty-cloud:#20374c;--empty-paper:#1b324a;--empty-edge:#466c94;--empty-symbol:#5ee4e4}
+@media(max-width:600px){.crm-app .crm-empty-state{min-height:230px;padding:18px 10px}.crm-app .crm-empty-art{width:160px;height:112px}.crm-app .crm-empty-state h3{font-size:17px}}
