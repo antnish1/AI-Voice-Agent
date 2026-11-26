@@ -8,7 +8,7 @@ export function CampaignActivityChart({daily,days}:{daily:Day[];days:number}){
  const [active,setActive]=useState<string|null>(null);
  const reduced=useReducedMotion();
  const max=Math.max(1,...daily.map(d=>d.count));
- return <div className="ref-chart-area" role="group" aria-label={"Campaigns created by day over "+days+" days"}>
+ return <div className="ref-chart-area" role="group" aria-label={"Campaigns created over "+days+" days"}>
   <div className="ref-chart-grid" aria-hidden="true"><span/><span/><span/><span/></div>
   <div className="ref-chart-bars">{daily.map((d,i)=><div key={d.key} className="ref-chart-column frontier-chart-column"
     tabIndex={0} aria-label={d.label+": "+d.count+" campaigns"}
@@ -23,7 +23,7 @@ export function CampaignActivityChart({daily,days}:{daily:Day[];days:number}){
       initial={reduced?false:{opacity:0,y:6,scale:.95}} animate={{opacity:1,y:0,scale:1}}
       exit={{opacity:0,y:3,scale:.97}} transition={{duration:reduced?0:.16}}
       role="status"><strong>{d.count}</strong><span>{d.label}</span></motion.div>}</AnimatePresence>
-    <small>{days===30?(i%5===0?d.label:""):days===14?(i%2===0?d.label:""):d.label}</small>
+    <small>{i%Math.max(1,Math.ceil(daily.length/7))===0?d.label:""}</small>
   </div>)}</div>
  </div>;
 }

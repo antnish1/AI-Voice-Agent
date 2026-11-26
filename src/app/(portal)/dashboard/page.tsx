@@ -1,4 +1,5 @@
 import Link from "next/link";
+import {CampaignPeriodFilter} from "@/components/motion/campaign-period-filter";
 import {DashboardPeriodFilter} from "./dashboard-period-filter";
 import {campaignDisplayStatus} from "@/lib/campaign-display-status";
 import {CountUp} from "@/components/motion/count-up";
@@ -10,7 +11,7 @@ type Campaign={id:string;name:string;status:string;created_at:string};
 type ImportBatch={id:string;filename:string;imported_rows:number;rejected_rows:number;created_at:string};
 const localDate=(date:string|Date)=>new Date(date).toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"});
 const formatted=(date:string)=>new Date(date).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Kolkata"});
-export default async function Dashboard({searchParams}:{searchParams:Promise<{days?:string;period?:string;from?:string;to?:string}>}){
+export default async function Dashboard({searchParams}:{searchParams:Promise<{days?:string;period?:string;from?:string;to?:string;chartPeriod?:string;chartFrom?:string;chartTo?:string}>}){
  const {supabase,user,membership}=await requireMembership();if(!membership)return null;
  const canCreate=canCreateCampaign(membership.role);
  const profileName=typeof user.user_metadata?.display_name==="string"?user.user_metadata.display_name.trim():"";
@@ -30,19 +31,32 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  const upper=to?new Date(Date.parse(to+"T00:00:00+05:30")+86400000).toISOString():"";
  const scoped=<T extends {gte:(column:string,value:string)=>T;lt:(column:string,value:string)=>T}>(q:T,column="created_at"):T=>{if(invalid)return q.gte(column,"9999-01-01T00:00:00Z");if(lower)q=q.gte(column,lower);if(upper)q=q.lt(column,upper);return q;};
  const requestedDays=rangeInput==="30"?30:rangeInput==="14"?14:7;
- const chartEnd=to||today;
- const chartStart=shift(chartEnd,-requestedDays+1);
- const effectiveStart=from&&from>chartStart?from:chartStart;
- const days=Math.max(1,Math.min(requestedDays,Math.round((Date.parse(chartEnd)-Date.parse(effectiveStart))/86400000)+1));
- const start=new Date(effectiveStart+"T00:00:00+05:30");
- const chartHref=(n:number)=>"/dashboard?"+new URLSearchParams({period,...(period==="custom"&&from?{from}:{}),...(period==="custom"&&to?{to}:{}),days:String(n)}).toString();
+ const chartPeriod=["all","today","mtd","custom"].includes(params.chartPeriod??"")?params.chartPeriod!:"all";
+ const chartCustomValid=valid(params.chartFrom)&&valid(params.chartTo)&&params.chartFrom<=params.chartTo&&params.chartTo<=today;
+ const ownFrom=chartPeriod==="today"?today:chartPeriod==="mtd"?today.slice(0,7)+"-01":chartPeriod==="custom"&&chartCustomValid?params.chartFrom!:"";
+ const ownTo=chartPeriod==="custom"&&chartCustomValid?params.chartTo!:today;
+ const chartFrom=from&&from>ownFrom?from:ownFrom;
+ const chartTo=to&&to<ownTo?to:ownTo;
+ const chartInvalid=invalid||(chartPeriod==="custom"&&!chartCustomValid)||!!(chartFrom&&chartFrom>chartTo);
+ const fetchPeriod=async()=>{
+  const rows:{id:string;created_at:string}[]=[];
+  if(chartInvalid)return {data:rows,error:null};
+  for(let offset=0;;offset+=500){
+   let q=supabase.from("campaigns").select("id,created_at").eq("dealership_id",id).lt("created_at",shift(chartTo,1)+"T00:00:00+05:30");
+   if(chartFrom)q=q.gte("created_at",chartFrom+"T00:00:00+05:30");
+   const result=await q.order("created_at",{ascending:true}).order("id",{ascending:true}).range(offset,offset+499);
+   if(result.error)return {data:rows,error:result.error};
+   rows.push(...(result.data??[]));
+   if((result.data??[]).length<500)return {data:rows,error:null};
+  }
+ };
  const [customerCount,campaignCount,approvalCount,approvedCount,recentCampaigns,periodCampaigns,recentImports,callCount,answeredCount,activeCount,providerCount,recentLaunches]=await Promise.all([
   scoped(supabase.from("customers").select("id",{count:"exact",head:true}).eq("dealership_id",id)),
   scoped(supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id)),
   scoped(supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id).in("status",["DRAFT","PENDING","PENDING_MANAGER_APPROVAL"])),
   scoped(supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id).eq("status","APPROVED")),
   scoped(supabase.from("campaigns").select("id,name,status,created_at").eq("dealership_id",id)).order("created_at",{ascending:false}).limit(7),
-  scoped(supabase.from("campaigns").select("id,created_at").eq("dealership_id",id)).gte("created_at",start.toISOString()).order("created_at",{ascending:false}).limit(1000),
+  fetchPeriod(),
   scoped(supabase.from("customer_import_batches").select("id,filename,imported_rows,rejected_rows,created_at").eq("dealership_id",id)).order("created_at",{ascending:false}).limit(6),
   scoped(supabase.from("voice_call_records").select("id",{count:"exact",head:true}).eq("dealership_id",id),"started_at"),
   scoped(supabase.from("voice_call_records").select("id",{count:"exact",head:true}).eq("dealership_id",id).eq("status","answered"),"started_at"),
@@ -55,7 +69,18 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  const launchMap=new Map((recentLaunches.data??[]).map(l=>[l.campaign_id,l.provider_status]));
  const display=(c:Campaign)=>campaignDisplayStatus(c.status,launchMap.get(c.id));
  const imports=(recentImports.data??[]) as ImportBatch[];
- const daily=Array.from({length:days},(_,i)=>{const date=new Date(start.getTime()+i*86400000);const key=localDate(date);return {key,label:date.toLocaleDateString("en-IN",{month:"short",day:"numeric",timeZone:"Asia/Kolkata"}),count:(periodCampaigns.data??[]).filter(c=>localDate(c.created_at)===key).length};});
+ const records=periodCampaigns.data??[];
+ const first=chartFrom||(records.length?localDate(records[0].created_at):today);
+ const days=Math.max(1,Math.round((Date.parse(chartTo+"T00:00:00Z")-Date.parse(first+"T00:00:00Z"))/86400000)+1);
+ const bucketSize=Math.max(1,Math.ceil(days/60));
+ const counts=new Map<string,number>();
+ for(const record of records){const key=localDate(record.created_at);counts.set(key,(counts.get(key)??0)+1);}
+ const label=(key:string)=>new Date(key+"T00:00:00Z").toLocaleDateString("en-IN",{day:"numeric",month:"short",year:days>365?"numeric":undefined,timeZone:"UTC"});
+ const daily=Array.from({length:Math.ceil(days/bucketSize)},(_,i)=>{
+  const key=shift(first,i*bucketSize),end=shift(first,Math.min(days-1,(i+1)*bucketSize-1));
+  let count=0;for(let j=i*bucketSize;j<Math.min(days,(i+1)*bucketSize);j++)count+=counts.get(shift(first,j))??0;
+  return {key,label:key===end?label(key):label(key)+" – "+label(end),count};
+ });
  const activity=[...recent.map(c=>({key:"c-"+c.id,title:"Campaign · "+display(c),detail:c.name,at:c.created_at,icon:"◫",tone:"campaign-"+display(c).toLowerCase()})),...imports.map(x=>({key:"i-"+x.id,title:"Customer list imported",detail:x.filename+" · "+x.imported_rows+" new",at:x.created_at,icon:"⇧",tone:"blue"}))].sort((a,b)=>Date.parse(b.at)-Date.parse(a.at)).slice(0,5);
  const hour=Number(new Intl.DateTimeFormat("en-GB",{hour:"numeric",hour12:false,timeZone:"Asia/Kolkata"}).format(new Date()));
  const greeting=hour<12?"Good Morning":hour<17?"Good Afternoon":"Good Evening";
@@ -69,9 +94,10 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  <div className="ref-kpi-grid ref-kpi-joined" aria-label="Dashboard key metrics">{metrics.map(m=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}>{m.icon}</div><div><span className="ref-kpi-label">{m.name}</span><CountUp className="ref-kpi-value" value={m.value}/><small className="ref-kpi-note">{m.note}</small></div></article>)}</div>
  <div className="ref-dashboard-columns">
  <div className="ref-dashboard-left">
-  <section className="ref-dashboard-panel ref-performance"><div className="ref-panel-header"><div><h2><span className="ref-heading-icon">▥</span> Campaign Performance</h2></div><div className="ref-date-filters"><span className="ref-selected-period">Last {days} days</span><div className="ref-range-links"><Link aria-current={days===7?"true":undefined} href={chartHref(7)}>7D</Link><Link aria-current={days===14?"true":undefined} href={chartHref(14)}>14D</Link><Link aria-current={days===30?"true":undefined} href={chartHref(30)}>30D</Link></div></div></div>
+  <section className="ref-dashboard-panel ref-performance"><div className="ref-panel-header"><div><h2><span className="ref-heading-icon">▥</span> Campaign Performance</h2></div><CampaignPeriodFilter period={chartPeriod} from={params.chartFrom??today} to={params.chartTo??today} today={today}/></div>
    <CampaignActivityChart daily={daily} days={days}/>
    <div className="ref-chart-footer"><span><i/> Campaigns created</span><span>{(periodCampaigns.data??[]).length} records in selected period</span></div>
+   {chartInvalid&&<p role="alert">Select a valid chart date range within the dashboard period (IST).</p>}
    {(periodCampaigns.data??[]).length===0&&<p className="ref-chart-empty">No campaigns created in this period. Charts will update with real data.</p>}
   </section>
   <section className="ref-dashboard-panel ref-recent-campaigns"><div className="ref-panel-header"><h2><span className="ref-heading-icon">◫</span> Recent Campaigns</h2><Link href="/campaigns">View All</Link></div>
