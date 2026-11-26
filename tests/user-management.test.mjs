@@ -98,6 +98,20 @@ test("dealer users do not have a portal password change or self-reset flow",()=>
  assert.doesNotMatch(ui,/IT-controlled login password/);
 });
 
+test("disable dealership uses dedicated compact confirmation and retains exact phrase guard",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ const css=file("../src/app/(portal)/users/unified-directory.css");
+ assert.match(ui,/dealerMode==="disable"\?" it-dealer-disable-dialog":""/);
+ assert.match(ui,/dealerMode==="disable"\?<section className="it-dealer-disable-panel"/);
+ assert.match(ui,/Confirm your action/);
+ assert.match(ui,/DEALERSHIP NAME/);
+ assert.match(ui,/Linked users, records or documents prevent disabling\./);
+ assert.match(ui,/dealerConfirm!=="DISABLE DEALERSHIP"/);
+ assert.match(ui,/className="it-dealer-disable-cancel"/);
+ assert.match(css,/dialog\.it-dealer-disable-dialog\{width:min\(540px/);
+ assert.match(css,/\.it-dealer-disable-actions\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+});
+
 test("one-time newly created password opens a centered modal and clears on dismiss",()=>{
  const ui=file("../src/app/(portal)/users/user-management.tsx");
  const css=file("../src/app/(portal)/users/unified-directory.css");
