@@ -64,14 +64,14 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
          onMouseLeave={hideTooltip}
          onFocus={(e:FocusEvent<HTMLAnchorElement>)=>showTooltip(item.name,e.currentTarget)}
          onBlur={hideTooltip}
-         aria-current={active?"page":undefined} className={`frontier-nav-link ${active?"active":""}`}>
+         aria-current={active&&(item.url!=="/campaigns"||collapsed||!campaignsExpanded)?"page":undefined} className={`frontier-nav-link ${active?"active":""}`}>
          <span className="nav-icon"><SidebarIcon name={item.icon} size={21}/></span>
          <span className="nav-label">{item.name}</span>
          {item.url==="/approvals"&&pendingApprovals>0&&<span className="frontier-approval-badge" title={`${pendingApprovals} campaigns awaiting approval`}>{pendingApprovals>99?"99+":pendingApprovals}</span>}
         </Link>
         {item.url==="/campaigns"&&<button type="button" className="frontier-campaign-toggle" aria-label={campaignsExpanded?"Collapse Campaigns submenu":"Expand Campaigns submenu"} aria-expanded={campaignsExpanded} onClick={()=>{if(collapsed){setCollapsed(false);setCampaignsExpanded(true);}else setCampaignsExpanded(s=>!s);}}><SidebarIcon name="chevron-down" size={16}/></button>}
        </div>
-       {item.url==="/campaigns"&&campaignsExpanded&&!collapsed&&<div className="frontier-campaign-subnav"><Link href="/campaigns" onClick={closeMobile}>All Campaigns</Link><Link href="/campaigns/new" aria-current={path==="/campaigns/new"?"page":undefined} onClick={closeMobile}>Create Campaign</Link></div>}
+       {item.url==="/campaigns"&&campaignsExpanded&&!collapsed&&<div className="frontier-campaign-subnav"><Link href="/campaigns" aria-current={path==="/campaigns"?"page":undefined} onClick={closeMobile}>All Campaigns</Link><Link href="/campaigns/new" aria-current={path==="/campaigns/new"||path.startsWith("/campaigns/new/")?"page":undefined} onClick={closeMobile}>Create Campaign</Link></div>}
       </div>;
     })}
    </nav>
