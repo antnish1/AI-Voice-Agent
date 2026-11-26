@@ -157,8 +157,8 @@ test("temporary password form supports optional custom password and email correc
  assert.match(ui,/aria-selected=\{activeTable==="dealerships"\}/);
  assert.match(ui,/activeTable==="users"&&<section/);
  assert.match(ui,/activeTable==="dealerships"&&<section/);
- assert.match(ui,/dealers\.map\(d=><tr/);
- assert.match(ui,/users\.map\(u=><tr/);
+ assert.match(ui,/filteredDealers\.map\(d=><tr/);
+ assert.match(ui,/filteredUsers\.map\(u=><tr/);
  assert.match(ui,/d\.address\|\|"—"/);
  assert.match(ui,/d\.contact_person\|\|d\.contact\|\|"—"/);
  assert.doesNotMatch(ui,/View dealership details|dealers\.filter\(d=>!users\.some/);
@@ -182,3 +182,17 @@ test("user management exposes separate password and accessible action icons",()=
  assert.match(edge,/body.action==="edit-user"/);
  assert.match(edge,/user_metadata:\{\.\.\.account.data.user.user_metadata/);
  });
+
+test("dealership lifecycle requires IT authorization and protects linked data",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ const edge=file("../supabase/functions/it-user-management/index.ts");
+ const sql=file("../db/20261126_dealership_lifecycle.sql");
+ assert.match(ui,/filteredDealers=dealers\.filter/);
+ assert.match(ui,/filteredUsers=users\.filter/);
+ assert.match(ui,/openDealerAction\(d,"delete"\)/);
+ assert.match(edge,/body\.confirm!==operation\.toUpperCase\(\)\+" DEALERSHIP"/);
+ assert.match(sql,/for update/);
+ assert.match(sql,/confrelid='public\.dealerships'::regclass/);
+ assert.match(sql,/Linked records prevent this operation/);
+ assert.match(sql,/revoke all on function public\.frontvox_dealership_lifecycle\(uuid,text\) from public,anon,authenticated/);
+});
