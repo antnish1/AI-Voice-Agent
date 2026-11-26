@@ -1,0 +1,79 @@
+
+/* Shared dark-only palette. No light-mode rules or layout changes. */
+:root[data-theme="dark"]{
+ --dark-canvas:#0b1220;--dark-sidebar:#0f172a;--dark-surface:#162234;--dark-raised:#1e3045;
+ --dark-line:#293b50;--dark-ink:#f1f5f9;--dark-text:#dce6f2;--dark-muted:#a8b8cc;
+ --dark-accent:#5ee4e4;--dark-selected:#153d45;--dark-hover:#22364a;
+}
+:root[data-theme="dark"] .crm-app{
+ --crisp-ink:var(--dark-ink);--crisp-text:var(--dark-text);--crisp-muted:var(--dark-muted);
+ --crisp-line:var(--dark-line);--crisp-surface:var(--dark-surface);--crisp-panel:var(--dark-surface);
+ --crisp-canvas:var(--dark-canvas);--crisp-header:var(--dark-raised);--crisp-accent:var(--dark-accent);
+ --crisp-hover:var(--dark-hover);--crisp-shadow:0 2px 8px #0003;
+ --surface:var(--dark-surface);--line:var(--dark-line);--ink:var(--dark-ink);--muted:var(--dark-muted);
+}
+:root[data-theme="dark"] .crm-app :is(.crm-topbar,.ref-topbar,.frontier-top-navigation,.frontier-reference-sidebar.ref-sidebar){background:var(--dark-sidebar);border-color:var(--dark-line);color:var(--dark-text)}
+:root[data-theme="dark"] .crm-app :is(.portal-crumb-back,.portal-crumb-compass,.portal-crumb-chevron,.portal-crumb-pill,.ref-menu-toggle,.ref-today-pill){background:var(--dark-raised);border-color:var(--dark-line);color:var(--dark-text)}
+:root[data-theme="dark"] .crm-app .portal-crumb-pill.active{background:var(--dark-selected);border-color:#287c86;color:var(--dark-accent)}
+:root[data-theme="dark"] .crm-app :is(.portal-crumb-back,.portal-crumb-pill,.ref-menu-toggle,.portal-profile-trigger):hover{background:var(--dark-hover);color:var(--dark-ink);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(.ref-topbar,.crm-topbar) :is(.nav-icon,.ref-menu-toggle,.portal-crumb-compass,.portal-crumb-chevron){color:var(--dark-muted)}
+:root[data-theme="dark"] .crm-app :is(.portal-profile-panel,.portal-profile-identity,.portal-profile-appearance,.portal-profile-actions,.portal-profile-expanded,.ref-user-menu>div,.ref-search-suggestions,.frontier-top-mega-panel){background:var(--dark-surface);color:var(--dark-text);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(.portal-profile-panel .portal-profile-actions :is(button,a),.portal-profile-edit-details,.ref-user-menu button,.ref-search-suggestions button){background:var(--dark-surface)!important;color:var(--dark-text);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(.portal-profile-panel .portal-profile-actions :is(button,a),.portal-profile-edit-details,.ref-user-menu button,.ref-search-suggestions button):hover{background:var(--dark-hover)!important;color:var(--dark-ink)}
+:root[data-theme="dark"] .crm-app .portal-profile-panel .portal-profile-actions .portal-logout{color:#fda4af}
+:root[data-theme="dark"] .crm-app .portal-profile-panel .portal-profile-details-toggle{color:var(--dark-muted)}
+:root[data-theme="dark"] .crm-app .portal-profile-panel .portal-profile-details-toggle:hover{color:var(--dark-accent)}
+:root[data-theme="dark"] .crm-app .ref-dashboard :is(.ref-kpi-joined,.ref-kpi-joined .ref-kpi-card,.ref-dashboard-panel){background:var(--dark-surface);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app .ref-dashboard :is(.ref-activity-item,.ref-campaign-table td,.ref-chart-grid span){border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app .ref-dashboard .ref-campaign-table th{background:var(--dark-raised);color:var(--dark-text)}
+:root[data-theme="dark"] .crm-app .ref-dashboard .ref-activity-item:last-child{border-bottom:0}
+:root[data-theme="dark"] .crm-app :is(.ref-kpi-icon.tone-blue,.agent-tone-blue .agent-stat-icon,.customers-tone-blue .customers-stat-icon,.calllogs-stat.tone-blue .calllogs-stat-icon,.reports-ref-kpi.tone-blue .reports-ref-kpi-icon){background:#193653;color:#93c5fd}
+:root[data-theme="dark"] .crm-app :is(.ref-kpi-icon.tone-mint,.agent-tone-green .agent-stat-icon,.customers-tone-green .customers-stat-icon,.calllogs-stat.tone-green .calllogs-stat-icon,.reports-ref-kpi.tone-green .reports-ref-kpi-icon){background:#153d3f;color:#5eead4}
+:root[data-theme="dark"] .crm-app :is(.ref-kpi-icon.tone-violet,.agent-tone-purple .agent-stat-icon,.customers-tone-purple .customers-stat-icon,.reports-ref-kpi.tone-purple .reports-ref-kpi-icon){background:#30254b;color:#c4b5fd}
+:root[data-theme="dark"] .crm-app :is(.ref-kpi-icon.tone-amber,.agent-tone-orange .agent-stat-icon,.customers-tone-orange .customers-stat-icon,.calllogs-stat.tone-amber .calllogs-stat-icon,.reports-ref-kpi.tone-amber .reports-ref-kpi-icon){background:#3d3220;color:#fcd34d}
+:root[data-theme="dark"] .crm-app .calllogs-stat.tone-rose .calllogs-stat-icon{background:#42232c;color:#fda4af}
+:root[data-theme="dark"] .campaign-status-pending{--campaign-status-bg:#3d3220;--campaign-status-fg:#fcd34d}
+:root[data-theme="dark"] .campaign-status-ongoing{--campaign-status-bg:#30254b;--campaign-status-fg:#c4b5fd}
+:root[data-theme="dark"] .campaign-status-complete{--campaign-status-bg:#153d32;--campaign-status-fg:#86efac}
+:root[data-theme="dark"] .campaign-status-reject{--campaign-status-bg:#42232c;--campaign-status-fg:#fda4af}
+:root[data-theme="dark"] .campaign-status-hold{--campaign-status-bg:#193653;--campaign-status-fg:#93c5fd}
+:root[data-theme="dark"] .crm-app :is(.agent-state-active,.customers-consent-tag.accepted,.fc-details-ok){background:#153d32;color:#86efac;border-color:#285a49}
+:root[data-theme="dark"] .crm-app :is(.agent-state-inactive,.environment-tag){background:var(--dark-raised);color:var(--dark-muted);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(.status-pill.pending,.ref-campaign-status.status-pending_manager_approval,.approvals-status.status-pending_manager_approval,.reports-ref-state.state-pending_manager_approval){background:#3d3220;color:#fcd34d}
+:root[data-theme="dark"] .crm-app :is(.status-pill.rejected,.ref-campaign-status.status-rejected,.approvals-status.status-rejected,.reports-ref-state.state-rejected,.customers-consent-tag.declined){background:#42232c;color:#fda4af}
+:root[data-theme="dark"] .crm-app :is(.agent-page-controls,.agent-preview-card,.customers-list-panel,.customers-import-history,.reports-ref-table-card,.calllogs-table-card,.fc-campaign-list,.it-user-card,.it-user-stats article,.settings-ref-card,.settings-ref-profile-card,.settings-ref-other-panel,.docs-library,.docs-upload-panel,.docs-stat,.appointments-calendar-card,.appointments-upcoming-card,.appointments-metric,.cb-stat,.cb-table-card,.pd-metric,.pd-map-panel,.pd-requests-panel,.approvals-table-panel,.review-panel){background:var(--dark-surface);background-image:none;color:var(--dark-text);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(.agent-card-actions,.agent-modal-title,.customers-data-table,.reports-ref-table,.calllogs-table,.docs-library,.settings-ref-preference,.review-row,.fc-list-toolbar){border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(.agent-detail-button,.agent-refresh,.customers-reset,.customers-export,.customers-view-group button,.customers-row-actions button:not(.delete),.customers-pagination button,.approvals-refresh,.approvals-details-button,.calllogs-filter,.reports-ref-filter-button,.docs-refresh,.docs-view-buttons button,.docs-row-actions button:not(.delete),.appointments-calendar-nav button,.appointments-view-all,.cb-reset,.pd-reset,.vdp-cancel,.vdp-import-btn,.vdp-import-select button,.review-pencil,.review-days button,.btn-outline,.btn-soft){background:var(--dark-raised);color:var(--dark-text);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(.agent-detail-button,.agent-refresh,.customers-reset,.customers-export,.customers-view-group button,.customers-row-actions button:not(.delete),.calllogs-filter,.reports-ref-filter-button,.docs-refresh,.vdp-cancel,.vdp-import-btn,.btn-outline,.btn-soft):hover{background:var(--dark-hover);color:var(--dark-ink);border-color:#416079}
+:root[data-theme="dark"] .crm-app :is(.dashboard-period-select,.campaign-period-filter select,.campaign-period-filter input,.fc-date-panel,.fc-date-details>summary,.fc-search,.fc-status,.calllogs-dropdown,.calllogs-search,.reports-ref-select,.reports-ref-search,.agent-list-search,.customers-search,.it-user-search,.docs-search,.vdp-control){background:var(--dark-raised);color:var(--dark-text);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(input,select,textarea):not([type=checkbox]):not([type=radio]){color:var(--dark-text);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(.dashboard-period-select,.calllogs-dropdown,.fc-search,.fc-status,.agent-list-search,.customers-search,.reports-ref-search,.calllogs-search,.vdp-control) :is(input,select){background:transparent;color:var(--dark-text)}
+:root[data-theme="dark"] .crm-app :is(select option,select optgroup){background:var(--dark-surface);color:var(--dark-text)}
+:root[data-theme="dark"] .crm-app :is(input,textarea)::placeholder{color:var(--dark-muted)}
+:root[data-theme="dark"] .crm-app :is(.campaign-period-select-arrow,.calllogs-dropdown svg,.dashboard-period-select svg){color:var(--dark-muted)}
+:root[data-theme="dark"] .crm-app :is(table th,.appointments-weekday,.appointments-empty-table-head){background:var(--dark-raised);color:var(--dark-text);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(table td,.appointments-calendar-day){color:var(--dark-text);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(table tbody tr:hover td,.appointments-calendar-day:hover){background:var(--dark-hover)}
+:root[data-theme="dark"] .crm-app :is(.portal-account-modal,.agent-preview-modal,.customers-modal,.approvals-modal,.reports-ref-modal,.settings-ref-modal,.document-modal,.campaign-modal,.campaign-modal-header,.campaign-modal-footer,.campaign-modal-scroll,.fc-compact-scroll,.call-details-dialog,.review-schedule-dialog,.review-schedule-dialog>.crm-panel){background:var(--dark-surface);color:var(--dark-text);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(.portal-account-modal,.agent-preview-modal,.customers-modal,.approvals-modal,.reports-ref-modal,.settings-ref-modal,.document-modal,.call-details-dialog,.review-schedule-dialog) :is(h2,h3,dd,label){color:var(--dark-ink)}
+:root[data-theme="dark"] .crm-app :is(.portal-account-modal,.agent-preview-modal,.customers-modal,.approvals-modal,.reports-ref-modal,.settings-ref-modal,.document-modal,.call-details-dialog,.review-schedule-dialog) :is(p,dt){color:var(--dark-muted)}
+:root[data-theme="dark"] .crm-app :is(.agent-preview-modal,.reports-ref-modal,.approvals-modal,.call-details-content) :is(dl,dl div){border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(.portal-account-modal-head button,.agent-modal-close,.customers-modal-title button,.approvals-modal header button,.reports-ref-modal header button,.settings-ref-modal header button,.portal-account-modal-buttons button:first-child,.customers-modal-buttons button:first-child,.settings-ref-modal-buttons button:first-child,.approvals-modal-actions button:first-child,.campaign-modal-back){background:var(--dark-raised);color:var(--dark-text);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(.portal-account-modal input[readonly],.campaign-pill-input,.fc-compact-upload,.fc-compact-preview,.fc-compact-preview-table td,.review-value input,.review-period input,.review-date,.review-hours,.review-period,.review-start-details,.calllogs-detail-fields,.call-details-transcript){background:var(--dark-raised);color:var(--dark-text);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app :is(.review-start-details,.calllogs-detail-fields,.call-details-transcript) :is(dt,p,small){color:var(--dark-muted)}
+:root[data-theme="dark"] .crm-app :is(.review-start-details,.calllogs-detail-fields,.call-details-transcript) :is(dd,strong,h3){color:var(--dark-ink)}
+:root[data-theme="dark"] .crm-app :is(.calllogs-chart-empty,.reports-ref-plot-empty,.pd-map-placeholder,.pd-map-grid,.pd-map-empty,.agent-preview-warning){background:var(--dark-raised);color:var(--dark-muted);border-color:var(--dark-line)}
+:root[data-theme="dark"] .crm-app .vdp-page:before{background:radial-gradient(ellipse at 78% 28%,#1c405b,transparent 48%),linear-gradient(125deg,var(--dark-canvas),var(--dark-sidebar))}
+:root[data-theme="dark"] .crm-app .vdp-visual{background:radial-gradient(ellipse at 50% 43%,#203e59,transparent 76%);filter:none}
+:root[data-theme="dark"] .crm-app :is(.vdp-card,.vdp-import,.vdp-control){background:var(--dark-surface);border-color:var(--dark-line);color:var(--dark-text)}
+:root[data-theme="dark"] .crm-app :is(.vdp-label,.vdp-check,.vdp-card-title h2,.vdp-import-head){color:var(--dark-ink)}
+:root[data-theme="dark"] .crm-app :is(.vdp-copy,.vdp-label svg,.vdp-kicker){color:#93c5fd}
+:root[data-theme="dark"] .crm-app .vdp-copy:hover{background:var(--dark-hover)}
+:root[data-theme="dark"] .crm-app .vdp-gear{background:#193653;color:#93c5fd}
+:root[data-theme="dark"] .crm-app :is(.vdp-import-ok,.vdp-success){background:#153d32;color:#86efac}
+:root[data-theme="dark"] .crm-app :is(.vdp-import-notice,.vdp-error,.portal-profile-error,.customers-add-error,.settings-ref-error,.approvals-error){background:#42232c;color:#fda4af}
+:root[data-theme="dark"] .crm-app :is(.frontier-campaign-subnav a[aria-current="page"],.review-days button[aria-pressed=true]){background:var(--dark-selected);color:var(--dark-accent);border-color:#287c86}
+:root[data-theme="dark"] .crm-app :is(.reports-category-card,.calllogs-category-card)[aria-pressed="true"]{background:var(--dark-selected);border-color:#43c6cc}
+:root[data-theme="dark"] .crm-app :is(.reports-category-card,.calllogs-category-card)[aria-pressed="true"] :is(strong,div>span){color:#a5f3fc}
+:root[data-theme="dark"] .crm-app :is(.reports-category-card,.calllogs-category-card)[aria-pressed="true"] :is(.reports-ref-kpi-icon,.calllogs-stat-icon){background:#22515b;color:#a5f3fc}
+:root[data-theme="dark"] .crm-app :is(button,a,input,select,textarea):focus-visible{outline-color:var(--dark-accent)}
