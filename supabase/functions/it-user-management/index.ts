@@ -87,7 +87,7 @@ Deno.serve(async(req)=>{
    if([body.name,body.address,body.mobile,body.contactPerson,body.email].some(v=>typeof v!=="string"))return json({error:"Invalid dealership details."},400,headers);
    const name=body.name!.trim().replace(/\s+/g," "),address=body.address!.trim(),mobile=body.mobile!.trim().replace(/[\s()-]/g,""),contactPerson=body.contactPerson!.trim(),email=body.email!.trim().toLowerCase();
    if(name.length<3||name.length>100||address.length>500||(mobile&&!validMobile(mobile))||contactPerson.length>100||(email&&!validEmail(email)))return json({error:"Check dealership details."},400,headers);
-   const duplicate=await admin.from("dealerships").select("id").ilike("name",name.replace(/[%_]/g,"\\ if(body.action==="create-user"){")).neq("id",id).limit(1);
+   const duplicate=await admin.from("dealerships").select("id").ilike("name",name.replace(/[\\%_]/g,ch=>"\\"+ch)).neq("id",id).limit(1);
    if(duplicate.error||duplicate.data?.length)return json({error:"Dealership name unavailable."},409,headers);
    const saved=await admin.from("dealerships").update({name,address:address||null,mobile:mobile?(mobile.startsWith("+")?mobile:mobile.startsWith("91")? "+"+mobile:"+91"+mobile):null,contact_person:contactPerson||null,email:email||null}).eq("id",id).select("id").maybeSingle();
    if(saved.error||!saved.data)return json({error:"Unable to update dealership."},409,headers);
