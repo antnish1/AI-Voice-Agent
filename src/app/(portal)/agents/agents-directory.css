@@ -233,3 +233,12 @@ dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:bl
 .crm-app .frontier-motion-route > .agent-directory{margin-inline:0;align-self:stretch;width:auto;max-width:100%;box-sizing:border-box;padding-inline:var(--compact-edge,8px)}
 .crm-app .agent-directory > :is(.agent-page-hero,.agent-stats-grid,.agent-page-controls,.agent-card-grid,.agent-no-results){min-width:0;max-width:100%;box-sizing:border-box}
 @media(max-width:600px){.crm-app .frontier-motion-route > .agent-directory{padding-inline:6px}}
+
+/* Fill remaining desktop workspace height with evenly stretched agent rows. */
+@media(min-width:1101px){
+ .crm-app .frontier-motion-route > .agent-directory{flex:1 1 auto;min-height:0;padding-bottom:var(--compact-edge,8px)}
+ .crm-app .agent-directory > .agent-card-grid:has(> .agent-preview-card:nth-child(4)){flex:1 1 auto;align-content:stretch;align-items:stretch;grid-auto-rows:minmax(170px,1fr)}
+ .crm-app .agent-directory .agent-card-grid > .agent-preview-card{display:flex;flex-direction:column;min-width:0;height:auto;box-sizing:border-box}
+ .crm-app .agent-directory .agent-preview-card .agent-card-content{flex:1;align-items:center}
+ .crm-app .agent-directory .agent-preview-card .agent-card-actions{margin-top:auto;flex-shrink:0}
+}
