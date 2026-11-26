@@ -143,3 +143,51 @@ dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:bl
  .configured-agent-wave{height:110px}
  .configured-agent-wave.bottom{height:70px}
 }
+
+
+/* Make View Details clearly actionable, with subtle zoom in/out interaction. */
+.crm-app .agent-directory .agent-card-actions .agent-detail-button{
+ background:linear-gradient(135deg,#e0f9fb 0%,#caeff4 100%);
+ border:1px solid #28a5b6;
+ color:#05647c;
+ opacity:1;
+ font-size:12px;
+ font-weight:800;
+ min-height:38px;
+ padding:8px 16px;
+ border-radius:9px;
+ box-shadow:0 3px 10px #08879c22;
+ cursor:pointer;
+ transform:scale(1);
+ transform-origin:center;
+ transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s ease,background .22s ease,border-color .22s ease;
+}
+.crm-app .agent-directory .agent-card-actions .agent-detail-button:hover{
+ background:linear-gradient(135deg,#07b9c7 0%,#087ca3 100%);
+ border-color:#05809a;
+ color:#fff;
+ transform:scale(1.08);
+ box-shadow:0 7px 20px #057a9b4d;
+}
+.crm-app .agent-directory .agent-card-actions .agent-detail-button:active{
+ transform:scale(.96);
+ box-shadow:0 2px 6px #057a9b38;
+}
+.crm-app .agent-directory .agent-card-actions .agent-detail-button:focus-visible{
+ outline:3px solid #05b6c6;
+ outline-offset:3px;
+}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-card-actions .agent-detail-button{
+ background:linear-gradient(135deg,#184b5b,#14677b);
+ border-color:#47cfda;
+ color:#d6fbff;
+}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-card-actions .agent-detail-button:hover{
+ background:linear-gradient(135deg,#0e9aab,#087a93);
+ color:#fff;
+}
+@media(prefers-reduced-motion:reduce){
+ .crm-app .agent-directory .agent-card-actions .agent-detail-button{transition:none}
+ .crm-app .agent-directory .agent-card-actions .agent-detail-button:hover,
+ .crm-app .agent-directory .agent-card-actions .agent-detail-button:active{transform:none}
+}
