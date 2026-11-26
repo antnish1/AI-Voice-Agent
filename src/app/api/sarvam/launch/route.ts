@@ -23,8 +23,9 @@ export async function POST(request:Request){
     .eq("user_id",user.id).eq("status","submitted").eq("agent_id",String(input.agentId??""))
     .gte("created_at",new Date(Date.now()-86400000).toISOString()).limit(20)
   ]);
-  if(batchError||configError||testError||!batch||!config||!test?.length)
-   return NextResponse.json({error:"A locked recipient cohort, matching approved configuration and a recent test call from AI Voice Agents are required."},{status:409});
+  if(batchError||!batch)return NextResponse.json({error:"The locked recipient cohort is missing or unavailable."},{status:409});
+  if(configError||!config)return NextResponse.json({error:"Campaign configuration is missing or unavailable."},{status:409});
+  if(testError)return NextResponse.json({error:"Unable to verify recent test calls."},{status:503});
   const setup=config.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start_mode?:"now"|"custom";start?:string;end?:string;days?:string[];from?:string;to?:string;retry_interval_minutes?:number}};
   const agent=String(input.agentId??""),version=Number(input.appVersion),connection=String(input.connectionId??""),sender=normalizePhone(String(input.callerNumber??""));
   if(!/^[\w.\-]{3,200}$/.test(agent)||!Number.isInteger(version)||version<1||
@@ -32,7 +33,7 @@ export async function POST(request:Request){
      setup.agent_label!==agent||setup.agent_version_label!==String(version)||
      setup.telephony_label!==connection||normalizePhone(setup.outgoing_number_label??"")!==sender)
    return NextResponse.json({error:"Agent, committed version, connection and caller number must exactly match the approved campaign draft."},{status:400});
-  if(!test.some(attempt=>attempt.agent_id===agent&&attempt.agent_version===version&&
+  if(!test?.some(attempt=>attempt.agent_id===agent&&attempt.agent_version===version&&
     attempt.connection_id===connection&&attempt.caller_number===sender))
    return NextResponse.json({error:"The recent test-call attempt must use the approved agent version, telephony connection and caller number. Re-test this exact setup from AI Voice Agents before launch."},{status:409});
   const schedule=setup.schedule;
