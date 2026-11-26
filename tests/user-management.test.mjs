@@ -107,8 +107,8 @@ test("one-time newly created password opens a centered modal and clears on dismi
  assert.match(ui,/New password created for \{issuedFor/);
  assert.match(ui,/Visible only once/);
  assert.match(ui,/Copy Password/);
- assert.match(ui,/setIssuedPassword\("“?\)/);
- assert.match(ui,/setIssuedFor\("“?\)/);
+ assert.match(ui,/setIssuedPassword\(""\)/);
+ assert.match(ui,/setIssuedFor\(""\)/);
  assert.match(ui,/passwordVisible\?"text":"password"/);
  assert.doesNotMatch(ui,/New password for \{issuedFor\} — visible once/);
  assert.match(css,/dialog\.it-password-success-dialog\{position:fixed;inset:0;margin:auto/);
