@@ -25,7 +25,7 @@ function Icon({name,size=18}:{name:IconName;size?:number}){
 }
 export type CallRecord={id:string;customer_name:string|null;registration_number:string|null;vehicle_model:string|null;service_type:string|null;call_summary:string|null;disposition:string|null;next_action:string|null;sarvam_attempt_id:string;sarvam_interaction_id:string|null;sarvam_campaign_id:string|null;agent_id:string|null;dialed_number:string|null;status:string;duration_seconds:number|null;started_at:string|null;transcript:Array<{role:string;en_text:string}>|null};
 const cards=[{label:"Total Calls",icon:"phone" as const,tone:"blue"},{label:"Answered Calls",icon:"answered" as const,tone:"green"},{label:"Failed Calls",icon:"failed" as const,tone:"rose"},{label:"Avg. Call Duration",icon:"clock" as const,tone:"amber"}];
-const tabs=[["all","All Calls"],["answered","Answered"],["failed","Failed"],["other","Other"]] as const;
+const tabs=[["all","All Calls"],["answered","Answered"],["failed","Failed"],["busy","Busy"],["no_answer","No Answer"],["other","Other"]] as const;
 export function CallLogsDirectory({calls}:{calls:CallRecord[]}){
  const [period,setPeriod]=useState("all"),[campaign,setCampaign]=useState("all"),[tab,setTab]=useState<(typeof tabs)[number][0]>("all"),[search,setSearch]=useState("");
  const [page,setPage]=useState(1);
@@ -33,12 +33,13 @@ export function CallLogsDirectory({calls}:{calls:CallRecord[]}){
  const invalidRange=!!(from&&to&&from>to);
  const inPeriod=(c:CallRecord)=>{if(period==="all")return true;if(period==="custom"){if(invalidRange||!c.started_at)return false;const timestamp=Date.parse(c.started_at);return Number.isFinite(timestamp)&&(!from||timestamp>=Date.parse(from+"T00:00:00+05:30"))&&(!to||timestamp<Date.parse(to+"T00:00:00+05:30")+86400000);}return !c.started_at||Date.parse(c.started_at)>=Date.now()-Number(period)*86400000;};
  const scoped=calls.filter(c=>(campaign==="all"||c.sarvam_campaign_id===campaign)&&inPeriod(c));
- const shown=scoped.filter(c=>(tab==="all"||(tab==="answered"&&c.status==="answered")||(tab==="failed"&&c.status==="failed")||(tab==="other"&&!["answered","failed"].includes(c.status)))&&(!search||[c.customer_name,c.dialed_number,c.registration_number,c.vehicle_model,c.service_type,c.call_summary,c.disposition,c.next_action,c.sarvam_attempt_id,c.sarvam_campaign_id].join(" ").toLowerCase().includes(search.toLowerCase().trim())));
+ const shown=scoped.filter(c=>(tab==="all"||(tab==="other"?!["answered","failed","busy","no_answer"].includes(c.status):c.status===tab))&&(!search||[c.customer_name,c.dialed_number,c.registration_number,c.vehicle_model,c.service_type,c.call_summary,c.disposition,c.next_action,c.sarvam_attempt_id,c.sarvam_campaign_id].join(" ").toLowerCase().includes(search.toLowerCase().trim())));
  const pageSize=15,totalPages=Math.max(1,Math.ceil(shown.length/pageSize)),currentPage=Math.min(page,totalPages),offset=(currentPage-1)*pageSize,visible=shown.slice(offset,offset+pageSize);
  const answered=scoped.filter(c=>c.status==="answered").length,failed=scoped.filter(c=>c.status==="failed").length;
  const durationRows=scoped.filter(c=>c.duration_seconds!==null);
  const average=durationRows.reduce((sum,c)=>sum+(c.duration_seconds??0),0)/Math.max(1,durationRows.length);
- const counts={all:scoped.length,answered,failed,other:scoped.length-answered-failed};
+ const busy=scoped.filter(c=>c.status==="busy").length,noAnswer=scoped.filter(c=>c.status==="no_answer").length;
+ const counts={all:scoped.length,answered,failed,busy,no_answer:noAnswer,other:scoped.length-answered-failed-busy-noAnswer};
  const statusColors:Record<string,string>={answered:"#089981",failed:"#e85a77",busy:"#5c9bf0",no_answer:"#9b63df",other:"#8294aa",cancelled:"#b0a1aa"};
  const badgeColors:Record<string,string>={answered:"#087A54",failed:"#C72C41",busy:"#195BB7",no_answer:"#7840B7",other:"#526477",cancelled:"#785765"};
  const statusLabels:Record<string,string>={answered:"Answered",failed:"Failed",busy:"Busy",no_answer:"No Answer",other:"Other",cancelled:"Cancelled"};
