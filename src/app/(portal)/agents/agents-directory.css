@@ -242,3 +242,5 @@ dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:bl
  .crm-app .agent-directory .agent-preview-card .agent-card-content{flex:1;align-items:center}
  .crm-app .agent-directory .agent-preview-card .agent-card-actions{margin-top:auto;flex-shrink:0}
 }
+
+.configured-agent-dealers{margin-top:10px;padding:10px 14px}.configured-agent-dealers h3{margin:0 0 8px;font-size:14px}.configured-agent-dealer-heading,.configured-agent-dealer-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0}.configured-agent-dealer-heading{font-size:11px;opacity:.8}.configured-agent-dealer-row{border-top:1px solid var(--crisp-line,#dce9ed);font-size:13px;font-weight:600}.configured-agent-dealer-row>div{display:flex;align-items:center;gap:8px;flex-shrink:0}.configured-agent-dealer-version{background:#d8f1ef;color:#086a73;border-radius:999px;padding:4px 10px}.configured-agent-dealer-row>span{overflow-wrap:anywhere;min-width:0}
