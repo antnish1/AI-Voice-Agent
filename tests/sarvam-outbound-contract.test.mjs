@@ -47,7 +47,8 @@ test("provider calls are default-off with explicit server-only switches",()=>{
  assert.match(launch,/callingEnabled\("campaign"\)/);
  assert.match(launch,/requireItSuperUser\(\)/);
  assert.match(launch,/frontvox_reserve_direct_launch/);
- assert.match(launch,/reviewedTestResult!==true/);
+ assert.match(launch,/confirmedLaunch!==true/);
+ assert.doesNotMatch(launch,/voice_test_call_requests|reviewedTestResult/);
  assert.ok(launch.indexOf('frontvox_reserve_direct_launch')<launch.indexOf('await sarvamPost'));
  const migration=readFileSync("db/20261125_direct_campaign.sql","utf8");
  assert.match(migration,/for update/i);
@@ -56,7 +57,7 @@ test("provider calls are default-off with explicit server-only switches",()=>{
  assert.match(migration,/auth\.uid\(\) is distinct from/);
  assert.match(launch,/csv_sha256/);
  assert.match(launch,/needs_reconciliation/);
- assert.match(launch,/attempt.agent_version===version/);
- assert.match(launch,/attempt.connection_id===connection/);
- assert.match(launch,/attempt.caller_number===sender/);
+ assert.match(launch,/setup.agent_version_label!==String\(version\)/);
+ assert.match(launch,/setup.telephony_label!==connection/);
+ assert.match(launch,/normalizePhone\(setup.outgoing_number_label/);
 });
