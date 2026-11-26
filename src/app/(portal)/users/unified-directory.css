@@ -131,3 +131,42 @@ dialog.it-password-success-dialog::backdrop{background:#24364a75;backdrop-filter
 :root[data-theme="dark"] .it-password-success-dismiss{background:#24374b;color:#e7f4ff;border-color:#526579}
 @media(max-width:560px){.it-password-success-panel{padding:22px 18px}.it-password-success-panel h2{font-size:19px}.it-password-success-subtitle{font-size:14px}.it-password-success-secret-row input{font-size:23px}.it-password-success-actions button{font-size:12px}}
 @media(prefers-reduced-motion:reduce){.it-password-success-actions button{transition:none}}
+
+
+/* Disable Dealership: compact centered confirmation matching the provided reference. */
+dialog.it-dealer-disable-dialog{width:min(540px,calc(100vw - 28px));max-width:540px;max-height:calc(100dvh - 30px);border-radius:19px;background:#fff;color:#1d3148;box-shadow:0 18px 55px #172c4250}
+dialog.it-dealer-disable-dialog::backdrop{background:rgba(37,53,76,.48)}
+.it-dealer-disable-panel{padding:25px 25px 23px}
+.it-dealer-disable-heading{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.it-dealer-disable-icon{display:grid;place-items:center;flex:none;width:53px;height:53px;border-radius:15px;background:#fff0f0;color:#d83232}
+.it-dealer-disable-icon svg{width:25px;height:25px}
+.it-dealer-disable-heading h2{margin:0 0 5px;color:#1c3045;font-size:21px;line-height:1.25;font-weight:750}
+.it-dealer-disable-heading p{margin:0;color:#737b86;font-size:15px}
+.it-dealer-disable-dialog .it-dealer-disable-form{display:flex;flex-direction:column;gap:0}
+.it-dealer-disable-name{display:flex;flex-direction:column;gap:10px;padding:15px;background:#f4f5fa;border-radius:11px;margin-bottom:21px}
+.it-dealer-disable-name>span{font-size:13px;font-weight:500;color:#70757d}
+.it-dealer-disable-name strong{font-size:18px;font-weight:700;color:#233c53;overflow-wrap:anywhere}
+.it-dealer-disable-warning{display:flex;align-items:flex-start;gap:11px;margin-bottom:22px}
+.it-dealer-disable-warning svg{width:22px;height:22px;color:#b88328;flex:none;margin-top:2px}
+.it-dealer-disable-warning p{font-size:15px;line-height:1.52;color:#697b8e;margin:0}
+.it-dealer-disable-form label{display:flex;flex-direction:column;gap:10px;font-size:15px;color:#182c41;font-weight:500;margin-bottom:29px}
+.it-dealer-disable-form label strong{font-weight:750}
+.it-dealer-disable-form input{width:100%;min-height:48px;box-sizing:border-box;border-radius:26px;background:#fff;color:#22364a;border:1px solid #d2d6da;padding:11px 19px;outline:none;font-size:15px}
+.it-dealer-disable-form input::placeholder{color:#9a9a9a}
+.it-dealer-disable-form input:focus-visible{outline:2px solid #1298a6;outline-offset:2px}
+.it-dealer-disable-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;border-top:1px solid #e7e8eb;padding-top:21px}
+.it-dealer-disable-actions button{min-height:45px;padding:10px 12px;font-size:14px;font-weight:650;border-radius:25px;cursor:pointer}
+.it-dealer-disable-cancel{background:#fff;color:#17202c;border:1px solid #d4d7dc}
+.it-dealer-disable-cancel:hover{background:#f2f5f8}
+.it-dealer-disable-actions button[type="submit"]{background:#0e939c;color:#fff;border:1px solid #0e939c}
+.it-dealer-disable-actions button[type="submit"]:disabled{background:#f0f0f0;border-color:#f0f0f0;color:#999;cursor:not-allowed}
+.it-dealer-disable-actions button:focus-visible{outline:3px solid #17a6b1;outline-offset:2px}
+:root[data-theme="dark"] dialog.it-dealer-disable-dialog{background:#192a3b;color:#edf5ff}
+:root[data-theme="dark"] .it-dealer-disable-heading h2,:root[data-theme="dark"] .it-dealer-disable-name strong,:root[data-theme="dark"] .it-dealer-disable-form label{color:#eaf5ff}
+:root[data-theme="dark"] .it-dealer-disable-heading p,:root[data-theme="dark"] .it-dealer-disable-warning p{color:#b3c5d6}
+:root[data-theme="dark"] .it-dealer-disable-name{background:#26384c}
+:root[data-theme="dark"] .it-dealer-disable-name>span{color:#b4bfcb}
+:root[data-theme="dark"] .it-dealer-disable-form input{background:#223649;color:#fff;border-color:#53667b}
+:root[data-theme="dark"] .it-dealer-disable-actions{border-top-color:#34495d}
+:root[data-theme="dark"] .it-dealer-disable-cancel{background:#24394b;border-color:#52667a;color:#eaf2fb}
+@media(max-width:560px){.it-dealer-disable-panel{padding:20px 17px}.it-dealer-disable-heading h2{font-size:19px}.it-dealer-disable-warning p{font-size:13px}.it-dealer-disable-form label{font-size:13px}.it-dealer-disable-name strong{font-size:16px}}
