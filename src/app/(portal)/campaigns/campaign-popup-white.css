@@ -79,3 +79,34 @@
 :root[data-theme="dark"] .fc-reference-file-copy strong,:root[data-theme="dark"] .fc-reference-metric strong,:root[data-theme="dark"] .fc-reference-sample td{color:#eaf3fb}
 :root[data-theme="dark"] .fc-reference-create .fc-reference-footer-buttons .campaign-modal-back{background:#263e52;color:#e4f1fa;border-color:#4e6679}
 @media(max-width:650px){.campaign-modal.fc-reference-create{width:calc(100vw - 20px);max-height:94dvh}.fc-reference-create .fc-reference-create-scroll{padding:15px 14px 0;gap:12px}.fc-reference-create .fc-reference-create-header{margin:0 14px}.fc-reference-create .fc-reference-create-footer{margin:12px 14px 0}.fc-reference-metrics{gap:5px}.fc-reference-metric{min-height:62px}.fc-reference-metric strong{font-size:16px}.fc-reference-metric span{font-size:9px}.fc-reference-sample th,.fc-reference-sample td{font-size:9px;padding:9px 6px}}
+
+
+/* Campaign-created success modal: reference-aligned centered status + compact card. */
+.campaign-modal.fc-success-reference-modal{width:min(440px,calc(100vw - 28px));max-width:440px;max-height:calc(100dvh - 28px);overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:21px 20px 19px;border-radius:17px;background:#fff;color:#21364c;box-shadow:0 20px 52px #1a31473a}
+.fc-success-reference-modal .fc-success-tick{height:60px;width:60px;flex:none;background:#e1f6ee;color:#109875;border-radius:50%;font-size:30px;margin:0 0 15px}
+.fc-success-reference-modal h2{font-size:18px;line-height:1.3;font-weight:740;margin:0 0 15px;color:#1e3247;text-align:center}
+.fc-success-reference-status{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;column-gap:8px;row-gap:5px;text-align:center;width:100%;margin:0 0 18px;color:#718092;font-size:12px;line-height:1.4}
+.fc-success-reference-status .campaign-status-badge{display:inline-flex;align-items:center;justify-content:center;margin:0;padding:4px 8px;background:#ffeadf;color:#a75f36;border-radius:999px;font-size:11px;font-weight:650;white-space:nowrap;line-height:1.2}
+.fc-success-reference-card{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-width:0;padding:14px 12px;background:#f3f9fa;border:1px solid #d5e5e6;border-radius:12px;text-align:left;margin-bottom:22px}
+.fc-success-reference-info{display:flex;flex-direction:column;gap:11px;min-width:0}
+.fc-success-reference-info>span{font-size:11px;color:#78818b;font-weight:500;letter-spacing:.1px}
+.fc-success-reference-modal .fc-success-reference{display:block;font-size:18px;line-height:1.3;letter-spacing:.1px;font-weight:750;color:#188a8e;overflow-wrap:anywhere}
+.fc-success-copy-icon{display:grid;place-items:center;flex:none;height:34px;width:34px;margin-top:15px;padding:0;background:#fff;color:#15898f;border:1px solid #d5e6e9;border-radius:8px;cursor:pointer}
+.fc-success-copy-icon:hover{background:#e5f6f5;border-color:#91cecf}
+.fc-success-reference-modal .fc-success-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;padding-top:22px;border-top:1px solid #e2e6ea}
+.fc-success-reference-modal .fc-success-actions button{min-height:42px;padding:9px 12px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:700;cursor:pointer}
+.fc-success-reference-modal .fc-success-cancel{background:#fff;color:#273e52;border:1px solid #ccd6dd}
+.fc-success-reference-modal .fc-success-cancel:hover{background:#f4f8fa}
+.fc-success-reference-modal .fc-success-view{background:#0d8e91;color:#fff;border:1px solid #0d8e91}
+.fc-success-reference-modal .fc-success-view:hover{background:#06787e}
+.fc-success-reference-modal button:focus-visible{outline:3px solid #14a1a4;outline-offset:2px}
+:root[data-theme="dark"] .campaign-modal.fc-success-reference-modal{background:#172b3e;color:#ebf6ff}
+:root[data-theme="dark"] .fc-success-reference-modal h2{color:#edf8ff}
+:root[data-theme="dark"] .fc-success-reference-status{color:#b1c6d5}
+:root[data-theme="dark"] .fc-success-reference-card{background:#243b4c;border-color:#405d6d}
+:root[data-theme="dark"] .fc-success-reference-info>span{color:#b7c5d1}
+:root[data-theme="dark"] .fc-success-reference-modal .fc-success-reference{color:#62d5d2}
+:root[data-theme="dark"] .fc-success-copy-icon{background:#1c3749;border-color:#4b6a7a;color:#9be8e5}
+:root[data-theme="dark"] .fc-success-reference-modal .fc-success-actions{border-color:#3e5365}
+:root[data-theme="dark"] .fc-success-reference-modal .fc-success-cancel{background:#263e50;color:#e9f4ff;border-color:#4f677a}
+@media(max-width:460px){.campaign-modal.fc-success-reference-modal{padding:19px 15px}.fc-success-reference-modal h2{font-size:17px}.fc-success-reference-status{font-size:11px}.fc-success-reference-modal .fc-success-reference{font-size:16px}.fc-success-reference-modal .fc-success-actions{gap:9px}}
