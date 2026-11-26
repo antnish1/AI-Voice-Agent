@@ -10,3 +10,5 @@
 .crm-app :is(.customers-card-grid,.docs-grid)>.crm-empty-state{grid-column:1/-1}
 :root[data-theme="dark"] .crm-app .crm-empty-state{--empty-cloud:#20374c;--empty-paper:#1b324a;--empty-edge:#466c94;--empty-symbol:#5ee4e4}
 @media(max-width:600px){.crm-app .crm-empty-state{min-height:230px;padding:18px 10px}.crm-app .crm-empty-art{width:160px;height:112px}.crm-app .crm-empty-state h3{font-size:17px}}
+
+.crm-app .settings-ref-illustrated-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:380px;padding:24px 16px;text-align:center}.crm-app .settings-ref-illustrated-empty .crm-empty-state{min-height:0;padding:12px 0 0;gap:12px}.crm-app .settings-ref-illustrated-empty .crm-empty-art{width:230px;height:161px}.crm-app .settings-ref-illustrated-empty .settings-ref-empty-hint{margin:10px 0 0;max-width:520px;font-size:12px;line-height:1.5;color:var(--crisp-muted,#52677b)}@media(max-width:600px){.crm-app .settings-ref-illustrated-empty{min-height:280px}.crm-app .settings-ref-illustrated-empty .crm-empty-art{width:170px;height:119px}}
