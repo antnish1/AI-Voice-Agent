@@ -107,3 +107,7 @@
 
 /* Frontier brand subtitle follows the red logo palette. */
 .frontier-reference-sidebar .frontier-sidebar-brand .frontier-brand-text small{color:#d32f2f!important}
+
+/* Active child route remains visible alongside the expanded parent. */
+.frontier-reference-sidebar .frontier-campaign-subnav a[aria-current="page"]{background:#e7f8f8;color:#087b88;font-weight:700;box-shadow:inset 2px 0 0 #078d9b;padding-left:9px}
+:root[data-theme="dark"] .frontier-reference-sidebar .frontier-campaign-subnav a[aria-current="page"]{background:#163b45;color:#9ce8ec;box-shadow:inset 2px 0 0 #43c6cc}
