@@ -35,6 +35,10 @@ export function UserManagement(){
 
  const [dealership,setDealership]=useState(emptyDealership),[employee,setEmployee]=useState(emptyUser);
  const [issuedPassword,setIssuedPassword]=useState(""),[issuedFor,setIssuedFor]=useState(""),[pending,startTransition]=useTransition(),[loading,setLoading]=useState(true),[error,setError]=useState(""),[notice,setNotice]=useState("");
+ const [passwordVisible,setPasswordVisible]=useState(true),[passwordCopyError,setPasswordCopyError]=useState("");
+ const issuedDialogRef=useRef<HTMLDialogElement>(null);
+ const dismissIssuedPassword=()=>{issuedDialogRef.current?.close();setIssuedPassword("");setIssuedFor("");setPasswordVisible(true);setPasswordCopyError("");};
+ useEffect(()=>{if(issuedPassword&&!issuedDialogRef.current?.open){setPasswordVisible(true);setPasswordCopyError("");issuedDialogRef.current?.showModal();}},[issuedPassword]);
  const dialogRef=useRef<HTMLDialogElement>(null);
  const resetDialogRef=useRef<HTMLDialogElement>(null);
  const [selectedAccount,setSelectedAccount]=useState<Account|null>(null);
@@ -83,15 +87,28 @@ export function UserManagement(){
   <header className="it-user-heading"><div className="calllogs-heading-left it-user-title"><span className="calllogs-main-icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><div><h1>User Management</h1></div></div><button type="button" className="it-create-dealer" onClick={openDealer}>+ Create Dealership</button></header>
   <div className="it-user-stats"><article><svg className="it-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V5l7-2v18M12 9h7v12M8 8v1m0 3v1m0 3v1m7-4v1m0 3v1"/></svg><span>Dealerships</span><strong>{loading?"—":dealers.length}</strong></article><article><svg className="it-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/><circle cx="9" cy="7" r="4"/></svg><span>Dealer users</span><strong>{loading?"—":users.length}</strong></article><article><svg className="it-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><span>Active accounts</span><strong>{loading?"—":users.filter(u=>u.activated&&(!u.accountState||u.accountState==="active")).length}</strong></article><article><svg className="it-stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg><span>System permission</span><strong>Viewer</strong></article></div>
   {error&&<p role="alert" className="it-user-error">{error}</p>}{notice&&<div role="status" aria-live="polite" className="it-user-toast"><span className="it-user-toast-check" aria-hidden="true">✓</span><span>{notice}</span><button type="button" aria-label="Dismiss notification" onClick={()=>setNotice("")}>×</button></div>}
-  {issuedPassword&&<div role="status" className="it-user-temporary" style={{margin:"12px 0 18px"}}>
-   <strong>New password for {issuedFor} — visible once</strong>
-   <div style={{display:"flex",flexWrap:"wrap",alignItems:"center",gap:10,marginTop:8}}>
-    <code style={{fontSize:16,overflowWrap:"anywhere"}}>{issuedPassword}</code>
-    <button type="button" className="btn-outline small" onClick={()=>void navigator.clipboard.writeText(issuedPassword)}>Copy</button>
-    <button type="button" className="btn-outline small" onClick={()=>{setIssuedPassword("");setIssuedFor("");}}>Dismiss</button>
-   </div>
-   <p>Only IT can reset this password. Share it privately; no email was sent. It will not be available again after you dismiss it.</p>
-  </div>}
+  <dialog ref={issuedDialogRef} className="it-password-success-dialog" aria-labelledby="it-password-success-title" aria-describedby="it-password-success-description" onClose={dismissIssuedPassword}>
+   {issuedPassword&&<div className="it-password-success-panel">
+    <div className="it-password-success-icon" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 4 33 9v11c0 9-6.4 14-13 17C13.4 34 7 29 7 20V9L20 4Z"/><path d="m14 20 4 4 8-9"/></svg></div>
+    <h2 id="it-password-success-title">Password Created Successfully</h2>
+    <p id="it-password-success-description" className="it-password-success-subtitle">New password created for {issuedFor||"the dealership user"}.</p>
+    <div className="it-password-success-secret">
+     <span>NEW PASSWORD</span>
+     <div className="it-password-success-secret-row">
+      <input readOnly aria-label="New password" type={passwordVisible?"text":"password"} value={issuedPassword} autoComplete="off" spellCheck={false}/>
+      <button type="button" className="it-password-success-eye" onClick={()=>setPasswordVisible(v=>!v)} aria-label={passwordVisible?"Hide password":"Show password"} title={passwordVisible?"Hide password":"Show password"}>
+       {passwordVisible?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m3 3 18 18M10.6 10.7a2 2 0 0 0 2.7 2.7"/><path d="M9.9 5.3A11.5 11.5 0 0 1 12 5c5.5 0 9.3 5 10 7a12.6 12.6 0 0 1-3.1 4.5M6.1 6.1C4.2 7.5 2.8 9.5 2 12c.8 2 4.5 7 10 7 1.4 0 2.8-.3 4-.9"/></svg>:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.7-7 10-7 10 7 10 7-3.7 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>}
+      </button>
+     </div>
+    </div>
+    <div className="it-password-success-warning"><span aria-hidden="true">⚠</span><div><strong>Visible only once</strong><p>Only IT can create a new password. Share it privately. No email was sent. It will not be available after dismissal.</p></div></div>
+    {passwordCopyError&&<p className="it-password-success-error" role="alert">{passwordCopyError}</p>}
+    <div className="it-password-success-actions">
+     <button type="button" className="it-password-success-dismiss" onClick={dismissIssuedPassword}>Dismiss</button>
+     <button type="button" className="it-password-success-copy" onClick={async()=>{try{await navigator.clipboard.writeText(issuedPassword);setPasswordCopyError("");}catch{setPasswordCopyError("Could not copy. Select the password and copy it manually.");}}}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Copy Password</button>
+    </div>
+   </div>}
+  </dialog>
   <dialog ref={dealerActionDialog} className="it-dealer-dialog" aria-labelledby="dealer-action-title" onClose={()=>setDealerTarget(null)} onCancel={e=>{if(pending)e.preventDefault();}}>
    {dealerTarget&&<section className="it-user-card"><div className="it-user-table-head"><h2 id="dealer-action-title">{dealerMode==="edit"?"Edit Dealership":dealerMode==="disable"?"Disable Dealership":dealerMode==="enable"?"Enable Dealership":"Delete Dealership"}</h2><button type="button" disabled={pending} onClick={()=>dealerActionDialog.current?.close()}>Close ×</button></div>
    <form className="it-user-form" onSubmit={saveDealerAction}>
