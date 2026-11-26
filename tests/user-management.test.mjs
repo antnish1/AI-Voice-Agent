@@ -98,6 +98,22 @@ test("dealer users do not have a portal password change or self-reset flow",()=>
  assert.doesNotMatch(ui,/IT-controlled login password/);
 });
 
+test("one-time newly created password opens a centered modal and clears on dismiss",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ const css=file("../src/app/(portal)/users/unified-directory.css");
+ assert.match(ui,/ref=\{issuedDialogRef\} className="it-password-success-dialog"/);
+ assert.match(ui,/issuedDialogRef\.current\?\.showModal\(\)/);
+ assert.match(ui,/Password Created Successfully/);
+ assert.match(ui,/New password created for \{issuedFor/);
+ assert.match(ui,/Visible only once/);
+ assert.match(ui,/Copy Password/);
+ assert.match(ui,/setIssuedPassword\("“?\)/);
+ assert.match(ui,/setIssuedFor\("“?\)/);
+ assert.match(ui,/passwordVisible\?"text":"password"/);
+ assert.doesNotMatch(ui,/New password for \{issuedFor\} — visible once/);
+ assert.match(css,/dialog\.it-password-success-dialog\{position:fixed;inset:0;margin:auto/);
+});
+
 test("password reset requires opening account details and explicit in-dialog action",()=>{
  const ui=file("../src/app/(portal)/users/user-management.tsx");
  assert.match(ui,/onClick=\{\(\)=>openReset\(u\)\}/);
