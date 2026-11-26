@@ -8,7 +8,7 @@ export function CampaignPeriodFilter({period,from,to,today}:{period:string;from:
  const [start,setStart]=useState(from);
  const [end,setEnd]=useState(to);
  useEffect(()=>{setSelected(period);setStart(from);setEnd(to);},[period,from,to]);
- const options=[{value:"all",label:"All Time"},{value:"today",label:"Today"},{value:"7",label:"Last 7 Days"},{value:"mtd",label:"MTD"},{value:"custom",label:"Custom"}];
+ const options=[{value:"all",label:"All Time"},{value:"today",label:"Today"},{value:"mtd",label:"MTD"},{value:"custom",label:"Custom"}];
  const selectedLabel=options.find(option=>option.value===selected)?.label??"All Time";
  const valid=start!==""&&end!==""&&start<=end&&end<=today;
  function navigate(value:string){
