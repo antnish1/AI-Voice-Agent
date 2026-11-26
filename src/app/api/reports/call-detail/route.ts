@@ -1,3 +1,4 @@
+import {normalizeTranscript} from "@/lib/sarvam/transcript";
 import {NextResponse} from "next/server";
 import {requireMembership} from "@/lib/auth";
 import {isItSuperUser} from "@/lib/it-access";
@@ -13,6 +14,6 @@ export async function GET(request:Request){
  if(!it)query=query.eq("dealership_id",membership.dealership_id);
  const {data,error}=await query.maybeSingle();
  if(error||!data)return NextResponse.json({error:"Record unavailable"},{status:404,headers});
- const transcript=Array.isArray(data.transcript)?data.transcript.filter((t:unknown):t is {role:string;en_text:string}=>!!t&&typeof t==="object"&&"role" in t&&"en_text" in t&&typeof t.en_text==="string"&&(t.role==="agent"||t.role==="user")):[];
+ const transcript=normalizeTranscript(data.transcript);
  return NextResponse.json({transcript},{headers});
 }
