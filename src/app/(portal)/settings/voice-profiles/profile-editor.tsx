@@ -50,16 +50,15 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}) {
  const [agent,setAgent]=useState(p?.agent_id??""),[version,setVersion]=useState(String(p?.app_version??1)),[connection,setConnection]=useState(p?.connection_id??""),[caller,setCaller]=useState(p?.caller_number??"");
  function changeDealer(value:string){const selected=dealerships.find(d=>d.id===value)?.profile;setId(value);setRevision(v=>v+1);setMessage("");setAgent(selected?.agent_id??"");setVersion(String(selected?.app_version??1));setConnection(selected?.connection_id??"");setCaller(selected?.caller_number??"");setImportResult(null);setDeploymentId("");}
  return <section className="vdp-card" aria-labelledby="vdp-card-title">
-  <div className="vdp-card-title"><div className="vdp-gear"><FieldIcon kind="settings"/></div><div><h2 id="vdp-card-title">Dealership AI Calling Defaults</h2><p>Configure default settings for your dealership&apos;s AI calling campaigns. These settings will be applied to new campaigns unless overridden.</p></div></div>
-  <div className="vdp-import">
-   <div className="vdp-import-head"><strong>Import calling settings from Sarvam</strong><button type="button" className="vdp-import-btn" onClick={()=>void loadSarvam()} disabled={loadingSarvam||!id}>{loadingSarvam?"Checking workspace…":"Load from Sarvam"}</button></div>
-   {importResult&&<div className={importResult.ok&&importResult.options?.length?"vdp-import-ok":"vdp-import-notice"} role="status">
+  <div className="vdp-card-title"><div className="vdp-gear"><FieldIcon kind="settings"/></div><h2 id="vdp-card-title">Dealership AI Calling Defaults</h2><button type="button" className="vdp-import-btn" onClick={()=>void loadSarvam()} disabled={loadingSarvam||!id||busy}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 15v5h16v-5"/></svg>{loadingSarvam?"Checking workspace…":"Load from Sarvam"}</button></div>
+  {importResult&&<div className="vdp-import">
+   <div className={importResult.ok&&importResult.options?.length?"vdp-import-ok":"vdp-import-notice"} role="status">
     <p>{importResult.message}</p>
     {importResult.counts&&<p>Workspace results: {importResult.counts.scanned} deployments checked · {importResult.counts.outbound} outbound-capable · {importResult.counts.verified} verified calling configurations.</p>}
     {importResult.options?.length? <div className="vdp-import-select"><label htmlFor="vdp-select-deployment">Available calling configurations</label><select id="vdp-select-deployment" value={deploymentId} onChange={e=>setDeploymentId(e.target.value)}><option value="">Select an agent + phone number</option>{importResult.options.map((d,i)=><option key={d.deploymentId+"-"+i} value={d.deploymentId+"|"+d.connectionId+"|"+d.callerNumber}>{d.label} · v{d.version} · {d.callerNumber}</option>)}</select><button type="button" disabled={!deploymentId} onClick={applySarvam}>Use selected settings</button></div>:null}
     {importResult.code==="no_deployments"||importResult.code==="no_outbound"||importResult.code==="incomplete"?<p>Open Sarvam → Build → Agents for the committed version and Deploy → Phone Numbers for the connection ID and caller number. You can complete the fields below manually without creating a deployment.</p>:null}
-   </div>}
-  </div>
+   </div>
+  </div>}
   <div className="vdp-fields">
    <label className="vdp-field vdp-dealer"><span className="vdp-label"><FieldIcon kind="dealer"/> Dealership</span><span className="vdp-control"><select value={id} disabled={loadingSarvam} onChange={e=>changeDealer(e.target.value)}>{dealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></span></label>
    <form id="vdp-save-form" className="vdp-form" key={id+"-"+revision} action={form=>start(async()=>{setMessage("");const r=await saveVoiceProfile(form);setMessage(r.error??(form.get("active")==="yes"?"Saved. Calling defaults are ACTIVE for new campaign drafts. Live calling still requires separate authorization and verified telephony.":"Saved. Calling defaults are INACTIVE for new campaign drafts."));if(r.ok&&/^[6-9]\d{9}$/.test(caller.trim()))setCaller("+91"+caller.trim());})}>
