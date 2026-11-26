@@ -108,6 +108,13 @@
 /* Frontier brand subtitle follows the red logo palette. */
 .frontier-reference-sidebar .frontier-sidebar-brand .frontier-brand-text small{color:#d32f2f!important}
 
-/* Active child route remains visible alongside the expanded parent. */
-.frontier-reference-sidebar .frontier-campaign-subnav a[aria-current="page"]{background:#e7f8f8;color:#087b88;font-weight:700;box-shadow:inset 2px 0 0 #078d9b;padding-left:9px}
-:root[data-theme="dark"] .frontier-reference-sidebar .frontier-campaign-subnav a[aria-current="page"]{background:#163b45;color:#9ce8ec;box-shadow:inset 2px 0 0 #43c6cc}
+
+/* Reference-style rounded child navigation, adapted to the current sidebar theme. */
+.frontier-reference-sidebar .frontier-campaign-subnav{border-left:0;margin:3px 7px 6px 35px;padding:2px 0;gap:3px}
+.frontier-reference-sidebar .frontier-campaign-subnav a{display:flex;align-items:center;gap:8px;min-height:33px;padding:7px 10px;border-radius:12px;border:1px solid transparent;line-height:1.25;transition:background .18s ease,color .18s ease,border-color .18s ease}
+.frontier-reference-sidebar .frontier-campaign-subnav a svg{flex-shrink:0}
+.frontier-reference-sidebar .frontier-campaign-subnav a[aria-current="page"]{background:#e7f8f8;border-color:#b3e1e4;color:#087b88;font-weight:700;box-shadow:none}
+.frontier-reference-sidebar .frontier-campaign-subnav a[aria-current="page"] svg{color:#078d9b}
+.frontier-reference-sidebar .frontier-campaign-subnav a:focus-visible{outline:2px solid #078d9b;outline-offset:2px}
+:root[data-theme="dark"] .frontier-reference-sidebar .frontier-campaign-subnav a[aria-current="page"]{background:#f8fafc;border-color:#f8fafc;color:#24364b;box-shadow:none}
+:root[data-theme="dark"] .frontier-reference-sidebar .frontier-campaign-subnav a[aria-current="page"] svg{color:#078d9b}
