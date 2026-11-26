@@ -115,7 +115,7 @@ export function AgentsDirectory({profiles,loadError,headerAction}:{profiles:Prof
   <div className="agent-page-controls"><label className="agent-list-search"><Icon name="search"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search agents..." aria-label="Search agents"/></label>
    <select value={category} onChange={e=>setCategory(e.target.value)} aria-label="Filter category"><option value="all">All Categories</option>{["Support","Sales","Service","Marketing","Feedback"].map(x=><option key={x}>{x}</option>)}</select>
    <select value={version} onChange={e=>setVersion(e.target.value)} aria-label="Filter version"><option value="all">All Versions</option>{Array.from(new Set(agents.map(a=>a.version))).map(x=><option key={x}>{x}</option>)}</select>
-   <button type="button" className="agent-refresh" onClick={clear}><Icon name="refresh"/> Reset</button><button type="button" className="agent-create-disabled" disabled title="Agent creation will become available after Sarvam connection"><Icon name="plus"/> Create Agent</button>
+   <button type="button" className="agent-create-disabled" disabled title="Agent creation will become available after Sarvam connection"><Icon name="plus"/> Create Agent</button>
   </div>
 
   {filtered.length>0?
