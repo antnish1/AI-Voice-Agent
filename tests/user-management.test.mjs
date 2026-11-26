@@ -134,12 +134,14 @@ test("temporary password form supports optional custom password and email correc
  assert.match(edge,/correctedEmail\?\{email:correctedEmail\}/);
 });
 
- test("compact user management retains four KPIs and removes redundant controls",()=>{
- const ui=file("../src/app/(portal)/users/user-management.tsx"),css=file("../src/app/globals.css");
- assert.doesNotMatch(ui,/it-user-permission|Create User \(No Email\)|>Refresh<|it-user-search/);
+ test("compact user management keeps KPIs and combines user accounts with directory",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ assert.doesNotMatch(ui,/it-user-permission|Create User \(No Email\)|>Refresh<|it-user-search|it-register-tabs|directoryView/);
  assert.match(ui,/>Dealerships<.*>Dealer users<.*>Active accounts<.*>System permission</);
- assert.match(ui,/setDirectoryView\(false\);await load\(\)/);
- assert.match(css,/\.it-register-tabs button\[aria-pressed=true\].*background:var\(--teal/);
+ assert.match(ui,/View dealership details/);
+ assert.match(ui,/d\.address\|\|"—"/);
+ assert.match(ui,/d\.contact_person\|\|"—"/);
+ assert.match(ui,/dealers\.filter\(d=>!users\.some\(u=>u\.dealershipId===d\.id\)\)/);
  });
 
  test("user management exposes separate password and accessible action icons",()=>{
