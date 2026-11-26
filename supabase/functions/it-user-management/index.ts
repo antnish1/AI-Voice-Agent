@@ -44,7 +44,7 @@ Deno.serve(async(req)=>{
  const {data:membership,error:memError}=await admin.from("memberships").select("id").eq("user_id",user.id).eq("role","super_admin").limit(1);
  if(memError||!membership?.length)return json({error:"IT Super User membership required"},403,headers);
  if(body.action==="list"){
-  const {data:dealers,error:dealersError}=await admin.from("dealerships").select("id,name,address,contact,mobile,contact_person,email").order("name").limit(500);
+  const {data:dealers,error:dealersError}=await admin.from("dealerships").select("id,name,address,contact,mobile,contact_person,email,is_active").order("name").limit(500);
   if(dealersError)return json({error:"Unable to load dealerships"},500,headers);
   const {data:rows,error:rowsError}=await admin.from("memberships").select("user_id,dealership_id,role,dealerships(name)").order("dealership_id").limit(500);
   if(rowsError)return json({error:"Unable to load memberships"},500,headers);
@@ -80,6 +80,25 @@ Deno.serve(async(req)=>{
   if(created.error)return json({error:"Unable to create dealership. Check the dealership address migration."},500,headers);
   return json({ok:true,message:"Dealership created. You can now create its user account; no email was sent."},201,headers);
  }
+ if(["edit-dealership","disable-dealership","enable-dealership","delete-dealership"].includes(body.action??"")){
+  const id=body.dealershipId??"";
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))return json({error:"Invalid dealership."},400,headers);
+  if(body.action==="edit-dealership"){
+   if([body.name,body.address,body.mobile,body.contactPerson,body.email].some(v=>typeof v!=="string"))return json({error:"Invalid dealership details."},400,headers);
+   const name=body.name!.trim().replace(/\s+/g," "),address=body.address!.trim(),mobile=body.mobile!.trim().replace(/[\s()-]/g,""),contactPerson=body.contactPerson!.trim(),email=body.email!.trim().toLowerCase();
+   if(name.length<3||name.length>100||address.length>500||(mobile&&!validMobile(mobile))||contactPerson.length>100||(email&&!validEmail(email)))return json({error:"Check dealership details."},400,headers);
+   const duplicate=await admin.from("dealerships").select("id").ilike("name",name.replace(/[\\%_]/g,ch=>"\\"+ch)).neq("id",id).limit(1);
+   if(duplicate.error||duplicate.data?.length)return json({error:"Dealership name unavailable."},409,headers);
+   const saved=await admin.from("dealerships").update({name,address:address||null,mobile:mobile?(mobile.startsWith("+")?mobile:mobile.startsWith("91")? "+"+mobile:"+91"+mobile):null,contact_person:contactPerson||null,email:email||null}).eq("id",id).select("id").maybeSingle();
+   if(saved.error||!saved.data)return json({error:"Unable to update dealership."},409,headers);
+   return json({ok:true,message:"Dealership updated."},200,headers);
+  }
+  const operation=body.action!.split("-")[0];
+  if(body.confirm!==operation.toUpperCase()+" DEALERSHIP")return json({error:"Exact confirmation required."},400,headers);
+  const result=await admin.rpc("frontvox_dealership_lifecycle",{target:id,operation});
+  if(result.error)return json({error:"Operation blocked. Dealership may have linked users, business records or documents, or lifecycle migration is unavailable."},409,headers);
+  return json({ok:true,message:"Dealership "+(operation==="delete"?"deleted":operation==="disable"?"disabled":"enabled")+"."},200,headers);
+ }
  if(body.action==="create-user"){
   const email=(body.email??"").trim().toLowerCase(),name=(body.name??"").trim().replace(/\s+/g," ");
   const mobile=(body.mobile??"").trim().replace(/[\s()-]/g,"");
@@ -90,7 +109,7 @@ Deno.serve(async(req)=>{
   if(!/^[A-Za-z0-9_./-]{2,40}$/.test(employeeId))return json({error:"Enter a valid employee ID (2–40 letters, numbers or -_/.)"},400,headers);
   if(post.length<2||post.length>100)return json({error:"Role / post must be 2–100 characters."},400,headers);
   if(!/^[0-9a-f-]{36}$/i.test(dealerId))return json({error:"Choose an existing dealership."},400,headers);
-  const dealer=await admin.from("dealerships").select("id").eq("id",dealerId).maybeSingle();
+  const dealer=await admin.from("dealerships").select("id").eq("id",dealerId).eq("is_active",true).maybeSingle();
   if(dealer.error||!dealer.data)return json({error:"Dealership does not exist. Create it first."},404,headers);
   // Initial dealership password is configured privately by IT; never commit it.
   const issuedPassword=Deno.env.get("DEALERSHIP_DEFAULT_PASSWORD");
