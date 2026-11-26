@@ -68,3 +68,63 @@
 .crm-app .review-actions .review-hold:hover:not(:disabled),.crm-app .review-start-actions .review-confirm-hold:hover:not(:disabled){background:#EAB308!important}
 .crm-app .review-actions .review-reject,.crm-app .review-start-actions .review-confirm-reject{background:#DC2626!important;border-color:#DC2626!important;color:#fff!important}
 .crm-app .review-actions .review-reject:hover:not(:disabled),.crm-app .review-start-actions .review-confirm-reject:hover:not(:disabled){background:#B91C1C!important}
+
+/* Phase two: route-specific accents and consistent modal surfaces. Preserve semantic statuses. */
+:root:not([data-theme="dark"]) .crm-app{--brand-soft:#FFF1F2;--brand-edge:#F3C7CA;--modal-surface:#fff;--modal-ink:#20242D;--modal-line:#E0E2E6;--modal-muted:#646B75}
+:root[data-theme="dark"] .crm-app{--brand-soft:#49252D;--brand-edge:#8A4149;--modal-surface:#162234;--modal-ink:#F1F5F9;--modal-line:#40566F;--modal-muted:#A8B8CC}
+.crm-app .frontier-reference-sidebar .frontier-campaign-subnav a[aria-current="page"]{background:var(--brand-soft)!important;border-color:var(--brand-edge)!important;color:var(--crisp-accent)!important}
+.crm-app .frontier-reference-sidebar .frontier-campaign-subnav a[aria-current="page"] svg,.crm-app .frontier-reference-sidebar .frontier-campaign-subnav a:hover svg{color:var(--crisp-accent)!important}
+.crm-app .frontier-reference-sidebar .frontier-campaign-subnav a:hover{background:var(--brand-soft);color:var(--crisp-accent)}
+.crm-app .frontier-reference-sidebar .frontier-campaign-subnav a:focus-visible{outline-color:var(--crisp-accent)}
+.crm-app .agent-directory .agent-current-card,.crm-app .agent-directory .agent-stat-card.agent-stat-selected{border-color:var(--frontier-red)!important;box-shadow:0 0 0 1px var(--frontier-red)!important}
+.crm-app .agent-directory .agent-stat-card.agent-stat-selected{background:var(--brand-soft)!important}
+.crm-app .agent-directory .agent-stat-card:hover{border-color:var(--brand-edge)}
+.crm-app .agent-directory :is(.agent-current-ribbon,.agent-ribbon){background:var(--frontier-red)!important;color:#fff!important}
+.crm-app .agent-directory .agent-card-actions .agent-detail-button{background:var(--modal-surface)!important;color:var(--modal-ink)!important;border-color:var(--modal-line)!important;box-shadow:none}
+.crm-app .agent-directory .agent-card-actions .agent-detail-button:hover{background:var(--brand-soft)!important;color:var(--crisp-accent)!important}
+.crm-app .agent-directory :is(.agent-create-disabled,.agent-use-disabled,.agent-empty-clear),.crm-app :is(.calllogs-export,.reports-ref-export,.reports-header-action,.reports-ref-local-export,.configured-agent-primary,.agent-modal-done,.fc-success-view,.campaign-modal-next,.crm-empty-action button,.crm-empty-action a,.settings-ref-password-button){background:var(--frontier-red)!important;background-image:none!important;border-color:var(--frontier-red)!important;color:#fff!important}
+.crm-app :is(.agent-create-disabled,.agent-use-disabled,.campaign-modal-next):disabled{opacity:.55;cursor:not-allowed}
+.crm-app :is(.calllogs-export,.reports-ref-export,.reports-header-action,.reports-ref-local-export,.configured-agent-primary,.agent-modal-done,.fc-success-view,.campaign-modal-next,.crm-empty-action button,.crm-empty-action a,.agent-empty-clear,.settings-ref-password-button):hover:not(:disabled){background:var(--frontier-red-deep)!important}
+.crm-app .agent-directory :is(.agent-sample-disabled,.agent-sample-icon){color:var(--crisp-accent)!important}
+.crm-app .agent-directory .agent-sample-icon{background:var(--brand-soft)!important}
+.crm-app .it-account-table-tabs{background:var(--crisp-header)!important;border-color:var(--modal-line)!important}
+.crm-app .it-account-table-tabs button[aria-selected=true]{background:var(--frontier-red)!important;color:#fff!important;box-shadow:none}
+.crm-app .it-account-table-tabs button[aria-selected=false]{color:var(--modal-ink)}
+.crm-app .it-account-table-tabs button[aria-selected=false]:hover{background:var(--brand-soft);color:var(--crisp-accent)}
+.crm-app :is(.customers-stat-icon,.agent-stat-icon,.calllogs-stat-icon,.reports-ref-kpi-icon) svg{color:inherit}
+.crm-app .customers-tone-blue .customers-stat-icon{color:var(--crisp-accent)!important;background:var(--brand-soft)!important}
+.crm-app :is(.customers-list-title svg,.settings-ref-sidebar button svg,.frontier-layout-title svg,.frontier-layout-option svg,.settings-ref-card-heading svg,.it-inline-dealer-directory>summary,.fc-template-text,.fc-upload-symbol,.fc-success-reference,.fc-success-copy-icon,.fc-create-phone-icon,.configured-agent-copy){color:var(--crisp-accent)!important}
+.crm-app :is(.customers-reset,.calllogs-view-icon,.settings-ref-api-actions button,.it-user-search,.configured-agent-x,.configured-agent-copy,.fc-success-copy-icon){background:var(--modal-surface)!important;border-color:var(--modal-line)!important;color:var(--modal-ink)!important}
+.crm-app :is(.customers-reset,.calllogs-view-icon,.configured-agent-x,.configured-agent-copy,.fc-success-copy-icon):hover{background:var(--brand-soft)!important;color:var(--crisp-accent)!important}
+.crm-app :is(.settings-ref-api-notice,.frontier-layout-option.selected,.fc-create-phone-icon,.configured-agent-field-icon,.configured-agent-summary>div,.configured-agent-header h2 span){background:var(--brand-soft)!important;border-color:var(--brand-edge)!important;color:var(--crisp-accent)!important}
+.crm-app :is(.settings-ref-api-notice strong,.settings-ref-api-notice small,.configured-agent-header p svg){color:var(--crisp-accent)!important}
+.crm-app :is(.settings-ref-profile-form label>span:focus-within,.fc-compact-campaign .campaign-pill-input:focus){border-color:var(--frontier-red)!important;box-shadow:0 0 0 3px #D719201A}
+.crm-app .crm-empty-art{filter:grayscale(1)}
+/* All existing native dialogs and named custom modal shells: no event or focus behavior changes. */
+.crm-app :is(dialog,.campaign-modal,.agent-preview-modal,.customers-modal,.approvals-modal,.reports-ref-modal,.settings-ref-modal,.portal-account-modal,.document-modal){background:var(--modal-surface)!important;color:var(--modal-ink)!important;border-color:var(--modal-line)!important;box-shadow:0 18px 54px #0003!important;border-radius:16px}
+.crm-app dialog{max-width:calc(100vw - 24px);max-height:calc(100dvh - 32px)}
+.crm-app dialog::backdrop{background:rgba(32,36,45,.48)!important;backdrop-filter:none}
+.crm-app :is(.campaign-modal-overlay,.agent-preview-modal-backdrop,.customers-modal-backdrop,.approvals-modal-backdrop,.reports-ref-modal-overlay,.settings-ref-modal-backdrop,.portal-account-modal-backdrop,.document-modal-backdrop){background:rgba(32,36,45,.48)!important;backdrop-filter:none}
+.crm-app :is(.campaign-modal-header,.campaign-modal-footer,.fc-compact-scroll,.fc-reference-create-header,.fc-reference-create-footer,.configured-agent-panel,.review-dialog>.crm-panel,.review-schedule-dialog>.crm-panel){background:var(--modal-surface)!important;color:var(--modal-ink)!important;border-color:var(--modal-line)!important}
+.crm-app :is(dialog,.campaign-modal,.agent-preview-modal,.customers-modal,.approvals-modal,.reports-ref-modal,.settings-ref-modal,.portal-account-modal,.document-modal) :is(h2,h3,dt,dd,label){color:var(--modal-ink)}
+.crm-app :is(.configured-agent-header p,.configured-agent-field-text>span,.configured-agent-footnote,.fc-success-reference-info>span){color:var(--modal-muted)}
+.crm-app :is(.configured-agent-field-card,.review-start-details,.fc-success-reference-card,.fc-reference-create .fc-reference-consent,.fc-reference-create .fc-compact-upload){background:var(--modal-surface)!important;border-color:var(--modal-line)!important;color:var(--modal-ink)!important;box-shadow:none}
+.crm-app .configured-agent-field-text strong{color:var(--modal-ink)}
+.crm-app .configured-agent-wave i{background:linear-gradient(115deg,#FDE2E4,#F3C7CA)!important;opacity:.45}
+.crm-app .configured-agent-avatar{background:var(--brand-soft)}
+.crm-app :is(.campaign-modal-close,.agent-modal-close,.customers-modal-title button,.approvals-modal header button,.reports-ref-modal header button,.settings-ref-modal header button,.portal-account-modal-head button){background:var(--modal-surface)!important;color:var(--modal-ink)!important;border-color:var(--modal-line)!important}
+.crm-app :is(.campaign-modal-close,.agent-modal-close,.customers-modal-title button,.approvals-modal header button,.reports-ref-modal header button,.settings-ref-modal header button,.portal-account-modal-head button):hover{background:var(--brand-soft)!important;color:var(--crisp-accent)!important}
+.crm-app :is(.campaign-modal-back,.fc-success-cancel,.configured-agent-x,.review-dialog .btn-outline:not(.review-hold,.review-reject)){background:var(--modal-surface)!important;border-color:var(--modal-line)!important;color:var(--modal-ink)!important}
+.crm-app :is(.campaign-modal-next,.fc-success-view,.configured-agent-primary):disabled{opacity:.55}
+.crm-app .campaign-modal-progress:before{background:var(--modal-line)}
+/* Do not recolor data-series outcome colors, status badges, warnings, or destructive confirmations. */
+
+/* Preserve visible status icon contrast and distinguish disabled preview actions. */
+.crm-app .customers-tone-blue .customers-stat-icon svg{stroke:currentColor}
+.crm-app :is(.agent-create-disabled,.agent-use-disabled)[aria-disabled=true]{opacity:.55;cursor:not-allowed}
+.crm-app .settings-ref-profile-identity strong{color:var(--modal-ink)}
+.crm-app .frontier-layout-title{color:var(--modal-ink)}
+.crm-app .frontier-layout-option:not(.selected){color:var(--modal-ink);border-color:var(--modal-line)}
+.crm-app .settings-ref-api-notice{background:var(--modal-surface)!important}
+.crm-app .settings-ref-api-notice :is(strong,small){color:var(--modal-ink)!important}
+.crm-app :is(.agent-stat-card,.customers-stat,.reports-ref-kpi,.calllogs-stat) :is(svg)[aria-hidden=true]{max-width:100%}
