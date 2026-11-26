@@ -1,5 +1,6 @@
 "use client";
 import {useState,useTransition} from "react";
+import {useRouter} from "next/navigation";
 import {saveVoiceProfile} from "./actions";
 type Dealership={id:string;name:string;profile?:{agent_id:string;app_version:number;connection_id:string;caller_number:string;active:boolean}|null};
 type DeploymentOption={deploymentId:string;label:string;agentId:string;version:number;connectionId:string;callerNumber:string};
@@ -23,6 +24,7 @@ function CopyButton({value,label}:{value:string;label:string}) {
  return <button className="vdp-copy" type="button" disabled={!value} title={copied?"Copied":`Copy ${label}`} aria-label={`Copy ${label}`} onClick={async()=>{try{await navigator.clipboard.writeText(value);setCopied(true);}catch{setCopied(false);}}}>{copied?"✓":<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></svg>}</button>;
 }
 export function ProfileEditor({dealerships}:{dealerships:Dealership[]}) {
+ const router=useRouter();
  const [id,setId]=useState(dealerships[0]?.id??""),[busy,start]=useTransition(),[message,setMessage]=useState("");
  const dealer=dealerships.find(d=>d.id===id),p=dealer?.profile;
  const [revision,setRevision]=useState(0);
@@ -66,9 +68,9 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}) {
     <label className="vdp-field vdp-version"><span className="vdp-label"><FieldIcon kind="version"/> Committed Agent Version</span><span className="vdp-control"><input name="version" required type="number" min={1} value={version} onChange={e=>setVersion(e.target.value)} placeholder="Committed version number"/></span></label>
     <label className="vdp-field vdp-connection"><span className="vdp-label"><FieldIcon kind="connection"/> Telephony Connection ID / Name</span><span className="vdp-control"><input name="connectionId" required value={connection} onChange={e=>setConnection(e.target.value)} placeholder="Name for inactive draft; verified ID to activate"/><CopyButton value={connection} label="connection ID"/></span></label>
     <label className="vdp-field vdp-caller"><span className="vdp-label"><FieldIcon kind="phone"/> Connected Caller Number</span><span className="vdp-control"><input name="callerNumber" required value={caller} onChange={e=>setCaller(e.target.value)} onBlur={()=>{const value=caller.trim().replace(/[\s()-]/g,"");if(/^[6-9]\d{9}$/.test(value))setCaller("+91"+value);else if(/^91[6-9]\d{9}$/.test(value))setCaller("+"+value);}} placeholder="+91XXXXXXXXXX or a connected Indian 10-digit number"/><CopyButton value={caller} label="caller number"/></span></label>
-    <div className="vdp-checkbox-info"><label className="vdp-check"><input type="checkbox" name="active" value="yes" defaultChecked={p?.active??false}/><span>Use these verified defaults for newly created drafts</span></label><div className="vdp-info"><FieldIcon kind="info"/><span>For inactive drafts, a connection name such as Sarvam Managed (Vobiz) is allowed. To activate calling defaults, enter the actual Sarvam Connection ID and verify the committed version and connected number. Indian 10-digit caller numbers auto-format to +91.</span></div></div>
+    <div className="vdp-checkbox-info"><label className="vdp-check"><input type="checkbox" name="active" value="yes" defaultChecked={p?.active??false}/><span>Use these verified defaults for newly created drafts</span></label></div>
     {message&&<p className={message.startsWith("Saved")?"vdp-success":"vdp-error"} role="status">{message}</p>}
-    <button type="submit" className="vdp-save" disabled={busy}><FieldIcon kind="save"/><span>{busy?"Saving…":"Save Default Profile"}</span><span className="vdp-save-arrow" aria-hidden="true">➜</span></button>
+    <div className="vdp-footer"><button type="button" className="vdp-cancel" disabled={busy||loadingSarvam} onClick={()=>router.push("/campaigns")}>Cancel</button><button type="submit" className="vdp-save" disabled={busy||loadingSarvam}><FieldIcon kind="save"/><span>{busy?"Saving…":"Save Draft Profile"}</span></button></div>
    </form>
   </div>
  </section>;

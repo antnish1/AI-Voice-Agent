@@ -4,6 +4,26 @@
 .agent-test-selection,.agent-test-footer{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.agent-test-selection{margin:12px 0}.agent-test-selection .wizard-field{min-width:0}.agent-test-selection select{width:100%;min-width:0}.agent-test-footer button{width:100%}@media(max-width:480px){.agent-test-selection{grid-template-columns:1fr}}
 
 
+/* A full-width, vertically centered empty state replaces the old promotion card.
+   Scoped to the agents route; existing filters, cards, and agent details are retained. */
+.crm-app .agent-directory{display:flex;flex-direction:column;min-height:max(620px,calc(100dvh - 190px))}
+.crm-app .agent-directory .agent-page-hero,.crm-app .agent-directory .agent-stats-grid,.crm-app .agent-directory .agent-page-controls{flex-shrink:0}
+.crm-app .agent-directory .agent-card-grid{width:100%;flex:none}
+.crm-app .agent-directory .agent-empty-panel{flex:1;min-height:clamp(380px,calc(100dvh - 375px),900px);width:100%;background:#fff;border:1px solid #d9e6f2;border-radius:16px;box-shadow:0 2px 7px #17365f0c;display:flex;align-items:center;justify-content:center;padding:35px 20px;margin:8px 0 0}
+.crm-app .agent-directory .agent-empty-content{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;max-width:420px;width:100%}
+.crm-app .agent-directory .agent-empty-illustration{display:block;width:min(240px,90%);height:auto;margin:0 auto 14px}
+.crm-app .agent-directory .agent-empty-content h2{margin:0 0 8px;font-size:19px;font-weight:800;letter-spacing:-.3px;color:#183454}
+.crm-app .agent-directory .agent-empty-content p{margin:0;color:#7187a4;line-height:1.6;font-size:13px}
+.crm-app .agent-directory .agent-empty-clear{border:0;border-radius:10px;background:#087fa6;color:white;padding:11px 20px;margin-top:20px;font-size:12px;font-weight:700;cursor:pointer;transition:transform .17s,box-shadow .17s}
+.crm-app .agent-directory .agent-empty-clear:hover{background:#096f94;transform:translateY(-1px);box-shadow:0 5px 12px #0d688d25}
+.crm-app .agent-directory .agent-empty-clear:focus-visible{outline:3px solid #36d3d4;outline-offset:3px}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-empty-panel{background:#14243a;border-color:#30465e}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-empty-content h2{color:#ecf6ff}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-empty-content p{color:#adbed4}
+@media(max-width:760px){.crm-app .agent-directory{min-height:calc(100dvh - 150px)}.crm-app .agent-directory .agent-empty-panel{min-height:390px;padding:25px 16px}.crm-app .agent-directory .agent-empty-illustration{width:205px}}
+@media(prefers-reduced-motion:reduce){.crm-app .agent-directory .agent-empty-clear{transition:none}}
+
+
 /* Configured agent details: reference-inspired teal waves, light glass surface and paired field cards. */
 dialog.configured-agent-dialog{position:fixed;inset:0;margin:auto;width:min(960px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 32px);padding:0;border:1px solid #e9ffff;border-radius:36px;background:#f7fcfd;color:#102a43;box-shadow:0 24px 70px #07354b55;overflow:auto;font-family:Inter,ui-sans-serif,system-ui,sans-serif}
 dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:blur(5px)}
