@@ -7,7 +7,7 @@ export const runtime="nodejs";
 const days:Record<string,string>={Mon:"Monday",Tue:"Tuesday",Wed:"Wednesday",Thu:"Thursday",Fri:"Friday",Sat:"Saturday",Sun:"Sunday"};
 export async function POST(request:Request){
  try{
-  const {supabase,user}=await requireItSuperUser();
+  const {supabase}=await requireItSuperUser();
   if(!callingEnabled("campaign"))return NextResponse.json({error:"Campaign launch is disabled in Vercel Production. No calls have been initiated."},{status:403});
   const input=await request.json();
   const id=String(input.campaignId??"");
@@ -15,17 +15,13 @@ export async function POST(request:Request){
   const {data:campaign,error:campaignError}=await supabase.from("campaigns").select("id,name,dealership_id,status,approved_by,approved_at").eq("id",id).maybeSingle();
   if(campaignError||!campaign||!["DRAFT","PENDING","PENDING_MANAGER_APPROVAL","PAUSED","APPROVED"].includes(campaign.status))
    return NextResponse.json({error:"A pending or held local campaign is required before launching."},{status:403});
-  if(input.confirm!=="LAUNCH "+campaign.name||input.reviewedTestResult!==true)return NextResponse.json({error:"Exact campaign confirmation and explicit reviewed-test acknowledgment are required."},{status:400});
-  const [{data:batch,error:batchError},{data:config,error:configError},{data:test,error:testError}]=await Promise.all([
+  if(input.confirm!=="LAUNCH "+campaign.name||input.confirmedLaunch!==true)return NextResponse.json({error:"Exact campaign confirmation and explicit authorization to launch real calls are required."},{status:400});
+  const [{data:batch,error:batchError},{data:config,error:configError}]=await Promise.all([
    supabase.from("campaign_recipient_batches").select("*").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
-   supabase.from("campaign_draft_configs").select("configuration").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle(),
-   supabase.from("voice_test_call_requests").select("id,agent_id,agent_version,connection_id,caller_number")
-    .eq("user_id",user.id).eq("status","submitted").eq("agent_id",String(input.agentId??""))
-    .gte("created_at",new Date(Date.now()-86400000).toISOString()).limit(20)
+   supabase.from("campaign_draft_configs").select("configuration").eq("campaign_id",id).eq("dealership_id",campaign.dealership_id).maybeSingle()
   ]);
   if(batchError||!batch)return NextResponse.json({error:"The locked recipient cohort is missing or unavailable."},{status:409});
   if(configError||!config)return NextResponse.json({error:"Campaign configuration is missing or unavailable."},{status:409});
-  if(testError)return NextResponse.json({error:"Unable to verify recent test calls."},{status:503});
   const setup=config.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start_mode?:"now"|"custom";start?:string;end?:string;days?:string[];from?:string;to?:string;retry_interval_minutes?:number}};
   const agent=String(input.agentId??""),version=Number(input.appVersion),connection=String(input.connectionId??""),sender=normalizePhone(String(input.callerNumber??""));
   if(!/^[\w.\-]{3,200}$/.test(agent)||!Number.isInteger(version)||version<1||
@@ -33,9 +29,6 @@ export async function POST(request:Request){
      setup.agent_label!==agent||setup.agent_version_label!==String(version)||
      setup.telephony_label!==connection||normalizePhone(setup.outgoing_number_label??"")!==sender)
    return NextResponse.json({error:"Agent, committed version, connection and caller number must exactly match the approved campaign draft."},{status:400});
-  if(!test?.some(attempt=>attempt.agent_id===agent&&attempt.agent_version===version&&
-    attempt.connection_id===connection&&attempt.caller_number===sender))
-   return NextResponse.json({error:"The recent test-call attempt must use the approved agent version, telephony connection and caller number. Re-test this exact setup from AI Voice Agents before launch."},{status:409});
   const schedule=setup.schedule;
   const approvedStart=new Date((schedule?.start??"")+"T"+(schedule?.from??"")+":00+05:30"),end=new Date((schedule?.end??"")+"T"+(schedule?.to??"")+":00+05:30");
   const start=new Date(Math.max(approvedStart.getTime(),schedule?.start_mode==="now"?Date.now()+120000:approvedStart.getTime()));
