@@ -98,20 +98,23 @@ test("dealer users do not have a portal password change or self-reset flow",()=>
  assert.doesNotMatch(ui,/IT-controlled login password/);
 });
 
-test("enable and disable dealership use shared compact confirmation with distinct exact phrases",()=>{
+test("enable, disable and delete dealership use compact reference dialogs with exact confirmation guards",()=>{
  const ui=file("../src/app/(portal)/users/user-management.tsx");
  const css=file("../src/app/(portal)/users/unified-directory.css");
- assert.match(ui,/dealerMode==="enable"\?" it-dealer-disable-dialog it-dealer-enable-dialog":""/);
- assert.match(ui,/dealerMode==="disable"\|\|dealerMode==="enable"/);
+ assert.match(ui,/dealerMode==="delete"\?" it-dealer-disable-dialog it-dealer-delete-dialog":""/);
+ assert.match(ui,/dealerMode==="disable"\|\|dealerMode==="enable"\|\|dealerMode==="delete"/);
  assert.match(ui,/Confirm your action/);
+ assert.match(ui,/Confirm permanent deletion/);
  assert.match(ui,/DEALERSHIP NAME/);
+ assert.match(ui,/This action cannot be undone\./);
+ assert.match(ui,/Permanently delete this unused dealership\. Linked records prevent deletion\./);
  assert.match(ui,/Linked users, records or documents prevent disabling\./);
  assert.match(ui,/Allow new records and user assignments to this dealership\./);
- assert.match(ui,/dealerMode==="enable"\?"ENABLE DEALERSHIP":"DISABLE DEALERSHIP"/);
- assert.match(ui,/disabled=\{pending\|\|dealerConfirm!==\(dealerMode==="enable"\?"ENABLE DEALERSHIP":"DISABLE DEALERSHIP"\)\}/);
+ assert.match(ui,/dealerConfirm!==\(dealerMode==="delete"\?"DELETE DEALERSHIP":dealerMode==="enable"\?"ENABLE DEALERSHIP":"DISABLE DEALERSHIP"\)/);
  assert.match(ui,/className="it-dealer-disable-cancel"/);
  assert.match(css,/dialog\.it-dealer-disable-dialog\{width:min\(540px/);
  assert.match(css,/dialog\.it-dealer-enable-dialog \.it-dealer-disable-icon/);
+ assert.match(css,/dialog\.it-dealer-delete-dialog \.it-dealer-delete-warning/);
  assert.match(css,/\.it-dealer-disable-actions\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 });
 
