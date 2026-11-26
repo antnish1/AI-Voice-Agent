@@ -46,3 +46,26 @@
 :root[data-theme="dark"] .crm-app .reports-ref-donut:before,:root[data-theme="dark"] .crm-app .calllogs-donut:before{background:var(--crisp-surface)}
 :root[data-theme="dark"] .crm-app .review-actions .review-hold{background:#203950;color:#e5effa;border-color:#526d89}
 :root[data-theme="dark"] .crm-app .review-actions .review-reject{background:#482a39;color:#ffb9c5;border-color:#a25b70}
+
+/* The selected report KPI follows the actual aria-pressed filter state.
+   Specificity exceeds the shared crisp panel reset. */
+.crm-app .reports-ref-kpis .reports-category-card[aria-pressed="true"]{
+  background:#e7f8f8;
+  border-color:#078d9b;
+  box-shadow:inset 3px 0 0 #078d9b,0 0 0 1px #078d9b;
+}
+.crm-app .reports-ref-kpis .reports-category-card[aria-pressed="true"] .reports-ref-kpi-icon{
+  background:#c9eeef;color:#087d89;
+}
+.crm-app .reports-ref-kpis .reports-category-card[aria-pressed="true"] div>span{color:#086b76}
+.crm-app .reports-ref-kpis .reports-category-card[aria-pressed="true"] strong{color:#086b76}
+.crm-app .reports-ref-kpis .reports-category-card[aria-pressed="true"]::after{
+  content:"";position:absolute;right:10px;top:10px;width:7px;height:7px;
+  border-radius:50%;background:#078d9b;
+}
+:root[data-theme="dark"] .crm-app .reports-ref-kpis .reports-category-card[aria-pressed="true"]{
+  background:#163b45;border-color:#43c6cc;box-shadow:inset 3px 0 0 #43c6cc,0 0 0 1px #43c6cc;
+}
+:root[data-theme="dark"] .crm-app .reports-ref-kpis .reports-category-card[aria-pressed="true"] :is(strong,div>span){color:#9ce8ec}
+:root[data-theme="dark"] .crm-app .reports-ref-kpis .reports-category-card[aria-pressed="true"] .reports-ref-kpi-icon{background:#22515b;color:#9ce8ec}
+:root[data-theme="dark"] .crm-app .reports-ref-kpis .reports-category-card[aria-pressed="true"]::after{background:#43c6cc}
