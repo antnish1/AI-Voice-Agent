@@ -20,9 +20,13 @@ async function fetchFromSarvam(path:string,key:string,base:string) {
  return obj(result)!;
 }
 
-export async function GET() {
+export async function GET(request:Request) {
  try{
-  await requireItSuperUser();
+  const {supabase}=await requireItSuperUser();
+  const dealer=new URL(request.url).searchParams.get("dealershipId")??"";
+  if(!/^[a-f0-9-]{36}$/i.test(dealer))return NextResponse.json({ok:false,code:"DEALER",message:"Select a dealership first."},{status:400});
+  const {data:dealership,error:dealerError}=await supabase.from("dealerships").select("id").eq("id",dealer).maybeSingle();
+  if(dealerError||!dealership)return NextResponse.json({ok:false,code:"DEALER",message:"Dealership not found."},{status:404});
   let config:ReturnType<typeof requireProviderConfig>;
   try{config=requireProviderConfig();}
   catch{return NextResponse.json({ok:false,code:"CONFIG",message:"Sarvam workspace API key, organization ID or workspace ID is missing in this Vercel project."},{status:503,headers:{"Cache-Control":"no-store"}});}
@@ -76,6 +80,35 @@ export async function GET() {
     });
    }
   }
+
+  // Outbound campaigns do not require an inbound deployment. Read back only
+  // previously accepted, linked campaigns belonging to the selected dealership.
+  const {data:links,error:linksError}=await supabase.from("voice_campaign_launches").select("campaign_id,sarvam_campaign_id").eq("dealership_id",dealer).eq("state","cohort_completed").not("sarvam_campaign_id","is",null).order("updated_at",{ascending:false}).limit(15);
+  const historical:typeof options=[];
+  let readFailures=0;
+  if(!linksError)for(const link of links??[]){
+   const id=str(link.sarvam_campaign_id);
+   if(!validId(id))continue;
+   try{
+    const record=await fetchFromSarvam("/api/scheduling/v1/orgs/"+org+"/workspaces/"+workspace+"/campaigns/"+encodeURIComponent(id),key,base);
+    const app=obj(record.app_config);
+    if(!app)continue;
+    const agentId=str(app.app_id),version=number(app.app_version);
+    if(!validId(agentId)||!version)continue;
+    const connections=Array.isArray(app.connection_configs)?app.connection_configs.map(obj).filter((v):v is RecordValue=>!!v):[];
+    for(const connection of connections){
+     const connectionId=str(connection.connection_id);
+     if(!validId(connectionId))continue;
+     const phones=Array.isArray(connection.phone_numbers)?connection.phone_numbers.map(str).filter(validPhone):[];
+     for(const callerNumber of phones){
+      if(historical.some(x=>x.agentId===agentId&&x.version===version&&x.connectionId===connectionId&&x.callerNumber===callerNumber))continue;
+      historical.push({deploymentId:"campaign:"+id,label:(str(record.name)||"Previous outbound campaign")+" (previously accepted)",agentId,version,connectionId,callerNumber});
+     }
+    }
+   }catch{readFailures++;}
+  }
+  if(historical.length)return NextResponse.json({ok:true,code:"outbound_history",message:"Select an active deployment or a previously accepted outbound configuration for this dealership. Confirm current agent and number availability before activation.",options:[...options.map(o=>({...o,label:o.label+" (active deployment)"})),...historical]},{headers:{"Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}});
+  if(!options.length)return NextResponse.json({ok:true,code:"manual_required",message:linksError||readFailures?"Could not read previous outbound settings. Enter the committed agent ID, version, connection ID and caller number manually. No deployment is required.":"No reusable outbound configuration was found for this dealership. Enter the committed agent ID, version, connection ID and caller number manually. No deployment is required.",options:[]},{headers:{"Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}});
   let code="ready",message="Choose a verified outbound deployment to pre-fill these fields. Check everything before saving.";
   if(!deployments.length){code="no_deployments";message="Sarvam returned no deployments in this workspace. An existing draft agent does not count as a deployment. For outbound campaigns, you can still enter a committed agent version and verified telephony details manually.";}
   else if(!outbound.length){code="no_outbound";message="Sarvam returned "+deployments.length+" deployments, but none are outbound-capable. Outbound campaigns can use a separately committed agent and connected phone number; enter those verified details manually.";}
