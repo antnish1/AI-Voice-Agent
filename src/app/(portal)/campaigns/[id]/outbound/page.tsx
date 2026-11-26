@@ -26,7 +26,11 @@ export default async function OutboundPage({params}:{params:Promise<{id:string}>
    if(rows.length!==batches.data.eligible_records||rows.some(r=>r.length!==columns.length))throw Error();
   }catch{columns=[];rows=[];recordError="Unable to verify the locked recipient file. Launch is unavailable.";}
  }
- const config=configs.data?.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start_mode?:"now"|"custom";start?:string;end?:string;days?:string[];from?:string;to?:string;cps?:number;max_retries?:number;retry_interval_minutes?:number}}|null;
+ let config=configs.data?.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start_mode?:"now"|"custom";start?:string;end?:string;days?:string[];from?:string;to?:string;cps?:number;max_retries?:number;retry_interval_minutes?:number}}|null;
+ if(config&&!launches.data&&["DRAFT","PENDING","PENDING_MANAGER_APPROVAL","PAUSED","APPROVED"].includes(campaign.status)&&![config.agent_label,config.agent_version_label,config.telephony_label,config.outgoing_number_label].every(Boolean)){
+  const {data,error}=await supabase.rpc("frontvox_refresh_campaign_voice",{p_campaign:id,p_missing_only:true});
+  if(!error&&data)config=data as typeof config;
+ }
  return <main className="review-reference-page">
  <CampaignReview campaign={{id:campaign.id,name:campaign.name,status:campaign.status,dealershipId:campaign.dealership_id}} dealership={dealer.data?.name??"Assigned dealership"} email={dealer.data?.email??""} config={config} batch={batches.data?{eligible_records:batches.data.eligible_records,total_records:batches.data.total_records}:null} launch={launches.data} columns={columns} rows={rows} recordError={recordError} liveEnabled={process.env.ENABLE_LIVE_CALLS==="true"}/></main>;
 }
