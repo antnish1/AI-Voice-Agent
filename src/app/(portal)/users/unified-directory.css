@@ -170,3 +170,11 @@ dialog.it-dealer-disable-dialog::backdrop{background:rgba(37,53,76,.48)}
 :root[data-theme="dark"] .it-dealer-disable-actions{border-top-color:#34495d}
 :root[data-theme="dark"] .it-dealer-disable-cancel{background:#24394b;border-color:#52667a;color:#eaf2fb}
 @media(max-width:560px){.it-dealer-disable-panel{padding:20px 17px}.it-dealer-disable-heading h2{font-size:19px}.it-dealer-disable-warning p{font-size:13px}.it-dealer-disable-form label{font-size:13px}.it-dealer-disable-name strong{font-size:16px}}
+
+
+/* Enable Dealership shares the compact dialog layout; use a positive action color. */
+dialog.it-dealer-enable-dialog .it-dealer-disable-icon{background:#e8f8f2;color:#159a76}
+dialog.it-dealer-enable-dialog .it-dealer-disable-warning svg{color:#159a76}
+dialog.it-dealer-enable-dialog .it-dealer-disable-actions button[type="submit"]:not(:disabled){background:#079b83;border-color:#079b83;color:#fff}
+dialog.it-dealer-enable-dialog .it-dealer-disable-actions button[type="submit"]:not(:disabled):hover{background:#078874}
+:root[data-theme="dark"] dialog.it-dealer-enable-dialog .it-dealer-disable-icon{background:#1b4b3c;color:#71e3be}
