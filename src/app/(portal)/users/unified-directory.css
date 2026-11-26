@@ -88,3 +88,112 @@
 .crm-app .it-account-tab-section{display:flex;align-items:center;grid-column:1/-1;width:100%;box-sizing:border-box;padding:8px 10px;margin:0;border:1px solid #cbd9e8;border-radius:12px;background:#fff;box-shadow:0 2px 6px #163b5610}.crm-app .it-account-tab-section .it-account-table-tabs{margin:0}.crm-app .it-account-tab-section .it-account-table-tabs button{min-height:36px;padding:9px 17px}:root[data-theme="dark"] .crm-app .it-account-tab-section{background:var(--dark-surface,#162234);border-color:var(--dark-line,#293b50);box-shadow:none}@media(max-width:540px){.crm-app .it-account-tab-section{padding:6px}.crm-app .it-account-tab-section .it-account-table-tabs button{padding:9px 8px}}
 
 .crm-app #it-panel-dealerships .it-row-actions{display:flex;align-items:center;justify-content:center;gap:6px}.crm-app #it-panel-dealerships th:last-child{text-align:center}.crm-app .it-dealer-action-buttons{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.crm-app .it-dealer-action-buttons button{width:100%}.crm-app .it-dealer-action-buttons .btn-outline{background:var(--crisp-panel,#fff);color:var(--crisp-ink,#183b57);border:1px solid var(--crisp-line,#cbd9e8)}
+
+
+/* One-time password success dialog — centered reference-style popup, never an inline banner. */
+dialog.it-password-success-dialog{position:fixed;inset:0;margin:auto;width:min(500px,calc(100vw - 30px));max-width:500px;max-height:calc(100dvh - 28px);padding:0;border:0;border-radius:19px;background:#fff;color:#142844;box-shadow:0 22px 65px #102e4150;overflow-y:auto;overflow-x:hidden}
+dialog.it-password-success-dialog::backdrop{background:#24364a75;backdrop-filter:blur(2px)}
+.it-password-success-panel{padding:25px 25px 24px;display:flex;flex-direction:column;align-items:stretch;text-align:center}
+.it-password-success-icon{display:grid;place-items:center;align-self:center;width:66px;height:66px;border-radius:50%;background:#e8f9f0;color:#0d967b;margin:0 auto 17px}
+.it-password-success-icon svg{width:37px;height:37px}
+.it-password-success-panel h2{font-size:21px;line-height:1.3;font-weight:750;letter-spacing:-.45px;color:#142644;margin:0 0 12px}
+.it-password-success-subtitle{font-size:16px;line-height:1.4;color:#6d7b8f;margin:0 0 18px}
+.it-password-success-secret{text-align:left;background:#f5f6fa;border:1px solid #dce2eb;border-radius:15px;padding:14px 15px 13px}
+.it-password-success-secret>span{font-size:13px;color:#737782;font-weight:500;letter-spacing:.2px}
+.it-password-success-secret-row{display:flex;align-items:center;gap:9px;margin-top:9px}
+.it-password-success-secret-row input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#172d4a;font-size:28px;font-weight:750;letter-spacing:.1px;line-height:1.2;padding:0;box-shadow:none;font-family:inherit}
+.it-password-success-eye{flex:none;display:grid;place-items:center;width:35px;height:35px;border:0;background:transparent;color:#111a24;cursor:pointer;border-radius:9px}
+.it-password-success-eye svg{height:23px;width:23px}
+.it-password-success-eye:hover{background:#e8ecf3}
+.it-password-success-warning{display:flex;text-align:left;gap:11px;background:#fff8e8;border-radius:11px;margin-top:15px;padding:14px 14px 13px;color:#9f6a14}
+.it-password-success-warning>span{font-size:21px;line-height:1.1;flex:none}
+.it-password-success-warning strong{display:block;font-size:15px;font-weight:700;margin-bottom:5px}
+.it-password-success-warning p{font-size:13px;line-height:1.5;color:#98723a;margin:0}
+.it-password-success-error{font-size:12px;color:#bd2d3d;margin:10px 0 0;text-align:left}
+.it-password-success-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:16px}
+.it-password-success-actions button{display:flex;justify-content:center;align-items:center;gap:9px;min-width:0;min-height:43px;padding:9px 10px;border-radius:24px;font-size:14px;font-weight:650;cursor:pointer;transition:transform .16s,background-color .16s}
+.it-password-success-dismiss{background:#fff;color:#171c25;border:1px solid #d2d5d9}
+.it-password-success-dismiss:hover{background:#f1f4f8}
+.it-password-success-copy{background:#111;color:#fff;border:1px solid #111}
+.it-password-success-copy:hover{background:#30343a}
+.it-password-success-copy svg{width:19px;height:19px;flex:none}
+.it-password-success-actions button:active{transform:scale(.98)}
+.it-password-success-dialog button:focus-visible{outline:3px solid #12a0a1;outline-offset:2px}
+:root[data-theme="dark"] dialog.it-password-success-dialog{background:#172638;color:#e8f3fd}
+:root[data-theme="dark"] .it-password-success-panel h2{color:#f0f7ff}
+:root[data-theme="dark"] .it-password-success-subtitle{color:#c1d0e0}
+:root[data-theme="dark"] .it-password-success-secret{background:#22364a;border-color:#39546d}
+:root[data-theme="dark"] .it-password-success-secret>span{color:#b6c7d8}
+:root[data-theme="dark"] .it-password-success-secret-row input{color:#fff}
+:root[data-theme="dark"] .it-password-success-eye{color:#e7f3ff}
+:root[data-theme="dark"] .it-password-success-warning{background:#43351d;color:#f7cd80}
+:root[data-theme="dark"] .it-password-success-warning p{color:#e4c38c}
+:root[data-theme="dark"] .it-password-success-dismiss{background:#24374b;color:#e7f4ff;border-color:#526579}
+@media(max-width:560px){.it-password-success-panel{padding:22px 18px}.it-password-success-panel h2{font-size:19px}.it-password-success-subtitle{font-size:14px}.it-password-success-secret-row input{font-size:23px}.it-password-success-actions button{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.it-password-success-actions button{transition:none}}
+
+
+/* Disable Dealership: compact centered confirmation matching the provided reference. */
+dialog.it-dealer-disable-dialog{width:min(540px,calc(100vw - 28px));max-width:540px;max-height:calc(100dvh - 30px);border-radius:19px;background:#fff;color:#1d3148;box-shadow:0 18px 55px #172c4250}
+dialog.it-dealer-disable-dialog::backdrop{background:rgba(37,53,76,.48)}
+.it-dealer-disable-panel{padding:25px 25px 23px}
+.it-dealer-disable-heading{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.it-dealer-disable-icon{display:grid;place-items:center;flex:none;width:53px;height:53px;border-radius:15px;background:#fff0f0;color:#d83232}
+.it-dealer-disable-icon svg{width:25px;height:25px}
+.it-dealer-disable-heading h2{margin:0 0 5px;color:#1c3045;font-size:21px;line-height:1.25;font-weight:750}
+.it-dealer-disable-heading p{margin:0;color:#737b86;font-size:15px}
+.it-dealer-disable-dialog .it-dealer-disable-form{display:flex;flex-direction:column;gap:0}
+.it-dealer-disable-name{display:flex;flex-direction:column;gap:10px;padding:15px;background:#f4f5fa;border-radius:11px;margin-bottom:21px}
+.it-dealer-disable-name>span{font-size:13px;font-weight:500;color:#70757d}
+.it-dealer-disable-name strong{font-size:18px;font-weight:700;color:#233c53;overflow-wrap:anywhere}
+.it-dealer-disable-warning{display:flex;align-items:flex-start;gap:11px;margin-bottom:22px}
+.it-dealer-disable-warning svg{width:22px;height:22px;color:#b88328;flex:none;margin-top:2px}
+.it-dealer-disable-warning p{font-size:15px;line-height:1.52;color:#697b8e;margin:0}
+.it-dealer-disable-form label{display:flex;flex-direction:column;gap:10px;font-size:15px;color:#182c41;font-weight:500;margin-bottom:29px}
+.it-dealer-disable-form label strong{font-weight:750}
+.it-dealer-disable-form input{width:100%;min-height:48px;box-sizing:border-box;border-radius:26px;background:#fff;color:#22364a;border:1px solid #d2d6da;padding:11px 19px;outline:none;font-size:15px}
+.it-dealer-disable-form input::placeholder{color:#9a9a9a}
+.it-dealer-disable-form input:focus-visible{outline:2px solid #1298a6;outline-offset:2px}
+.it-dealer-disable-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;border-top:1px solid #e7e8eb;padding-top:21px}
+.it-dealer-disable-actions button{min-height:45px;padding:10px 12px;font-size:14px;font-weight:650;border-radius:25px;cursor:pointer}
+.it-dealer-disable-cancel{background:#fff;color:#17202c;border:1px solid #d4d7dc}
+.it-dealer-disable-cancel:hover{background:#f2f5f8}
+.it-dealer-disable-actions button[type="submit"]{background:#0e939c;color:#fff;border:1px solid #0e939c}
+.it-dealer-disable-actions button[type="submit"]:disabled{background:#f0f0f0;border-color:#f0f0f0;color:#999;cursor:not-allowed}
+.it-dealer-disable-actions button:focus-visible{outline:3px solid #17a6b1;outline-offset:2px}
+:root[data-theme="dark"] dialog.it-dealer-disable-dialog{background:#192a3b;color:#edf5ff}
+:root[data-theme="dark"] .it-dealer-disable-heading h2,:root[data-theme="dark"] .it-dealer-disable-name strong,:root[data-theme="dark"] .it-dealer-disable-form label{color:#eaf5ff}
+:root[data-theme="dark"] .it-dealer-disable-heading p,:root[data-theme="dark"] .it-dealer-disable-warning p{color:#b3c5d6}
+:root[data-theme="dark"] .it-dealer-disable-name{background:#26384c}
+:root[data-theme="dark"] .it-dealer-disable-name>span{color:#b4bfcb}
+:root[data-theme="dark"] .it-dealer-disable-form input{background:#223649;color:#fff;border-color:#53667b}
+:root[data-theme="dark"] .it-dealer-disable-actions{border-top-color:#34495d}
+:root[data-theme="dark"] .it-dealer-disable-cancel{background:#24394b;border-color:#52667a;color:#eaf2fb}
+@media(max-width:560px){.it-dealer-disable-panel{padding:20px 17px}.it-dealer-disable-heading h2{font-size:19px}.it-dealer-disable-warning p{font-size:13px}.it-dealer-disable-form label{font-size:13px}.it-dealer-disable-name strong{font-size:16px}}
+
+
+/* Enable Dealership shares the compact dialog layout; use a positive action color. */
+dialog.it-dealer-enable-dialog .it-dealer-disable-icon{background:#e8f8f2;color:#159a76}
+dialog.it-dealer-enable-dialog .it-dealer-disable-warning svg{color:#159a76}
+dialog.it-dealer-enable-dialog .it-dealer-disable-actions button[type="submit"]:not(:disabled){background:#079b83;border-color:#079b83;color:#fff}
+dialog.it-dealer-enable-dialog .it-dealer-disable-actions button[type="submit"]:not(:disabled):hover{background:#078874}
+:root[data-theme="dark"] dialog.it-dealer-enable-dialog .it-dealer-disable-icon{background:#1b4b3c;color:#71e3be}
+
+
+/* Destructive dealership confirmation: match reference's red icon, warning and two-button footer. */
+dialog.it-dealer-delete-dialog .it-dealer-disable-icon{background:#fff0f0;color:#d63136}
+dialog.it-dealer-delete-dialog .it-dealer-disable-heading{margin-bottom:21px}
+dialog.it-dealer-delete-dialog .it-dealer-disable-name{margin-bottom:20px}
+dialog.it-dealer-delete-dialog .it-dealer-delete-warning{display:flex;align-items:flex-start;gap:11px;background:#fff0f0;padding:16px 15px;border-radius:11px;margin-bottom:23px}
+dialog.it-dealer-delete-dialog .it-dealer-delete-warning svg{flex:none;width:22px;height:22px;color:#da3439;margin-top:2px}
+dialog.it-dealer-delete-dialog .it-dealer-delete-warning>div{min-width:0}
+dialog.it-dealer-delete-dialog .it-dealer-delete-warning strong{display:block;color:#b52b30;font-size:15px;font-weight:750;margin-bottom:6px}
+dialog.it-dealer-delete-dialog .it-dealer-delete-warning p{color:#a65053;font-size:13px;line-height:1.45;margin:0}
+dialog.it-dealer-delete-dialog .it-dealer-disable-form label{margin-bottom:29px}
+dialog.it-dealer-delete-dialog .it-dealer-disable-actions button[type="submit"]:not(:disabled){background:#cf3035;border-color:#cf3035;color:#fff}
+dialog.it-dealer-delete-dialog .it-dealer-disable-actions button[type="submit"]:not(:disabled):hover{background:#b52229}
+:root[data-theme="dark"] dialog.it-dealer-delete-dialog .it-dealer-disable-icon{background:#4b252b;color:#ffa1a6}
+:root[data-theme="dark"] dialog.it-dealer-delete-dialog .it-dealer-delete-warning{background:#47282e}
+:root[data-theme="dark"] dialog.it-dealer-delete-dialog .it-dealer-delete-warning strong{color:#ffb5b8}
+:root[data-theme="dark"] dialog.it-dealer-delete-dialog .it-dealer-delete-warning p{color:#f0bec0}
+@media(max-width:560px){dialog.it-dealer-delete-dialog .it-dealer-delete-warning strong{font-size:14px}}
