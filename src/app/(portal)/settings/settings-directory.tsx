@@ -50,6 +50,11 @@ export function SettingsDirectory({userId,email,role,dealership,displayName,phon
  const [passwordOpen,setPasswordOpen]=useState(false),[newPassword,setNewPassword]=useState(""),[confirmPassword,setConfirmPassword]=useState("");
  const uploadInput=useRef<HTMLInputElement>(null);
  useEffect(()=>{let active=true;if(!path||!path.startsWith(userId+"/")){setAvatarUrl("");return;}void supabase.storage.from("frontier-profile-avatars").createSignedUrl(path,3600).then(({data})=>{if(active)setAvatarUrl(data?.signedUrl??"");});return()=>{active=false;};},[path,userId,supabase]);
+ useEffect(()=>{
+  if(!notice)return;
+  const timeout=window.setTimeout(()=>setNotice(""),3500);
+  return ()=>window.clearTimeout(timeout);
+ },[notice]);
  const flash=(text:string)=>{setNotice(text);setError("");};
  const save=async()=>{if(!canManageAccount)return;const clean=name.trim().replace(/\s+/g," "),digits=mobile.trim();
   setError("");setNotice("");
@@ -113,7 +118,7 @@ export function SettingsDirectory({userId,email,role,dealership,displayName,phon
     </>:<section className="settings-ref-other-panel"><div className="settings-ref-other-heading"><span><Icon name={sections.find(s=>s.id===section)?.icon??"gear"} size={24}/></span><div><h2>{settingsPanels[section]}</h2><p>{section==="organization"?"Your assigned dealership and permissions":section==="notifications"?"Preferences for future alerts and email notifications":section==="api"?"Integration readiness and API security":section==="security"?"Account password and authentication options":section==="billing"?"Plan and billing settings":"Workspace configuration"}</p></div></div>
      {section==="organization"?<dl className="settings-ref-details"><div><dt>Dealership</dt><dd>{dealership}</dd></div><div><dt>Your Role</dt><dd>{role.replaceAll("_"," ")}</dd></div><div><dt>Membership</dt><dd>Authenticated</dd></div></dl>:section==="api"&&canManageAccount?<SarvamConnectionCard/>:section==="security"&&canManageAccount?<><button type="button" className="settings-ref-password-button" onClick={()=>setPasswordOpen(true)}><Icon name="lock" size={16}/> Change Password</button><p className="settings-ref-other-note">Two-factor authentication and trusted-device controls are not configured.</p></>:<div className="settings-ref-unavailable"><Icon name="info" size={22}/><strong>This section is ready for future configuration.</strong><p>{section==="notifications"?"Notification channels and delivery permissions are not yet configured.":section==="billing"?"A billing provider and confirmed plan information are not integrated.":"Changes to advanced settings require dedicated permissions and backend validation."}</p></div>}
     </section>}
-    {notice&&<p role="status" className="settings-ref-success">{notice}</p>}
+    {notice&&<div role="status" aria-live="polite" className="settings-ref-toast" key={notice}><Icon name="check" size={19}/><span>{notice}</span><button type="button" onClick={()=>setNotice("")} aria-label="Dismiss notification">×</button></div>}
     {error&&!passwordOpen&&<p role="alert" className="settings-ref-error">{error}</p>}
    </div>
   </div>
