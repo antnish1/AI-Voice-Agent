@@ -1,0 +1,18 @@
+/* Combined dealership user and directory register in one table. */
+.it-inline-dealer-directory{margin-top:6px;min-width:160px;max-width:400px;font-size:11px}
+.it-inline-dealer-directory>summary{display:inline-flex;align-items:center;gap:5px;color:#087e99;font-size:11px;font-weight:700;cursor:pointer;border-radius:5px;padding:3px 0;list-style:none}
+.it-inline-dealer-directory>summary::-webkit-details-marker{display:none}
+.it-inline-dealer-directory>summary:after{content:"⌄";font-size:14px;line-height:1;transition:transform .16s}
+.it-inline-dealer-directory[open]>summary:after{transform:rotate(180deg)}
+.it-inline-dealer-directory>summary:focus-visible{outline:2px solid #1685b4;outline-offset:2px}
+.it-inline-dealer-fields{display:grid;grid-template-columns:1fr;gap:7px;margin-top:8px;padding:11px 12px;background:#f4f9fc;border:1px solid #dce9f2;border-radius:9px;white-space:normal;overflow-wrap:anywhere}
+.it-inline-dealer-fields>div{display:grid;gap:2px;min-width:0}
+.it-inline-dealer-fields b{color:#486985;font-size:10px}
+.it-inline-dealer-fields span{color:#183b57;font-size:11px}
+.it-directory-only-row{background:#fbfdff}
+:root[data-theme="dark"] .it-inline-dealer-directory>summary{color:#7cdbed}
+:root[data-theme="dark"] .it-inline-dealer-fields{background:#1a3046;border-color:#39546c}
+:root[data-theme="dark"] .it-inline-dealer-fields b{color:#b5cce0}
+:root[data-theme="dark"] .it-inline-dealer-fields span{color:#e2eef9}
+:root[data-theme="dark"] .it-directory-only-row{background:#14263a}
+@media(prefers-reduced-motion:reduce){.it-inline-dealer-directory>summary:after{transition:none}}
