@@ -1,4 +1,5 @@
 "use client";
+import {EmptyState} from "@/components/empty-state";
 import {useMemo,useState,useEffect,useRef,type ReactNode} from "react";
 import "./agents-directory.css";
 type Profile={dealership_id:string;name:string;agent_id:string;app_version:number;connection_id:string;caller_number:string;active:boolean};
@@ -121,13 +122,7 @@ export function AgentsDirectory({profiles,loadError,headerAction}:{profiles:Prof
   {filtered.length>0?
    <div className="agent-card-grid">{filtered.map(a=><AgentCard agent={a} key={a.id} onDetails={setSelected}/>)}</div>:
    <section className="agent-empty-panel" aria-label={agents.length===0?"No AI voice agents yet":"No matching AI voice agents"}>
-    <div className="agent-empty-content">
-     <EmptyAgentArtwork/>
-     <h2>{agents.length===0?"No agents yet":"No matching agents"}</h2>
-     <p>{agents.length===0?"Your AI voice agents will appear here once they are added.":kpiFilter!=="all"?"No configured agents match this KPI selection. Choose another card or reset your filters.":"No agents match your current search, category or version filters."}</p>
-     {agents.length>0&&<button className="agent-empty-clear" type="button" onClick={clear}>Clear filters</button>}
-    </div>
-   </section>}
+    <EmptyState kind="agents" title={agents.length===0?"No agents yet":"No matching agents"} description={loadError?"Saved configurations could not be loaded.": "No agents match your current search, category or version filters."} action={agents.length>0?<button type="button" onClick={clear}>Clear filters</button>:undefined}/></section>}
   {selected?.profiles&&<ConfiguredAgentDetails key={selected.id} agent={selected} onClose={()=>setSelected(null)}/>}
   {selected&&!selected.profiles&&<div className="agent-preview-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null);}}><section role="dialog" aria-modal="true" aria-label={selected.name+" details"} className="agent-preview-modal"><button type="button" aria-label="Close agent details" className="agent-modal-close" onClick={()=>setSelected(null)}>×</button><div className="agent-modal-title"><span className={"agent-card-portrait tone-"+selected.tone}><Portrait kind={selected.portrait}/></span><div><h2>{selected.name}</h2><span>{selected.profiles?"Configured Sarvam agent":"Illustrative agent"} · {selected.version}</span></div></div><p>{selected.description}</p><dl><div><dt>Category</dt><dd>{selected.category}</dd></div><div><dt>Reference status</dt><dd>{selected.status} (sample only)</dd></div><div><dt>Sarvam connection</dt><dd>Not connected</dd></div></dl><div className="agent-preview-warning">Agent versions, sample playback and campaign selection will be enabled only after the Sarvam API is connected.</div><button type="button" onClick={()=>setSelected(null)} className="agent-modal-done">Close</button></section></div>}
  </div>;

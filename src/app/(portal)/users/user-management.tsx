@@ -1,4 +1,5 @@
 "use client";
+import {EmptyState} from "@/components/empty-state";
 import {useCallback,useEffect,useRef,useState,useTransition} from "react";
 import {createBrowserSupabase} from "@/lib/supabase/browser";
 
@@ -161,14 +162,14 @@ export function UserManagement(){
    <div className="tablewrap"><table><thead><tr><th>User</th><th>Dealership</th><th>Mobile</th><th>Employee ID</th><th>Role / Post</th><th>Account</th><th>Password Set</th><th>Action</th></tr></thead><tbody>
     {users.map(u=><tr key={u.id}><td><strong>{u.name||"Dealership User"}</strong><small>{u.email}</small></td><td>{u.dealership}</td><td>{u.mobile||"—"}</td><td>{u.employeeId||"—"}</td><td>{u.post||"—"}</td><td><span className={u.activated&&(!u.accountState||u.accountState==="active")?"it-user-active":"it-user-invited"}>{accountStatus(u)}</span></td><td><button type="button" aria-label={"IT Super User: reset password for "+u.name} title="IT Super User only · Reset temporary password without email" onClick={()=>openReset(u)} disabled={pending}>Reset password</button></td><td><div className="it-row-actions"><button type="button" title="Edit User" aria-label="Edit User" disabled={pending||!isManageableDealershipRole(u.role)||u.accountState==="archived"} onClick={()=>openReset(u,"edit")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m16 3 5 5L8 21H3v-5L16 3Zm-2 2 5 5"/></svg></button><button type="button" title={u.accountState&&u.accountState!=="active"?"Enable User":"Disable User"} aria-label={u.accountState&&u.accountState!=="active"?"Enable User":"Disable User"} disabled={pending||!isManageableDealershipRole(u.role)||Boolean(u.originalEmail)} onClick={()=>openReset(u,"lifecycle",u.accountState&&u.accountState!=="active"?"enable-login":"disable-login")}>{u.accountState&&u.accountState!=="active"?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m6 6 12 12"/></svg>}</button><button type="button" className="it-delete-icon" title="Delete User" aria-label="Delete User" disabled={pending||!isManageableDealershipRole(u.role)} onClick={()=>openReset(u,"lifecycle","delete-user")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></svg></button></div></td></tr>)}
 
-    {!users.length&&<tr><td colSpan={8} className="it-user-empty">{loading?"Loading users…":"No dealership user accounts found."}</td></tr>}
+    {!users.length&&<tr><td colSpan={8} className="it-user-empty">{loading?"Loading users…":error?"User records could not be loaded.":<EmptyState kind="users" title="No users available" description="Create a dealership user using the form above."/>}</td></tr>}
    </tbody></table></div>
   </section>}
   {activeTable==="dealerships"&&<section id="it-panel-dealerships" role="tabpanel" aria-labelledby="it-tab-dealerships" className="it-user-card it-user-list it-full-width">
    <div className="it-user-table-head"><h2>Dealership Accounts</h2></div>
    <div className="tablewrap"><table><thead><tr><th>Dealership</th><th>Address</th><th>Contact Person</th><th>Mobile</th><th>Email</th><th>Linked Users</th></tr></thead><tbody>
     {dealers.map(d=><tr key={d.id}><td><strong>{d.name}</strong></td><td>{d.address||"—"}</td><td>{d.contact_person||d.contact||"—"}</td><td>{d.mobile||"—"}</td><td>{d.email||"—"}</td><td>{users.filter(u=>u.dealershipId===d.id).length}</td></tr>)}
-    {!dealers.length&&<tr><td colSpan={6} className="it-user-empty">{loading?"Loading dealerships…":"No dealerships found."}</td></tr>}
+    {!dealers.length&&<tr><td colSpan={6} className="it-user-empty">{loading?"Loading dealerships…":error?"Dealership records could not be loaded.":<EmptyState kind="users" title="No dealerships found" description="Create a dealership to get started." action={<button type="button" onClick={openDealer}>Create Dealership</button>}/>}</td></tr>}
    </tbody></table></div>
   </section>}
  </div>;

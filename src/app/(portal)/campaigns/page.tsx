@@ -1,3 +1,4 @@
+import {EmptyState} from "@/components/empty-state";
 import Link from "next/link";
 import {campaignStatuses,campaignDisplayStatus} from "@/lib/campaign-display-status";
 import {requireMembership,canCreateCampaign} from "@/lib/auth";
@@ -80,7 +81,7 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
     </AutoCampaignFilters>
    </div>
    {shown.length?<div className="fc-tablewrap"><table className={"crm-table fc-full-campaign-table"+(!itUser?" fc-dealer-campaign-table":"")}><colgroup><col/>{itUser&&<col/>}<col/><col/><col/></colgroup><thead><tr><th>Campaign</th>{itUser&&<th>Dealership</th>}<th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>{shown.map(c=><tr key={c.id}><td><strong>{c.name}</strong><div className="fc-row-id">#{c.id.slice(0,8)}</div></td>{itUser&&<td>{dealershipName}</td>}<td><span className={`status-pill campaign-status-badge campaign-status-${display(c).toLowerCase()}`}>{display(c)}</span></td><td>{new Date(c.created_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</td><td>{canOperate?<div className="fc-row-actions"><Link className="fc-review-start" href={"/campaigns/"+c.id+"/outbound"}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M9 12l3 3 7-8M19 12v7H5V5h10"/></svg> Review / Start</Link></div>:<CampaignDetailsPopup name={c.name} dealership={membership.dealerships?.name??"Assigned dealership"} status={display(c)} created={formatDate(c.created_at)} approved={c.approved_at?formatDate(c.approved_at):"Not approved"} autoOpen={viewId===c.id}/>}</td></tr>)}</tbody></table><p className="fc-list-count">Showing {shown.length} of the latest {total} campaigns</p></div>:
-   <div className="fc-campaign-empty"><EmptyArt/><h3>{filtered?"No matching campaigns":"Start your first campaign"}</h3>{filtered&&<p>Try another search, status, or date range.</p>}{!filtered&&permitted?<Link href="/campaigns/new" className="fc-primary-button">＋ Create Campaign <span aria-hidden="true">→</span></Link>:null}</div>}
+   <EmptyState kind="campaigns" title={filtered?"No matching campaigns":"No campaigns yet"} description={filtered?"Try another search, status, or date range.":"Your campaigns will appear here once created."} action={filtered?<Link href="/campaigns">Clear filters</Link>:permitted?<Link href="/campaigns/new">Create Campaign</Link>:undefined}/>}
   </section>
  </div>;
 }

@@ -65,3 +65,20 @@
 #it-panel-users table td:first-child{text-align:left}
 #it-panel-users .it-row-actions{justify-content:center}
 #it-panel-users table td:not(:first-child)>button{display:inline-flex;align-items:center;justify-content:center}
+
+
+/* Keep the user identity and dealership adjacent, independent of short row content.
+   Scoped to the user-accounts tab; the separate dealership directory is unchanged. */
+.crm-app #it-panel-users .tablewrap>table{table-layout:fixed;min-width:940px}
+.crm-app #it-panel-users .tablewrap{overflow-x:auto}
+.crm-app #it-panel-users :is(th,td):nth-child(1){width:17%;text-align:left}
+.crm-app #it-panel-users :is(th,td):nth-child(2){width:16%;text-align:left}
+.crm-app #it-panel-users :is(th,td):nth-child(3){width:12%}
+.crm-app #it-panel-users :is(th,td):nth-child(4){width:11%}
+.crm-app #it-panel-users :is(th,td):nth-child(5){width:13%}
+.crm-app #it-panel-users :is(th,td):nth-child(6){width:9%}
+.crm-app #it-panel-users :is(th,td):nth-child(7){width:11%}
+.crm-app #it-panel-users :is(th,td):nth-child(8){width:11%}
+.crm-app #it-panel-users td:nth-child(-n+5){white-space:normal;overflow-wrap:anywhere}
+.crm-app #it-panel-users td:first-child :is(strong,small){white-space:normal;overflow-wrap:anywhere}
+.crm-app #it-panel-users td:last-child .it-row-actions{justify-content:flex-start;gap:4px}
