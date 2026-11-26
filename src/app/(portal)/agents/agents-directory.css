@@ -108,3 +108,38 @@ dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:bl
  .crm-app .agent-directory .agent-preview-card{min-height:205px}
 }
 @media(prefers-reduced-motion:reduce){.crm-app .agent-directory .agent-stat-card{transition:none}.crm-app .agent-directory .agent-stat-card:hover{transform:none}}
+
+/* Kajal details dialog: compact footprint matching the Verify AI Agent dialog.
+   Presentation sizing only; no data, controls or interactions are changed. */
+@media(min-width:761px){
+ dialog.configured-agent-dialog{width:min(680px,calc(100vw - 32px));border-radius:20px}
+ .configured-agent-panel{padding:20px 22px 16px}
+ .configured-agent-header{gap:17px;margin-bottom:15px;padding-right:40px}
+ .configured-agent-avatar{width:82px;height:82px;flex-basis:82px}
+ .configured-agent-avatar>span{width:18px;height:18px;border-width:3px}
+ .configured-agent-header h2{font-size:29px;gap:9px;margin-bottom:7px}
+ .configured-agent-header h2 span{font-size:17px;padding:4px 10px}
+ .configured-agent-header p{font-size:14px;gap:6px}
+ .configured-agent-header p svg{width:21px;height:21px}
+ .configured-agent-x{right:15px;top:14px;width:37px;height:37px;border-radius:10px}
+ .configured-agent-x svg{width:19px;height:19px}
+ .configured-agent-summary{gap:10px;margin-bottom:11px}
+ .configured-agent-summary>div{min-height:44px;padding:8px 10px;font-size:13px;gap:8px}
+ .configured-agent-summary>div svg{width:20px;height:20px}
+ .configured-agent-primary{min-height:43px;padding:8px 14px;border-radius:12px;font-size:14px}
+ .configured-agent-primary svg{width:18px;height:18px}
+ .configured-agent-columns{gap:9px}
+ .configured-agent-field-card{border-radius:15px;padding:0 10px}
+ .configured-agent-field{min-height:69px;padding:9px 0;gap:8px}
+ .configured-agent-field-icon{width:37px;height:37px;flex-basis:37px}
+ .configured-agent-field-icon svg{width:19px;height:19px}
+ .configured-agent-field-text{gap:3px}
+ .configured-agent-field-text>span{font-size:12px}
+ .configured-agent-field-text strong{font-size:12px}
+ .configured-agent-copy{width:25px;flex-basis:25px;height:28px}
+ .configured-agent-copy svg{width:18px;height:18px}
+ .configured-agent-footer{margin-top:12px}
+ .configured-agent-footer .configured-agent-primary{min-width:95px}
+ .configured-agent-wave{height:110px}
+ .configured-agent-wave.bottom{height:70px}
+}
