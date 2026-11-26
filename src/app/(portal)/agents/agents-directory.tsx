@@ -43,6 +43,21 @@ function Portrait({kind}:{kind:Agent["portrait"]}){
  {kind==="glasses"&&<g stroke="#29384d" fill="none" strokeWidth="2.2"><rect x="37" y="47" rx="7" width="22" height="18"/><rect x="62" y="47" rx="7" width="22" height="18"/><path d="M59 53h3M37 52l-6-2M84 52l7-2"/></g>}
  </svg>;
 }
+function EmptyAgentArtwork(){
+ return <svg className="agent-empty-illustration" viewBox="0 0 290 176" fill="none" aria-hidden="true">
+  <defs><linearGradient id="ae-paper" x1="90" y1="16" x2="201" y2="165" gradientUnits="userSpaceOnUse"><stop stopColor="#fff"/><stop offset="1" stopColor="#e3efff"/></linearGradient><linearGradient id="ae-accent" x1="75" y1="70" x2="212" y2="150" gradientUnits="userSpaceOnUse"><stop stopColor="#16c9c3"/><stop offset="1" stopColor="#2461c3"/></linearGradient></defs>
+  <ellipse cx="146" cy="160" rx="97" ry="9" fill="#e5f1fd"/>
+  <circle cx="145" cy="77" r="64" fill="#edf6ff"/><circle cx="66" cy="93" r="26" fill="#f1f8ff"/><circle cx="230" cy="87" r="30" fill="#eef5ff"/>
+  <rect x="96" y="19" width="105" height="129" rx="13" fill="url(#ae-paper)" stroke="#bfd7f4" strokeWidth="2"/>
+  <rect x="124" y="13" width="49" height="14" rx="6" fill="#5895df"/><rect x="137" y="17" width="23" height="5" rx="2" fill="#aee2ff"/>
+  <circle cx="148" cy="66" r="27" fill="#e0f8fc" stroke="#7cc9de" strokeWidth="2"/>
+  <path d="M136 65v-5a12 12 0 0 1 24 0v5M132 66h8v15h-5a4 4 0 0 1-4-4v-7a4 4 0 0 1 4-4Zm24 0h8v15h-5a4 4 0 0 1-4-4v-7a4 4 0 0 1 4-4Zm0 15v2c0 5-4 7-10 7h-3" stroke="#1394b7" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+  <path d="M123 104h50M123 117h40M123 130h30" stroke="#c2d9ef" strokeWidth="5" strokeLinecap="round"/>
+  <path d="m75 80 5 5 10-12" stroke="#19bcb2" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
+  <circle cx="220" cy="101" r="23" fill="#fff" stroke="#4597e8" strokeWidth="5"/><path d="m237 118 18 18" stroke="#246bc1" strokeWidth="6" strokeLinecap="round"/>
+  <path d="M49 52v-13M42 46h14M222 36v-11M216 31h12M75 133l4-7 4 7 7 4-7 4-4 7-4-7-7-4 7-4Z" stroke="#9bcaf7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+ </svg>;
+}
 function ProfileDetails({profiles}:{profiles:Profile[]}){
  return <div className="agent-real-profiles">{profiles.map(p=><dl className="agent-real-details" key={p.dealership_id+":"+p.app_version+":"+p.connection_id}><div><dt>Dealership</dt><dd>{p.name}</dd></div><div><dt>Sarvam Agent ID</dt><dd>{p.agent_id}</dd></div><div><dt>Committed Agent Version</dt><dd>{p.app_version}</dd></div><div><dt>Telephony Connection ID / Name</dt><dd>{p.connection_id}</dd></div><div><dt>Connected Caller Number</dt><dd>{p.caller_number}</dd></div></dl>)}</div>;
 }
@@ -79,9 +94,16 @@ export function AgentsDirectory({profiles,loadError,headerAction}:{profiles:Prof
    <button type="button" className="agent-refresh" onClick={clear}><Icon name="refresh"/> Reset</button><button type="button" className="agent-create-disabled" disabled title="Agent creation will become available after Sarvam connection"><Icon name="plus"/> Create Agent</button>
   </div>
 
-  <div className="agent-card-grid">{filtered.map(a=><AgentCard agent={a} key={a.id} onDetails={setSelected}/>)}
-  {filtered.length===0&&<div className="agent-no-results"><strong>No matching agents</strong><p>Try a different name, category, version or status.</p><button onClick={clear} type="button">Clear filters</button></div>}
-  <aside className="agent-custom-card"><div><h3>Create Your Own<br/>AI Voice Agent</h3><p>Customize instructions, voice and behaviour for your business needs.</p><button type="button" disabled title="Agent creation requires Sarvam API">Create Agent <Icon name="arrow" size={13}/></button></div><div className="agent-custom-art"><div className="agent-mic-glow"/><span aria-hidden="true">🎙</span></div></aside></div>
+  {filtered.length>0?
+   <div className="agent-card-grid">{filtered.map(a=><AgentCard agent={a} key={a.id} onDetails={setSelected}/>)}</div>:
+   <section className="agent-empty-panel" aria-label={agents.length===0?"No AI voice agents yet":"No matching AI voice agents"}>
+    <div className="agent-empty-content">
+     <EmptyAgentArtwork/>
+     <h2>{agents.length===0?"No agents yet":"No matching agents"}</h2>
+     <p>{agents.length===0?"Your AI voice agents will appear here once they are added.":"No agents match your current filters. Try a different name, category, version or status."}</p>
+     {agents.length>0&&<button className="agent-empty-clear" type="button" onClick={clear}>Clear filters</button>}
+    </div>
+   </section>}
   {selected&&<div className="agent-preview-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null);}}><section role="dialog" aria-modal="true" aria-label={selected.name+" details"} className="agent-preview-modal"><button type="button" aria-label="Close agent details" className="agent-modal-close" onClick={()=>setSelected(null)}>×</button><div className="agent-modal-title"><span className={"agent-card-portrait tone-"+selected.tone}><Portrait kind={selected.portrait}/></span><div><h2>{selected.name}</h2><span>{selected.profiles?"Configured Sarvam agent":"Illustrative agent"} · {selected.version}</span></div></div><p>{selected.description}</p>{selected.profiles?<><ProfileDetails profiles={selected.profiles}/><p className="muted">Saved CRM configuration; live Sarvam status and connection name are not independently verified.</p></>:<><dl><div><dt>Category</dt><dd>{selected.category}</dd></div><div><dt>Reference status</dt><dd>{selected.status} (sample only)</dd></div><div><dt>Sarvam connection</dt><dd>Not connected</dd></div></dl><div className="agent-preview-warning">Agent versions, sample playback and campaign selection will be enabled only after the Sarvam API is connected.</div></>}<button type="button" onClick={()=>setSelected(null)} className="agent-modal-done">Close</button></section></div>}
  </div>;
 }
