@@ -56,7 +56,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
    </div>
    <nav className="frontier-sidebar-nav" aria-label="Main navigation">
     {[...navigation.filter(item=>isItAdmin||(!dealershipHiddenRoutes.has(item.url)&&!["/approvals","/agents"].includes(item.url))),...(isItAdmin?[{name:"User Management",url:"/users",icon:"users" as SidebarIconName}]:[])].map(item=>{
-     const active=path===item.url||(item.url==="/campaigns"&&campaignActive);
+     const active=item.url==="/campaigns"?campaignActive&&(collapsed||!campaignsExpanded):path===item.url;
      return <div className="frontier-nav-entry" key={item.url}>
        <div className={`frontier-nav-row ${active?"selected":""} ${item.url==="/campaigns"?"frontier-campaign-row":""}`}>{active&&<motion.span layoutId="frontier-active-nav" className="frontier-motion-active-nav" transition={reducedMotion?{duration:0}:motionTokens.spring} aria-hidden="true"/>}
         <Link href={item.url} onClick={()=>{hideTooltip();closeMobile();}} title={!collapsed||narrowScreen?item.name:undefined} aria-label={item.name}
