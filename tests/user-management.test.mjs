@@ -148,17 +148,33 @@ test("temporary password form supports optional custom password and email correc
  assert.match(edge,/correctedEmail\?\{email:correctedEmail\}/);
 });
 
- test("compact user management keeps KPIs and combines user accounts with directory",()=>{
+ test("user management keeps KPIs and separates user and dealership tables",()=>{
  const ui=file("../src/app/(portal)/users/user-management.tsx");
  assert.doesNotMatch(ui,/it-user-permission|Create User \(No Email\)|>Refresh<|it-user-search|it-register-tabs|directoryView/);
  assert.match(ui,/>Dealerships<.*>Dealer users<.*>Active accounts<.*>System permission</);
- assert.match(ui,/View dealership details/);
+ assert.match(ui,/role="tablist" aria-label="User management tables"/);
+ assert.match(ui,/aria-selected=\{activeTable==="users"\}/);
+ assert.match(ui,/aria-selected=\{activeTable==="dealerships"\}/);
+ assert.match(ui,/activeTable==="users"&&<section/);
+ assert.match(ui,/activeTable==="dealerships"&&<section/);
+ assert.match(ui,/dealers\.map\(d=><tr/);
+ assert.match(ui,/users\.map\(u=><tr/);
  assert.match(ui,/d\.address\|\|"—"/);
- assert.match(ui,/d\.contact_person\|\|"—"/);
- assert.match(ui,/dealers\.filter\(d=>!users\.some\(u=>u\.dealershipId===d\.id\)\)/);
+ assert.match(ui,/d\.contact_person\|\|d\.contact\|\|"—"/);
+ assert.doesNotMatch(ui,/View dealership details|dealers\.filter\(d=>!users\.some/);
  });
 
- test("user management exposes separate password and accessible action icons",()=>{
+ test("edit user dialog has two side-by-side actions with safe cancel",()=>{
+ const ui=file("../src/app/(portal)/users/user-management.tsx");
+ const css=file("../src/app/(portal)/users/unified-directory.css");
+ assert.doesNotMatch(ui,/Login email changes remain in Password Set\. Dealership assignment and system permissions are unchanged\./);
+ assert.match(ui,/className="it-edit-form-actions"/);
+ assert.match(ui,/className="it-edit-cancel" disabled=\{pending\} onClick=\{\(\)=>resetDialogRef\.current\?\.close\(\)\}>Cancel<\/button>/);
+ assert.match(ui,/<button type="submit" disabled=\{pending\}>\{pending\?"Saving…":"Save changes"\}<\/button>/);
+ assert.match(css,/\.it-edit-form \.it-edit-form-actions\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+});
+
+test("user management exposes separate password and accessible action icons",()=>{
  const ui=file("../src/app/(portal)/users/user-management.tsx");
  assert.match(ui,/<th>Password Set<\/th><th>Action<\/th>/);
  for(const label of ["Edit User","Disable User","Enable User","Delete User"])assert.ok(ui.includes(label));

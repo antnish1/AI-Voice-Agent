@@ -30,3 +30,38 @@
 :root[data-theme="dark"] .it-user-toast>button:hover{background:#285947}
 @media(max-width:600px){.it-user-toast{top:72px;right:12px;padding:10px 12px;max-width:calc(100vw - 24px)}}
 @media(prefers-reduced-motion:reduce){.it-user-toast{animation:none}}
+
+
+/* Separate dealership-user and dealership-account tables with compact tabs. */
+.it-account-table-tabs{display:flex;align-items:center;gap:5px;width:max-content;max-width:100%;margin:0 0 10px;padding:5px;border:1px solid #dbe6ef;border-radius:12px;background:#f0f5fa}
+.it-account-table-tabs button{appearance:none;border:0;border-radius:9px;background:transparent;color:#46617e;padding:11px 17px;font-size:12px;font-weight:750;white-space:nowrap;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s}
+.it-account-table-tabs button[aria-selected="true"]{background:#0b8b99;color:#fff;box-shadow:0 3px 8px #087a872a}
+.it-account-table-tabs button[aria-selected="false"]:hover{background:#e1eaf2;color:#244968}
+.it-account-table-tabs button:focus-visible{outline:3px solid #0d9eae;outline-offset:2px}
+:root[data-theme="dark"] .it-account-table-tabs{background:#1c3046;border-color:#37516b}
+:root[data-theme="dark"] .it-account-table-tabs button{color:#bed3e5}
+:root[data-theme="dark"] .it-account-table-tabs button[aria-selected="true"]{background:#088ea0;color:#fff}
+:root[data-theme="dark"] .it-account-table-tabs button[aria-selected="false"]:hover{background:#29445b;color:#fff}
+@media(max-width:540px){.it-account-table-tabs{width:100%}.it-account-table-tabs button{flex:1;min-width:0;white-space:normal;text-align:center;padding:10px 8px;font-size:11px}}
+@media(prefers-reduced-motion:reduce){.it-account-table-tabs button{transition:none}}
+
+
+/* Compact two-button action row for editing dealership users. */
+.it-edit-form .it-edit-form-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;grid-column:1/-1;margin-top:5px}
+.it-edit-form .it-edit-form-actions button{width:100%;min-height:42px;margin:0;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:750;cursor:pointer}
+.it-edit-form .it-edit-form-actions button[type="submit"]{background:#078d9b;color:#fff}
+.it-edit-form .it-edit-form-actions .it-edit-cancel{background:#f4f8fb;color:#31516c;border:1px solid #cadbe8}
+.it-edit-form .it-edit-form-actions .it-edit-cancel:hover:not(:disabled){background:#e7eff6}
+.it-edit-form .it-edit-form-actions button:disabled{cursor:not-allowed;opacity:.6}
+.it-edit-form .it-edit-form-actions button:focus-visible{outline:3px solid #06a5ad;outline-offset:2px}
+:root[data-theme="dark"] .it-edit-form .it-edit-form-actions .it-edit-cancel{background:#263b50;color:#d7e9f6;border-color:#50677e}
+:root[data-theme="dark"] .it-edit-form .it-edit-form-actions .it-edit-cancel:hover:not(:disabled){background:#36536a}
+
+
+/* User records: center all columns except the User column, including headers and actions. */
+#it-panel-users table th:not(:first-child),
+#it-panel-users table td:not(:first-child){text-align:center}
+#it-panel-users table th:first-child,
+#it-panel-users table td:first-child{text-align:left}
+#it-panel-users .it-row-actions{justify-content:center}
+#it-panel-users table td:not(:first-child)>button{display:inline-flex;align-items:center;justify-content:center}
