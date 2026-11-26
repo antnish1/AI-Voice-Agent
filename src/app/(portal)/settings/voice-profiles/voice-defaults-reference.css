@@ -75,3 +75,7 @@ linear-gradient(125deg,#e8f4ff 0%,#edf4ff 50%,#dceeff 100%);}
 .vdp-import-select label{font-weight:800}
 .vdp-import-select select{flex:1;min-width:190px;max-width:100%;padding:10px;border-radius:8px;border:1px solid #afd6f6;background:white;color:#123153}
 @media(max-width:650px){.vdp-import-head{align-items:flex-start;flex-direction:column}.vdp-import-select{align-items:stretch;flex-direction:column}}
+
+/* Keep the robot completely inside its own artwork column. */
+.vdp-header{align-items:center;padding:6px 4px 16px}.vdp-heading h1{margin:4px 0 0}.vdp-body{grid-template-columns:minmax(0,68%) minmax(0,32%);gap:0;align-items:stretch}.vdp-visual{height:auto;min-height:440px;align-self:stretch;overflow:hidden;isolation:isolate;padding:12px 8px;background:radial-gradient(ellipse at 50% 43%,#f0f8ff 0%,#d5e8ff 44%,transparent 76%)}.vdp-visual:before{width:94%;height:74%;z-index:-1;opacity:.7}.vdp-visual:after{z-index:-1;bottom:-74px;right:-24%;width:150%;height:132px;border-color:#526ce44a;background:#689ef233}.vdp-visual .vdp-robot{display:block;width:100%;max-width:500px;height:auto;max-height:none;opacity:1;filter:drop-shadow(0 14px 16px #2653a74a);align-self:center;justify-self:center;z-index:1}.vdp-page:before{background:radial-gradient(ellipse at 78% 28%,#d5e9ff,transparent 48%),linear-gradient(125deg,#e8f4ff,#edf4ff 55%,#e2ecff)}
+@media(max-width:900px){.vdp-body{grid-template-columns:1fr}.vdp-visual{min-height:0;height:320px;padding:8px}.vdp-visual .vdp-robot{width:auto;height:100%;max-width:100%}.vdp-card{max-width:none}}
