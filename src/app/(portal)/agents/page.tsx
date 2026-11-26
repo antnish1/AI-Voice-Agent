@@ -6,10 +6,11 @@ import {AgentTestCall} from "./agent-test-call";
 export default async function Agents(){
  const {supabase,membership,user,memberships}=await requireMembership();if(!membership)return null;
  if(!isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":""))redirect("/campaigns");
- const {data,error}=await supabase.from("dealership_voice_profiles").select("dealership_id,agent_id,app_version,connection_id,caller_number").eq("active",true);
+ const {data,error}=await supabase.from("dealership_voice_profiles").select("dealership_id,agent_id,app_version,connection_id,caller_number,active");
  const {data:dealers,error:dealerError}=await supabase.from("dealerships").select("id,name");
  const names=new Map((dealers??[]).map(d=>[d.id,d.name]));
- const defaults=error||dealerError?[]:(data??[]).filter(p=>names.has(p.dealership_id)).map(p=>({...p,name:names.get(p.dealership_id)??""}));
+ const configured=error||dealerError?[]:(data??[]).filter(p=>names.has(p.dealership_id)).map(p=>({...p,name:names.get(p.dealership_id)??""}));
+ const defaults=configured.filter(p=>p.active).map(({active,...p})=>p);
  const saved:typeof defaults=[];
  let savedError=false;
  for(let offset=0;;offset+=200){
@@ -27,5 +28,5 @@ export default async function Agents(){
   if(campaigns.length<200)break;
  }
  const profiles=[...defaults,...saved];
- return <><AgentTestCall profiles={profiles} enabled={process.env.ENABLE_TEST_CALLS==="true"} loadError={!!error||!!dealerError||savedError}/><AgentsDirectory/></>;
+ return <AgentsDirectory profiles={configured} loadError={!!error||!!dealerError} headerAction={<AgentTestCall profiles={profiles} enabled={process.env.ENABLE_TEST_CALLS==="true"} loadError={!!error||!!dealerError||savedError}/>}/>;
 }
