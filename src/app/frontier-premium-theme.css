@@ -93,7 +93,7 @@
 .crm-app .it-account-table-tabs button[aria-selected=false]:hover{background:var(--brand-soft);color:var(--crisp-accent)}
 .crm-app :is(.customers-stat-icon,.agent-stat-icon,.calllogs-stat-icon,.reports-ref-kpi-icon) svg{color:inherit}
 .crm-app .customers-tone-blue .customers-stat-icon{color:var(--crisp-accent)!important;background:var(--brand-soft)!important}
-.crm-app :is(.customers-list-title svg,.settings-ref-sidebar button svg,.frontier-layout-title svg,.frontier-layout-option svg,.settings-ref-card-heading svg,.settings-ref-profile-identity strong,.it-inline-dealer-directory>summary,.fc-template-text,.fc-upload-symbol,.fc-success-reference,.fc-success-copy-icon,.fc-create-phone-icon,.configured-agent-copy){color:var(--crisp-accent)!important}
+.crm-app :is(.customers-list-title svg,.settings-ref-sidebar button svg,.frontier-layout-title svg,.frontier-layout-option svg,.settings-ref-card-heading svg,.it-inline-dealer-directory>summary,.fc-template-text,.fc-upload-symbol,.fc-success-reference,.fc-success-copy-icon,.fc-create-phone-icon,.configured-agent-copy){color:var(--crisp-accent)!important}
 .crm-app :is(.customers-reset,.calllogs-view-icon,.settings-ref-api-actions button,.it-user-search,.configured-agent-x,.configured-agent-copy,.fc-success-copy-icon){background:var(--modal-surface)!important;border-color:var(--modal-line)!important;color:var(--modal-ink)!important}
 .crm-app :is(.customers-reset,.calllogs-view-icon,.configured-agent-x,.configured-agent-copy,.fc-success-copy-icon):hover{background:var(--brand-soft)!important;color:var(--crisp-accent)!important}
 .crm-app :is(.settings-ref-api-notice,.frontier-layout-option.selected,.fc-create-phone-icon,.configured-agent-field-icon,.configured-agent-summary>div,.configured-agent-header h2 span){background:var(--brand-soft)!important;border-color:var(--brand-edge)!important;color:var(--crisp-accent)!important}
@@ -114,7 +114,17 @@
 .crm-app .configured-agent-avatar{background:var(--brand-soft)}
 .crm-app :is(.campaign-modal-close,.agent-modal-close,.customers-modal-title button,.approvals-modal header button,.reports-ref-modal header button,.settings-ref-modal header button,.portal-account-modal-head button){background:var(--modal-surface)!important;color:var(--modal-ink)!important;border-color:var(--modal-line)!important}
 .crm-app :is(.campaign-modal-close,.agent-modal-close,.customers-modal-title button,.approvals-modal header button,.reports-ref-modal header button,.settings-ref-modal header button,.portal-account-modal-head button):hover{background:var(--brand-soft)!important;color:var(--crisp-accent)!important}
-.crm-app :is(.campaign-modal-back,.fc-success-cancel,.configured-agent-x,.review-dialog .btn-outline){background:var(--modal-surface)!important;border-color:var(--modal-line)!important;color:var(--modal-ink)!important}
+.crm-app :is(.campaign-modal-back,.fc-success-cancel,.configured-agent-x,.review-dialog .btn-outline:not(.review-hold,.review-reject)){background:var(--modal-surface)!important;border-color:var(--modal-line)!important;color:var(--modal-ink)!important}
 .crm-app :is(.campaign-modal-next,.fc-success-view,.configured-agent-primary):disabled{opacity:.55}
 .crm-app .campaign-modal-progress:before{background:var(--modal-line)}
 /* Do not recolor data-series outcome colors, status badges, warnings, or destructive confirmations. */
+
+/* Preserve visible status icon contrast and distinguish disabled preview actions. */
+.crm-app .customers-tone-blue .customers-stat-icon svg{stroke:currentColor}
+.crm-app :is(.agent-create-disabled,.agent-use-disabled)[aria-disabled=true]{opacity:.55;cursor:not-allowed}
+.crm-app .settings-ref-profile-identity strong{color:var(--modal-ink)}
+.crm-app .frontier-layout-title{color:var(--modal-ink)}
+.crm-app .frontier-layout-option:not(.selected){color:var(--modal-ink);border-color:var(--modal-line)}
+.crm-app .settings-ref-api-notice{background:var(--modal-surface)!important}
+.crm-app .settings-ref-api-notice :is(strong,small){color:var(--modal-ink)!important}
+.crm-app :is(.agent-stat-card,.customers-stat,.reports-ref-kpi,.calllogs-stat) :is(svg)[aria-hidden=true]{max-width:100%}
