@@ -1,3 +1,4 @@
+import {normalizeTranscript} from "@/lib/sarvam/transcript";
 import {NextResponse} from "next/server";
 import {requireItSuperUser} from "@/lib/it-access";
 export const dynamic="force-dynamic";
@@ -12,7 +13,7 @@ export async function GET(request:Request){
   if(!test.sarvam_attempt_id)return NextResponse.json({transcript:[]},{headers});
   const {data:call,error:callError}=await supabase.from("voice_test_call_results").select("transcript,interaction_id,status,duration_seconds,started_at").eq("request_id",id).maybeSingle();
   if(callError)return NextResponse.json({error:"Call details unavailable"},{status:404,headers});
-  const transcript=Array.isArray(call?.transcript)?call.transcript.filter((t:unknown):t is {role:string;en_text:string}=>!!t&&typeof t==="object"&&"role" in t&&"en_text" in t&&typeof t.en_text==="string"&&(t.role==="agent"||t.role==="user")):[];
+  const transcript=normalizeTranscript(call?.transcript);
   return NextResponse.json({transcript,interactionId:call?.interaction_id??null,outcome:call?.status??null,duration:call?.duration_seconds??null,startedAt:call?.started_at??null},{headers});
  }catch{return NextResponse.json({error:"Not authorized"},{status:403,headers});}
 }
