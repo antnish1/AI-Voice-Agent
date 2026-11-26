@@ -3,7 +3,8 @@ import {requireMembership} from "@/lib/auth";
 import {isItSuperUser} from "@/lib/it-access";
 import {AgentsDirectory} from "./agents-directory";
 import {AgentTestCall} from "./agent-test-call";
-export default async function Agents(){
+export default async function Agents({searchParams}:{searchParams:Promise<{campaign?:string}>}){
+ const requested=(await searchParams).campaign;
  const {supabase,membership,user,memberships}=await requireMembership();if(!membership)return null;
  if(!isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":""))redirect("/campaigns");
  const {data,error}=await supabase.from("dealership_voice_profiles").select("dealership_id,agent_id,app_version,connection_id,caller_number,active");
@@ -14,7 +15,7 @@ export default async function Agents(){
  const saved:{id:string;name:string;dealership_id:string;profile:typeof defaults[number]|null}[]=[];
  let savedError=false;
  for(let offset=0;;offset+=200){
-  const {data:campaigns,error:ce}=await supabase.from("campaigns").select("id,name,dealership_id").in("status",["DRAFT","PENDING_MANAGER_APPROVAL","APPROVED"]).order("id").range(offset,offset+199);
+  const {data:campaigns,error:ce}=await supabase.from("campaigns").select("id,name,dealership_id").in("status",["DRAFT","PENDING","PENDING_MANAGER_APPROVAL","PAUSED","APPROVED"]).order("id").range(offset,offset+199);
   if(ce){savedError=true;break;}
   if(!campaigns?.length)break;
   const {data:configs,error:cfgError}=await supabase.from("campaign_draft_configs").select("campaign_id,dealership_id,configuration").in("campaign_id",campaigns.map(c=>c.id));
@@ -28,5 +29,5 @@ export default async function Agents(){
   }
   if(campaigns.length<200)break;
  }
- return <AgentsDirectory profiles={configured} loadError={!!error||!!dealerError} headerAction={<AgentTestCall dealerships={(dealers??[]).map(d=>({id:d.id,name:d.name})).sort((a,b)=>a.name.localeCompare(b.name))} profiles={defaults} campaigns={saved} enabled={process.env.ENABLE_TEST_CALLS==="true"} loadError={!!error||!!dealerError||savedError}/>}/>;
+ return <AgentsDirectory profiles={configured} loadError={!!error||!!dealerError} headerAction={<AgentTestCall dealerships={(dealers??[]).map(d=>({id:d.id,name:d.name})).sort((a,b)=>a.name.localeCompare(b.name))} profiles={defaults} campaigns={saved} initialCampaign={saved.find(c=>c.id===requested)?.id} enabled={process.env.ENABLE_TEST_CALLS==="true"} loadError={!!error||!!dealerError||savedError}/>}/>;
 }
