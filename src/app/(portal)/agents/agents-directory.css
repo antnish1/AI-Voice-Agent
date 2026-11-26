@@ -228,3 +228,8 @@ dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:bl
  .crm-app .agent-directory .agent-card-portrait{width:59px;height:59px;flex-basis:59px}
  .crm-app .agent-directory .agent-card-content{min-height:59px}
 }
+
+/* Match the Customers workspace inset; keep all agent sections aligned. */
+.crm-app .frontier-motion-route > .agent-directory{margin-inline:0;align-self:stretch;width:auto;max-width:100%;box-sizing:border-box;padding-inline:var(--compact-edge,8px)}
+.crm-app .agent-directory > :is(.agent-page-hero,.agent-stats-grid,.agent-page-controls,.agent-card-grid,.agent-no-results){min-width:0;max-width:100%;box-sizing:border-box}
+@media(max-width:600px){.crm-app .frontier-motion-route > .agent-directory{padding-inline:6px}}
