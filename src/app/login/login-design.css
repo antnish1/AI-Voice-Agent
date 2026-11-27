@@ -487,3 +487,10 @@
  .fv-login-left-card .fv-left-top{align-self:flex-start}
  .fv-login-left-card .fv-signin-card{width:min(420px,100%)}
 }
+
+/* Stationary background dissolve, matching the reference website effect. */
+.fv-login-full-background .fv-vehicle-crossfade{position:relative;display:block;transform:none;transition:none;isolation:isolate}
+.fv-login-full-background .fv-vehicle-crossfade .fv-vehicle-slide{position:absolute;inset:0;width:100%;height:100%;opacity:0;z-index:0;transition:opacity 800ms ease-in-out;pointer-events:none}
+.fv-login-full-background .fv-vehicle-crossfade .fv-vehicle-slide[data-active="true"]{opacity:1;z-index:1}
+.fv-login-full-background .fv-vehicle-viewport::after{z-index:2}
+@media(prefers-reduced-motion:reduce){.fv-login-full-background .fv-vehicle-crossfade .fv-vehicle-slide{transition:none}}
