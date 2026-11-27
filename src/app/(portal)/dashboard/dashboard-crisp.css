@@ -153,3 +153,12 @@
   .crm-app .ref-dashboard.dashboard-reference .dashboard-hero{min-height:100px;padding:10px 12px}
   .crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy{margin:0;padding:6px 10px 6px 15px}
 }
+
+/* Compact welcome: heading and authorized actions share the same header. */
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero{justify-content:space-between;align-items:center;min-height:78px;gap:16px;padding:12px 18px;overflow:visible;flex-wrap:wrap}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy{flex:1 1 auto;min-width:0;padding:6px 12px 6px 16px}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy h1{font-size:clamp(19px,1.8vw,27px);line-height:1.3;margin:0}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy h1 strong{font-size:inherit;font-weight:750}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero .dashboard-reference-toolbar{flex:0 1 auto;margin-left:auto;position:relative;z-index:3}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero .ref-dashboard-heading-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px}
+@media(max-width:760px){.crm-app .ref-dashboard.dashboard-reference .dashboard-hero{gap:10px;padding:10px 12px}.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy{flex-basis:100%}.crm-app .ref-dashboard.dashboard-reference .dashboard-hero .dashboard-reference-toolbar{margin-left:0;width:100%;justify-content:flex-start}.crm-app .ref-dashboard.dashboard-reference .dashboard-hero .ref-dashboard-heading-actions{justify-content:flex-start}}
