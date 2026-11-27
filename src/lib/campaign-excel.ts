@@ -1,8 +1,7 @@
 // Browser-only XLSX template and first-sheet reader. No external Excel service or customer-data upload.
 export const RECIPIENT_TEMPLATE_HEADERS=[
- "Mobile","Customer Name","Model","Reg. Number","Service Type","Service DueDate",
- "Last ServiceDate","Original CallDate","Last Reported Mileage","Last Follow up date",
- "Last Follow up Remarks","consent","do_not_call"
+ "phone_number","customer_name","vehicle_model","last_service_date","next_service_due_date",
+ "service_type","service_category","last_reported_mileage","complimentary_pickup_drop_available","active_offer_description"
 ] as const;
 const encode=(s:string)=>new TextEncoder().encode(s);
 const escapeXml=(s:string)=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");
