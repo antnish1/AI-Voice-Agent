@@ -1,6 +1,7 @@
 import {NextResponse} from "next/server";
 import {requireItSuperUser} from "@/lib/it-access";
 import {callingEnabled,sha256,sarvamPost,sarvamPath} from "@/lib/sarvam/outbound-provider";
+import {followUpDate} from "@/lib/sarvam/service-recipients";
 import {normalizePhone,prepareRecipients} from "@/lib/sarvam/recipient-validation";
 export const runtime="nodejs";
 
@@ -88,7 +89,7 @@ export async function POST(request:Request){
   if(reserveCohortError)return NextResponse.json({error:"Remote campaign created but cohort reservation failed. Do not retry launch."},{status:502});
   try{
    const streamed=await sarvamPost(sarvamPath("campaigns","/"+encodeURIComponent(providerId)+"/cohorts/stream"),{
-    name:batch.cohort_name,users:prepared.users
+    name:batch.cohort_name,users:prepared.users.map(user=>{if(batch.phone_column!=="phone_number")return user;return {...user,app_variables:{...user.app_variables,call_plus_3_date:followUpDate(istDate(start),3),call_plus_7_date:followUpDate(istDate(start),7)}};})
    });
    if(typeof streamed.cohort_id!=="string"||!streamed.cohort_id)throw Error("Provider did not acknowledge cohort");
    const {error:statusError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitted",provider_status:"scheduled",sarvam_cohort_id:streamed.cohort_id,updated_at:new Date().toISOString()}).eq("campaign_id",id);
