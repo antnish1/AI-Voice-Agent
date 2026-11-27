@@ -2,7 +2,6 @@ import {isItSuperUser} from "@/lib/it-access";
 import {EmptyState} from "@/components/empty-state";
 import Link from "next/link";
 import {CampaignPeriodFilter} from "@/components/motion/campaign-period-filter";
-import {DashboardPeriodFilter} from "./dashboard-period-filter";
 import {campaignDisplayStatus} from "@/lib/campaign-display-status";
 import {CountUp} from "@/components/motion/count-up";
 import {CampaignActivityChart} from "@/components/motion/campaign-activity-chart";
@@ -22,7 +21,6 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  const id=membership.dealership_id;
  const itUser=isItSuperUser(user.id,user.email??"",memberships.some(m=>m.role==="super_admin")?"super_admin":"");
  const params=await searchParams;
- const {days:rangeInput}=params;
  const period=["all","mtd","today","90","custom"].includes(params.period??"")?params.period!:"all";
  const today=localDate(new Date());
  const shift=(date:string,n:number)=>new Date(Date.parse(date+"T00:00:00+05:30")+n*86400000).toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
@@ -33,7 +31,6 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  const lower=from?new Date(from+"T00:00:00+05:30").toISOString():"";
  const upper=to?new Date(Date.parse(to+"T00:00:00+05:30")+86400000).toISOString():"";
  const scoped=<T extends {gte:(column:string,value:string)=>T;lt:(column:string,value:string)=>T}>(q:T,column="created_at"):T=>{if(invalid)return q.gte(column,"9999-01-01T00:00:00Z");if(lower)q=q.gte(column,lower);if(upper)q=q.lt(column,upper);return q;};
- const requestedDays=rangeInput==="30"?30:rangeInput==="14"?14:7;
  const chartPeriod=["all","today","mtd","custom"].includes(params.chartPeriod??"")?params.chartPeriod!:"all";
  const chartCustomValid=valid(params.chartFrom)&&valid(params.chartTo)&&params.chartFrom<=params.chartTo&&params.chartTo<=today;
  const ownFrom=chartPeriod==="today"?today:chartPeriod==="mtd"?today.slice(0,7)+"-01":chartPeriod==="custom"&&chartCustomValid?params.chartFrom!:"";
@@ -125,7 +122,7 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  {name:"Total Calls",value:String(callCount.count??0),note:String(answeredCount.count??0)+" answered",icon:"◕",tone:"blue"}];
  return <div className="ref-dashboard dashboard-reference">
  <section className="dashboard-hero" aria-label="Dashboard welcome"><div className="dashboard-hero-copy"><h1>{greeting}, <strong>{userName}!</strong></h1></div>
-<div className="dashboard-reference-toolbar"><div className="ref-dashboard-heading-actions"><DashboardPeriodFilter period={period} from={from} to={period==="custom"?to:""} days={requestedDays}/>{canCreate&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div></section>
+<div className="dashboard-reference-toolbar"><div className="ref-dashboard-heading-actions">{canCreate&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div></section>
  <div className="ref-kpi-grid dashboard-separated-kpis" aria-label="Dashboard key metrics">{metrics.map((m,index)=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}><img src={"/assets/artwork/"+["total-customers","campaigns-megaphone","active-campaigns-play","scheduled-campaigns-calendar","total-calls-phone"][index]+".webp"} alt="" width={64} height={64}/></div><div><span className="ref-kpi-label">{m.name}</span><CountUp className="ref-kpi-value" value={m.value}/></div></article>)}</div>
  <div className="ref-dashboard-columns">
  <div className="ref-dashboard-left">
