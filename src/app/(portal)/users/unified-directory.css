@@ -218,3 +218,8 @@ dialog.it-dealer-delete-dialog .it-dealer-disable-actions button[type="submit"]:
 :root[data-theme="dark"] .it-user-page .it-user-stats .it-stat-users{background:#3b3058;color:#cdb7ff}
 :root[data-theme="dark"] .it-user-page .it-user-stats .it-stat-active{background:#204b3e;color:#86dfb7}
 :root[data-theme="dark"] .it-user-page .it-user-stats .it-stat-shield{background:#244858;color:#91d8ed}
+
+.it-user-page .it-user-stats .it-stat-icon.it-dimensional-icon{width:52px;height:52px;padding:3px;background:transparent;overflow:visible;filter:drop-shadow(0 2px 2px #20395b18)}
+.it-user-page .it-user-title .it-dimensional-icon{width:43px;height:43px}
+.it-user-page .it-icon-heading>.it-dimensional-icon{width:28px;height:28px}
+.it-user-page .it-account-table-tabs .it-dimensional-icon{width:23px;height:23px}
