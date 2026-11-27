@@ -177,3 +177,64 @@
     transform:none!important;
   }
 }
+
+
+/* Reports visual refresh: plain white header + KPI cards, shared toolbar/table surface.
+   Keep existing tab/search positions for IT; dealership gets title + left-side search. */
+.crm-app .reports-ref .reports-ref-heading{
+  background:#fff!important;
+  border:1px solid var(--r-line);
+  box-shadow:none!important;
+}
+.crm-app .reports-ref .reports-ref-heading:before{display:none!important}
+.crm-app .reports-ref .reports-ref-kpis .reports-category-card,
+.crm-app .reports-ref .reports-ref-kpis .reports-category-card.tone-green,
+.crm-app .reports-ref .reports-ref-kpis .reports-category-card.tone-purple,
+.crm-app .reports-ref .reports-ref-kpis .reports-category-card.tone-amber{
+  background:#fff!important;
+}
+.crm-app .reports-ref .reports-ref-toolbar{
+  background:var(--r-panel);border:1px solid var(--r-line);border-bottom:0;
+  border-radius:14px 14px 0 0;margin-bottom:0;padding:10px 12px 0;
+  box-sizing:border-box;
+}
+/* No additional table heading for IT Super User; tabs stay left, search stays right. */
+.crm-app .reports-ref .reports-ref-toolbar:not(.reports-dealership-toolbar){
+  display:flex;align-items:center;justify-content:space-between;
+}
+.crm-app .reports-ref .reports-ref-toolbar:not(.reports-dealership-toolbar) .reports-ref-filters{
+  margin-left:auto;
+}
+.crm-app .reports-ref .reports-ref-table-card{
+  border-top:0;border-radius:0 0 14px 14px;
+  box-shadow:0 3px 10px #25446910;
+}
+.crm-app .reports-ref .reports-dealership-toolbar{
+  justify-content:flex-start;gap:16px;align-items:center;
+  padding:12px 14px;
+}
+.crm-app .reports-ref .reports-dealership-toolbar .reports-ref-filters{
+  margin-left:0!important;margin-right:auto;
+}
+.crm-app .reports-ref .reports-dealership-toolbar .reports-ref-search{
+  min-width:275px;
+}
+@media(max-width:680px){
+  .crm-app .reports-ref .reports-ref-toolbar{padding:10px 10px 0;flex-wrap:wrap}
+  .crm-app .reports-ref .reports-dealership-toolbar{padding:12px;gap:10px}
+  .crm-app .reports-ref .reports-dealership-toolbar .reports-ref-filters{
+    margin-left:0!important;width:100%;
+  }
+  .crm-app .reports-ref .reports-dealership-toolbar .reports-ref-search{
+    width:100%;min-width:0;
+  }
+}
+:root[data-theme="dark"] .crm-app .reports-ref .reports-ref-heading{
+  background:var(--r-panel)!important;
+}
+:root[data-theme="dark"] .crm-app .reports-ref .reports-ref-kpis .reports-category-card,
+:root[data-theme="dark"] .crm-app .reports-ref .reports-ref-kpis .reports-category-card.tone-green,
+:root[data-theme="dark"] .crm-app .reports-ref .reports-ref-kpis .reports-category-card.tone-purple,
+:root[data-theme="dark"] .crm-app .reports-ref .reports-ref-kpis .reports-category-card.tone-amber{
+  background:var(--r-panel)!important;
+}
