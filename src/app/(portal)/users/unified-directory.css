@@ -197,3 +197,24 @@ dialog.it-dealer-delete-dialog .it-dealer-disable-actions button[type="submit"]:
 :root[data-theme="dark"] dialog.it-dealer-delete-dialog .it-dealer-delete-warning strong{color:#ffb5b8}
 :root[data-theme="dark"] dialog.it-dealer-delete-dialog .it-dealer-delete-warning p{color:#f0bec0}
 @media(max-width:560px){dialog.it-dealer-delete-dialog .it-dealer-delete-warning strong{font-size:14px}}
+
+/* Consistent line icons for user administration; existing layout and action handlers stay intact. */
+.it-user-page .it-professional-icon{flex:none;vertical-align:middle}
+.it-user-page .it-user-title .it-professional-icon{width:28px;height:28px}
+.it-user-page .it-icon-heading,.it-user-page .it-field-caption{display:flex;align-items:center;gap:7px}
+.it-user-page .it-icon-heading>.it-professional-icon{width:20px;height:20px;color:#526b83}
+.it-user-page .it-field-caption>.it-professional-icon{width:15px;height:15px;color:#64748b}
+.it-user-page :is(.it-create-dealer,.it-create-user-form button[type="submit"],.it-account-table-tabs button){display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.it-user-page .it-account-table-tabs .it-professional-icon{width:16px;height:16px}
+.it-user-page #it-panel-users td>button .it-professional-icon{width:14px;height:14px;margin-right:5px}
+.it-user-page .it-user-stats .it-stat-building{background:#eaf1ff;color:#3268cc}
+.it-user-page .it-user-stats .it-stat-users{background:#f1ebff;color:#7854c5}
+.it-user-page .it-user-stats .it-stat-active{background:#e3f7ef;color:#16835d}
+.it-user-page .it-user-stats .it-stat-shield{background:#e7f4fa;color:#207e9d}
+.it-user-page .it-row-actions button:not(:disabled):hover{color:#2459a4;background:#e9f0fb}
+.it-user-page .it-row-actions .it-delete-icon:not(:disabled):hover{color:#c92735;background:#ffebed}
+:root[data-theme="dark"] .it-user-page :is(.it-icon-heading,.it-field-caption)>.it-professional-icon{color:#a8bdd5}
+:root[data-theme="dark"] .it-user-page .it-user-stats .it-stat-building{background:#223c63;color:#a4c6ff}
+:root[data-theme="dark"] .it-user-page .it-user-stats .it-stat-users{background:#3b3058;color:#cdb7ff}
+:root[data-theme="dark"] .it-user-page .it-user-stats .it-stat-active{background:#204b3e;color:#86dfb7}
+:root[data-theme="dark"] .it-user-page .it-user-stats .it-stat-shield{background:#244858;color:#91d8ed}
