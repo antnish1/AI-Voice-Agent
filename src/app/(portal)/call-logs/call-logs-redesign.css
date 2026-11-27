@@ -76,3 +76,154 @@
 .crm-app .calllogs-reference .calllogs-stat-icon img{width:100%;height:100%;object-fit:contain;max-width:100%}
 .crm-app .calllogs-reference .calllogs-header-actions .calllogs-export{background:#142b50!important;border-color:#142b50!important;color:#fff!important}
 @media(max-width:760px){.crm-app .calllogs-reference .calllogs-hero-art{top:8px;height:96px}}
+
+
+/* Call Logs: neutral, compact header without duplicated KPI artwork or central illustration. */
+.crm-app .calllogs-reference .calllogs-ref-heading{
+  min-height:84px;
+  padding:12px 16px;
+  background:#fff;
+  background-image:none;
+  border:1px solid #e2e7ee;
+  border-radius:13px;
+  gap:12px;
+}
+.crm-app .calllogs-reference .calllogs-ref-heading:before{content:none;display:none}
+.crm-app .calllogs-reference .calllogs-heading-left{
+  flex:1 1 300px;
+  min-width:0;
+}
+.crm-app .calllogs-reference .calllogs-main-icon{
+  height:45px;width:45px;flex:0 0 45px;
+  border-radius:12px;
+  display:grid;place-items:center;
+  background:#fff0f3!important;
+  color:#d71c36!important;
+  box-shadow:none!important;
+}
+.crm-app .calllogs-reference .calllogs-heading-left h1{font-size:25px;font-weight:700}
+.crm-app .calllogs-reference .calllogs-header-actions{
+  flex:0 1 auto;
+  margin-left:auto;
+  justify-content:flex-end;
+}
+.crm-app .calllogs-reference .calllogs-stats .calllogs-stat,
+.crm-app .calllogs-reference .calllogs-stats .calllogs-stat.tone-blue,
+.crm-app .calllogs-reference .calllogs-stats .calllogs-stat.tone-green,
+.crm-app .calllogs-reference .calllogs-stats .calllogs-stat.tone-rose,
+.crm-app .calllogs-reference .calllogs-stats .calllogs-stat.tone-amber,
+.crm-app .calllogs-reference .calllogs-stats .calllogs-category-card[aria-pressed=true]{
+  background:#fff!important;
+  background-image:none!important;
+}
+.crm-app .calllogs-reference .calllogs-stats .calllogs-stat:after{content:none;display:none}
+.crm-app .calllogs-reference .calllogs-stats .calllogs-stat{
+  min-height:82px;padding:10px 14px;gap:10px;
+  border-color:#e2e7ee;
+}
+.crm-app .calllogs-reference .calllogs-stats .calllogs-stat[aria-pressed=true]{
+  border-color:#df263b!important;
+  box-shadow:inset 3px 0 0 #df263b,0 2px 9px #1e366416!important;
+}
+.crm-app .calllogs-reference .calllogs-stat-icon,
+.crm-app .calllogs-reference .calllogs-stats .calllogs-stat .calllogs-stat-icon{
+  width:44px;height:44px;flex:0 0 44px;
+  background:transparent!important;
+  border-radius:0;
+  box-shadow:none!important;
+}
+.crm-app .calllogs-reference .calllogs-stats .calllogs-stat-icon img{
+  width:44px;height:44px;max-width:100%;max-height:100%;object-fit:contain;
+  filter:drop-shadow(0 2px 2px #203a5c12);
+}
+.crm-app .calllogs-reference .calllogs-stat strong{font-size:26px}
+
+/* One bordered surface for status tabs/search, table and pagination. */
+.crm-app .calllogs-reference .calllogs-records-card{
+  background:#fff;
+  border:1px solid #e3e7ed;
+  border-radius:13px;
+  box-shadow:0 2px 8px #132c5110;
+  overflow:hidden;
+  min-width:0;
+}
+.crm-app .calllogs-reference .calllogs-records-card .calllogs-table-top{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:#fff;
+  padding:10px 12px 0;
+  margin:0;
+  border-bottom:1px solid #e3e7ed;
+}
+.crm-app .calllogs-reference .calllogs-records-card .calllogs-tabs{
+  min-width:0;border-bottom:0;
+}
+.crm-app .calllogs-reference .calllogs-records-card .calllogs-tabs button{
+  border-radius:12px 12px 0 0;
+}
+.crm-app .calllogs-reference .calllogs-records-card .calllogs-search-controls{
+  padding-bottom:8px;
+}
+.crm-app .calllogs-reference .calllogs-records-card .calllogs-table-card{
+  border:0;border-radius:0;box-shadow:none;
+  background:transparent;
+}
+.crm-app .calllogs-reference .calllogs-records-card .calllogs-expanded-table thead th{
+  background:#f0f1f5;
+}
+.crm-app .calllogs-reference .calllogs-records-card .calllogs-table-footer{
+  border-top:1px solid #e3e7ed;
+}
+
+/* Statuses are informational badges; animate subtly on hover without a pointer cursor. */
+.crm-app .calllogs-reference .calllogs-expanded-table .calllogs-badge-shrink{
+  display:inline-flex;align-items:center;justify-content:center;
+  transform:scale(1);
+  transform-origin:center;
+  transition:transform 150ms ease-out;
+  cursor:default;
+}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+  .crm-app .calllogs-reference .calllogs-expanded-table .calllogs-badge-shrink:hover{
+    transform:scale(.95);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .crm-app .calllogs-reference .calllogs-expanded-table .calllogs-badge-shrink{transition:none;transform:none!important}
+}
+:root[data-theme="dark"] .crm-app .calllogs-reference .calllogs-ref-heading,
+:root[data-theme="dark"] .crm-app .calllogs-reference .calllogs-records-card,
+:root[data-theme="dark"] .crm-app .calllogs-reference .calllogs-records-card .calllogs-table-top,
+:root[data-theme="dark"] .crm-app .calllogs-reference .calllogs-stats .calllogs-stat:nth-child(n){
+  background:#14243a!important;border-color:#354b63;color:#edf6ff;
+}
+:root[data-theme="dark"] .crm-app .calllogs-reference .calllogs-main-icon{
+  background:#3c2b44!important;color:#ff9bac!important;
+}
+:root[data-theme="dark"] .crm-app .calllogs-reference .calllogs-records-card .calllogs-table-top,
+:root[data-theme="dark"] .crm-app .calllogs-reference .calllogs-records-card .calllogs-table-footer{border-color:#354b63}
+@media(max-width:1080px){
+  .crm-app .calllogs-reference .calllogs-ref-heading{min-height:84px;flex-wrap:wrap}
+  .crm-app .calllogs-reference .calllogs-header-actions{width:auto;max-width:100%}
+}
+@media(max-width:760px){
+  .crm-app .calllogs-reference .calllogs-ref-heading{
+    min-height:0;padding:12px;flex-direction:column;align-items:stretch;
+  }
+  .crm-app .calllogs-reference .calllogs-heading-left{
+    flex:0 0 auto;max-width:100%;min-height:0;
+  }
+  .crm-app .calllogs-reference .calllogs-main-icon{width:42px;height:42px;flex-basis:42px}
+  .crm-app .calllogs-reference .calllogs-header-actions{width:100%;max-width:none}
+  .crm-app .calllogs-reference .calllogs-records-card .calllogs-table-top{
+    flex-wrap:wrap;padding:10px 10px 0;
+  }
+  .crm-app .calllogs-reference .calllogs-records-card .calllogs-tabs{
+    width:100%;overflow-x:auto;flex-wrap:nowrap;
+  }
+  .crm-app .calllogs-reference .calllogs-records-card .calllogs-search-controls{
+    width:100%;padding-bottom:10px;
+  }
+  .crm-app .calllogs-reference .calllogs-records-card .calllogs-search{
+    width:100%;min-width:0;
+  }
+}
