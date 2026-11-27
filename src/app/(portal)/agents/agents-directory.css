@@ -706,3 +706,50 @@ dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:bl
   .crm-app .agent-directory .agent-preview-card .agent-card-actions{gap:4px}
   .crm-app .agent-directory .agent-preview-card .agent-card-actions > button{font-size:9px;padding:5px 3px}
 }
+
+
+/* Agent details: compact 2-by-2 provider field grid; Sarvam ID remains in calling configuration. */
+.crm-app .agent-directory .configured-agent-provider-grid,
+.configured-agent-dialog .configured-agent-provider-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  padding:10px;
+}
+.crm-app .agent-directory .configured-agent-provider-grid > .configured-agent-field,
+.configured-agent-dialog .configured-agent-provider-grid > .configured-agent-field{
+  display:flex;
+  align-items:center;
+  min-height:76px;
+  padding:12px;
+  border:1px solid #e3e9f1;
+  border-radius:11px;
+  background:#fff;
+  gap:8px;
+}
+.crm-app .agent-directory .configured-agent-provider-grid > .configured-agent-field + .configured-agent-field,
+.configured-agent-dialog .configured-agent-provider-grid > .configured-agent-field + .configured-agent-field{
+  border-top:1px solid #e3e9f1;
+}
+.configured-agent-dialog .configured-agent-provider-grid .configured-agent-field-text{
+  min-width:0;
+}
+.configured-agent-dialog .configured-agent-provider-grid .configured-agent-field-text strong{
+  overflow-wrap:anywhere;
+}
+:root[data-theme="dark"] .configured-agent-dialog .configured-agent-provider-grid > .configured-agent-field{
+  background:#253448;
+  border-color:#45546b;
+}
+@media(max-width:540px){
+  .crm-app .agent-directory .configured-agent-provider-grid,
+  .configured-agent-dialog .configured-agent-provider-grid{
+    grid-template-columns:1fr;
+    gap:7px;
+    padding:8px;
+  }
+  .configured-agent-dialog .configured-agent-provider-grid > .configured-agent-field{
+    min-height:62px;
+    padding:9px 10px;
+  }
+}
