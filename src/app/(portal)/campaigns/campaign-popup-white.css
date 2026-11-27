@@ -317,3 +317,126 @@
 :root[data-theme="dark"] .crm-app .campaign-modal.fc-reference-create .fc-compact-upload{
  background:#192e43!important;border-color:#526b87!important;
 }
+
+
+/* Compact Create Campaign popup: 30% narrower than the 1060px design.
+   Scoped to creation form; confirmation/success popup remains unchanged. */
+.crm-app .campaign-modal.fc-reference-create{
+  width:min(742px,calc(100vw - 28px));
+  max-height:min(94dvh,780px);
+  border-radius:20px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-create-header{
+  min-height:90px;
+  padding:13px 22px;
+  gap:14px;
+  background:#fff!important;
+  border-bottom:1px solid #e6eaf0!important;
+  overflow:visible;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-create-header:before{
+  content:none!important;
+  display:none!important;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-create-phone-icon{
+  height:46px;width:46px;flex:0 0 46px;
+  border-radius:13px;
+  box-shadow:none!important;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-create-phone-icon img{
+  height:42px;width:42px;object-fit:contain;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-create-heading-copy{
+  padding-left:13px;max-width:calc(100% - 115px);margin-right:34px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-create-header h2{
+  font-size:21px;font-weight:700;line-height:1.2;letter-spacing:-.45px;
+  margin-bottom:3px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-create-header p{
+  font-size:12px;line-height:1.35;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-create-close{
+  top:18px;right:16px;width:31px;height:31px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-create-scroll{
+  padding:15px 24px 7px;
+  gap:13px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-compact-fields{gap:13px}
+.crm-app .campaign-modal.fc-reference-create .campaign-form-label,
+.crm-app .campaign-modal.fc-reference-create .fc-reference-period,
+.crm-app .campaign-modal.fc-reference-create .fc-compact-excel-head strong{
+  font-size:14px;font-weight:600;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-create-dealer-select{margin-top:7px}
+.crm-app .campaign-modal.fc-reference-create .campaign-pill-input,
+.crm-app .campaign-modal.fc-reference-create .fc-period-fields select{
+  min-height:46px;
+  padding-top:9px;padding-bottom:9px;
+  font-size:13px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-create-dealer-select select.campaign-pill-input{
+  padding-left:52px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-create-dealer-select>svg{left:18px;width:19px;height:19px}
+.crm-app .campaign-modal.fc-reference-create .fc-period-fields{
+  margin-top:8px;gap:14px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-period-fields label{gap:5px;font-size:12px}
+.crm-app .campaign-modal.fc-reference-create .fc-template-text{
+  font-size:12px;min-height:26px;padding:3px 0;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-template-text svg{width:17px;height:17px}
+.crm-app .campaign-modal.fc-reference-create .fc-compact-upload{
+  min-height:80px;padding:13px 12px;
+  gap:12px;border-radius:13px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-compact-upload strong{font-size:15px}
+.crm-app .campaign-modal.fc-reference-create .fc-compact-upload small{
+  font-size:12px;padding-left:12px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-consent{
+  margin-top:0;padding:6px 0;gap:11px;font-size:12px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-consent input{width:20px;height:20px}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-create-footer{
+  margin:7px 24px 0;padding:11px 0 15px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-footer-buttons{gap:14px}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-footer-buttons button{
+  min-height:46px;font-size:14px;gap:8px;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-footer-buttons .campaign-modal-next svg{
+  width:17px;height:17px;
+}
+:root[data-theme="dark"] .crm-app .campaign-modal.fc-reference-create .fc-reference-create-header{
+  background:#14243a!important;border-bottom-color:#354b63!important;
+}
+@media(max-width:720px){
+  .crm-app .campaign-modal.fc-reference-create{
+    width:calc(100vw - 18px);
+    max-height:94dvh;border-radius:16px;
+  }
+  .crm-app .campaign-modal.fc-reference-create .fc-reference-create-header{
+    min-height:76px;padding:11px 13px;gap:9px;
+  }
+  .crm-app .campaign-modal.fc-reference-create .fc-create-phone-icon{
+    height:39px;width:39px;flex-basis:39px;
+  }
+  .crm-app .campaign-modal.fc-reference-create .fc-create-phone-icon img{height:36px;width:36px}
+  .crm-app .campaign-modal.fc-reference-create .fc-create-heading-copy{
+    padding-left:9px;margin-right:20px;max-width:calc(100% - 82px);
+  }
+  .crm-app .campaign-modal.fc-reference-create .fc-reference-create-header h2{font-size:16px}
+  .crm-app .campaign-modal.fc-reference-create .fc-reference-create-header p{font-size:10px}
+  .crm-app .campaign-modal.fc-reference-create .fc-create-close{top:9px;right:8px;width:29px;height:29px}
+  .crm-app .campaign-modal.fc-reference-create .fc-reference-create-scroll{padding:12px 15px 6px;gap:12px}
+  .crm-app .campaign-modal.fc-reference-create .fc-reference-create-footer{margin:7px 15px 0;padding:11px 0 13px}
+  .crm-app .campaign-modal.fc-reference-create .fc-compact-fields{gap:12px}
+  .crm-app .campaign-modal.fc-reference-create .fc-compact-upload{min-height:75px}
+  .crm-app .campaign-modal.fc-reference-create .fc-compact-upload strong{font-size:12px}
+  .crm-app .campaign-modal.fc-reference-create .fc-compact-upload small{font-size:11px}
+  .crm-app .campaign-modal.fc-reference-create .fc-reference-footer-buttons{gap:9px}
+  .crm-app .campaign-modal.fc-reference-create .fc-reference-footer-buttons button{min-height:45px;font-size:12px}
+}

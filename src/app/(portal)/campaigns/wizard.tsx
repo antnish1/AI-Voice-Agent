@@ -118,7 +118,6 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
    <header className="campaign-modal-header fc-reference-create-header">
     <span className="fc-create-phone-icon" aria-hidden="true"><img src="/call-logs-total-3d.svg" width={76} height={76} alt=""/></span>
     <div className="fc-create-heading-copy"><h2 id="campaign-dialog-title">Create AI Calling Campaign</h2><p>Upload customer data to create a campaign.</p></div>
-    <img className="fc-create-agent-art" src="/call-logs-support-agent-3d.svg" width={640} height={168} alt="" aria-hidden="true"/>
     <button type="button" className="fc-create-close" aria-label="Close Create Campaign" title="Close" disabled={busy} onClick={()=>router.push("/campaigns")}><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 5 19 19M19 5 5 19"/></svg></button>
    </header>
    <div className="campaign-modal-scroll fc-compact-scroll fc-reference-create-scroll">
