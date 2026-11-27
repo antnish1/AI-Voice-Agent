@@ -7,6 +7,7 @@ import "./campaigns-reference.css";
 import {CampaignDetailsPopup} from "./campaign-details-popup";
 import {CampaignActionToast} from "./campaign-action-toast";
 import {AutoCampaignFilters} from "./auto-campaign-filters";
+import {CampaignArtwork} from "./campaign-artwork";
 
 type Filters={dealership?:string;q?:string;status?:string;from?:string;to?:string;view?:string};
 type Campaign={dealership_id:string;id:string;name:string;status:string;created_at:string;approved_at:string|null};
@@ -38,7 +39,7 @@ function EmptyArt(){
  </svg>;
 }
 function CountsCard({kind,label,value}:{kind:"all"|"draft"|"pending";label:string;value:number}){
- return <div className={`fc-count-card fc-count-${kind}`}><span className="fc-count-icon"><CampaignIcon kind={kind}/></span><span className="fc-count-content"><span>{label}</span><strong>{value}</strong></span></div>;
+ return <div className={`fc-count-card fc-count-${kind}`}><span className="fc-count-icon"><CampaignArtwork kind={kind==="draft"?"ongoing":kind}/></span><span className="fc-count-content"><span>{label}</span><strong>{value}</strong></span></div>;
 }
 function normalizeDate(input?:string){return input&&/^\d{4}-\d{2}-\d{2}$/.test(input)?input:"";}
 export default async function Campaigns({searchParams}:{searchParams?:Promise<Filters>}={}){
@@ -82,7 +83,7 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
  const filtered=!!(q||selectedStatus||from||to||selectedDealer);
  return <div className="fc-campaign-page"><CampaignActionToast/>
   <header className="fc-campaign-hero">
-   <div className="fc-hero-copy"><h1>Campaigns</h1></div>
+   <div className="fc-hero-copy"><h1><CampaignArtwork kind="hero" className="fc-campaign-hero-art"/> <span>Campaigns</span></h1></div>
    <HeaderWave/>
    <div className="fc-hero-actions">{itUser&&<Link href="/settings/voice-profiles" className="fc-voice-button"><CampaignIcon kind="voice"/> Voice Agent Defaults</Link>}{permitted&&<Link href="/campaigns/new" className="fc-primary-button"><span>＋</span> New Campaign</Link>}</div>
   </header>
@@ -91,9 +92,11 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
    <div className="fc-list-toolbar"><h2><span className="fc-grid-icon"><CampaignIcon kind="grid"/></span> All Campaigns</h2>
     <AutoCampaignFilters>
      <label className="fc-search"><CampaignIcon kind="search"/><input type="search" name="q" aria-label="Search campaigns" placeholder="Search campaigns..." defaultValue={q}/></label>
+     <div className="fc-filter-right">
      {itUser&&<label className="fc-status"><select name="dealership" aria-label="Filter by dealership" defaultValue={selectedDealer}><option value="">All Dealerships</option>{dealerOptions.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></label>}
      <label className="fc-status"><CampaignIcon kind="filter"/><select name="status" aria-label="Filter by status" defaultValue={selectedStatus}><option value="">All Status</option>{statuses.map(s=><option key={s} value={s}>{s}</option>)}</select></label>
      <details className="fc-date-details"><summary><CampaignIcon kind="calendar"/> {from||to?"Date Range Set":"Date Range"}</summary><div className="fc-date-panel"><label>From<input name="from" type="date" defaultValue={from}/></label><label>To<input name="to" type="date" defaultValue={to}/></label></div></details>
+     </div>
     </AutoCampaignFilters>
    </div>
    {shown.length?<div className="fc-tablewrap"><table className={"crm-table fc-full-campaign-table"+(!itUser?" fc-dealer-campaign-table":"")}><colgroup><col/>{itUser&&<col/>}<col/><col/><col/></colgroup><thead><tr><th>Campaign</th>{itUser&&<th>Dealership</th>}<th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>{shown.map(c=><tr key={c.id}><td><strong>{c.name}</strong><div className="fc-row-id">#{c.id.slice(0,8)}</div></td>{itUser&&<td>{nameFor(c.dealership_id)}</td>}<td><span className={`status-pill campaign-status-badge campaign-status-${display(c).toLowerCase()}`}>{display(c)}</span></td><td>{new Date(c.created_at).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</td><td>{canOperate?<div className="fc-row-actions"><Link className="fc-review-start" href={"/campaigns/"+c.id+"/outbound"}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M9 12l3 3 7-8M19 12v7H5V5h10"/></svg> Review / Start</Link></div>:<CampaignDetailsPopup name={c.name} dealership={membership.dealerships?.name??"Assigned dealership"} status={display(c)} created={formatDate(c.created_at)} approved={c.approved_at?formatDate(c.approved_at):"Not approved"} autoOpen={viewId===c.id}/>}</td></tr>)}</tbody></table><p className="fc-list-count">Showing {shown.length} of {total} campaigns</p></div>:
