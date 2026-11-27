@@ -271,3 +271,40 @@
     min-height:80px;
   }
 }
+
+/* Fixed activity status track, compact artwork and stronger badge feedback. */
+.crm-app .ref-dashboard.dashboard-reference .ref-panel-header .ref-heading-icon.dashboard-heading-art{
+ display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;
+ width:26px;height:26px;flex:0 0 26px;padding:0;border:0;border-radius:0;
+ background:transparent!important;background-image:none!important;box-shadow:none!important;
+}
+.crm-app .ref-dashboard.dashboard-reference .ref-panel-header .dashboard-heading-art img{
+ display:block;width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;
+}
+:root[data-theme="dark"] .crm-app .ref-dashboard.dashboard-reference .ref-panel-header .dashboard-heading-art img{mix-blend-mode:normal}
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-list{container-type:inline-size}
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item{
+ grid-template-columns:27px minmax(0,1fr) 82px 90px;column-gap:8px;align-items:center;
+}
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item>div{min-width:0;overflow-wrap:anywhere}
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item .dashboard-activity-status{grid-column:3;justify-self:center;text-align:center}
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item time,
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item:not(:has(.dashboard-activity-status)) time{
+ grid-column:4;grid-row:1;justify-self:end;text-align:right;white-space:nowrap;
+}
+.crm-app .ref-dashboard.dashboard-reference :is(.ref-activity-list,.ref-campaign-table) .campaign-status-badge{
+ display:inline-flex;align-items:center;justify-content:center;transform:scale(1);transform-origin:center;
+ transition:transform 200ms cubic-bezier(.2,.7,.2,1);cursor:default;
+}
+@media(hover:hover){
+ .crm-app .ref-dashboard.dashboard-reference :is(.ref-activity-list,.ref-campaign-table) .campaign-status-badge:hover{transform:scale(.85)}
+}
+.crm-app .ref-dashboard.dashboard-reference :is(.ref-activity-list,.ref-campaign-table) .campaign-status-badge:active{transform:scale(.75)}
+@container(max-width:330px){
+ .crm-app .ref-dashboard.dashboard-reference .ref-activity-item{grid-template-columns:24px minmax(0,1fr) 76px;gap:5px}
+ .crm-app .ref-dashboard.dashboard-reference .ref-activity-item time,
+ .crm-app .ref-dashboard.dashboard-reference .ref-activity-item:not(:has(.dashboard-activity-status)) time{grid-column:2/-1;grid-row:2;justify-self:end}
+}
+@media(prefers-reduced-motion:reduce){
+ .crm-app .ref-dashboard.dashboard-reference :is(.ref-activity-list,.ref-campaign-table) .campaign-status-badge{transition:none!important;transform:none!important}
+}
