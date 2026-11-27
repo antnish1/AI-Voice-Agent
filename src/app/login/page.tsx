@@ -11,8 +11,9 @@ function VoiceBadge({type}:{type:"voice"|"performance"|"shield"}){
 }
 export default async function Login({searchParams}:{searchParams:Promise<{error?:string}>}){
  const {error}=await searchParams;
- return <main className="fv-login">
-  <section className="fv-left fv-left-with-banners" aria-label="Frontier Voice CRM introduction">
+ return <main className="fv-login fv-login-full-background">
+  <VehicleCarousel/>
+  <section className="fv-left" aria-label="Frontier Voice CRM introduction">
    <div className="fv-left-glow" aria-hidden="true"/>
    <div className="fv-left-top" title="Frontier Voice CRM">
     <img src="/autoreach-logo.png" alt="Frontier Voice CRM" width={88} height={88}/>
@@ -29,7 +30,6 @@ export default async function Login({searchParams}:{searchParams:Promise<{error?
      <span><VoiceBadge type="shield"/>Manage Your Business</span>
     </div>
    </div>
-   <VehicleCarousel/>
    <div className="fv-left-wave-bottom" aria-hidden="true"/>
   </section>
   <section className="fv-right" aria-label="Sign in to Frontier Voice CRM">

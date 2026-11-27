@@ -448,3 +448,21 @@
  .fv-left-with-banners .fv-pills{flex-wrap:wrap;margin-top:12px}
 }
 @media(prefers-reduced-motion:reduce){.fv-vehicle-track,.fv-vehicle-dot::after{transition:none}}
+
+/* Full-viewport vehicle background behind both login columns. */
+.fv-login.fv-login-full-background{position:relative;isolation:isolate;background:#071a38;min-height:100dvh}
+.fv-login-full-background .fv-vehicle-background{position:fixed;inset:0;width:100%;height:100dvh;max-width:none;z-index:0;pointer-events:none}
+.fv-login-full-background .fv-vehicle-viewport{position:absolute;inset:0;border:0;border-radius:0;box-shadow:none;background:#071a38}
+.fv-login-full-background .fv-vehicle-track{height:100%;width:100%}
+.fv-login-full-background .fv-vehicle-slide{height:100%;display:block}
+.fv-login-full-background .fv-vehicle-slide img{width:100%;height:100%;max-height:none;aspect-ratio:auto;object-fit:cover;object-position:center}
+.fv-login-full-background .fv-vehicle-viewport::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(3,16,37,.68),rgba(3,16,37,.25) 55%,rgba(3,16,37,.18))}
+.fv-login-full-background .fv-left,.fv-login-full-background .fv-right{position:relative;z-index:1;background:transparent!important}
+.fv-login-full-background .fv-left-content h1,.fv-login-full-background .fv-left-content h2,.fv-login-full-background .fv-left-content>p,.fv-login-full-background .fv-left-top strong{text-shadow:0 2px 14px #07142c99}
+.fv-login-full-background .fv-signin-card{background:rgba(255,255,255,.96);box-shadow:0 18px 55px #0004}
+.fv-login-full-background .fv-vehicle-controls{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:3;pointer-events:auto;background:#071a38b8;border-radius:30px;padding:2px 9px;margin:0}
+@media(max-width:800px){
+ .fv-login-full-background{padding-bottom:52px}
+ .fv-login-full-background .fv-vehicle-slide img{object-position:center}
+ .fv-login-full-background .fv-vehicle-controls{bottom:8px}
+}
