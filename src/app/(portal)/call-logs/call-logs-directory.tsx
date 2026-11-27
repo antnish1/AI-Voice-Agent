@@ -8,9 +8,10 @@ import "./call-details-dialog.css";
 import "./call-logs-redesign.css";
 import {CallRecordingPlayer} from "@/components/call-recording-player";
 
-type IconName="eye"|"phone"|"answered"|"failed"|"clock"|"download"|"calendar"|"chevron"|"search"|"filter"|"play"|"info"|"refresh";
+type IconName="headphones"|"eye"|"phone"|"answered"|"failed"|"clock"|"download"|"calendar"|"chevron"|"search"|"filter"|"play"|"info"|"refresh";
 function Icon({name,size=18}:{name:IconName;size?:number}){
  const paths:Record<IconName,React.ReactNode>={
+ headphones:<><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><rect x="3" y="12" width="4" height="8" rx="2"/><rect x="17" y="12" width="4" height="8" rx="2"/></>,
  eye:<><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></>,
  phone:<><path d="M5.2 3.2h3.5l1.5 5-2.3 2a17 17 0 0 0 6.2 6.2l2-2.3 4.7 1.5v3.5c0 1.6-1.1 2.2-2.6 2C10.8 20 4 13.3 3.3 5.6c-.1-1.1.5-2.4 1.9-2.4Z"/></>,
  answered:<><circle cx="12" cy="12" r="9"/><path d="m7.5 12 3 3 6-6"/></>,

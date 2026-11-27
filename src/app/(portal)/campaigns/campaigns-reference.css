@@ -165,3 +165,15 @@
     min-width:0;
   }
 }
+
+/* Campaign-specific artwork dimensions and non-interactive status motion. */
+.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card .fc-count-icon{width:46px;height:46px;flex:0 0 46px;background:transparent!important;background-image:none!important;border-radius:0!important;box-shadow:none!important}
+.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card .fc-count-icon .fc-3d-art{width:46px;height:46px;flex:0 0 46px;background:transparent!important;box-shadow:none!important}
+.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card .fc-count-icon .fc-3d-art img{width:100%;height:100%;object-fit:contain}
+.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card{align-items:center;gap:12px}
+.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-content{justify-content:center}
+.crm-app .fc-campaign-page .fc-full-campaign-table tbody td .campaign-status-badge{display:inline-flex;align-items:center;justify-content:center;transform:scale(1);transform-origin:center;transition:transform 180ms ease;cursor:default}
+@media(hover:hover){.crm-app .fc-campaign-page .fc-full-campaign-table tbody td .campaign-status-badge:hover{transform:scale(.95)}}
+.crm-app .fc-campaign-page .fc-full-campaign-table tbody td .campaign-status-badge:active{transform:scale(.90)}
+@media(max-width:700px){.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card .fc-count-icon,.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card .fc-count-icon .fc-3d-art{width:44px;height:44px;flex-basis:44px}}
+@media(prefers-reduced-motion:reduce){.crm-app .fc-campaign-page .fc-full-campaign-table tbody td .campaign-status-badge{transition:none!important;transform:none!important}}
