@@ -1,5 +1,3 @@
-import type {ReactNode} from "react";
-
 /** Lightweight dimensional SVGs, local to the Campaigns page (no external asset requests). */
 export function CampaignArtwork({kind,className=""}:{kind:"hero"|"all"|"ongoing"|"pending";className?:string}){
  const key="fc-art-"+kind;
