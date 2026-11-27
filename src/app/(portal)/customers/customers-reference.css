@@ -71,3 +71,36 @@
 .crm-app .customers-reference .customers-tone-purple>.customers-stat-wave{color:#bd95f2!important}
 .crm-app .customers-reference .customers-tone-orange>.customers-stat-wave{color:#f6bb70!important}
 .crm-app .customers-reference .customers-list-panel .customers-view-group button.active{background:#14263f!important;border-color:#14263f!important;color:white!important}
+
+/* Compact neutral customer layout; controls form a second record-header row. */
+.crm-app .customers-reference{background:transparent;container-type:inline-size}
+.crm-app .customers-reference .customers-ref-header{min-height:86px;background:#fff!important;background-image:none!important;border:1px solid var(--customer-line);padding:12px 14px}
+.crm-app .customers-reference .customers-ref-header:before,.crm-app .customers-reference .customers-ref-header:after{content:none!important;display:none!important}
+.crm-app .customers-reference .customers-header-heading{max-width:none;min-width:0;flex:1 1 auto}
+.crm-app .customers-reference .customers-header-heading h1,.crm-app .customers-reference .customers-stat strong,.crm-app .customers-reference .customers-list-title h2,.crm-app .customers-reference .customers-illustrated-empty h3{font-weight:700!important}
+.crm-app .customers-reference .customers-stats .customers-stat{background:#fff!important;background-image:none!important}
+.crm-app .customers-reference .customers-stats .customers-stat:before,.crm-app .customers-reference .customers-stats .customers-stat:after{content:none!important;display:none!important}
+.crm-app .customers-reference .customers-table-header{display:flex;flex-direction:column;gap:8px;padding:12px;margin:0}
+.crm-app .customers-reference .customers-table-header .customers-list-title{min-height:0;padding:0;margin:0;display:flex;align-items:center}
+.crm-app .customers-reference .customers-table-header .customers-list-title h2{margin:0;line-height:1.3;font-size:15px}
+.crm-app .customers-reference .customers-table-header .customers-toolbar{display:flex;align-items:center;gap:8px;margin:0;padding:0;min-width:0;flex-wrap:nowrap}
+.crm-app .customers-reference .customers-table-header .customers-search{flex:0 1 245px;width:245px;max-width:245px;min-width:160px;min-height:36px;height:36px;box-sizing:border-box;border-radius:8px;gap:6px;padding:4px 7px}
+.crm-app .customers-reference .customers-table-header .customers-search input{min-width:0;width:0;flex:1;font-size:11px;height:26px;line-height:26px;padding:0;border:none}
+.crm-app .customers-reference .customers-table-header .customers-search button{flex:none;min-height:26px;height:26px;line-height:1;padding:0 7px;font-size:10px;font-weight:600}
+.crm-app .customers-reference .customers-table-header .customers-search>svg{flex:none;width:15px;height:15px}
+.crm-app .customers-reference .customers-table-header .customers-toolbar select{flex:0 1 auto;min-width:0;width:auto;max-width:160px;height:36px;min-height:36px;box-sizing:border-box;border-radius:8px;font-size:11px;padding:0 24px 0 9px}
+.crm-app .customers-reference .customers-table-header .customers-toolbar select:nth-of-type(1){width:122px}
+.crm-app .customers-reference .customers-table-header .customers-toolbar select:nth-of-type(2){width:150px}
+.crm-app .customers-reference .customers-table-header .customers-toolbar select:nth-of-type(3){width:108px}
+.crm-app .customers-reference .customers-table-header .customers-toolbar select:nth-of-type(4){width:115px}
+.crm-app .customers-reference .customers-table-header .customers-table-actions{display:flex;flex:0 0 auto;align-items:center;gap:8px;margin-left:auto}
+.crm-app .customers-reference .customers-table-header .customers-reset,.crm-app .customers-reference .customers-table-header .customers-view-group button{display:inline-flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;min-height:36px;min-width:36px;padding:0;border-radius:8px;box-sizing:border-box}
+.crm-app .customers-reference .customers-table-header .customers-export{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;height:36px;padding:0 10px;font-size:11px;white-space:nowrap;border-radius:8px;box-sizing:border-box}
+.crm-app .customers-reference .customers-table-header .customers-view-group{display:flex;align-items:center;gap:8px;flex:none}
+.crm-app .customers-reference .customers-table-header .customers-view-group button.active{background:#14263f!important;border-color:#14263f!important;color:#fff!important}
+.crm-app .customers-reference .customers-table-header .customers-view-group button.active svg{color:#fff!important;stroke:currentColor!important}
+.crm-app .customers-reference :is(h1,h2,h3,h4,strong,b,th,summary,.customers-kpi-value){font-weight:700!important}
+.crm-app .customers-reference :is(button,select){font-weight:600}
+@container(max-width:1050px){.crm-app .customers-reference .customers-table-header .customers-toolbar{flex-wrap:wrap}.crm-app .customers-reference .customers-table-header .customers-search{flex:1 1 220px;max-width:245px}.crm-app .customers-reference .customers-table-header .customers-table-actions{margin-left:auto}}
+@container(max-width:600px){.crm-app .customers-reference .customers-table-header{padding:10px;gap:10px}.crm-app .customers-reference .customers-table-header .customers-search{flex:1 1 100%;max-width:none;width:100%}.crm-app .customers-reference .customers-table-header .customers-toolbar select{flex:1 1 calc(50% - 8px);max-width:none;width:auto}.crm-app .customers-reference .customers-table-header .customers-table-actions{margin-left:auto}}
+:root[data-theme="dark"] .crm-app .customers-reference .customers-ref-header,:root[data-theme="dark"] .crm-app .customers-reference .customers-stats .customers-stat{background:#23344a!important;background-image:none!important;border-color:#40516b}
