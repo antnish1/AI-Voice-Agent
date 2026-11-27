@@ -132,3 +132,45 @@ linear-gradient(125deg,#e8f4ff 0%,#edf4ff 50%,#dceeff 100%);}
 @media(max-width:900px){.vdp-body{grid-template-columns:1fr}.vdp-visual{min-height:0;height:280px}.vdp-header-wave{opacity:.55}.vdp-card{max-width:none}}
 @media(max-width:650px){.vdp-page{padding:8px}.vdp-header{min-height:86px}.vdp-heading{gap:10px}.vdp-heading>div{padding-left:12px}.vdp-header-wave{display:none}.vdp-card{padding:16px}.vdp-card-title h2{font-size:16px}.vdp-fields:before{display:none}.vdp-fields{row-gap:16px}.vdp-footer{gap:8px}.vdp-footer .vdp-save,.vdp-footer .vdp-cancel{font-size:13px}.vdp-visual{height:240px}}
 @media(prefers-reduced-motion:reduce){.vdp-visual .vdp-robot{animation:none}.vdp-save{transition:none}}
+
+/* Compact voice profile layout; scoped specificity overrides shared portal sizing. */
+.crm-app .vdp-page{min-height:0;padding:8px 12px 18px}
+.crm-app .vdp-page .vdp-header{min-height:0;padding:4px 4px 15px;gap:10px}
+.crm-app .vdp-page .vdp-heading{gap:14px}
+.crm-app .vdp-page .vdp-heading>div{padding-left:14px}
+.crm-app .vdp-page .vdp-brand-icon{width:65px;height:65px;border-radius:17px}
+.crm-app .vdp-page .vdp-brand-icon svg{width:46px;height:46px}
+.crm-app .vdp-page .vdp-kicker{font-size:11px;letter-spacing:2px}
+.crm-app .vdp-page .vdp-heading h1{font-size:26px;font-weight:650;line-height:1.18;margin:2px 0 0}
+.crm-app .vdp-page .vdp-card{padding:16px;border-radius:18px}
+.crm-app .vdp-page .vdp-card-title{gap:12px;margin-bottom:16px}
+.crm-app .vdp-page .vdp-card-title h2{font-size:19px;font-weight:650;line-height:1.25}
+.crm-app .vdp-page .vdp-card-title .vdp-gear{width:48px;height:48px;border-radius:13px}
+.crm-app .vdp-page .vdp-card-title .vdp-gear svg{width:27px;height:27px}
+.crm-app .vdp-page .vdp-card-title .vdp-import-btn{min-height:34px;height:auto;padding:6px 10px;font-size:12px;font-weight:600;gap:6px;border-radius:9px}
+.crm-app .vdp-page .vdp-fields{column-gap:26px;row-gap:14px}
+.crm-app .vdp-page .vdp-fields:before{height:calc(100% - 68px)}
+.crm-app .vdp-page .vdp-field{gap:6px}
+.crm-app .vdp-page .vdp-label{font-size:13px;font-weight:600;line-height:1.25;gap:6px}
+.crm-app .vdp-page .vdp-label svg{width:16px;height:16px}
+.crm-app .vdp-page .vdp-control{height:42px;min-height:42px;border-radius:10px}
+.crm-app .vdp-page .vdp-control :is(input,select){height:40px;min-height:0;font-size:13px;line-height:normal;padding:0 11px}
+.crm-app .vdp-page .vdp-copy{width:30px;height:30px;padding:5px}
+.crm-app .vdp-page .vdp-copy svg{width:16px;height:16px}
+.crm-app .vdp-page .vdp-version button{min-height:30px;height:auto;padding:5px 9px;font-size:11px;line-height:1.35;border-radius:8px}
+.crm-app .vdp-page .vdp-checkbox-info{padding-top:0;justify-content:center;gap:6px}
+.crm-app .vdp-page .vdp-check{font-size:12px;font-weight:600;gap:8px}
+.crm-app .vdp-page .vdp-check input{width:17px;height:17px}
+.crm-app .vdp-page .vdp-footer{padding-top:12px;margin-top:0;gap:12px}
+.crm-app .vdp-page .vdp-footer :is(.vdp-cancel,.vdp-save){height:42px;min-height:42px;font-size:14px;font-weight:650;border-radius:10px;gap:8px}
+.crm-app .vdp-page .vdp-footer .vdp-save>svg{width:17px;height:17px}
+.crm-app .vdp-page .vdp-visual{min-height:0;height:auto;padding:0 8px}
+.crm-app .vdp-page .vdp-visual .vdp-robot{width:100%;height:auto;max-width:310px;max-height:330px}
+.crm-app .vdp-page .vdp-import{padding:10px;margin-bottom:12px}
+.crm-app .vdp-page :is(.vdp-import-ok,.vdp-import-notice){padding:8px;font-size:12px;line-height:1.45}
+:root:not([data-theme="dark"]) .crm-app .vdp-page{background-color:#fff}
+:root:not([data-theme="dark"]) .crm-app .vdp-page .vdp-visual{filter:none}
+:root:not([data-theme="dark"]) .crm-app .vdp-page .vdp-card-title h2{color:#a80008}
+:root[data-theme="dark"] .crm-app .vdp-page{background-color:var(--dark-canvas,#101f37)}
+@media(max-width:900px){.crm-app .vdp-page .vdp-visual{height:220px}.crm-app .vdp-page .vdp-visual .vdp-robot{height:100%;width:auto;max-width:100%}}
+@media(max-width:650px){.crm-app .vdp-page{padding:8px}.crm-app .vdp-page .vdp-heading{gap:10px}.crm-app .vdp-page .vdp-heading h1{font-size:22px}.crm-app .vdp-page .vdp-brand-icon{width:52px;height:52px}.crm-app .vdp-page .vdp-brand-icon svg{width:38px;height:38px}.crm-app .vdp-page .vdp-card{padding:12px}.crm-app .vdp-page .vdp-card-title h2{font-size:16px}.crm-app .vdp-page .vdp-card-title .vdp-gear{width:40px;height:40px}.crm-app .vdp-page .vdp-fields{row-gap:12px}.crm-app .vdp-page .vdp-footer{gap:8px}}
