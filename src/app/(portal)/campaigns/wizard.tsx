@@ -115,13 +115,19 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
   </div>,modalHost);
  return createPortal(<div className="campaign-modal-overlay" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)router.push("/campaigns");}}>
   <section className="campaign-modal fc-compact-campaign fc-reference-create" role="dialog" aria-modal="true" aria-labelledby="campaign-dialog-title">
-   <header className="campaign-modal-header fc-reference-create-header"><span className="fc-create-phone-icon" aria-hidden="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m7.4 2.8 3 3a2 2 0 0 1 .4 2.3l-1 1.9a15 15 0 0 0 4.2 4.2l1.9-1a2 2 0 0 1 2.3.4l3 3a2 2 0 0 1 .1 2.7c-1.7 2-3.8 2.6-6.4 1.9C8.9 19.7 4.3 15.1 2.6 9.1 1.9 6.5 2.5 4.4 4.5 2.7a2 2 0 0 1 2.9.1Z"/><path d="M14 4a6 6 0 0 1 6 6m-6-3a3 3 0 0 1 3 3"/></svg></span><div><h2 id="campaign-dialog-title">Create AI Calling Campaign</h2><p>Upload customer data to create a campaign.</p></div></header>
+   <header className="campaign-modal-header fc-reference-create-header">
+    <span className="fc-create-phone-icon" aria-hidden="true"><img src="/call-logs-total-3d.svg" width={76} height={76} alt=""/></span>
+    <div className="fc-create-heading-copy"><h2 id="campaign-dialog-title">Create AI Calling Campaign</h2><p>Upload customer data to create a campaign.</p></div>
+    <img className="fc-create-agent-art" src="/call-logs-support-agent-3d.svg" width={640} height={168} alt="" aria-hidden="true"/>
+    <button type="button" className="fc-create-close" aria-label="Close Create Campaign" title="Close" disabled={busy} onClick={()=>router.push("/campaigns")}><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 5 19 19M19 5 5 19"/></svg></button>
+   </header>
    <div className="campaign-modal-scroll fc-compact-scroll fc-reference-create-scroll">
     <div className="fc-compact-fields">
      {canOpenOutbound&&<label className="campaign-form-label">Dealership <span>*</span>
+      <span className="fc-create-dealer-select"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 10h18l-2-6H5l-2 6Zm2 0v10h14V10M9 20v-6h6v6M2 10c0 2 3 3 5 1 2 2 4 2 5 0 2 2 4 2 5 0 2 2 5 1 5-1"/></svg>
       <select className="campaign-pill-input" value={dealershipId} disabled={busy||!!existingDraft||dealerships.length===1} onChange={e=>{setDealershipId(e.target.value);setPreview(null);setExistingDraft("");}}>
        {dealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}
-      </select>
+      </select></span>
      </label>}
      <div className="campaign-form-label fc-reference-period">Campaign Month &amp; Year <span>*</span><div className="fc-period-fields"><label>Month<select aria-label="Campaign month" className="campaign-pill-input" value={month} disabled={busy||!!existingDraft} onChange={e=>setMonth(e.target.value)}>{months.map((m,i)=><option key={m} value={String(i+1).padStart(2,"0")}>{m}</option>)}</select></label><label>Year<select aria-label="Campaign year" className="campaign-pill-input" value={year} disabled={busy||!!existingDraft} onChange={e=>setYear(e.target.value)}>{Array.from({length:currentYear-1899},(_,i)=>currentYear-i).map(y=><option key={y} value={y}>{y}</option>)}</select></label></div></div>
      
@@ -134,7 +140,7 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
     </div>
     <input ref={uploadInputRef} id="fc-create-upload-input" className="fc-create-hidden-file" type="file" accept=".xlsx,.csv" disabled={busy||reading||!!existingDraft} onChange={e=>void chooseFile(e.target.files?.[0])}/>
     {preview?<div className="fc-reference-upload-success"><span className="fc-reference-file-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M10 9v12M4 15h16"/></svg></span><div className="fc-reference-file-copy"><strong>{preview.filename}</strong><span>Successfully validated</span></div><button type="button" aria-label="Remove uploaded file" title={existingDraft?"Campaign draft already created":"Remove file"} disabled={busy||reading||!!existingDraft} onClick={removeUploadedFile}><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v6m4-6v6"/></svg></button></div>:
-    <label htmlFor="fc-create-upload-input" className="upload-zone fc-compact-upload"><span aria-hidden="true" className="fc-upload-symbol">⇧</span><strong>{reading?"Checking file…":"Upload Excel / CSV"}</strong><small>Up to 5 MB</small></label>}
+    <label htmlFor="fc-create-upload-input" className="upload-zone fc-compact-upload"><strong>{reading?"Checking file…":"Upload Excel / CSV"}</strong><small>Up to 5 MB</small></label>}
     {preview&&<div className="fc-reference-readiness">
      <h3>Recipient Readiness</h3>
      <div className="fc-reference-metrics">
@@ -148,7 +154,7 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
     <label className="fc-compact-consent fc-reference-consent"><input type="checkbox" checked={consentCertified} disabled={busy} onChange={e=>setConsentCertified(e.target.checked)}/>I confirm customer consent and DNC/suppression screening.</label>
     {error&&<p role="alert" className="form-error">{error}</p>}
    </div>
-   <footer className="campaign-modal-footer fc-reference-create-footer"><div className="fc-reference-eligible-footer">{preview&&<><span aria-hidden="true">♧</span> {preview.eligible} eligible {preview.eligible===1?"recipient":"recipients"}</>}</div><div className="fc-reference-footer-buttons"><button type="button" className="campaign-modal-back" disabled={busy} onClick={()=>router.push("/campaigns")}>Cancel</button><button type="button" disabled={busy||reading||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next">{busy?"Creating…":"Create Campaign"}</button></div></footer>
+   <footer className="campaign-modal-footer fc-reference-create-footer"><div className="fc-reference-eligible-footer">{preview&&<><span aria-hidden="true">♧</span> {preview.eligible} eligible {preview.eligible===1?"recipient":"recipients"}</>}</div><div className="fc-reference-footer-buttons"><button type="button" className="campaign-modal-back" disabled={busy} onClick={()=>router.push("/campaigns")}>Cancel</button><button type="button" disabled={busy||reading||!preview||!preview.eligible||!consentCertified} onClick={submit} className="campaign-modal-next"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5.2 3.2h3.5l1.5 5-2.3 2a17 17 0 0 0 6.2 6.2l2-2.3 4.7 1.5v3.5c0 1.6-1.1 2.2-2.6 2C10.8 20 4 13.3 3.3 5.6c-.1-1.1.5-2.4 1.9-2.4Z"/><path d="M14 4a6 6 0 0 1 6 6m-6-3a3 3 0 0 1 3 3"/></svg>{busy?"Creating…":"Create Campaign"}</button></div></footer>
   </section>
  </div>,modalHost);
 }
