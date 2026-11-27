@@ -113,3 +113,43 @@
 @media(max-width:1000px){.ref-dashboard.dashboard-reference .ref-dashboard-columns{grid-template-columns:1fr}.ref-dashboard.dashboard-reference .dashboard-separated-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.dashboard-reference .dashboard-hero-tagline{display:none}.dashboard-reference .dashboard-hero{grid-template-columns:minmax(180px,1fr) minmax(140px,1fr)}.ref-dashboard.dashboard-reference .ref-dashboard-right{display:flex}}
 @media(max-width:600px){.ref-dashboard.dashboard-reference .dashboard-separated-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card:last-child{grid-column:1/-1}.dashboard-reference .dashboard-hero{grid-template-columns:1fr;min-height:0}.dashboard-reference .dashboard-hero-copy{margin:12px 12px 0;padding:4px 8px 4px 12px}.dashboard-reference .dashboard-hero-art{min-height:125px}.ref-dashboard.dashboard-reference .ref-dashboard-panel{padding:10px}.ref-dashboard.dashboard-reference .ref-activity-item{gap:6px}}
 @media(prefers-reduced-motion:reduce){.ref-dashboard.dashboard-reference .ref-kpi-card{transition:none;transform:none!important}}
+
+
+/* Operations dashboard: minimal welcome, neutral KPI cards and navy actions. */
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero{
+  display:flex;align-items:center;justify-content:flex-start;min-height:112px;
+  padding:12px 18px;gap:0;overflow:hidden;
+}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy{
+  margin-left:0;padding:6px 10px 6px 20px;max-width:100%;
+}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy h1{margin:0;font-weight:600}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy h1 strong{font-weight:600}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card:nth-child(n){
+  background:#fff;
+}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-reference-toolbar .ref-create-button,
+.crm-app .ref-dashboard.dashboard-reference .ref-dashboard-heading-actions .ref-create-button{
+  background:#082d5d!important;background-image:none!important;border-color:#082d5d!important;
+  color:#fff!important;font-weight:600;
+}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-reference-toolbar .ref-create-button:hover,
+.crm-app .ref-dashboard.dashboard-reference .ref-dashboard-heading-actions .ref-create-button:hover{
+  background:#061f42!important;background-image:none!important;border-color:#061f42!important;color:#fff!important;
+}
+.crm-app .ref-dashboard.dashboard-reference .ref-panel-header>a{
+  background:#fff;color:#082d5d;border-color:#dce4ef;font-weight:600;
+}
+.crm-app .ref-dashboard.dashboard-reference .ref-panel-header>a:hover{
+  color:#061f42;border-color:#082d5d;background:#f3f6fb;
+}
+:root[data-theme="dark"] .crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card:nth-child(n){
+  background:#14243a;
+}
+:root[data-theme="dark"] .crm-app .ref-dashboard.dashboard-reference .ref-panel-header>a{
+  background:#20364c;color:#c1d7f3;border-color:#40566f;
+}
+@media(max-width:600px){
+  .crm-app .ref-dashboard.dashboard-reference .dashboard-hero{min-height:100px;padding:10px 12px}
+  .crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy{margin:0;padding:6px 10px 6px 15px}
+}
