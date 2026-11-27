@@ -60,3 +60,14 @@
 :root[data-theme="dark"] .crm-app .customers-reference .customers-ref-header{background:linear-gradient(130deg,#1a2b40,#29425e)}
 :root[data-theme="dark"] .crm-app .customers-reference .customers-ref-header:before,:root[data-theme="dark"] .crm-app .customers-reference .customers-illustrated-empty:after{opacity:.12}
 :root[data-theme="dark"] .crm-app .customers-reference :is(.customers-stat,.customers-list-panel,.customers-illustrated-empty,.customers-search,.customers-toolbar select,.customers-reset,.customers-button-outline,.customers-export,.customers-view-group button:not(.active),.customers-search button,.customers-data-table th){background:#23344a!important;border-color:#40516b!important;color:var(--customer-ink)!important}
+
+
+.crm-app .customers-reference .customers-stats .customers-stat .customers-stat-icon{background:transparent!important;color:inherit!important;box-shadow:none!important}
+.crm-app .customers-reference .customers-stat-icon .original-artwork,.crm-app .customers-reference .customers-hero-art .original-artwork{width:100%;height:100%;object-fit:contain;display:block}
+.crm-app .customers-reference .customers-hero-art{top:8px;bottom:8px}
+.crm-app .customers-reference .customers-illustrated-empty .original-artwork{width:170px;height:128px;object-fit:contain}
+.crm-app .customers-reference .customers-tone-blue>.customers-stat-wave{color:#6ab6f5!important}
+.crm-app .customers-reference .customers-tone-green>.customers-stat-wave{color:#57d9a1!important}
+.crm-app .customers-reference .customers-tone-purple>.customers-stat-wave{color:#bd95f2!important}
+.crm-app .customers-reference .customers-tone-orange>.customers-stat-wave{color:#f6bb70!important}
+.crm-app .customers-reference .customers-list-panel .customers-view-group button.active{background:#14263f!important;border-color:#14263f!important;color:white!important}
