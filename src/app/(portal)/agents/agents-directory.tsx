@@ -1,4 +1,5 @@
 "use client";
+import {ArtworkImage} from "@/components/artwork-image";
 import {EmptyState} from "@/components/empty-state";
 import {useMemo,useState,useEffect,useRef,useId,type ReactNode} from "react";
 import "./agents-directory.css";
@@ -94,7 +95,7 @@ function AgentCard({agent,onDetails}:{agent:Agent;onDetails:(a:Agent)=>void}){
  return <article className={"agent-preview-card"+(inUse?" agent-current-card":"")}>
   {inUse?<span className="agent-ribbon agent-current-ribbon">✓ Currently Used</span>:agent.recommended&&<span className="agent-ribbon">★ Recommended</span>}
   <div className="agent-card-status"><span className={agent.status==="Active"?"agent-state-active":"agent-state-inactive"}>● {agent.profiles?"Configured":"Preview"} · {agent.status}</span><span className="agent-version">{agent.version}</span></div>
-  <div className="agent-card-content"><div className={"agent-card-portrait tone-"+agent.tone}><AgentArtwork kind={agent.profiles?"woman":agent.id}/></div><div className="agent-card-copy"><h3>{agent.name}</h3><p>{agent.description}</p></div></div>
+  <div className="agent-card-content"><div className={"agent-card-portrait tone-"+agent.tone}><ArtworkImage key={agent.id} name={"agents-"+(agent.profiles?"kajal":agent.id)} fallback={<AgentArtwork kind={agent.profiles?"woman":agent.id==="feedback"?"robot":agent.id}/>}/></div><div className="agent-card-copy"><h3>{agent.name}</h3><p>{agent.description}</p></div></div>
   <div className="agent-card-actions"><button type="button" className="agent-sample-disabled" disabled title="Sample playback requires Sarvam integration"><span className="agent-sample-icon"><Icon name="play" size={11}/></span> Play Sample</button><button type="button" className="agent-detail-button" onClick={()=>onDetails(agent)}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>View Details</button><button type="button" className="agent-use-disabled" disabled title={agent.profiles?"Use the saved voice configuration when creating a campaign":"Preview agent cannot be used"}><Icon name="play" size={14}/>Use Agent</button></div>
  </article>;
 }
@@ -124,7 +125,7 @@ export function AgentsDirectory({profiles,loadError,headerAction}:{profiles:Prof
  const clear=()=>{setSearch("");setKpiFilter("all");setCategory("all");setVersion("all");};
  const selectKpi=(filter:"total"|"active"|"inactive"|"recommended")=>setKpiFilter(current=>current===filter?"all":filter);
  return <div className="agent-directory">
-  <div className="agent-page-hero"><div className="agent-hero-heading"><div className="agent-hero-icon"><Icon name="sound" size={26}/></div><div><h1>AI Voice Agents</h1><p className="agent-hero-subtitle">Create, manage and deploy intelligent voice agents for customer interactions.</p></div></div><div className="agent-hero-art"><AgentArtwork kind="hero"/></div>
+  <div className="agent-page-hero"><div className="agent-hero-heading"><div className="agent-hero-icon"><Icon name="sound" size={26}/></div><div><h1>AI Voice Agents</h1><p className="agent-hero-subtitle">Create, manage and deploy intelligent voice agents for customer interactions.</p></div></div><div className="agent-hero-art"><ArtworkImage name="agents-hero" fallback={<AgentArtwork kind="hero"/>}/></div>
    {headerAction}
   </div>
   {loadError&&<p role="alert">Saved agent configurations could not be loaded.</p>}
@@ -133,7 +134,7 @@ export function AgentsDirectory({profiles,loadError,headerAction}:{profiles:Prof
    {label:"Active Agents",filter:"active" as const,number:loadError?"—":String(actual.filter(a=>a.status==="Active").length),note:"Active configuration",icon:"check",tone:"green"},
    {label:"Inactive Agents",filter:"inactive" as const,number:loadError?"—":String(actual.filter(a=>a.status==="Inactive").length),note:"Inactive configuration",icon:"pause",tone:"purple"},
    {label:"Recommended",filter:"recommended" as const,number:loadError?"—":String(actual.filter(a=>a.recommended).length),note:"Configured agents only",icon:"star",tone:"orange"}
-  ].map(m=><button type="button" className={"agent-stat-card agent-tone-"+m.tone+(kpiFilter===m.filter?" agent-stat-selected":"")} key={m.label} aria-pressed={kpiFilter===m.filter} aria-label={"Show "+m.label.toLowerCase()+" ("+m.number+")"} onClick={()=>selectKpi(m.filter)}><span className="agent-stat-icon"><Icon name={m.icon} size={23}/></span><div><span>{m.label}</span><strong>{m.number}</strong><small>{m.note}</small></div><svg viewBox="0 0 85 35" aria-hidden="true"><path d="M1 25Q12 4 24 19T46 13T68 19T84 6" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M1 25Q12 4 24 19T46 13T68 19T84 6V35H1Z" fill="currentColor" opacity=".06"/></svg></button>)}</div>
+  ].map(m=><button type="button" className={"agent-stat-card agent-tone-"+m.tone+(kpiFilter===m.filter?" agent-stat-selected":"")} key={m.label} aria-pressed={kpiFilter===m.filter} aria-label={"Show "+m.label.toLowerCase()+" ("+m.number+")"} onClick={()=>selectKpi(m.filter)}><span className="agent-stat-icon"><ArtworkImage name={"agents-"+(m.filter==="all"?"total":m.filter)} fallback={<Icon name={m.icon} size={23}/>}/></span><div><span>{m.label}</span><strong>{m.number}</strong><small>{m.note}</small></div><svg viewBox="0 0 85 35" aria-hidden="true"><path d="M1 25Q12 4 24 19T46 13T68 19T84 6" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M1 25Q12 4 24 19T46 13T68 19T84 6V35H1Z" fill="currentColor" opacity=".06"/></svg></button>)}</div>
   <div className="agent-page-controls"><label className="agent-list-search"><Icon name="search"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search agents..." aria-label="Search agents"/></label>
    <select value={category} onChange={e=>setCategory(e.target.value)} aria-label="Filter category"><option value="all">All Categories</option>{["Support","Sales","Service","Marketing","Feedback"].map(x=><option key={x}>{x}</option>)}</select>
    <select value={version} onChange={e=>setVersion(e.target.value)} aria-label="Filter version"><option value="all">All Versions</option>{Array.from(new Set(agents.map(a=>a.version))).map(x=><option key={x}>{x}</option>)}</select>
