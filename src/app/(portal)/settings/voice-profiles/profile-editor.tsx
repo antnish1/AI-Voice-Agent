@@ -67,7 +67,7 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}) {
  }
  function changeDealer(value:string){const selected=dealerships.find(d=>d.id===value)?.profile;setLiveVersions(null);setVersionNotice("");setId(value);setRevision(v=>v+1);setMessage("");setAgent(selected?.agent_id??"");setVersion(selected?String(selected.app_version):"");setConnection(selected?.connection_id??"");setCaller(selected?.caller_number??"");setImportResult(null);setDeploymentId("");}
  return <section className="vdp-card" aria-labelledby="vdp-card-title">
-  <div className="vdp-card-title"><div className="vdp-gear"><FieldIcon kind="settings"/></div><h2 id="vdp-card-title">Dealership AI Calling Defaults</h2><button type="button" className="vdp-import-btn" onClick={()=>void loadSarvam()} disabled={loadingSarvam||versionBusy||!id||busy}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 15v5h16v-5"/></svg>{loadingSarvam?"Checking workspace…":"Load from Sarvam"}</button></div>
+  <div className="vdp-card-title"><div className="vdp-gear"><FieldIcon kind="settings"/></div><h2 id="vdp-card-title">Dealership AI Calling Defaults</h2></div>
   {importResult&&<div className="vdp-import">
    <div className={importResult.ok&&importResult.code!=="saved_defaults"&&importResult.options?.length?"vdp-import-ok":"vdp-import-notice"} role="status">
     <p>{importResult.message}</p>
