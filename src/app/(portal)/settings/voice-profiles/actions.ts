@@ -1,6 +1,7 @@
 "use server";
 import {revalidatePath} from "next/cache";
 import {requireItSuperUser} from "@/lib/it-access";
+import {agentSnapshot} from "@/lib/sarvam/voice-discovery-snapshot";
 
 export async function saveVoiceProfile(form:FormData):Promise<{error?:string;ok?:boolean}>{
  try{
@@ -26,6 +27,14 @@ export async function saveVoiceProfile(form:FormData):Promise<{error?:string;ok?
   if(!/^\+[1-9]\d{7,14}$/.test(callerNumber))return {error:"Enter a valid connected caller number. Indian 10-digit numbers are automatically formatted as +91XXXXXXXXXX."};
   const {data:dealership,error:dealerError}=await supabase.from("dealerships").select("id").eq("id",dealershipId).maybeSingle();
   if(dealerError||!dealership)return {error:"Dealership not found."};
+  const {data:existing,error:existingError}=await supabase.from("dealership_voice_profiles").select("agent_id,app_version,connection_id,caller_number,active").eq("dealership_id",dealershipId).maybeSingle();
+  if(existingError)return {error:"Unable to verify the existing profile."};
+  const unchanged=existing?.agent_id===agentId&&existing?.app_version===version&&existing?.connection_id===connectionId&&existing?.caller_number===callerNumber;
+  if(!unchanged){
+   const known=agentSnapshot.find(a=>a.id===agentId);
+   if(known&&!known.versions.includes(version))return {error:"This version is not in the last verified committed-version catalogue. Refresh the catalogue before changing the profile."};
+   if(!known)return {error:"This agent is not in the last verified catalogue. Refresh the catalogue before changing the profile."};
+  }
   const {error}=await supabase.from("dealership_voice_profiles").upsert({
    dealership_id:dealershipId,agent_id:agentId,app_version:version,
    connection_id:connectionId,caller_number:callerNumber,active,updated_by:user.id,
