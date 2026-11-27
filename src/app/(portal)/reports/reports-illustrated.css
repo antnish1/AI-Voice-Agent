@@ -238,3 +238,40 @@
 :root[data-theme="dark"] .crm-app .reports-ref .reports-ref-kpis .reports-category-card.tone-amber{
   background:var(--r-panel)!important;
 }
+
+/* Compact report record names and shared search alignment. */
+.crm-app .reports-ref .reports-ref-table .reports-customer-name{
+ display:block;min-width:0;text-align:left;line-height:1.4;
+}
+.crm-app .reports-ref .reports-ref-toolbar{
+ display:flex;align-items:center;gap:12px;padding:8px 12px;flex-wrap:wrap;
+}
+.crm-app .reports-ref .reports-ref-toolbar .reports-ref-tabs{
+ display:flex;align-items:center;min-width:0;flex:1 1 auto;gap:4px;flex-wrap:wrap;margin:0;
+}
+.crm-app .reports-ref .reports-ref-toolbar .reports-ref-tabs button{
+ display:inline-flex;align-items:center;justify-content:center;min-height:36px;box-sizing:border-box;white-space:nowrap;
+}
+.crm-app .reports-ref .reports-ref-toolbar .reports-ref-filters{
+ display:flex;align-items:center;flex:0 1 260px;width:260px;max-width:260px;min-width:0;margin:0 0 0 auto;justify-content:flex-end;
+}
+.crm-app .reports-ref .reports-ref-toolbar .reports-ref-search{
+ display:flex;align-items:center;gap:8px;width:100%;min-width:0;max-width:260px;flex:1 1 auto;
+ height:36px;min-height:36px;box-sizing:border-box;margin:0;padding:0 10px;border-radius:8px;
+}
+.crm-app .reports-ref .reports-ref-toolbar .reports-ref-search input{
+ width:0;min-width:0;flex:1 1 auto;height:100%;padding:0;margin:0;border:0;line-height:normal;
+}
+.crm-app .reports-ref .reports-ref-toolbar .reports-ref-search svg{flex:none}
+.crm-app .reports-ref .reports-dealership-toolbar .reports-ref-filters{
+ margin-left:0!important;margin-right:auto;
+}
+@media(max-width:1100px){
+ .crm-app .reports-ref .reports-ref-toolbar:not(.reports-dealership-toolbar) .reports-ref-tabs{flex:1 1 100%}
+ .crm-app .reports-ref .reports-ref-toolbar:not(.reports-dealership-toolbar) .reports-ref-filters{margin-left:auto}
+}
+@media(max-width:680px){
+ .crm-app .reports-ref .reports-ref-toolbar .reports-ref-filters{flex:1 1 100%;width:100%;max-width:none}
+ .crm-app .reports-ref .reports-ref-toolbar .reports-ref-search{max-width:none}
+ .crm-app .reports-ref .reports-ref-toolbar .reports-ref-tabs{flex-wrap:nowrap;overflow-x:auto}
+}
