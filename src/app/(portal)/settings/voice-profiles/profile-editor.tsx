@@ -44,7 +44,7 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}) {
   const selected=importResult?.options?.find(x=>x.deploymentId+"|"+x.connectionId+"|"+x.callerNumber===deploymentId);
   if(!selected)return;
   setAgent(selected.agentId);setVersion(String(selected.version));setConnection(selected.connectionId);setCaller(selected.callerNumber);
-  setMessage("Settings loaded into the form. Review current agent and phone availability before saving; no agent or calls were changed.");
+  setMessage(importResult?.code==="saved_defaults"?"Saved dealership defaults loaded. Live Sarvam availability is not verified by this request. No settings or calls were changed.":"Settings loaded into the form. Review current agent and phone availability before saving; no agent or calls were changed.");
  }
 
  const [agent,setAgent]=useState(p?.agent_id??""),[version,setVersion]=useState(String(p?.app_version??1)),[connection,setConnection]=useState(p?.connection_id??""),[caller,setCaller]=useState(p?.caller_number??"");
@@ -52,10 +52,10 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}) {
  return <section className="vdp-card" aria-labelledby="vdp-card-title">
   <div className="vdp-card-title"><div className="vdp-gear"><FieldIcon kind="settings"/></div><h2 id="vdp-card-title">Dealership AI Calling Defaults</h2><button type="button" className="vdp-import-btn" onClick={()=>void loadSarvam()} disabled={loadingSarvam||!id||busy}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 15v5h16v-5"/></svg>{loadingSarvam?"Checking workspace…":"Load from Sarvam"}</button></div>
   {importResult&&<div className="vdp-import">
-   <div className={importResult.ok&&importResult.options?.length?"vdp-import-ok":"vdp-import-notice"} role="status">
+   <div className={importResult.ok&&importResult.code!=="saved_defaults"&&importResult.options?.length?"vdp-import-ok":"vdp-import-notice"} role="status">
     <p>{importResult.message}</p>
     {importResult.counts&&<p>Workspace results: {importResult.counts.scanned} deployments checked · {importResult.counts.outbound} outbound-capable · {importResult.counts.verified} verified calling configurations.</p>}
-    {importResult.options?.length? <div className="vdp-import-select"><label htmlFor="vdp-select-deployment">Available calling configurations</label><select id="vdp-select-deployment" value={deploymentId} onChange={e=>setDeploymentId(e.target.value)}><option value="">Select an agent + phone number</option>{importResult.options.map((d,i)=><option key={d.deploymentId+"-"+i} value={d.deploymentId+"|"+d.connectionId+"|"+d.callerNumber}>{d.label} · v{d.version} · {d.callerNumber}</option>)}</select><button type="button" disabled={!deploymentId} onClick={applySarvam}>Use selected settings</button></div>:null}
+    {importResult.options?.length? <div className="vdp-import-select"><label htmlFor="vdp-select-deployment">{importResult.code==="saved_defaults"?"Saved dealership configuration":"Available calling configurations"}</label><select id="vdp-select-deployment" value={deploymentId} onChange={e=>setDeploymentId(e.target.value)}><option value="">Select an agent + phone number</option>{importResult.options.map((d,i)=><option key={d.deploymentId+"-"+i} value={d.deploymentId+"|"+d.connectionId+"|"+d.callerNumber}>{d.label} · v{d.version} · {d.callerNumber}</option>)}</select><button type="button" disabled={!deploymentId} onClick={applySarvam}>Use selected settings</button></div>:null}
     {importResult.code==="no_deployments"||importResult.code==="no_outbound"||importResult.code==="incomplete"?<p>Open Sarvam → Build → Agents for the committed version and Deploy → Phone Numbers for the connection ID and caller number. You can complete the fields below manually without creating a deployment.</p>:null}
    </div>
   </div>}
@@ -68,7 +68,7 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}) {
     <label className="vdp-field vdp-connection"><span className="vdp-label"><FieldIcon kind="connection"/> Telephony Connection ID / Name</span><span className="vdp-control"><input name="connectionId" required value={connection} onChange={e=>setConnection(e.target.value)} placeholder="Name for inactive draft; verified ID to activate"/><CopyButton value={connection} label="connection ID"/></span></label>
     <label className="vdp-field vdp-caller"><span className="vdp-label"><FieldIcon kind="phone"/> Connected Caller Number</span><span className="vdp-control"><input name="callerNumber" required value={caller} onChange={e=>setCaller(e.target.value)} onBlur={()=>{const value=caller.trim().replace(/[\s()-]/g,"");if(/^[6-9]\d{9}$/.test(value))setCaller("+91"+value);else if(/^91[6-9]\d{9}$/.test(value))setCaller("+"+value);}} placeholder="+91XXXXXXXXXX or a connected Indian 10-digit number"/><CopyButton value={caller} label="caller number"/></span></label>
     <div className="vdp-checkbox-info"><label className="vdp-check"><input type="checkbox" name="active" value="yes" defaultChecked={p?.active??false}/><span>Use these verified defaults for newly created drafts</span></label></div>
-    {message&&<p className={message.startsWith("Saved")?"vdp-success":"vdp-error"} role="status">{message}</p>}
+    {message&&<p className={message.startsWith("Saved.")?"vdp-success":"vdp-error"} role="status">{message}</p>}
     <div className="vdp-footer"><button type="button" className="vdp-cancel" disabled={busy||loadingSarvam} onClick={()=>router.push("/campaigns")}>Cancel</button><button type="submit" className="vdp-save" disabled={busy||loadingSarvam}><FieldIcon kind="save"/><span>{busy?"Saving…":"Save Draft Profile"}</span></button></div>
    </form>
   </div>
