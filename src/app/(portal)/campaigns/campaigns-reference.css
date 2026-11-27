@@ -111,3 +111,14 @@
 @media(max-width:1120px){.fc-campaign-page .fc-filters{width:100%}.fc-campaign-page .fc-filter-right{margin-left:auto}.fc-campaign-page .fc-search{flex:1 1 320px;width:auto}.fc-campaign-page .fc-campaign-hero-art{width:70px;height:65px}}
 @media(max-width:700px){.fc-campaign-page .fc-filter-right{width:100%;justify-content:flex-start;margin-left:0}.fc-campaign-page .fc-search{flex:1 1 100%;width:100%;min-width:0}.fc-campaign-page .fc-campaign-hero-art{width:58px;height:54px}.fc-campaign-page .fc-hero-copy h1{gap:6px}.fc-campaign-page .fc-count-icon{width:52px;height:52px}.fc-campaign-page .fc-count-icon svg{width:54px;height:49px}}
 @media(prefers-reduced-motion:reduce){.fc-campaign-page .fc-review-start{transition:none!important;transform:none!important}}
+
+
+/* Generated 3D artwork sprite, local and optimized. Individual icon slot is one quarter of sprite. */
+.fc-campaign-page .fc-3d-art{display:block;flex:none;background-image:url('/campaign-3d-sprite.svg');background-repeat:no-repeat;background-size:400% 100%;background-position:0% center;aspect-ratio:1/1}
+.fc-campaign-page .fc-3d-hero{background-position:0% center}
+.fc-campaign-page .fc-3d-all{background-position:33.333% center}
+.fc-campaign-page .fc-3d-ongoing{background-position:66.667% center}
+.fc-campaign-page .fc-3d-pending{background-position:100% center}
+.fc-campaign-page .fc-count-icon .fc-3d-art{width:58px;height:58px;border-radius:12px;filter:none}
+.fc-campaign-page .fc-campaign-hero-art.fc-3d-art{width:79px;height:72px;aspect-ratio:auto;background-size:400% 100%;filter:drop-shadow(0 3px 5px #60728a22)}
+@media(max-width:700px){.fc-campaign-page .fc-count-icon .fc-3d-art{width:52px;height:52px}.fc-campaign-page .fc-campaign-hero-art.fc-3d-art{width:58px;height:54px}}
