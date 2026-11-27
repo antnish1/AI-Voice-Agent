@@ -89,3 +89,10 @@
 :root[data-theme="dark"] .crm-app .reports-ref .reports-ref-table th,:root[data-theme="dark"] .crm-app .reports-ref .reports-ref-table td button{background:#30435b;color:var(--r-ink)}
 :root[data-theme="dark"] .crm-app .reports-ref .reports-ref-table tr:hover td{background:#293c51}
 :root[data-theme="dark"] .crm-app .reports-ref .reports-ref-plot-lines span{border-color:#3a4c64}
+
+
+.crm-app .reports-ref .reports-ref-heading .reports-ref-heading-icon{background:transparent!important;box-shadow:none!important}
+.crm-app .reports-ref .reports-hero-art{top:8px;bottom:8px;min-height:0}
+.crm-app .reports-ref .reports-hero-art img{display:block;max-height:100%;width:100%;height:100%;object-fit:contain;object-position:center}
+.crm-app .reports-ref .reports-ref-kpis .reports-category-card .reports-ref-kpi-icon{background:transparent!important}
+.crm-app .reports-ref .reports-ref-kpi-icon img{display:block;object-fit:contain}
