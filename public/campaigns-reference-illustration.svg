@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="610" height="180" viewBox="0 0 610 180">
+<defs>
+ <linearGradient id="shirt" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#d5e8fc"/></linearGradient>
+ <linearGradient id="skin" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#ffd5b3"/><stop offset="1" stop-color="#ed8c66"/></linearGradient>
+ <linearGradient id="screen" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#50566d"/><stop offset="1" stop-color="#252a3c"/></linearGradient>
+ <linearGradient id="blue" x1="0" x2="1" y1="0" y2="0"><stop stop-color="#61c3ff"/><stop offset="1" stop-color="#4162e9"/></linearGradient>
+ <linearGradient id="red" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#ffb7ba"/><stop offset="1" stop-color="#e92545"/></linearGradient>
+ <filter id="shade" x="-30%" y="-40%" width="160%" height="190%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#26335a" flood-opacity=".19"/></filter>
+ </defs>
+ <ellipse cx="285" cy="166" rx="260" ry="8" fill="#dbbcd2" opacity=".28"/>
+ <!-- plant -->
+ <g filter="url(#shade)"><path d="M48 132h45l-8 37H57Z" fill="#e8dbe3"/><path d="M54 137h33l-3 27H58Z" fill="#f9f7f8"/><path d="M70 132q-35-40-31-79 26 14 31 79Z" fill="#45b64f"/><path d="M70 132q1-67 22-99 10 52-22 99Z" fill="#31983e"/><path d="M70 132q20-52 53-54-13 35-53 54Z" fill="#6bca51"/><path d="M70 132Q54 83 18 90q12 31 52 42Z" fill="#77cf66"/></g>
+ <!-- rising charts -->
+ <g filter="url(#shade)"><rect x="346" y="28" width="130" height="102" rx="9" fill="#fff" stroke="#d7d5f5" stroke-width="3"/><rect x="358" y="88" width="17" height="29" rx="3" fill="#9ee6ff"/><rect x="383" y="71" width="17" height="46" rx="3" fill="#6ab5ff"/><rect x="408" y="52" width="17" height="65" rx="3" fill="#557af3"/><rect x="433" y="37" width="17" height="80" rx="3" fill="#3164da"/><path d="m359 71 32-22 25 8 33-30" fill="none" stroke="#fa5976" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="m437 28 12-2-2 12" fill="none" stroke="#fa5976" stroke-width="5"/><path d="M355 133h111" stroke="#b2d3ff" stroke-width="7" stroke-linecap="round"/></g>
+ <!-- person -->
+ <g filter="url(#shade)"><path d="M143 166q-2-62 26-79l64-1q30 21 30 80Z" fill="url(#shirt)"/><path d="M178 90q27 30 46 1" fill="#e8f4ff" stroke="#c5dff3" stroke-width="3"/><rect x="190" y="68" width="20" height="25" rx="7" fill="url(#skin)"/><ellipse cx="199" cy="47" rx="32" ry="41" fill="url(#skin)"/><path d="M169 41Q166 5 197 6q35-4 35 29l-12-8q-14 3-22-10-6 17-29 24Z" fill="#3f2530"/><ellipse cx="187" cy="52" rx="3.1" ry="4" fill="#293044"/><ellipse cx="213" cy="52" rx="3.1" ry="4" fill="#293044"/><path d="M190 67q10 9 20-1" fill="none" stroke="#d45759" stroke-width="3" stroke-linecap="round"/><path d="M163 115q-7 29 16 36l43 2 5-16-39-10" fill="url(#shirt)"/><path d="M181 138q14-8 23 4" fill="none" stroke="#f0af93" stroke-width="11" stroke-linecap="round"/></g>
+ <!-- laptop -->
+ <g filter="url(#shade)"><path d="M237 103h112l-14 60H225Z" fill="url(#screen)" stroke="#7b7892" stroke-width="3"/><circle cx="284" cy="135" r="5" fill="#8b95bb"/><path d="M225 162h113l9 7H216Z" fill="#979cb1"/></g>
+ <!-- target -->
+ <g filter="url(#shade)"><circle cx="535" cy="90" r="55" fill="#ff7b8e"/><circle cx="535" cy="90" r="44" fill="#fff"/><circle cx="535" cy="90" r="33" fill="#f74660"/><circle cx="535" cy="90" r="22" fill="#fff"/><circle cx="535" cy="90" r="11" fill="#f43355"/><path d="m531 94 61-65" fill="none" stroke="#42465c" stroke-width="6" stroke-linecap="round"/><path d="m588 32-2-19 13 5 8-15 1 21Z" fill="#fa5259"/></g>
+ </svg>
