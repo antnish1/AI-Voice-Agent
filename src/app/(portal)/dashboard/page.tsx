@@ -69,6 +69,13 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  ]);
  if([customerCount,campaignCount,approvalCount,approvedCount,recentCampaigns,periodCampaigns,recentImports,callCount,answeredCount,activeCount,providerCount,recentLaunches].some(x=>x.error))throw new Error("Could not load dealership dashboard.");
  const recent=(recentCampaigns.data??[]) as Campaign[];
+ const recentDealerIds=Array.from(new Set(recent.map(c=>c.dealership_id)));
+ const dealerNames=new Map<string,string>();
+ if(itUser&&recentDealerIds.length){
+  const {data,error}=await supabase.from("dealerships").select("id,name").in("id",recentDealerIds);
+  if(error)throw new Error("Could not load recent campaign dealerships.");
+  for(const dealer of data??[])dealerNames.set(dealer.id,dealer.name);
+ }else if(!itUser&&membership.dealerships?.name){dealerNames.set(id,membership.dealerships.name);}
  // Per-campaign lifetime totals, constrained to the authorized recent campaign and its tenant.
  const recentDetails=new Map(await Promise.all(recent.map(async c=>{
   const [config,batch,link]=await Promise.all([
@@ -129,7 +136,7 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
    {(periodCampaigns.data??[]).length===0&&<p className="ref-chart-empty">No campaigns created in this period. Charts will update with real data.</p>}
   </section>
   <section className="ref-dashboard-panel ref-recent-campaigns"><div className="ref-panel-header"><h2><span className="ref-heading-icon">◫</span> Recent <span className="dashboard-title-accent">Campaigns</span></h2><Link href="/campaigns">View All <span aria-hidden="true">→</span></Link></div>
-   <div className="tablewrap"><table className="ref-campaign-table"><thead><tr><th>Campaign Name</th><th>Agent</th><th>Type</th><th>Contacts</th><th>Status</th><th>Calls</th><th title="Answered calls divided by recorded call attempts">Answer Rate</th><th>Actions</th></tr></thead><tbody>{recent.length?recent.map(c=><tr key={c.id}><td><strong>{c.name}</strong><small>{formatted(c.created_at)}</small></td><td>{recentDetails.get(c.id)?.agent??"—"}</td><td>{recentDetails.get(c.id)?.type??"—"}</td><td>{recentDetails.get(c.id)?.contacts??"—"}</td><td><span className={"ref-campaign-status campaign-status-badge campaign-status-"+display(c).toLowerCase()}>{display(c)}</span></td><td>{recentDetails.get(c.id)?.calls??"—"}</td><td>{recentDetails.get(c.id)?.answerRate??"—"}</td><td><Link href={itUser?"/campaigns/"+c.id+"/outbound":"/campaigns?view="+encodeURIComponent(c.id)} aria-label={"View campaign "+c.name}>•••</Link></td></tr>):<tr><td colSpan={8} className="ref-table-empty"><EmptyState compact kind="campaigns" title="No campaigns yet" description="Campaigns will appear here once created."/></td></tr>}</tbody></table></div>
+   <div className="tablewrap"><table className="ref-campaign-table"><thead><tr><th>Campaign Name</th><th>Dealership Name</th><th>Agent</th><th>Type</th><th>Contacts</th><th>Status</th><th>Calls</th><th title="Answered calls divided by recorded call attempts">Answer Rate</th><th>Actions</th></tr></thead><tbody>{recent.length?recent.map(c=><tr key={c.id}><td><strong>{c.name}</strong><small>{formatted(c.created_at)}</small></td><td>{dealerNames.get(c.dealership_id)??"Dealership unavailable"}</td><td>{recentDetails.get(c.id)?.agent??"—"}</td><td>{recentDetails.get(c.id)?.type??"—"}</td><td>{recentDetails.get(c.id)?.contacts??"—"}</td><td><span className={"ref-campaign-status campaign-status-badge campaign-status-"+display(c).toLowerCase()}>{display(c)}</span></td><td>{recentDetails.get(c.id)?.calls??"—"}</td><td>{recentDetails.get(c.id)?.answerRate??"—"}</td><td><Link href={itUser?"/campaigns/"+c.id+"/outbound":"/campaigns?view="+encodeURIComponent(c.id)} aria-label={"View campaign "+c.name}>•••</Link></td></tr>):<tr><td colSpan={9} className="ref-table-empty"><EmptyState compact kind="campaigns" title="No campaigns yet" description="Campaigns will appear here once created."/></td></tr>}</tbody></table></div>
    {Array.from(recentDetails.values()).some(x=>x.unavailable)&&<p role="status">Some campaign metrics are unavailable. Refresh to try again.</p>}
   </section>
  </div>
