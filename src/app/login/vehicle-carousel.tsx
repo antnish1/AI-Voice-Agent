@@ -30,8 +30,8 @@ export function VehicleCarousel(){
  },[active,paused,reduced]);
  return <div className="fv-vehicle-carousel fv-vehicle-background" role="region" aria-label="Frontier Group vehicle banners" aria-roledescription="carousel">
   <div className="fv-vehicle-viewport">
-   <div className="fv-vehicle-track" style={{transform:`translateX(-${active*100}%)`}}>
-    {slides.map((slide,i)=><div key={slide.file} className="fv-vehicle-slide" aria-hidden={i!==active}>
+   <div className="fv-vehicle-track fv-vehicle-crossfade">
+    {slides.map((slide,i)=><div key={slide.file} className="fv-vehicle-slide" data-active={i===active?"true":"false"} aria-hidden={i!==active}>
      <img src={`/banners/${encodeURIComponent(slide.file)}`} alt={slide.alt} draggable={false} decoding="async"/>
     </div>)}
    </div>
