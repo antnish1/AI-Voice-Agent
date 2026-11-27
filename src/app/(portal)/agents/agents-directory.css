@@ -244,3 +244,52 @@ dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:bl
 }
 
 .configured-agent-dealers{margin-top:10px;padding:10px 14px}.configured-agent-dealers h3{margin:0 0 8px;font-size:14px}.configured-agent-dealer-heading,.configured-agent-dealer-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0}.configured-agent-dealer-heading{font-size:11px;opacity:.8}.configured-agent-dealer-row{border-top:1px solid var(--crisp-line,#dce9ed);font-size:13px;font-weight:600}.configured-agent-dealer-row>div{display:flex;align-items:center;gap:8px;flex-shrink:0}.configured-agent-dealer-version{background:#d8f1ef;color:#086a73;border-radius:999px;padding:4px 10px}.configured-agent-dealer-row>span{overflow-wrap:anywhere;min-width:0}
+
+/* Illustrated agents reference — local to this route. */
+.crm-app .frontier-motion-route > .agent-directory{background:radial-gradient(ellipse at 76% 0%,#e2ddff 0%,transparent 46%),linear-gradient(150deg,#faf8ff,#f1f1fc);border-radius:16px;padding:12px;gap:0}
+.crm-app .agent-directory .agent-page-hero{position:relative;isolation:isolate;overflow:hidden;min-height:124px;padding:12px 16px;margin:0 0 9px;border-radius:14px;background:radial-gradient(ellipse at 72% 60%,#c7bbff80,transparent 65%),linear-gradient(110deg,#fff5fc,#e5e9ff);flex-wrap:nowrap}
+.crm-app .agent-directory .agent-page-hero:before{content:"";position:absolute;z-index:-1;inset:48% -10% -40%;background:repeating-radial-gradient(ellipse at 65% 100%,transparent 0 8px,#9e86ed24 9px 10px);transform:rotate(-5deg);pointer-events:none}
+.crm-app .agent-directory .agent-hero-heading{position:relative;z-index:1;gap:14px;max-width:54%}
+.crm-app .agent-directory .agent-hero-heading h1{font-size:clamp(23px,2.1vw,34px);color:#202744;font-weight:800;letter-spacing:-.6px}
+.crm-app .agent-directory .agent-hero-subtitle{font-size:12px;color:#465579;line-height:1.5;margin:5px 0 0}
+.crm-app .agent-directory .agent-hero-icon{width:58px;height:58px;flex-basis:58px;border-radius:16px;background:linear-gradient(145deg,#ff7586,#df1838 55%,#a80f30);color:white;box-shadow:inset 0 2px 3px #ffffff99,0 6px 15px #e2244930}
+.crm-app .agent-directory .agent-hero-art{position:absolute;z-index:0;right:20%;top:0;bottom:0;width:clamp(115px,20%,245px);display:grid;place-items:center;pointer-events:none;animation:agent-float 4s ease-in-out infinite}
+.crm-app .agent-directory .agent-hero-art .agent-artwork{width:100%;height:100%;max-height:145px}
+.crm-app .agent-directory .agent-test-header-action{position:relative;z-index:2}
+.crm-app .agent-directory .agent-test-header-action>button{background:#fafaff;color:#252b47;border:1px solid #c9c9ed;border-radius:11px;box-shadow:0 3px 10px #6255a518}
+.crm-app .agent-directory .agent-stats-grid{gap:10px;margin-bottom:9px}
+.crm-app .agent-directory .agent-stat-card{--agent-accent:#e52c51;--agent-tint:#fff0f3;background:linear-gradient(140deg,#fff,var(--agent-tint));border:1px solid #e4e0f2;border-radius:14px;box-shadow:0 4px 12px #4c397a10;color:#222940;padding:12px;gap:10px;min-height:83px}
+.crm-app .agent-directory .agent-tone-green{--agent-accent:#0a9e64;--agent-tint:#eafaf3}
+.crm-app .agent-directory .agent-tone-purple{--agent-accent:#7950d9;--agent-tint:#f1ebff}
+.crm-app .agent-directory .agent-tone-orange{--agent-accent:#dc971b;--agent-tint:#fff7e8}
+.crm-app .agent-directory .agent-stat-card .agent-stat-icon{background:radial-gradient(circle at 30% 20%,#fff9,transparent 45%),linear-gradient(145deg,var(--agent-tint),var(--agent-accent));color:#fff;box-shadow:inset 0 2px 3px #fff9,0 4px 9px color-mix(in srgb,var(--agent-accent) 24%,transparent);border-radius:15px}
+.crm-app .agent-directory .agent-stat-card>svg{color:var(--agent-accent)}
+.crm-app .agent-directory .agent-stat-card.agent-stat-selected{border-color:var(--agent-accent);box-shadow:0 0 0 2px var(--agent-tint)}
+.crm-app .agent-directory .agent-page-controls{background:#ffffffb0;border:1px solid #e4e1f2;border-radius:13px;padding:7px;gap:9px;margin-bottom:10px}
+.crm-app .agent-directory .agent-list-search,.crm-app .agent-directory .agent-page-controls select{background:#fff;border:1px solid #deddf0;border-radius:9px;color:#293452}
+.crm-app .agent-directory .agent-card-grid{gap:11px}
+.crm-app .agent-directory .agent-preview-card{background:linear-gradient(145deg,#fff,#f9f7ff);border:1px solid #dfdff1;border-radius:15px;box-shadow:0 4px 13px #4b3c8014;padding:12px;transition:transform .2s,box-shadow .2s;animation:agent-enter .35s ease-out both}
+.crm-app .agent-directory .agent-preview-card:hover{transform:translateY(-2px);box-shadow:0 8px 19px #4b3c8022}
+.crm-app .agent-directory .agent-current-card{border-color:#ed2c48;box-shadow:0 0 0 1px #ed2c4833}
+.crm-app .agent-directory .agent-ribbon,.crm-app .agent-directory .agent-current-ribbon{background:linear-gradient(135deg,#fa3d58,#d80c27);color:#fff;border-radius:999px;top:9px;left:9px;padding:4px 9px}
+.crm-app .agent-directory .agent-card-content{gap:10px;min-height:90px}
+.crm-app .agent-directory .agent-card-portrait{width:100px;height:94px;flex:0 0 100px;background:transparent;overflow:visible;border-radius:0}
+.crm-app .agent-directory .agent-card-portrait .agent-artwork{width:100%;height:100%;filter:drop-shadow(0 4px 4px #43398019)}
+.crm-app .agent-directory .agent-card-copy h3{color:#20253c;font-size:14px}
+.crm-app .agent-directory .agent-card-copy p{color:#4b5675;line-height:1.45}
+.crm-app .agent-directory .agent-card-actions{border-color:#e9e5f4;gap:5px}
+.crm-app .agent-directory .agent-card-actions button{display:inline-flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
+.crm-app .agent-directory .agent-card-actions .agent-detail-button,.crm-app .agent-directory .agent-card-actions .agent-detail-button:hover{background:linear-gradient(#fff,#f7f7ff);color:#202741;border:1px solid #d9d9ed;box-shadow:0 3px 8px #544b8520;transform:none;padding-inline:9px}
+.crm-app .agent-directory .agent-card-actions .agent-use-disabled,.crm-app .agent-directory .agent-page-controls .agent-create-disabled{background:linear-gradient(145deg,#9775fa,#6240d6);color:#fff;border:1px solid #8063df;border-radius:9px;box-shadow:0 3px 8px #6844d72a;opacity:.78;cursor:not-allowed}
+.crm-app .agent-directory .agent-card-actions .agent-sample-disabled{color:#d72d4c}
+@keyframes agent-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes agent-enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1100px){.crm-app .agent-directory .agent-hero-art{right:23%;width:17%}.crm-app .agent-directory .agent-hero-heading{max-width:57%}.crm-app .agent-directory .agent-stat-card>svg{display:none}}
+@media(max-width:760px){.crm-app .agent-directory .agent-page-hero{flex-wrap:wrap;min-height:110px;padding:12px}.crm-app .agent-directory .agent-hero-heading{max-width:100%;flex:1 1 100%}.crm-app .agent-directory .agent-hero-art{display:none}.crm-app .agent-directory .agent-hero-icon{width:45px;height:45px;flex-basis:45px}.crm-app .agent-directory .agent-hero-subtitle{font-size:11px}.crm-app .agent-directory .agent-card-portrait{width:86px;height:86px;flex-basis:86px}}
+@media(prefers-reduced-motion:reduce){.crm-app .agent-directory .agent-hero-art,.crm-app .agent-directory .agent-preview-card{animation:none;transition:none}.crm-app .agent-directory .agent-preview-card:hover{transform:none}}
+:root[data-theme="dark"] .crm-app .frontier-motion-route > .agent-directory{background:#17192e}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-page-hero{background:linear-gradient(120deg,#25223c,#35304d)}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-stat-card,:root[data-theme="dark"] .crm-app .agent-directory .agent-preview-card{background:#25273e;border-color:#414360}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-current-card{border-color:#f45d77}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-hero-heading h1,:root[data-theme="dark"] .crm-app .agent-directory .agent-card-copy h3,:root[data-theme="dark"] .crm-app .agent-directory .agent-stat-card{color:#f1efff}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-hero-subtitle,:root[data-theme="dark"] .crm-app .agent-directory .agent-card-copy p{color:#c7c6de}
