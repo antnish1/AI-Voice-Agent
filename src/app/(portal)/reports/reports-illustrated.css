@@ -159,19 +159,16 @@
 }
 
 
-/* Reports customer-record Call Status badge: shrink gently on hover, then return.
-   Transform-only animation leaves table geometry and semantic status colours unchanged. */
+/* Reports customer-record Call Status badges gently shrink and return continuously,
+   independent of hover. Transform only: table dimensions and status colours stay fixed. */
 @keyframes reports-status-badge-shrink{
   0%,100%{transform:scale(1)}
   50%{transform:scale(.94)}
 }
-@media (hover:hover) and (prefers-reduced-motion:no-preference){
+@media (prefers-reduced-motion:no-preference){
   .crm-app .reports-ref .reports-ref-table .reports-call-status{
     transform-origin:center;
-    will-change:auto;
-  }
-  .crm-app .reports-ref .reports-ref-table .reports-call-status:hover{
-    animation:reports-status-badge-shrink 600ms ease-in-out 1;
+    animation:reports-status-badge-shrink 2.4s ease-in-out infinite;
   }
 }
 @media (prefers-reduced-motion:reduce){
