@@ -93,9 +93,9 @@ function AgentArtwork({kind}:{kind:string}){
 function AgentCard({agent,onDetails}:{agent:Agent;onDetails:(a:Agent)=>void}){
  const inUse=!!agent.profiles&&agent.status==="Active";
  return <article className={"agent-preview-card"+(inUse?" agent-current-card":"")}>
-  {inUse?<span className="agent-ribbon agent-current-ribbon">✓ Currently Used</span>:agent.recommended&&<span className="agent-ribbon">★ Recommended</span>}
-  <div className="agent-card-status"><span className={agent.status==="Active"?"agent-state-active":"agent-state-inactive"}>● {agent.profiles?"Configured":"Preview"} · {agent.status}</span><span className="agent-version">{agent.version}</span></div>
-  <div className="agent-card-content"><div className={"agent-card-portrait tone-"+agent.tone}><ArtworkImage key={agent.id} name={"agents-"+(agent.profiles?"kajal":agent.id)} fallback={<AgentArtwork kind={agent.profiles?"woman":agent.id==="feedback"?"robot":agent.id}/>}/></div><div className="agent-card-copy"><h3>{agent.name}</h3><p>{agent.description}</p></div></div>
+  {agent.recommended&&<span className="agent-ribbon">★ Recommended</span>}
+  <div className="agent-card-status"><span className={agent.status==="Active"?"agent-state-active":"agent-state-inactive"}>● {agent.profiles?"Configured":"Preview"} · {agent.status}</span>{inUse&&<span className="agent-current-inline">✓ Currently Used</span>}</div>
+  <div className="agent-card-content"><div className={"agent-card-portrait tone-"+agent.tone}><ArtworkImage key={agent.id} name={"agents-"+(agent.profiles?"kajal":agent.id)} fallback={<AgentArtwork kind={agent.profiles?"woman":agent.id==="feedback"?"robot":agent.id}/>}/></div><div className="agent-card-copy"><div className="agent-card-title-row"><h3>{agent.name}</h3><span className="agent-version">{agent.version}</span></div><p>{agent.description}</p></div></div>
   <div className="agent-card-actions"><button type="button" className="agent-sample-disabled" disabled title="Sample playback requires Sarvam integration"><span className="agent-sample-icon"><Icon name="play" size={11}/></span> Play Sample</button><button type="button" className="agent-detail-button" onClick={()=>onDetails(agent)}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>View Details</button><button type="button" className="agent-use-disabled" disabled title={agent.profiles?"Use the saved voice configuration when creating a campaign":"Preview agent cannot be used"}><Icon name="play" size={14}/>Use Agent</button></div>
  </article>;
 }
@@ -125,7 +125,7 @@ export function AgentsDirectory({profiles,loadError,headerAction}:{profiles:Prof
  const clear=()=>{setSearch("");setKpiFilter("all");setCategory("all");setVersion("all");};
  const selectKpi=(filter:"total"|"active"|"inactive"|"recommended")=>setKpiFilter(current=>current===filter?"all":filter);
  return <div className="agent-directory">
-  <div className="agent-page-hero"><div className="agent-hero-heading"><div className="agent-hero-icon"><Icon name="sound" size={26}/></div><div><h1>AI Voice Agents</h1><p className="agent-hero-subtitle">Create, manage and deploy intelligent voice agents for customer interactions.</p></div></div><div className="agent-hero-art"><ArtworkImage name="agents-hero" fallback={<AgentArtwork kind="hero"/>}/></div>
+  <div className="agent-page-hero"><div className="agent-hero-heading"><div className="agent-hero-icon"><Icon name="sound" size={26}/></div><div><h1>AI Voice Agents</h1><p className="agent-hero-subtitle">Create, manage and deploy intelligent voice agents for customer interactions.</p></div></div>
    {headerAction}
   </div>
   {loadError&&<p role="alert">Saved agent configurations could not be loaded.</p>}
