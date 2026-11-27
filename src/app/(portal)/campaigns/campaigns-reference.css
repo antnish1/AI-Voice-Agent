@@ -84,3 +84,30 @@
 .fc-campaign-details-dialog{padding:0;border:0;border-radius:16px;width:min(680px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;background:transparent;color:inherit;box-shadow:0 18px 65px #102b4540}.fc-campaign-details-dialog::backdrop{background:rgba(15,35,55,.42);backdrop-filter:blur(3px)}
 
 .fc-action-toast{position:fixed;top:86px;right:24px;z-index:1000;display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:12px;box-shadow:0 8px 26px #15304d24;border:1px solid;max-width:calc(100vw - 32px);font-size:13px;animation:fc-action-toast-in .18s ease-out}.fc-action-toast-hold{background:#fff5dc;color:#8a5706;border-color:#efd69c}.fc-action-toast-reject{background:#fff0f0;color:#b4232b;border-color:#f4c4c4}@keyframes fc-action-toast-in{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}@media(prefers-reduced-motion:reduce){.fc-action-toast{animation:none}}@media(max-width:600px){.fc-action-toast{right:16px;top:76px}}
+
+
+/* 27 Nov reference polish — Campaigns content only; no shell or shared icon overrides. */
+.fc-campaign-page .fc-review-start,
+.fc-campaign-page .fc-row-actions .fc-review-start{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#142d4e!important;color:#fff!important;border:1px solid #142d4e!important;border-radius:9px;box-shadow:0 3px 7px #142d4e20;transition:background .18s ease,box-shadow .18s ease,transform .18s ease}
+.fc-campaign-page .fc-review-start:hover,.fc-campaign-page .fc-review-start:focus-visible{background:#1e436f!important;color:#fff!important;box-shadow:0 5px 12px #142d4e36}
+.fc-campaign-page .fc-review-start:focus-visible{outline:2px solid #4c88c4;outline-offset:2px}
+.fc-campaign-page .fc-hero-copy h1{display:inline-flex;align-items:center;gap:12px;position:relative;padding-bottom:7px}
+.fc-campaign-page .fc-hero-copy h1:after{position:absolute;left:0;bottom:0;margin:0;width:30px}
+.fc-campaign-page .fc-campaign-hero-art{display:block;flex:none;width:79px;height:72px;object-fit:contain;filter:drop-shadow(0 5px 6px #8ea0c140)}
+.fc-campaign-page .fc-hero-copy{min-width:0}
+.fc-campaign-page .fc-count-icon{width:59px;height:59px;border-radius:16px;background:transparent;box-shadow:none;overflow:visible}
+.fc-campaign-page .fc-count-icon svg{display:block;width:64px;height:57px;overflow:visible;filter:drop-shadow(0 2px 4px #60728a18)}
+.fc-campaign-page .fc-count-card{gap:10px}
+.fc-campaign-page .fc-filters{display:flex;flex:1;min-width:0;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.fc-campaign-page .fc-filter-right{display:flex;align-items:center;justify-content:flex-end;gap:9px;margin-left:auto;flex-wrap:wrap}
+.fc-campaign-page .fc-search{flex:0 1 365px;width:365px;min-width:230px;max-width:100%;height:39px}
+.fc-campaign-page .fc-search input{font-size:12px}
+.fc-campaign-page .fc-status,.fc-campaign-page .fc-date-details>summary{height:39px}
+.fc-campaign-page .fc-status select{max-width:190px}
+.fc-campaign-page .fc-list-toolbar{gap:18px}
+.fc-campaign-page .fc-date-details[open]>summary,.fc-campaign-page .fc-status:focus-within{outline:2px solid #9cc9e7;outline-offset:2px}
+:root[data-theme="dark"] .fc-campaign-page .fc-review-start{background:#142d4e!important;color:#fff!important}
+@media(max-width:1450px){.fc-campaign-page .fc-search{flex-basis:290px;width:290px}.fc-campaign-page .fc-list-toolbar{gap:12px}.fc-campaign-page .fc-filter-right{gap:7px}}
+@media(max-width:1120px){.fc-campaign-page .fc-filters{width:100%}.fc-campaign-page .fc-filter-right{margin-left:auto}.fc-campaign-page .fc-search{flex:1 1 320px;width:auto}.fc-campaign-page .fc-campaign-hero-art{width:70px;height:65px}}
+@media(max-width:700px){.fc-campaign-page .fc-filter-right{width:100%;justify-content:flex-start;margin-left:0}.fc-campaign-page .fc-search{flex:1 1 100%;width:100%;min-width:0}.fc-campaign-page .fc-campaign-hero-art{width:58px;height:54px}.fc-campaign-page .fc-hero-copy h1{gap:6px}.fc-campaign-page .fc-count-icon{width:52px;height:52px}.fc-campaign-page .fc-count-icon svg{width:54px;height:49px}}
+@media(prefers-reduced-motion:reduce){.fc-campaign-page .fc-review-start{transition:none!important;transform:none!important}}
