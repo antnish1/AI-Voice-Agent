@@ -38,8 +38,9 @@ function EmptyArt(){
  <g fill="#147bd7"><circle cx="77" cy="111" r="4"/><circle cx="383" cy="116" r="4"/><path d="m68 30 4 10 10 4-10 4-4 10-4-10-10-4 10-4Z" opacity=".6"/><path d="m402 27 3 7 7 3-7 3-3 7-3-7-7-3 7-3Z" opacity=".45"/></g>
  </svg>;
 }
-function CountsCard({kind,label,value}:{kind:"all"|"draft"|"pending";label:string;value:number}){
- return <div className={`fc-count-card fc-count-${kind}`}><span className="fc-count-icon"><CampaignArtwork kind={kind==="draft"?"ongoing":kind}/></span><span className="fc-count-content"><span>{label}</span><strong>{value}</strong></span></div>;
+function CountsCard({kind,label,value}:{kind:"all"|"draft"|"pending"|"hold"|"reject";label:string;value:number}){
+ const icon=kind==="hold"?<svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><defs><linearGradient id="fc-hold-gradient" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#a9d3ff"/><stop offset="1" stopColor="#3f74ce"/></linearGradient></defs><rect x="5" y="5" width="38" height="38" rx="13" fill="url(#fc-hold-gradient)"/><rect x="16" y="13" width="6" height="22" rx="3" fill="white"/><rect x="27" y="13" width="6" height="22" rx="3" fill="white"/></svg>:kind==="reject"?<svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><defs><linearGradient id="fc-reject-gradient" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#ff9ca8"/><stop offset="1" stopColor="#d53852"/></linearGradient></defs><rect x="5" y="5" width="38" height="38" rx="13" fill="url(#fc-reject-gradient)"/><path d="M17 17l14 14M31 17 17 31" stroke="white" strokeWidth="4.5" strokeLinecap="round"/></svg>:<CampaignArtwork kind={kind==="draft"?"ongoing":kind}/>;
+ return <div className={`fc-count-card fc-count-${kind}`}><span className="fc-count-icon">{icon}</span><span className="fc-count-content"><span>{label}</span><strong>{value}</strong></span></div>;
 }
 function normalizeDate(input?:string){return input&&/^\d{4}-\d{2}-\d{2}$/.test(input)?input:"";}
 export default async function Campaigns({searchParams}:{searchParams?:Promise<Filters>}={}){
@@ -72,7 +73,8 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
  }
  const byCampaign=new Map((launches??[]).map(l=>[l.campaign_id,l.provider_status]));
  const display=(c:Campaign)=>campaignDisplayStatus(c.status,byCampaign.get(c.id));
- const total=campaigns.length,drafts=campaigns.filter(c=>display(c)==="Ongoing").length,pending=campaigns.filter(c=>display(c)==="Pending").length;
+ const statusCounts=new Map(campaignStatuses.map(status=>[status,campaigns.filter(c=>display(c)===status).length]));
+ const total=campaigns.length,drafts=statusCounts.get("Ongoing")??0,pending=statusCounts.get("Pending")??0,hold=statusCounts.get("Hold")??0,rejected=statusCounts.get("Reject")??0;
  const filters=params;const q=(filters.q??"").trim().slice(0,120),status=filters.status??"",from=normalizeDate(filters.from),to=normalizeDate(filters.to);
  const statuses:readonly string[]=campaignStatuses;
  const selectedStatus=statuses.includes(status)?status:"";
@@ -87,7 +89,7 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
    <HeaderWave/>
    <div className="fc-hero-actions">{itUser&&<Link href="/settings/voice-profiles" className="fc-voice-button"><CampaignIcon kind="voice"/> Voice Agent Defaults</Link>}{permitted&&<Link href="/campaigns/new" className="fc-primary-button"><span>＋</span> New Campaign</Link>}</div>
   </header>
-  <div className="fc-campaign-stats"><CountsCard kind="all" label="Total Campaigns" value={total}/><CountsCard kind="draft" label="Ongoing" value={drafts}/><CountsCard kind="pending" label="Pending" value={pending}/></div>
+  <div className="fc-campaign-stats"><CountsCard kind="all" label="Total Campaigns" value={total}/><CountsCard kind="draft" label="Ongoing" value={drafts}/><CountsCard kind="pending" label="Pending" value={pending}/><CountsCard kind="hold" label="Hold" value={hold}/><CountsCard kind="reject" label="Rejected" value={rejected}/></div>
   <section className="fc-campaign-list" aria-label="All campaigns">
    <div className="fc-list-toolbar"><h2><span className="fc-grid-icon"><CampaignIcon kind="grid"/></span> All Campaigns</h2>
     <AutoCampaignFilters>
