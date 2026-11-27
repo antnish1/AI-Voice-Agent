@@ -172,8 +172,57 @@
 .crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card .fc-count-icon .fc-3d-art img{width:100%;height:100%;object-fit:contain}
 .crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card{align-items:center;gap:12px}
 .crm-app .fc-campaign-page .fc-campaign-stats .fc-count-content{justify-content:center}
-.crm-app .fc-campaign-page .fc-full-campaign-table tbody td .campaign-status-badge{display:inline-flex;align-items:center;justify-content:center;transform:scale(1);transform-origin:center;transition:transform 180ms ease;cursor:default}
-@media(hover:hover){.crm-app .fc-campaign-page .fc-full-campaign-table tbody td .campaign-status-badge:hover{transform:scale(.95)}}
-.crm-app .fc-campaign-page .fc-full-campaign-table tbody td .campaign-status-badge:active{transform:scale(.90)}
+.crm-app .fc-campaign-page .fc-full-campaign-table tbody td .campaign-status-badge{display:inline-flex;align-items:center;justify-content:center;transform-origin:center;cursor:default}
 @media(max-width:700px){.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card .fc-count-icon,.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card .fc-count-icon .fc-3d-art{width:44px;height:44px;flex-basis:44px}}
 @media(prefers-reduced-motion:reduce){.crm-app .fc-campaign-page .fc-full-campaign-table tbody td .campaign-status-badge{transition:none!important;transform:none!important}}
+
+/* Five compact, real-data KPI slots: existing artwork retained; new state icons stay crisp. */
+.crm-app .fc-campaign-page .fc-campaign-stats{
+  grid-template-columns:repeat(5,minmax(0,1fr));
+}
+.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card{
+  min-width:0;padding:8px 12px;
+}
+.crm-app .fc-campaign-page .fc-count-hold{--fc-accent:#4f82c9}
+.crm-app .fc-campaign-page .fc-count-reject{--fc-accent:#d53852}
+.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-icon>svg{
+  width:44px;height:44px;flex-shrink:0;
+}
+/* Continuous strong shrink; never depends on pointer hover. */
+@keyframes fc-campaign-status-pulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(.88)}
+}
+@media(prefers-reduced-motion:no-preference){
+  .crm-app .fc-campaign-page .fc-full-campaign-table tbody td .campaign-status-badge{
+    animation:fc-campaign-status-pulse 1.8s ease-in-out infinite;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .crm-app .fc-campaign-page .fc-full-campaign-table tbody td .campaign-status-badge{
+    animation:none!important;transform:none!important;
+  }
+}
+/* Override global red palette, including its hover rule, for this one New Campaign link. */
+.crm-app .fc-campaign-page .fc-hero-actions a.fc-primary-button{
+  background:#142D4E!important;background-image:none!important;
+  border-color:#142D4E!important;color:#fff!important;
+}
+.crm-app .fc-campaign-page .fc-hero-actions a.fc-primary-button:hover,
+.crm-app .fc-campaign-page .fc-hero-actions a.fc-primary-button:focus-visible{
+  background:#1E436F!important;background-image:none!important;
+  border-color:#1E436F!important;color:#fff!important;
+}
+@media(max-width:1050px){
+  .crm-app .fc-campaign-page .fc-campaign-stats{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card{
+    border-bottom:1px solid #e1eaf3;
+  }
+}
+@media(max-width:650px){
+  .crm-app .fc-campaign-page .fc-campaign-stats{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
