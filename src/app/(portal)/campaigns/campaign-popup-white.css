@@ -110,3 +110,171 @@
 :root[data-theme="dark"] .fc-success-reference-modal .fc-success-actions{border-color:#3e5365}
 :root[data-theme="dark"] .fc-success-reference-modal .fc-success-cancel{background:#263e50;color:#e9f4ff;border-color:#4f677a}
 @media(max-width:460px){.campaign-modal.fc-success-reference-modal{padding:19px 15px}.fc-success-reference-modal h2{font-size:17px}.fc-success-reference-status{font-size:11px}.fc-success-reference-modal .fc-success-reference{font-size:16px}.fc-success-reference-modal .fc-success-actions{gap:9px}}
+
+
+/* Create AI Calling Campaign — reference-style wide modal.
+   All rules are scoped to the create modal; success modal and campaign logic stay intact. */
+.campaign-modal.fc-reference-create{
+  width:min(1060px,calc(100vw - 32px));max-height:min(95dvh,920px);border-radius:25px;
+  overflow:hidden;background:#fff;box-shadow:0 24px 80px #14253f55;
+}
+.fc-reference-create .fc-reference-create-header{
+  position:relative;isolation:isolate;display:flex;align-items:center;justify-content:flex-start;gap:22px;
+  min-height:168px;margin:0;padding:22px 38px;border:0;
+  background:radial-gradient(ellipse at 75% 120%,#ffdbe87a,transparent 48%),linear-gradient(110deg,#fff 5%,#f4f7ff 56%,#f0f3ff 100%);
+  overflow:hidden;
+}
+.fc-reference-create .fc-reference-create-header:before{
+  content:"";position:absolute;inset:auto -7% -93px 48%;height:140px;border-radius:50%;
+  transform:rotate(-9deg);background:linear-gradient(15deg,#fde1ed66,#f3edff1c);z-index:-1;pointer-events:none;
+}
+.fc-reference-create .fc-create-phone-icon{
+  display:grid;place-items:center;flex:0 0 90px;width:90px;height:90px;border-radius:24px;
+  background:linear-gradient(145deg,#fff0f1,#ffe2e7);box-shadow:0 7px 13px #d71f3020;color:#e01b2e;
+}
+.fc-reference-create .fc-create-phone-icon img{width:81px;height:81px;object-fit:contain}
+.fc-reference-create .fc-create-heading-copy{
+  padding-left:20px;border-left:3px solid #ed263a;z-index:2;min-width:0;max-width:510px;
+}
+.fc-reference-create .fc-reference-create-header h2{
+  color:#0b254b;font-size:clamp(21px,2.1vw,30px);font-weight:600;letter-spacing:-.9px;
+  line-height:1.16;margin:0 0 8px;
+}
+.fc-reference-create .fc-reference-create-header p{font-size:15px;line-height:1.35;color:#465a78;margin:0}
+.fc-reference-create .fc-create-agent-art{
+  position:absolute;right:44px;bottom:-3px;width:39%;height:168px;object-fit:contain;
+  object-position:center bottom;pointer-events:none;z-index:1;
+}
+.fc-reference-create .fc-create-close{
+  position:absolute;right:18px;top:16px;z-index:4;display:grid;place-items:center;
+  height:38px;width:38px;border-radius:50%;border:0;background:#e6ecf7;color:#0d2950;
+  cursor:pointer;transition:background .18s ease;
+}
+.fc-reference-create .fc-create-close:hover:not(:disabled){background:#d8e0ef}
+.fc-reference-create .fc-create-close:disabled{cursor:not-allowed;opacity:.5}
+.fc-reference-create .fc-reference-create-scroll{
+  display:flex;flex-direction:column;gap:22px;padding:22px 42px 10px;overflow-y:auto;min-height:0;
+  background:#fff;
+}
+.fc-reference-create .fc-compact-fields{gap:23px}
+.fc-reference-create .campaign-form-label,.fc-reference-create .fc-reference-period{
+  font-size:17px;font-weight:600;color:#10284e;line-height:1.3;
+}
+.fc-reference-create .campaign-form-label>span:not(.fc-create-dealer-select),.fc-reference-create .fc-reference-period>span{color:#e41e35}
+.fc-reference-create .fc-create-dealer-select{display:flex;align-items:center;position:relative;margin-top:11px}
+.fc-reference-create .fc-create-dealer-select>svg{
+  position:absolute;left:21px;z-index:2;pointer-events:none;color:#e31b33;
+}
+.fc-reference-create .fc-create-dealer-select select.campaign-pill-input{
+  margin-top:0;padding-left:70px;
+}
+.fc-reference-create .campaign-pill-input,.fc-reference-create .fc-period-fields select{
+  appearance:auto;border:1px solid #b9c7de;border-radius:999px;color:#172b47;
+  background-color:#fff;min-height:58px;font-size:16px;font-weight:500;padding:12px 22px;
+  box-shadow:0 1px 2px #18395708;
+}
+.fc-reference-create .campaign-pill-input:focus-visible,.fc-reference-create .fc-period-fields select:focus-visible{
+  outline:2px solid #759acb;outline-offset:2px;box-shadow:0 0 0 3px #4069aa16;
+}
+.fc-reference-create .fc-period-fields{gap:28px;margin-top:12px}
+.fc-reference-create .fc-period-fields label{gap:7px;font-size:15px;color:#495c77;font-weight:400}
+.fc-reference-create .fc-period-fields select{width:100%;margin-top:0}
+.fc-reference-create .fc-compact-excel-head{margin-top:0;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.fc-reference-create .fc-compact-excel-head strong{font-size:17px;font-weight:600;color:#0e284f}
+.fc-reference-create .fc-template-text{
+  color:#e1192f!important;min-height:32px;border:0!important;background:transparent!important;
+  padding:4px 0;gap:8px;font-size:15px;font-weight:600;box-shadow:none;
+}
+.fc-reference-create .fc-template-text svg{width:22px;height:22px}
+.fc-reference-create .fc-template-text:hover{color:#b61024!important;text-decoration:underline}
+.fc-reference-create .fc-compact-upload{
+  min-height:116px;padding:22px 18px;border:2px dashed #a4b3cd;border-radius:18px;
+  background:#fff;display:flex;justify-content:center;align-items:center;gap:18px;
+}
+.fc-reference-create .fc-compact-upload strong{font-size:20px;font-weight:600;color:#10294f}
+.fc-reference-create .fc-compact-upload small{
+  font-size:15px;color:#60708a;white-space:nowrap;padding-left:20px;border-left:1px solid #a9b7cc;
+}
+.fc-reference-create .fc-compact-upload:hover{background:#f8faff;border-color:#6f8db9}
+.fc-reference-create .fc-reference-consent{
+  display:flex;align-items:center;gap:15px;margin-top:2px;padding:4px 0 8px;
+  background:transparent;color:#152b50;font-size:15px;line-height:1.5;border-radius:0;
+}
+.fc-reference-create .fc-reference-consent input{
+  width:24px;height:24px;accent-color:#082d5d;flex-shrink:0;
+}
+.fc-reference-create .fc-reference-create-footer{
+  display:flex;flex-direction:column;gap:0;margin:10px 42px 0;padding:17px 0 24px;
+  border-top:1px solid #dce4ef;background:#fff;
+}
+.fc-reference-create .fc-reference-eligible-footer{min-height:0;margin:0 0 5px;font-size:12px}
+.fc-reference-create .fc-reference-eligible-footer:empty{display:none}
+.fc-reference-create .fc-reference-footer-buttons{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.fc-reference-create .fc-reference-footer-buttons button{
+  min-height:58px;border-radius:999px;font-size:18px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+}
+.fc-reference-create .fc-reference-footer-buttons .campaign-modal-back{
+  background:#fff;border:1px solid #afc0da;color:#10284e;
+}
+.fc-reference-create .fc-reference-footer-buttons .campaign-modal-back:hover{background:#f4f7fb}
+.fc-reference-create .fc-reference-footer-buttons .campaign-modal-next{
+  background:linear-gradient(180deg,#153663,#082d5d 55%,#061f42);
+  background-color:#082d5d;border:1px solid #082d5d;color:#fff;
+}
+.fc-reference-create .fc-reference-footer-buttons .campaign-modal-next:hover:not(:disabled){
+  background:#061f42;border-color:#061f42;
+}
+.fc-reference-create .fc-reference-footer-buttons .campaign-modal-next:disabled{
+  background:#aeb9cc;border-color:#aeb9cc;color:#fff;opacity:1;cursor:not-allowed;
+}
+.fc-reference-create .fc-reference-footer-buttons .campaign-modal-next svg{flex-shrink:0}
+:root[data-theme="dark"] .campaign-modal.fc-reference-create .fc-reference-create-header{
+  background:linear-gradient(110deg,#1b2e48,#2c3754);
+}
+:root[data-theme="dark"] .fc-reference-create .fc-create-heading-copy h2,
+:root[data-theme="dark"] .fc-reference-create .fc-reference-create-header p{color:#e4efff}
+:root[data-theme="dark"] .fc-reference-create .fc-create-dealer-select select.campaign-pill-input,
+:root[data-theme="dark"] .fc-reference-create .fc-period-fields select{background:#253c52;color:#e6f0ff;border-color:#526b87}
+:root[data-theme="dark"] .fc-reference-create .fc-reference-consent{background:transparent;color:#e6f0ff}
+:root[data-theme="dark"] .fc-reference-create .fc-reference-create-footer,
+:root[data-theme="dark"] .fc-reference-create .fc-reference-create-scroll{background:#14243a}
+:root[data-theme="dark"] .fc-reference-create .fc-compact-upload{background:#192e43}
+@media(max-width:1000px){
+  .fc-reference-create .fc-create-agent-art{width:36%;right:29px;opacity:.96}
+  .fc-reference-create .fc-reference-create-header{padding:18px 25px}
+  .fc-reference-create .fc-create-heading-copy{max-width:60%}
+  .fc-reference-create .fc-reference-create-scroll{padding:19px 27px 10px}
+  .fc-reference-create .fc-reference-create-footer{margin-left:27px;margin-right:27px}
+}
+@media(max-width:720px){
+  .campaign-modal.fc-reference-create{width:calc(100vw - 18px);max-height:95dvh;border-radius:17px}
+  .fc-reference-create .fc-reference-create-header{min-height:125px;padding:16px 14px;gap:10px}
+  .fc-reference-create .fc-create-phone-icon{width:52px;height:52px;flex-basis:52px;border-radius:15px}
+  .fc-reference-create .fc-create-phone-icon img{width:50px;height:50px}
+  .fc-reference-create .fc-create-heading-copy{max-width:calc(100% - 90px);padding-left:10px}
+  .fc-reference-create .fc-reference-create-header h2{font-size:18px;letter-spacing:-.4px}
+  .fc-reference-create .fc-reference-create-header p{font-size:11px}
+  .fc-reference-create .fc-create-agent-art{right:7px;width:44%;height:82px;opacity:.3}
+  .fc-reference-create .fc-create-close{width:32px;height:32px;right:9px;top:8px}
+  .fc-reference-create .fc-reference-create-scroll{padding:17px 16px 7px;gap:14px}
+  .fc-reference-create .fc-compact-fields{gap:15px}
+  .fc-reference-create .campaign-form-label,.fc-reference-create .fc-reference-period,.fc-reference-create .fc-compact-excel-head strong{font-size:13px}
+  .fc-reference-create .campaign-pill-input,.fc-reference-create .fc-period-fields select{min-height:45px;font-size:13px;padding:9px 12px}
+  .fc-reference-create .fc-create-dealer-select select.campaign-pill-input{padding-left:42px}
+  .fc-reference-create .fc-create-dealer-select>svg{left:14px;width:18px;height:18px}
+  .fc-reference-create .fc-period-fields{gap:10px}
+  .fc-reference-create .fc-period-fields label{font-size:12px}
+  .fc-reference-create .fc-template-text{font-size:11px;gap:4px}
+  .fc-reference-create .fc-template-text svg{width:16px;height:16px}
+  .fc-reference-create .fc-compact-upload{min-height:78px;padding:12px;gap:9px}
+  .fc-reference-create .fc-compact-upload strong{font-size:13px}
+  .fc-reference-create .fc-compact-upload small{font-size:11px;padding-left:9px;width:auto;text-align:left}
+  .fc-reference-create .fc-reference-consent{font-size:11px;gap:9px;padding:7px 0}
+  .fc-reference-create .fc-reference-consent input{width:19px;height:19px}
+  .fc-reference-create .fc-reference-create-footer{margin:8px 16px 0;padding:12px 0 14px}
+  .fc-reference-create .fc-reference-footer-buttons{gap:9px}
+  .fc-reference-create .fc-reference-footer-buttons button{min-height:45px;font-size:13px}
+  .fc-reference-create .fc-reference-footer-buttons .campaign-modal-next svg{width:16px;height:16px}
+}
+@media(prefers-reduced-motion:reduce){.fc-reference-create .fc-create-close{transition:none}}
