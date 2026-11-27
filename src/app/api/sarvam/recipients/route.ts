@@ -28,12 +28,15 @@ export async function POST(request:Request){
   if(form.get("serviceTemplate")==="yes"){
    const {data:dealer,error:dealerError}=await supabase.from("dealerships").select("name").eq("id",campaign.dealership_id).single();
    if(dealerError||!dealer)throw Error("Recipient dealership configuration unavailable.");
-   const {data:customers,error:customerError}=await supabase.from("customers").select("mobile,consent_status,do_not_call").eq("dealership_id",campaign.dealership_id);
-   if(customerError)throw Error("Recipient DNC screening unavailable.");
    const blocked=new Set<string>();
-   for(const customer of customers??[]){
+   for(let offset=0;;offset+=500){
+    const {data:customers,error:customerError}=await supabase.from("customers").select("mobile,consent_status,do_not_call").eq("dealership_id",campaign.dealership_id).order("id").range(offset,offset+499);
+    if(customerError||!customers)throw Error("Recipient DNC screening unavailable.");
+    for(const customer of customers){
     const number=normalizePhone(customer.mobile??"");
     if(number&&(customer.do_not_call||!["yes","true","1","opted_in","consented","granted"].includes(String(customer.consent_status??"").toLowerCase())))blocked.add(number);
+    }
+    if(customers.length<500)break;
    }
    const result=enrichServiceRecipients(parseCSV(csv),dealer.name,blocked);
    csv=result.csv;mapping=result.mapping;
