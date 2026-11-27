@@ -36,9 +36,6 @@ export function VehicleCarousel(){
     </div>)}
    </div>
   </div>
-  <div className="fv-vehicle-controls">
-   {slides.map((slide,i)=><button key={slide.file} type="button" className="fv-vehicle-dot" aria-label={`Show ${slide.alt}`} aria-current={i===active?"true":undefined} onClick={()=>setActive(i)}/>)}
-   {!reduced&&<button type="button" className="fv-vehicle-pause" aria-label={paused?"Resume slideshow":"Pause slideshow"} onClick={()=>setPaused(v=>!v)}>{paused?"▶":"Ⅱ"}</button>}
-  </div>
+  {!reduced&&<button type="button" className="fv-background-keyboard-pause" onClick={()=>setPaused(v=>!v)}>{paused?"Resume background animation":"Pause background animation"}</button>}
  </div>;
 }

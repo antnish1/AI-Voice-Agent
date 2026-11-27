@@ -436,3 +436,33 @@ dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:bl
   .crm-app .agent-directory .agent-list-search{flex:1 1 100%;max-width:none;width:100%;min-width:0}
   .crm-app .agent-directory .agent-page-controls select:first-of-type{margin-left:0}
 }
+
+/* Restore a left/right badge row and visible, equal-width action separators. */
+.crm-app .agent-directory .agent-preview-card .agent-card-status{
+ display:flex;flex-direction:row;justify-content:space-between;align-items:flex-start;
+ gap:8px;min-height:30px;margin:0 0 4px;
+}
+.crm-app .agent-directory .agent-card-status .agent-card-left-badges{
+ display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:5px;min-width:0;
+}
+.crm-app .agent-directory .agent-card-status .agent-card-left-badges .agent-ribbon{
+ position:static;inset:auto;white-space:nowrap;
+}
+.crm-app .agent-directory .agent-card-status .agent-current-inline{white-space:nowrap}
+.crm-app .agent-directory .agent-card-status :is(.agent-state-active,.agent-state-inactive){flex-shrink:0;white-space:nowrap}
+.crm-app .agent-directory .agent-preview-card .agent-card-actions{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;align-items:stretch;
+}
+.crm-app .agent-directory .agent-preview-card .agent-card-actions>button{
+ position:relative;min-width:0;width:100%;margin:0;box-sizing:border-box;
+}
+.crm-app .agent-directory .agent-preview-card .agent-card-actions>button+button::before{
+ content:"";position:absolute;left:0;top:8px;bottom:8px;width:1px;background:#cbd3e1;pointer-events:none;
+}
+.crm-app .agent-directory .agent-preview-card .agent-card-actions>button+button{border-left:0!important}
+.crm-app .agent-directory .agent-preview-card .agent-card-portrait .original-artwork{width:100%;height:100%;object-fit:contain}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-preview-card .agent-card-actions>button+button::before{background:#525b76}
+@media(max-width:420px){
+ .crm-app .agent-directory .agent-preview-card .agent-card-status{flex-wrap:wrap;min-height:30px}
+ .crm-app .agent-directory .agent-card-status :is(.agent-state-active,.agent-state-inactive){margin-left:auto}
+}

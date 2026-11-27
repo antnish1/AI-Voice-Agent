@@ -2,7 +2,7 @@
 import {ArtworkImage} from "@/components/artwork-image";
 import {EmptyState} from "@/components/empty-state";
 import {Pagination} from "@/components/pagination";
-import {useMemo,useState,useTransition,useId,type ReactNode} from "react";
+import {useEffect,useMemo,useState,useTransition,useId,type ReactNode} from "react";
 import "./customers-reference.css";
 import {useRouter} from "next/navigation";
 import {createBrowserSupabase} from "@/lib/supabase/browser";
@@ -56,6 +56,17 @@ export function CustomersDirectory({customers,count,page,pageSize,query,status,p
  const from=count===0?0:(page-1)*pageSize+1,to=Math.min(page*pageSize,count);
  const pathname=(params:{page?:number;query?:string;status?:string;period?:string})=>{const p=new URLSearchParams();const searchValue=params.query??query;const st=params.status??status;const pr=params.period??period;const pg=params.page??1;if(searchValue)p.set("q",searchValue);if(st!=="all")p.set("status",st);if(pr!=="all")p.set("period",pr);if(pg>1)p.set("page",String(pg));return "/customers"+(p.size?"?"+p.toString():"");};
  const navigate=(params:{page?:number;query?:string;status?:string;period?:string})=>{router.push(pathname(params));setSelected([]);};
+ // Update customer search automatically with a short debounce while retaining filters.
+ useEffect(()=>{
+  if(term.trim()===query)return;
+  const timer=window.setTimeout(()=>{
+   router.replace(pathname({query:term.trim(),page:1}),{scroll:false});
+   setSelected([]);
+  },350);
+  return ()=>window.clearTimeout(timer);
+ // pathname uses the latest search and filter props from this render.
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ },[term,query,status,period,router]);
  const ids=useMemo(()=>new Set(selected),[selected]);
  const toggleAll=(checked:boolean)=>setSelected(checked?customers.map(c=>c.id):[]);
  const exportRows=()=>{const rows=customers.filter(c=>!selected.length||ids.has(c.id));const csv=["Name,Phone Number,Consent Status,Do Not Call,Source,Created At",...rows.map(c=>[c.name,c.mobile??"",c.consent_status,c.do_not_call?"Yes":"No",c.source,c.created_at].map(v=>csvEscape(String(v))).join(","))].join("\r\n");const file=new Blob([csv],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(file);const a=document.createElement("a");a.href=url;a.download="frontier-customers-page-"+page+".csv";a.click();URL.revokeObjectURL(url);};
@@ -63,11 +74,11 @@ export function CustomersDirectory({customers,count,page,pageSize,query,status,p
  const cards=[{label:"Total Customers",value:formatNumber(count),icon:"users",tone:"blue",note:"Dealership records"},{label:"Active Customers",value:"—",icon:"phone",tone:"green",note:"Activity tracking pending"},{label:"Contacted",value:"—",icon:"check",tone:"purple",note:"Calling API not connected"},{label:"Pending Follow-up",value:"—",icon:"clock",tone:"orange",note:"Follow-up data pending"}];
  return <div className="customers-reference">
   <header className="customers-ref-header"><div className="customers-header-heading"><span className="customers-heading-icon"><Icon name="users" size={26}/></span><div><h1>Customers</h1><p>Manage your customer database and view complete details</p></div></div><div className="customers-heading-actions">{canManage&&<><button className="customers-button-outline" onClick={()=>{setShowUpload(v=>!v);setSuccess("");}} type="button"><Icon name="upload" size={15}/> Upload Customers</button><button className="customers-button-primary" onClick={()=>{setShowAdd(true);setError("");}} type="button"><Icon name="plus" size={17}/> Add Customer</button></>}</div></header>
-  <div className="customers-stats">{cards.map(c=><article className={"customers-stat customers-tone-"+c.tone} key={c.label}><span className="customers-stat-icon"><ArtworkImage name={c.tone==="blue"?"total-customers":c.tone==="green"?"customers-active":c.tone==="purple"?"reports-callback":"scheduled-campaigns-calendar"} fallback={<CustomerArtwork kind={c.tone==="blue"?"total":c.tone==="green"?"active":c.tone==="purple"?"contacted":"followup"}/>}/></span><div><span>{c.label}</span><strong>{c.value}</strong><small>{c.note}</small></div></article>)}</div>
+  <div className="customers-stats">{cards.map(c=><article className={"customers-stat customers-tone-"+c.tone} key={c.label}><span className="customers-stat-icon"><ArtworkImage name={c.tone==="blue"?"total-customers":c.tone==="green"?"customers-active":c.tone==="purple"?"reports-callback":"scheduled-campaigns-calendar"} fallback={<CustomerArtwork kind={c.tone==="blue"?"total":c.tone==="green"?"active":c.tone==="purple"?"contacted":"followup"}/>}/></span><div><span>{c.label}</span><strong>{c.value}</strong></div></article>)}</div>
   {showUpload&&canManage&&<div className="customers-upload-panel"><button type="button" className="customers-upload-close" onClick={()=>setShowUpload(false)} aria-label="Close upload section">×</button><CustomerImport dealershipId={dealershipId}/></div>}
   {success&&<p role="status" className="customers-ref-notice">{success}</p>}
   <section className="customers-list-panel"><header className="customers-table-header"><div className="customers-list-title"><h2><Icon name="users" size={18}/> Customer List</h2></div>
-  <div className="customers-toolbar"><form role="search" className="customers-search" onSubmit={e=>{e.preventDefault();navigate({query:term,page:1});}}><Icon name="search" size={17}/><input value={term} onChange={e=>setTerm(e.target.value)} aria-label="Search customer name or phone number" placeholder="Search customers..."/><button type="submit" aria-label="Search customers">Search</button></form>
+  <div className="customers-toolbar"><div role="search" className="customers-search"><Icon name="search" size={17}/><input type="search" value={term} onChange={e=>setTerm(e.target.value)} aria-label="Search customer name or phone number" placeholder="Search customers..." autoComplete="off"/></div>
    <select aria-label="Filter campaign" disabled title="Customer campaign assignment not yet available"><option>All Campaigns</option></select>
    <select aria-label="Filter calling consent" value={status} onChange={e=>navigate({status:e.target.value,page:1})}><option value="all">All Consent Status</option><option value="unverified">Unverified</option><option value="verified">Verified</option><option value="declined">Declined</option></select>
    <select aria-label="Filter sources" disabled title="Source filtering will be enabled after complete source history is connected"><option>All Sources</option></select>
