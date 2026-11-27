@@ -7,7 +7,7 @@
 }
 .frontier-layout-title{display:flex;align-items:center;gap:11px;color:#34306f}
 .frontier-layout-title svg{color:#7640e4;flex:none}
-.frontier-layout-title h3{margin:0;font-size:16px;line-height:1.3;font-weight:750}
+.frontier-layout-title h3{margin:0;font-size:16px;line-height:1.3;font-weight:600}
 .frontier-layout-settings>p{margin:12px 0 17px;font-size:12px;color:#7d87a1}
 .frontier-layout-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .frontier-layout-option{
@@ -19,7 +19,7 @@
 .frontier-layout-option input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
 .frontier-layout-option svg{color:#8139e8;flex:0 0 29px}
 .frontier-layout-option span{display:flex;flex-direction:column;gap:5px;min-width:0}
-.frontier-layout-option strong{font-size:13px;font-weight:750}
+.frontier-layout-option strong{font-size:13px;font-weight:600}
 .frontier-layout-option small{color:#8585aa;font-size:11px;line-height:1.35}
 .frontier-layout-option:hover{border-color:#b6a2ef;background:#faf8ff}
 .frontier-layout-option.selected{border-color:#b7a3f4;box-shadow:0 0 0 1px rgba(131,93,227,.13);background:#fcfbff}
@@ -27,9 +27,9 @@
 .frontier-top-layout{display:flex;min-width:0;min-height:100vh}
 .frontier-top-layout .crm-workspace{width:100%;max-width:100%;min-width:0;flex:1}
 .frontier-top-layout .ref-topbar{min-height:60px}
-.frontier-topbar-brand{display:flex;gap:9px;align-items:center;min-width:fit-content;font-size:13px;font-weight:850;letter-spacing:.04em;color:#173650}
+.frontier-topbar-brand{display:flex;gap:9px;align-items:center;min-width:fit-content;font-size:13px;font-weight:600;letter-spacing:.04em;color:#173650}
 .frontier-topbar-brand small{display:block;margin-top:2px;color:#0e98a3;font-size:8px;letter-spacing:.12em}
-.frontier-topbar-brand-mark{display:grid;place-items:center;background:linear-gradient(140deg,#12c3c5,#058c9d);color:#fff;font-size:18px;font-weight:850;border-radius:9px;width:34px;height:34px}
+.frontier-topbar-brand-mark{display:grid;place-items:center;background:linear-gradient(140deg,#12c3c5,#058c9d);color:#fff;font-size:18px;font-weight:600;border-radius:9px;width:34px;height:34px}
 .frontier-top-navigation{
  position:relative;z-index:20;display:block;background:#fff;
  border-bottom:1px solid #e3ebf3;box-shadow:0 5px 12px rgba(10,36,59,.025);
@@ -42,7 +42,7 @@
 }
 .frontier-top-nav-entry{display:flex;position:relative;align-items:center;gap:0;flex:0 0 auto;border-radius:9px}
 .frontier-top-nav-entry.active{background:#e7f7f7;box-shadow:inset 0 -2px 0 #0ba3aa}
-.frontier-top-nav-link{display:flex;align-items:center;gap:7px;color:#496276;padding:9px 10px;text-decoration:none;font-size:12px;font-weight:650;white-space:nowrap;border-radius:9px;min-height:36px}
+.frontier-top-nav-link{display:flex;align-items:center;gap:7px;color:#496276;padding:9px 10px;text-decoration:none;font-size:12px;font-weight:600;white-space:nowrap;border-radius:9px;min-height:36px}
 .frontier-top-nav-link svg{color:#648499;flex:none}
 .frontier-top-nav-entry:hover{background:#eff8fa}
 .frontier-top-nav-entry.active .frontier-top-nav-link,.frontier-top-nav-entry.active .frontier-top-nav-link svg{color:#087e8b}
@@ -52,7 +52,7 @@
 .frontier-top-campaign-toggle svg{transition:transform .22s ease}
 .frontier-top-campaign-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
 .frontier-top-campaign-menu{display:flex;align-items:center;gap:3px;white-space:nowrap;margin-left:3px;border-left:1px solid #d6e5e9;padding-left:5px}
-.frontier-top-campaign-menu a{padding:8px 11px;border-radius:7px;font-size:11px;font-weight:650;text-decoration:none;color:#157e89;background:#f1f9fa}
+.frontier-top-campaign-menu a{padding:8px 11px;border-radius:7px;font-size:11px;font-weight:600;text-decoration:none;color:#157e89;background:#f1f9fa}
 .frontier-top-campaign-menu a:hover{background:#dff3f4}
 .frontier-top-layout .ref-main{max-width:none;width:100%;margin:0 auto}
 @media(max-width:850px){
@@ -113,12 +113,12 @@
  gap:24px;padding:0 0 18px;
  border-bottom:1px solid #e6eaf3;
 }
-.frontier-mega-head small{display:block;font-size:10px;color:#8a5adc;letter-spacing:.13em;font-weight:800}
+.frontier-mega-head small{display:block;font-size:10px;color:#8a5adc;letter-spacing:.13em;font-weight:600}
 .frontier-mega-head h2{font-size:20px;letter-spacing:-.035em;color:#263858;margin:7px 0}
 .frontier-mega-head p{font-size:12px;color:#73829d;margin:0;line-height:1.4}
 .frontier-mega-explore{
  padding:8px 14px;display:inline-flex;align-items:center;gap:8px;
- font-size:11px;font-weight:750;white-space:nowrap;text-decoration:none;
+ font-size:11px;font-weight:600;white-space:nowrap;text-decoration:none;
  background:#f1edff;color:#6546b6;border-radius:30px;
 }
 .frontier-mega-explore:hover{background:#e6ddff;color:#513394}
@@ -130,7 +130,7 @@
 .frontier-mega-body section{min-width:0}
 .frontier-mega-body h3{
  margin:0 0 12px;padding-left:3px;
- color:#7653c7;font-size:10px;letter-spacing:.11em;font-weight:800;
+ color:#7653c7;font-size:10px;letter-spacing:.11em;font-weight:600;
 }
 .frontier-mega-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .frontier-mega-body:has(>section:only-child) .frontier-mega-links{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -147,7 +147,7 @@
  background:#f0eaff;border-radius:13px;color:#8057cc;
 }
 .frontier-mega-link-text{display:flex;flex:1;flex-direction:column;gap:5px;min-width:0}
-.frontier-mega-link-text strong{font-size:13px;font-weight:750;line-height:1.3}
+.frontier-mega-link-text strong{font-size:13px;font-weight:600;line-height:1.3}
 .frontier-mega-link-text small{font-size:11px;color:#7887a0;line-height:1.4}
 .frontier-mega-arrow{font-size:17px;color:#8e69cc}
 .frontier-mega-secondary{border-left:1px solid #e9eaf4;padding-left:20px}
