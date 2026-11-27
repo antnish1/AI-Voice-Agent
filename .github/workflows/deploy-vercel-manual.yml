@@ -44,14 +44,18 @@ jobs:
             exit 1
           fi
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '24'
       - name: Install Vercel CLI
         run: npm install --global "vercel@$VERCEL_CLI_VERSION"
       - name: Install dependencies and check source
         run: |
-          npm ci
+          if [[ -f package-lock.json || -f npm-shrinkwrap.json ]]; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
           npm run lint
           npm test
       - name: Load production configuration
