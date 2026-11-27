@@ -39,7 +39,7 @@ function EmptyArt(){
  </svg>;
 }
 function CountsCard({kind,label,value}:{kind:"all"|"draft"|"pending"|"hold"|"reject";label:string;value:number}){
- const icon=kind==="hold"?<svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><defs><linearGradient id="fc-hold-gradient" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#a9d3ff"/><stop offset="1" stopColor="#3f74ce"/></linearGradient></defs><rect x="5" y="5" width="38" height="38" rx="13" fill="url(#fc-hold-gradient)"/><rect x="16" y="13" width="6" height="22" rx="3" fill="white"/><rect x="27" y="13" width="6" height="22" rx="3" fill="white"/></svg>:kind==="reject"?<svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><defs><linearGradient id="fc-reject-gradient" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#ff9ca8"/><stop offset="1" stopColor="#d53852"/></linearGradient></defs><rect x="5" y="5" width="38" height="38" rx="13" fill="url(#fc-reject-gradient)"/><path d="M17 17l14 14M31 17 17 31" stroke="white" strokeWidth="4.5" strokeLinecap="round"/></svg>:<CampaignArtwork kind={kind==="draft"?"ongoing":kind}/>;
+ const icon=<CampaignArtwork kind={kind==="draft"?"ongoing":kind}/>;
  return <div className={`fc-count-card fc-count-${kind}`}><span className="fc-count-icon">{icon}</span><span className="fc-count-content"><span>{label}</span><strong>{value}</strong></span></div>;
 }
 function normalizeDate(input?:string){return input&&/^\d{4}-\d{2}-\d{2}$/.test(input)?input:"";}

@@ -226,3 +226,11 @@
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
 }
+
+/* Explicit interaction palette, independent of the shared red theme. */
+.crm-app .fc-campaign-page .fc-hero-actions a.fc-primary-button:active{background:#061f42!important;background-image:none!important;border-color:#061f42!important;color:white!important}
+.crm-app .fc-campaign-page .fc-hero-actions a.fc-primary-button:focus-visible{outline:2px solid #5d91d0;outline-offset:3px}
+.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card .fc-count-icon,
+.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card .fc-count-icon .fc-3d-art{background:transparent!important;background-image:none!important;box-shadow:none!important}
+.crm-app .fc-campaign-page .fc-campaign-stats .fc-count-icon img{mix-blend-mode:multiply}
+:root[data-theme="dark"] .crm-app .fc-campaign-page .fc-campaign-stats .fc-count-icon img{mix-blend-mode:normal}
