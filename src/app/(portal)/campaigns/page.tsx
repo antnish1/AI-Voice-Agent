@@ -38,7 +38,9 @@ function EmptyArt(){
  </svg>;
 }
 function CountsCard({kind,label,value}:{kind:"all"|"draft"|"pending";label:string;value:number}){
- return <div className={`fc-count-card fc-count-${kind}`}><span className="fc-count-icon"><CampaignIcon kind={kind}/></span><span className="fc-count-content"><span>{label}</span><strong>{value}</strong></span></div>;
+ const notes={all:"All campaign states",draft:"Scheduled or active",pending:"Waiting to start"};
+ const art={all:"📣",draft:"▶",pending:"🗓️"};
+ return <div className={`fc-count-card fc-count-${kind}`}><span className="fc-count-icon" aria-hidden="true">{art[kind]}</span><span className="fc-count-content"><span>{label}</span><strong>{value}</strong><small>{notes[kind]}</small></span></div>;
 }
 function normalizeDate(input?:string){return input&&/^\d{4}-\d{2}-\d{2}$/.test(input)?input:"";}
 export default async function Campaigns({searchParams}:{searchParams?:Promise<Filters>}={}){
@@ -82,9 +84,9 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
  const filtered=!!(q||selectedStatus||from||to||selectedDealer);
  return <div className="fc-campaign-page"><CampaignActionToast/>
   <header className="fc-campaign-hero">
-   <div className="fc-hero-copy"><h1>Campaigns</h1></div>
-   <HeaderWave/>
-   <div className="fc-hero-actions">{itUser&&<Link href="/settings/voice-profiles" className="fc-voice-button"><CampaignIcon kind="voice"/> Voice Agent Defaults</Link>}{permitted&&<Link href="/campaigns/new" className="fc-primary-button"><span>＋</span> New Campaign</Link>}</div>
+   <div className="fc-hero-copy"><h1>Campaigns</h1><p>Manage, track and optimize your campaigns.</p></div>
+   <div className="fc-hero-art" aria-hidden="true"/>
+   <div className="fc-hero-right"><div className="fc-hero-tagline"><strong>Plan. Connect. <em>Convert.</em></strong><span>Run smarter campaigns, reach more customers.</span></div><div className="fc-hero-actions">{itUser&&<Link href="/settings/voice-profiles" className="fc-voice-button"><CampaignIcon kind="voice"/> Voice Agent Defaults</Link>}{permitted&&<Link href="/campaigns/new" className="fc-primary-button"><span>＋</span> New Campaign</Link>}</div></div>
   </header>
   <div className="fc-campaign-stats"><CountsCard kind="all" label="Total Campaigns" value={total}/><CountsCard kind="draft" label="Ongoing" value={drafts}/><CountsCard kind="pending" label="Pending" value={pending}/></div>
   <section className="fc-campaign-list" aria-label="All campaigns">
