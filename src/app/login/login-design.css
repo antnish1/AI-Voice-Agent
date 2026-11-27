@@ -494,3 +494,36 @@
 .fv-login-full-background .fv-vehicle-crossfade .fv-vehicle-slide[data-active="true"]{opacity:1;z-index:1}
 .fv-login-full-background .fv-vehicle-viewport::after{z-index:2}
 @media(prefers-reduced-motion:reduce){.fv-login-full-background .fv-vehicle-crossfade .fv-vehicle-slide{transition:none}}
+
+
+/* Premium showroom login: neutral glass keeps all eight vehicle backgrounds visible. */
+.fv-login.fv-login-premium{color-scheme:dark;background:#101722}
+.fv-login-premium .fv-vehicle-viewport::after{background:linear-gradient(90deg,rgba(9,15,23,.72) 0%,rgba(9,15,23,.45) 30%,rgba(9,15,23,.08) 62%,transparent 100%)}
+.fv-login-premium .fv-left.fv-left-login-layout{padding:clamp(24px,5vh,60px) clamp(24px,6vw,100px) 70px;justify-content:center;align-items:flex-start}
+.fv-login-premium .fv-signin-card{width:min(400px,100%);padding:30px 30px 25px;align-items:stretch;text-align:left;border:1px solid #ffffff30;border-radius:22px;background:rgba(17,24,35,.88);backdrop-filter:blur(24px) saturate(120%);box-shadow:0 24px 64px #0005;color:#f5f7fa}
+.fv-login-premium .fv-premium-brand{display:flex;align-items:center;gap:13px}
+.fv-login-premium .fv-premium-brand img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 2px 6px #0005)}
+.fv-login-premium .fv-premium-brand div{display:grid;gap:4px}
+.fv-login-premium .fv-premium-brand strong{font-size:12px;font-weight:700;letter-spacing:.18em;color:#f4f6f9}
+.fv-login-premium .fv-premium-brand span{font-size:11px;letter-spacing:.22em;color:#c3cbd6;font-weight:600}
+.fv-login-premium .fv-premium-rule{height:1px;background:linear-gradient(90deg,#d53d43 0 40px,#ffffff24 40px);margin:17px 0 22px}
+.fv-login-premium .fv-signin-card h1{font-size:30px;line-height:1.15;letter-spacing:-.035em;color:#f8fafc;font-weight:650;margin:0 0 8px}
+.fv-login-premium .fv-signin-subtitle{font-size:13px;line-height:1.5;color:#c3cbd6;margin:0 0 24px}
+.fv-login-premium .fv-login-form{gap:9px}
+.fv-login-premium .fv-premium-label{font-size:12px;font-weight:550;color:#e1e7ef;margin:0}
+.fv-login-premium .fv-input-wrap{height:48px;min-height:48px;border:1px solid #ffffff32;border-radius:10px;background:#ffffff0d;box-shadow:none;margin-bottom:8px}
+.fv-login-premium .fv-input-wrap:focus-within{border-color:#9ebde8;box-shadow:0 0 0 3px #9ebde820}
+.fv-login-premium .fv-input-wrap input{font-size:14px!important;color:#f4f6f9!important;padding:12px 42px 12px 45px!important;caret-color:#fff}
+.fv-login-premium .fv-input-wrap input::placeholder{color:#aab6c6;opacity:1}
+.fv-login-premium .fv-input-wrap input:-webkit-autofill{-webkit-text-fill-color:#f4f6f9!important;box-shadow:0 0 0 1000px #263344 inset!important}
+.fv-login-premium .fv-input-wrap>svg{left:14px;width:18px;height:18px;color:#a8bad2}
+.fv-login-premium .fv-password-eye{color:#b6c4d6}
+.fv-login-premium .fv-password-eye:hover{color:#fff}
+.fv-login-premium .fv-submit{height:49px;margin:3px 0 0;border:1px solid #7795bd70;border-radius:10px;background:#294a77!important;color:white;font-size:14px;font-weight:650;box-shadow:0 6px 15px #0003}
+.fv-login-premium .fv-submit:focus-visible,.fv-login-premium .fv-password-eye:focus-visible{outline:2px solid #a8c8f5;outline-offset:3px}
+.fv-login-premium .fv-access-note{justify-content:flex-start;gap:9px;padding-top:17px;margin-top:20px;border-top:1px solid #ffffff24;color:#c3cbd6;font-size:11px;line-height:1.55}
+.fv-login-premium .fv-access-note svg{color:#a8bad2;width:17px;height:17px}
+.fv-login-premium .fv-error{background:#532b35;color:#ffdade;border-color:#b56b77;margin:0 0 12px}
+.fv-login-premium .fv-vehicle-controls{background:#111827b8;border:1px solid #ffffff22;backdrop-filter:blur(12px)}
+@media(max-width:800px){.fv-login-premium .fv-left.fv-left-login-layout{align-items:center;padding:24px 16px 70px}.fv-login-premium .fv-vehicle-viewport::after{background:#090f2350}.fv-login-premium .fv-signin-card{padding:24px 22px}}
+@media(max-height:580px) and (min-width:801px){.fv-login-premium .fv-left.fv-left-login-layout{padding-top:18px}.fv-login-premium .fv-signin-card{padding:22px 26px}.fv-login-premium .fv-premium-rule{margin:10px 0 14px}.fv-login-premium .fv-signin-subtitle{margin-bottom:15px}}
