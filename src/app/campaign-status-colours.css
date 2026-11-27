@@ -4,9 +4,14 @@
  color:var(--campaign-status-fg)!important;
  border-color:transparent!important;
 }
-.campaign-status-badge{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:700;line-height:1.35;white-space:nowrap}
+.campaign-status-badge{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:600;line-height:1.35;white-space:nowrap}
 .campaign-status-pending{--campaign-status-bg:#fff1d5;--campaign-status-fg:#865406}
 .campaign-status-ongoing{--campaign-status-bg:#e9ddfb;--campaign-status-fg:#6735ad}
 .campaign-status-complete{--campaign-status-bg:#ddf5e8;--campaign-status-fg:#146d40}
 .campaign-status-reject{--campaign-status-bg:#fde5e8;--campaign-status-fg:#b62840}
 .campaign-status-hold{--campaign-status-bg:#e5edf9;--campaign-status-fg:#315d9c}
+
+/* Consistent lighter navigation and status text across the portal. */
+.crm-app .frontier-reference-sidebar .frontier-nav-link,.crm-app .frontier-reference-sidebar .frontier-nav-link.active,.crm-app .frontier-reference-sidebar .frontier-campaign-subnav a,.crm-app .frontier-top-nav-link{font-weight:500}
+.crm-app :is(.status-pill,.ref-campaign-status,.agent-card-status,.approvals-status,.campaign-status-badge,.calllogs-status-highlight,.it-user-viewer-pill,.it-user-active,.it-user-invited){font-weight:500}
+.crm-app .calllogs-table .calllogs-status-highlight{font-weight:500}
