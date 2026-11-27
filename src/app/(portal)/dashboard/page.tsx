@@ -124,8 +124,8 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  {name:"Pending Campaigns",value:String((approvalCount.count??0)+Math.max(0,(approvedCount.count??0)-(providerCount.count??0))),note:"Waiting to start",icon:"◷",tone:"amber"},
  {name:"Total Calls",value:String(callCount.count??0),note:String(answeredCount.count??0)+" answered",icon:"◕",tone:"blue"}];
  return <div className="ref-dashboard dashboard-reference">
- <section className="dashboard-hero" aria-label="Dashboard welcome"><div className="dashboard-hero-copy"><h1>{greeting},<br/><strong>{userName}! <span aria-hidden="true">👋</span></strong></h1></div></section>
- <div className="dashboard-reference-toolbar"><div className="ref-dashboard-heading-actions"><DashboardPeriodFilter period={period} from={from} to={period==="custom"?to:""} days={requestedDays}/>{canCreate&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div>
+ <section className="dashboard-hero" aria-label="Dashboard welcome"><div className="dashboard-hero-copy"><h1>{greeting}, <strong>{userName}! <span aria-hidden="true">👋</span></strong></h1></div>
+ <div className="dashboard-reference-toolbar"><div className="ref-dashboard-heading-actions"><DashboardPeriodFilter period={period} from={from} to={period==="custom"?to:""} days={requestedDays}/>{canCreate&&<Link href="/campaigns/new" className="ref-create-button">＋ &nbsp; Create Campaign</Link>}</div></div></section>
  <div className="ref-kpi-grid dashboard-separated-kpis" aria-label="Dashboard key metrics">{metrics.map(m=><article key={m.name} className={"ref-kpi-card tone-"+m.tone}><div className={"ref-kpi-icon tone-"+m.tone}>{m.icon}</div><div><span className="ref-kpi-label">{m.name}</span><CountUp className="ref-kpi-value" value={m.value}/><small className="ref-kpi-note">{m.note}</small></div></article>)}</div>
  <div className="ref-dashboard-columns">
  <div className="ref-dashboard-left">
