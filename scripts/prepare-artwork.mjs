@@ -81,4 +81,17 @@ for(const [name,patterns] of Object.entries(aliases)){
  if(found){await save(name,found.bytes,{max:name.endsWith('hero')?1400:768});used.add(found.name)}
  else console.warn('No dedicated source for '+name+'; retain existing fallback');
 }
+
+// Render matching dimensional status-button artwork into transparent WebP files.
+// Supersampled gradients, bevels and shadows are rasterized at build time.
+async function statusButton(name,kind){
+ const pause=kind==='hold';
+ const top=pause?'#92d9ff':'#ffadb9',mid=pause?'#4c9cf0':'#f05c76',bottom=pause?'#2250ae':'#b82045';
+ const symbol=pause?'<rect x="104" y="79" width="32" height="101" rx="15"/><rect x="153" y="79" width="32" height="101" rx="15"/>':'<path d="M108 94L180 166M180 94L108 166" fill="none" stroke="#fff" stroke-width="31" stroke-linecap="round"/>';
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" width="288" height="288" viewBox="0 0 288 288"><defs><linearGradient id="body" x1="0" y1="0" x2="0.8" y2="1"><stop stop-color="'+top+'"/><stop offset=".48" stop-color="'+mid+'"/><stop offset="1" stop-color="'+bottom+'"/></linearGradient><linearGradient id="rim" x2=".2" y2="1"><stop stop-color="#fff" stop-opacity=".72"/><stop offset=".48" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#10234a" stop-opacity=".42"/></linearGradient><radialGradient id="shine" cx=".24" cy=".14" r=".85"><stop stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><filter id="shadow"><feGaussianBlur stdDeviation="7"/></filter></defs><ellipse cx="144" cy="260" rx="95" ry="12" fill="#1b2e55" opacity=".22" filter="url(#shadow)"/><rect x="27" y="39" width="234" height="220" rx="69" fill="'+bottom+'"/><rect x="24" y="22" width="240" height="225" rx="70" fill="url(#body)" stroke="url(#rim)" stroke-width="6"/><rect x="30" y="28" width="228" height="212" rx="64" fill="url(#shine)"/><g fill="#23395c" opacity=".22" transform="translate(0 5)">'+symbol+'</g><g fill="#fff">'+symbol+'</g></svg>';
+ await save(name,Buffer.from(svg),{max:288,removeBackground:false});
+}
+await statusButton('campaign-hold','hold');
+await statusButton('campaign-rejected','reject');
+
 await writeFile(join(target,'manifest.json'),JSON.stringify(available,null,2)+'\n');
