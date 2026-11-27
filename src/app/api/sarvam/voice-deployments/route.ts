@@ -27,9 +27,17 @@ export async function GET(request:Request) {
   if(!/^[a-f0-9-]{36}$/i.test(dealer))return NextResponse.json({ok:false,code:"DEALER",message:"Select a dealership first."},{status:400});
   const {data:dealership,error:dealerError}=await supabase.from("dealerships").select("id").eq("id",dealer).maybeSingle();
   if(dealerError||!dealership)return NextResponse.json({ok:false,code:"DEALER",message:"Dealership not found."},{status:404});
+  // A dealership's saved defaults are independent of campaign history.
+  // They are reusable form values, not evidence of current provider availability.
+  const {data:profile,error:profileError}=await supabase.from("dealership_voice_profiles").select("agent_id,app_version,connection_id,caller_number,active").eq("dealership_id",dealer).maybeSingle();
+  if(profileError)return NextResponse.json({ok:false,code:"PROFILE",message:"Unable to read saved dealership voice defaults. No settings have been changed."},{status:503,headers:{"Cache-Control":"no-store"}});
+  const saved=profile&&validId(str(profile.agent_id))&&number(profile.app_version)&&validId(str(profile.connection_id))&&validPhone(str(profile.caller_number))?{
+   deploymentId:"saved:"+dealer,label:"Saved dealership defaults (not live verified)",agentId:str(profile.agent_id),version:profile.app_version,connectionId:str(profile.connection_id),callerNumber:str(profile.caller_number)
+  }:null;
+  const savedResponse=(reason:string)=>NextResponse.json({ok:true,code:"saved_defaults",message:reason+" Your saved dealership configuration is available below. Its current agent version and caller availability have not been verified by this request. Review before saving; no deployment or campaign is required.",options:[saved]},{headers:{"Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}});
   let config:ReturnType<typeof requireProviderConfig>;
   try{config=requireProviderConfig();}
-  catch{return NextResponse.json({ok:false,code:"CONFIG",message:"Sarvam workspace API key, organization ID or workspace ID is missing in this Vercel project."},{status:503,headers:{"Cache-Control":"no-store"}});}
+  catch{if(saved)return savedResponse("Live Sarvam configuration is unavailable.");return NextResponse.json({ok:false,code:"CONFIG",message:"Sarvam workspace API key, organization ID or workspace ID is missing in this Vercel project."},{status:503,headers:{"Cache-Control":"no-store"}});}
   const {key,base,org,workspace}=config;
   const deploymentPath="/api/app-authoring/v1/orgs/"+org+"/workspaces/"+workspace+"/deployments";
   const deployments:RecordValue[]=[];
@@ -53,6 +61,7 @@ export async function GET(request:Request) {
     FORMAT:"Sarvam returned an unexpected deployment list. No settings have been changed.",
     PROVIDER:"Unable to read Sarvam deployments. No settings have been changed."
    };
+   if(saved)return savedResponse(messages[code]??messages.PROVIDER);
    return NextResponse.json({ok:false,code,message:messages[code]??messages.PROVIDER},{status:503,headers:{"Cache-Control":"no-store"}});
   }
   const outbound=deployments.filter(d=>["outbound","inbound_outbound"].includes(str(d.channel_direction).toLowerCase()));
@@ -108,6 +117,7 @@ export async function GET(request:Request) {
    }catch{readFailures++;}
   }
   if(historical.length)return NextResponse.json({ok:true,code:"outbound_history",message:"Select an active deployment or a previously accepted outbound configuration for this dealership. Confirm current agent and number availability before activation.",options:[...options.map(o=>({...o,label:o.label+" (active deployment)"})),...historical]},{headers:{"Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}});
+  if(!options.length&&saved)return savedResponse("No reusable deployment or historical campaign was found.");
   if(!options.length)return NextResponse.json({ok:true,code:"manual_required",message:linksError||readFailures?"Could not read previous outbound settings. Enter the committed agent ID, version, connection ID and caller number manually. No deployment is required.":"No reusable outbound configuration was found for this dealership. Enter the committed agent ID, version, connection ID and caller number manually. No deployment is required.",options:[]},{headers:{"Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}});
   let code="ready",message="Choose a verified outbound deployment to pre-fill these fields. Check everything before saving.";
   if(!deployments.length){code="no_deployments";message="Sarvam returned no deployments in this workspace. An existing draft agent does not count as a deployment. For outbound campaigns, you can still enter a committed agent version and verified telephony details manually.";}
