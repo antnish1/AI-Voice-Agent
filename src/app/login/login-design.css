@@ -466,3 +466,24 @@
  .fv-login-full-background .fv-vehicle-slide img{object-position:center}
  .fv-login-full-background .fv-vehicle-controls{bottom:8px}
 }
+
+/* Left-aligned login: retain the complete rotating backdrop and leave the right side open. */
+.fv-login.fv-login-left-card{display:grid;grid-template-columns:minmax(0,1fr);height:auto;min-height:100dvh;overflow:visible;padding:0}
+.fv-login-left-card .fv-left.fv-left-login-layout{width:100%;min-height:100dvh;height:auto;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:clamp(12px,2vh,24px);padding:clamp(18px,3vh,32px) clamp(24px,5vw,80px) 64px;overflow:visible;pointer-events:none}
+.fv-login-left-card .fv-left-top{position:static;flex:none;pointer-events:auto}
+.fv-login-left-card .fv-left-top img{width:clamp(48px,8vh,72px);height:clamp(48px,8vh,72px)}
+.fv-login-left-card .fv-brand-separator{height:clamp(34px,6vh,48px)}
+.fv-login-left-card .fv-left-top strong{font-size:clamp(17px,2.5vh,24px)}
+.fv-login-left-card .fv-signin-card{width:min(460px,100%);height:auto;max-height:none;min-height:0;flex:none;overflow:visible;pointer-events:auto;padding:clamp(18px,3vh,28px) clamp(22px,3vw,38px);background:rgba(255,255,255,.96)}
+.fv-login-left-card .fv-login-icon,.fv-login-left-card .fv-login-icon img{width:clamp(62px,10vh,84px);height:clamp(62px,10vh,84px)}
+.fv-login-left-card .fv-login-icon{margin-bottom:8px}
+.fv-login-left-card .fv-overline{margin-bottom:10px}
+.fv-login-left-card .fv-signin-subtitle{margin-bottom:clamp(14px,2.5vh,24px)}
+.fv-login-left-card .fv-login-form{gap:12px}
+.fv-login-left-card .fv-or{margin:16px auto 10px}
+.fv-login-left-card .fv-vehicle-viewport::after{background:linear-gradient(90deg,rgba(7,20,44,.40),rgba(7,20,44,.15) 45%,rgba(7,20,44,.08))}
+@media(max-width:800px){
+ .fv-login-left-card .fv-left.fv-left-login-layout{align-items:center;padding:20px 16px 64px}
+ .fv-login-left-card .fv-left-top{align-self:flex-start}
+ .fv-login-left-card .fv-signin-card{width:min(420px,100%)}
+}
