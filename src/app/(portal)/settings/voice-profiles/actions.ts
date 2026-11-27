@@ -6,8 +6,9 @@ import {fetchCommittedVersions} from "@/lib/sarvam/agent-versions";
 
 export async function saveVoiceProfile(form:FormData):Promise<{error?:string;ok?:boolean}>{
  try{
-  const {supabase,user}=await requireItSuperUser();
+  const {supabase,user,membership}=await requireItSuperUser();
   const dealershipId=String(form.get("dealershipId")??"");
+  if(!membership||membership.dealership_id!==dealershipId)return {error:"Active dealership changed. Refresh before saving."};
   const agentId=String(form.get("agentId")??"").trim();
   const version=Number(form.get("version"));
   const connectionId=String(form.get("connectionId")??"").trim();
