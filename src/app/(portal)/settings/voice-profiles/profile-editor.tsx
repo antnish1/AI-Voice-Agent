@@ -24,11 +24,11 @@ function CopyButton({value,label}:{value:string;label:string}) {
  const [copied,setCopied]=useState(false);
  return <button className="vdp-copy" type="button" disabled={!value} title={copied?"Copied":`Copy ${label}`} aria-label={`Copy ${label}`} onClick={async()=>{try{await navigator.clipboard.writeText(value);setCopied(true);}catch{setCopied(false);}}}>{copied?"✓":<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></svg>}</button>;
 }
-export function ProfileEditor({dealerships}:{dealerships:Dealership[]}) {
+export function ProfileEditor({dealerships,activeDealershipId}:{dealerships:Dealership[];activeDealershipId:string}) {
  const router=useRouter();
- const [id,setId]=useState(dealerships[0]?.id??""),[busy,start]=useTransition(),[message,setMessage]=useState("");
+ const id=activeDealershipId;
+ const [busy,start]=useTransition(),[message,setMessage]=useState("");
  const dealer=dealerships.find(d=>d.id===id),p=dealer?.profile;
- const [revision,setRevision]=useState(0);
  const [loadingSarvam,setLoadingSarvam]=useState(false);
  const [importResult,setImportResult]=useState<ImportResult|null>(null);
  const [deploymentId,setDeploymentId]=useState("");
@@ -65,9 +65,9 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}) {
   }catch(e){setVersionNotice(e instanceof Error?e.message:"Live version lookup failed.");}
   finally{setVersionBusy(false);}
  }
- function changeDealer(value:string){const selected=dealerships.find(d=>d.id===value)?.profile;setLiveVersions(null);setVersionNotice("");setId(value);setRevision(v=>v+1);setMessage("");setAgent(selected?.agent_id??"");setVersion(selected?String(selected.app_version):"");setConnection(selected?.connection_id??"");setCaller(selected?.caller_number??"");setImportResult(null);setDeploymentId("");}
  return <section className="vdp-card" aria-labelledby="vdp-card-title">
   <div className="vdp-card-title"><div className="vdp-gear"><FieldIcon kind="settings"/></div><h2 id="vdp-card-title">Dealership AI Calling Defaults</h2></div>
+  <p className="vdp-active-context">Editing defaults for {dealer?.name??"selected dealership"}</p>
   {importResult&&<div className="vdp-import">
    <div className={importResult.ok&&importResult.code!=="saved_defaults"&&importResult.options?.length?"vdp-import-ok":"vdp-import-notice"} role="status">
     <p>{importResult.message}</p>
@@ -77,8 +77,7 @@ export function ProfileEditor({dealerships}:{dealerships:Dealership[]}) {
    </div>
   </div>}
   <div className="vdp-fields">
-   <label className="vdp-field vdp-dealer"><span className="vdp-label"><FieldIcon kind="dealer"/> Dealership</span><span className="vdp-control"><select value={id} disabled={loadingSarvam||versionBusy||busy} onChange={e=>changeDealer(e.target.value)}>{dealerships.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></span></label>
-   <form id="vdp-save-form" className="vdp-form" key={id+"-"+revision} action={form=>start(async()=>{setMessage("");const r=await saveVoiceProfile(form);setMessage(r.error??(form.get("active")==="yes"?"Saved. Calling defaults are ACTIVE for new campaign drafts. Live calling still requires separate authorization and verified telephony.":"Saved. Calling defaults are INACTIVE for new campaign drafts."));if(r.ok&&/^[6-9]\d{9}$/.test(caller.trim()))setCaller("+91"+caller.trim());})}>
+   <form id="vdp-save-form" className="vdp-form" key={id} action={form=>start(async()=>{setMessage("");const r=await saveVoiceProfile(form);setMessage(r.error??(form.get("active")==="yes"?"Saved. Calling defaults are ACTIVE for new campaign drafts. Live calling still requires separate authorization and verified telephony.":"Saved. Calling defaults are INACTIVE for new campaign drafts."));if(r.ok&&/^[6-9]\d{9}$/.test(caller.trim()))setCaller("+91"+caller.trim());})}>
     <input type="hidden" name="dealershipId" value={id}/>
     
     <label className="vdp-field vdp-agent"><span className="vdp-label"><FieldIcon kind="agent"/> Sarvam Agent ID</span><span className="vdp-control"><select name="agentId" required value={agent} disabled={versionBusy} onChange={e=>{setLiveVersions(null);setVersionNotice("");setAgent(e.target.value);setVersion("");}}><option value="">Select agent</option>{agent&&!agentSnapshot.some(a=>a.id===agent)&&<option value={agent}>{agent} (saved/imported)</option>}{agentSnapshot.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select><CopyButton value={agent} label="agent ID"/></span></label>
