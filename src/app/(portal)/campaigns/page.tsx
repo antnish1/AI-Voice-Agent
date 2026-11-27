@@ -4,6 +4,7 @@ import {campaignStatuses,campaignDisplayStatus} from "@/lib/campaign-display-sta
 import {requireMembership,canCreateCampaign} from "@/lib/auth";
 import {isItSuperUser} from "@/lib/it-access";
 import "./campaigns-reference.css";
+import "./campaigns-illustrated.css";
 import {CampaignDetailsPopup} from "./campaign-details-popup";
 import {CampaignActionToast} from "./campaign-action-toast";
 import {AutoCampaignFilters} from "./auto-campaign-filters";
