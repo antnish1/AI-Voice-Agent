@@ -531,3 +531,24 @@
 /* No visible slideshow toolbar; retain a keyboard-accessible motion control. */
 .fv-login-full-background .fv-background-keyboard-pause{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:4;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;pointer-events:none}
 .fv-login-full-background .fv-background-keyboard-pause:focus-visible{width:auto;height:auto;padding:10px 16px;overflow:visible;clip-path:none;background:#071a38;color:white;border-radius:8px;pointer-events:auto}
+
+/* White login section only; preserve the existing showroom background and motion. */
+.fv-login.fv-login-premium{color-scheme:light}
+.fv-login-premium .fv-signin-card{background:#fff;color:#17243a;border-color:#e2e8f0;box-shadow:0 24px 64px #0003;backdrop-filter:none}
+.fv-login-premium .fv-premium-brand strong{color:#17243a}
+.fv-login-premium .fv-premium-brand span{color:#64748b}
+.fv-login-premium .fv-premium-brand img{filter:none}
+.fv-login-premium .fv-premium-rule{background:linear-gradient(90deg,#df1420 0 40px,#e2e8f0 40px)}
+.fv-login-premium .fv-signin-card h1{color:#17243a}
+.fv-login-premium .fv-signin-subtitle,.fv-login-premium .fv-access-note{color:#526176}
+.fv-login-premium .fv-premium-label{color:#263449}
+.fv-login-premium .fv-input-wrap{background:#f4f7fb;border-color:#d7e0eb}
+.fv-login-premium .fv-input-wrap:focus-within{border-color:#608cc4;box-shadow:0 0 0 3px #608cc420}
+.fv-login-premium .fv-input-wrap input{color:#17243a!important;caret-color:#17243a}
+.fv-login-premium .fv-input-wrap input::placeholder{color:#64748b}
+.fv-login-premium .fv-input-wrap input:-webkit-autofill{-webkit-text-fill-color:#17243a!important;box-shadow:0 0 0 1000px #edf3fa inset!important}
+.fv-login-premium .fv-input-wrap>svg,.fv-login-premium .fv-password-eye,.fv-login-premium .fv-access-note svg{color:#526e92}
+.fv-login-premium .fv-password-eye:hover{color:#17243a}
+.fv-login-premium .fv-submit{background:#df1420!important;color:#fff;border-color:#df1420}
+.fv-login-premium .fv-access-note{border-top-color:#e2e8f0}
+.fv-login-premium .fv-error{background:#fff0f1;color:#a61e2d;border-color:#f2b8bf}
