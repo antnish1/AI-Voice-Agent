@@ -1,7 +1,7 @@
 /* Persistent portal color themes: System resolves to an explicit data-theme via
    matchMedia. Login artwork intentionally remains unchanged. */
 .frontier-theme-and-layout{display:flex;align-items:center;justify-content:flex-end;flex:1;gap:17px;flex-wrap:wrap}
-.frontier-theme-control{display:flex;align-items:center;gap:9px;color:#384e75;font-size:12px;font-weight:750}
+.frontier-theme-control{display:flex;align-items:center;gap:9px;color:#384e75;font-size:12px;font-weight:600}
 .frontvox-theme-fieldset{margin:0;padding:0;border:0;min-width:0}
 .frontvox-theme-switch{display:inline-flex;gap:1px;align-items:center;border:1px solid #e0e5ee;border-radius:99px;background:#f9fbff;padding:3px}
 .frontvox-theme-switch label{position:relative;cursor:pointer;display:grid;place-items:center;width:34px;height:32px;border-radius:99px;color:#64748b;transition:background .15s,color .15s}
