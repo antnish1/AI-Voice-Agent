@@ -128,3 +128,21 @@
 .crm-app .settings-ref-api-notice{background:var(--modal-surface)!important}
 .crm-app .settings-ref-api-notice :is(strong,small){color:var(--modal-ink)!important}
 .crm-app :is(.agent-stat-card,.customers-stat,.reports-ref-kpi,.calllogs-stat) :is(svg)[aria-hidden=true]{max-width:100%}
+
+
+/* Campaign row action is intentionally navy, unlike the red primary campaign creation action. */
+.crm-app .fc-campaign-page .fc-row-actions a.fc-review-start,
+:root:not([data-theme="dark"]) .crm-app .fc-campaign-page .fc-row-actions a.fc-review-start,
+:root[data-theme="dark"] .crm-app .fc-campaign-page .fc-row-actions a.fc-review-start{
+  background:#142D4E!important;
+  background-image:none!important;
+  border-color:#142D4E!important;
+  color:#fff!important;
+}
+.crm-app .fc-campaign-page .fc-row-actions a.fc-review-start:hover,
+.crm-app .fc-campaign-page .fc-row-actions a.fc-review-start:focus-visible{
+  background:#1E436F!important;
+  background-image:none!important;
+  border-color:#1E436F!important;
+  color:#fff!important;
+}
