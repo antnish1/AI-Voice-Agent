@@ -308,3 +308,26 @@
 @media(prefers-reduced-motion:reduce){
  .crm-app .ref-dashboard.dashboard-reference :is(.ref-activity-list,.ref-campaign-table) .campaign-status-badge{transition:none!important;transform:none!important}
 }
+
+
+/* Correct the remaining dashboard tint: header is only greeting + campaign action. */
+:root:not([data-theme="dark"]) .crm-app .ref-dashboard.dashboard-reference{
+  background:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+}
+:root:not([data-theme="dark"]) .crm-app .ref-dashboard.dashboard-reference .dashboard-hero{
+  background:transparent!important;
+  background-image:none!important;
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy{
+  border:0!important;
+  box-shadow:none!important;
+}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy:before,
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy:after{
+  display:none!important;
+}
