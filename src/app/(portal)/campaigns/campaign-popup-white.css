@@ -278,3 +278,42 @@
   .fc-reference-create .fc-reference-footer-buttons .campaign-modal-next svg{width:16px;height:16px}
 }
 @media(prefers-reduced-motion:reduce){.fc-reference-create .fc-create-close{transition:none}}
+
+
+/* Higher specificity than global brand !important styles, without affecting any other modal. */
+.crm-app .campaign-modal.fc-reference-create .fc-reference-create-header{
+ background:radial-gradient(ellipse at 75% 120%,#ffdbe87a,transparent 48%),linear-gradient(110deg,#fff 5%,#f4f7ff 56%,#f0f3ff 100%)!important;
+ border-color:transparent!important;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-create-phone-icon{
+ background:linear-gradient(145deg,#fff0f1,#ffe2e7)!important;
+ box-shadow:0 7px 13px #d71f3020!important;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-template-text{color:#e1192f!important}
+.crm-app .campaign-modal.fc-reference-create .fc-compact-upload{
+ background:#fff!important;border:2px dashed #a4b3cd!important;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-compact-upload:hover{
+ background:#f8faff!important;border-color:#6f8db9!important;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-consent{
+ background:transparent!important;border-color:transparent!important;box-shadow:none!important;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-footer-buttons .campaign-modal-next:not(:disabled){
+ background:linear-gradient(180deg,#153663,#082d5d 55%,#061f42)!important;
+ background-image:linear-gradient(180deg,#153663,#082d5d 55%,#061f42)!important;
+ border-color:#082d5d!important;color:#fff!important;opacity:1;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-footer-buttons .campaign-modal-next:hover:not(:disabled){
+ background:#061f42!important;background-image:none!important;border-color:#061f42!important;
+}
+.crm-app .campaign-modal.fc-reference-create .fc-reference-footer-buttons .campaign-modal-next:disabled{
+ background:#aeb9cc!important;background-image:none!important;
+ border-color:#aeb9cc!important;color:#fff!important;opacity:.55;
+}
+:root[data-theme="dark"] .crm-app .campaign-modal.fc-reference-create .fc-reference-create-header{
+ background:linear-gradient(110deg,#1b2e48,#2c3754)!important;
+}
+:root[data-theme="dark"] .crm-app .campaign-modal.fc-reference-create .fc-compact-upload{
+ background:#192e43!important;border-color:#526b87!important;
+}
