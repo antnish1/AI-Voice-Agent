@@ -2,7 +2,6 @@
 import {revalidatePath} from "next/cache";
 import {requireItSuperUser} from "@/lib/it-access";
 import {agentSnapshot} from "@/lib/sarvam/voice-discovery-snapshot";
-import {fetchCommittedVersions} from "@/lib/sarvam/agent-versions";
 
 export async function saveVoiceProfile(form:FormData):Promise<{error?:string;ok?:boolean}>{
  try{
@@ -32,16 +31,9 @@ export async function saveVoiceProfile(form:FormData):Promise<{error?:string;ok?
   if(existingError)return {error:"Unable to verify the existing profile."};
   const unchanged=existing?.agent_id===agentId&&existing?.app_version===version&&existing?.connection_id===connectionId&&existing?.caller_number===callerNumber;
   if(!unchanged){
-   // Prefer live validation. Preserve the existing dated-catalogue workflow
-   // if the upstream dashboard endpoint does not accept workspace API keys.
-   let live:number[]|null=null;
-   try{live=await fetchCommittedVersions(agentId);}catch{/* Existing catalogue fallback is not live verification. */}
-   if(live!==null){
-    if(!live.includes(version))return {error:"This version is not committed in the current Sarvam workspace."};
-   }else{
-    const known=agentSnapshot.find(a=>a.id===agentId);
-    if(!known?.versions.includes(version))return {error:"Live Sarvam verification unavailable and this version is not in the last verified catalogue. No profile was changed."};
-   }
+   const known=agentSnapshot.find(a=>a.id===agentId);
+   if(known&&!known.versions.includes(version))return {error:"This version is not in the last verified committed-version catalogue. Refresh the catalogue before changing the profile."};
+   if(!known)return {error:"This agent is not in the last verified catalogue. Refresh the catalogue before changing the profile."};
   }
   const {error}=await supabase.from("dealership_voice_profiles").upsert({
    dealership_id:dealershipId,agent_id:agentId,app_version:version,
