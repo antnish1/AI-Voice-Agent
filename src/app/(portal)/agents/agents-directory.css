@@ -293,3 +293,10 @@ dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:bl
 :root[data-theme="dark"] .crm-app .agent-directory .agent-current-card{border-color:#f45d77}
 :root[data-theme="dark"] .crm-app .agent-directory .agent-hero-heading h1,:root[data-theme="dark"] .crm-app .agent-directory .agent-card-copy h3,:root[data-theme="dark"] .crm-app .agent-directory .agent-stat-card{color:#f1efff}
 :root[data-theme="dark"] .crm-app .agent-directory .agent-hero-subtitle,:root[data-theme="dark"] .crm-app .agent-directory .agent-card-copy p{color:#c7c6de}
+
+
+.crm-app .agent-directory .agent-hero-art{top:7px;bottom:7px}
+.crm-app .agent-directory .agent-hero-art .original-artwork,.crm-app .agent-directory .agent-card-portrait .original-artwork{display:block;width:100%;height:100%;object-fit:contain}
+.crm-app .agent-directory .agent-stat-card:has(.original-artwork) .agent-stat-icon{background:transparent!important;box-shadow:none!important}
+.crm-app .agent-directory .agent-stat-icon .original-artwork{width:100%;height:100%;object-fit:contain}
+.crm-app .agent-directory .agent-card-actions button.agent-use-disabled,.crm-app .agent-directory .agent-page-controls button.agent-create-disabled{background:linear-gradient(145deg,#9775fa,#6240d6)!important;border-color:#8063df!important;color:white!important}
