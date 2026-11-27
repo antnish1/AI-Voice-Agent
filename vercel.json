@@ -4,5 +4,8 @@
       "path": "/api/cron/sarvam-sync",
       "schedule": "0 * * * *"
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": false
+  }
 }
