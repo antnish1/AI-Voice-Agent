@@ -1,0 +1,66 @@
+name: Deploy Frontier AI Voice CRM to Vercel (Manual Only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type DEPLOY to authorize one production deployment of current main'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontier-ai-voice-crm-manual-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and publish production
+    if: ${{ github.ref == 'refs/heads/main' && inputs.confirmation == 'DEPLOY' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      VERCEL_ORG_ID: team_DsOUqnF8Pbd7YGNt8RCE8NgA
+      VERCEL_PROJECT_ID: prj_51k5pHkUt6ZRbcaf2kS798fT2KL9
+      VERCEL_CLI_VERSION: ${{ vars.VERCEL_CLI_VERSION }}
+    steps:
+      - name: Checkout exact main commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Validate deployment configuration
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        shell: bash
+        run: |
+          if [[ -z "$VERCEL_TOKEN" ]]; then
+            echo "::error::Configure the VERCEL_TOKEN repository Actions secret."
+            exit 1
+          fi
+          if [[ ! "$VERCEL_CLI_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Set VERCEL_CLI_VERSION to a reviewed exact CLI version in Actions variables."
+            exit 1
+          fi
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Vercel CLI
+        run: npm install --global "vercel@$VERCEL_CLI_VERSION"
+      - name: Install dependencies and check source
+        run: |
+          npm ci
+          npm run lint
+          npm test
+      - name: Load production configuration
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production
+      - name: Build production
+        run: vercel build --prod
+      - name: Publish prebuilt production output
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --archive=tgz --prod --yes
