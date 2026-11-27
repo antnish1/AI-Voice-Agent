@@ -9,7 +9,7 @@ import {CampaignActivityChart} from "@/components/motion/campaign-activity-chart
 import {requireMembership,canCreateCampaign} from "@/lib/auth";
 import "./dashboard-crisp.css";
 
-type Campaign={id:string;name:string;status:string;created_at:string};
+type Campaign={dealership_id:string;id:string;name:string;status:string;created_at:string};
 type ImportBatch={id:string;filename:string;imported_rows:number;rejected_rows:number;created_at:string};
 const localDate=(date:string|Date)=>new Date(date).toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"});
 const formatted=(date:string)=>new Date(date).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Kolkata"});
@@ -58,7 +58,7 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
   scoped((itUser?supabase.from("campaigns").select("id",{count:"exact",head:true}):supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id))),
   scoped((itUser?supabase.from("campaigns").select("id",{count:"exact",head:true}):supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id)).in("status",["DRAFT","PENDING","PENDING_MANAGER_APPROVAL"])),
   scoped((itUser?supabase.from("campaigns").select("id",{count:"exact",head:true}):supabase.from("campaigns").select("id",{count:"exact",head:true}).eq("dealership_id",id)).eq("status","APPROVED")),
-  scoped((itUser?supabase.from("campaigns").select("id,name,status,created_at"):supabase.from("campaigns").select("id,name,status,created_at").eq("dealership_id",id))).order("created_at",{ascending:false}).limit(7),
+  scoped((itUser?supabase.from("campaigns").select("id,name,status,created_at,dealership_id"):supabase.from("campaigns").select("id,name,status,created_at,dealership_id").eq("dealership_id",id))).order("created_at",{ascending:false}).limit(7),
   fetchPeriod(),
   scoped((itUser?supabase.from("customer_import_batches").select("id,filename,imported_rows,rejected_rows,created_at"):supabase.from("customer_import_batches").select("id,filename,imported_rows,rejected_rows,created_at").eq("dealership_id",id))).order("created_at",{ascending:false}).limit(6),
   scoped((itUser?supabase.from("voice_call_records").select("id",{count:"exact",head:true}):supabase.from("voice_call_records").select("id",{count:"exact",head:true}).eq("dealership_id",id)),"started_at"),
@@ -69,6 +69,30 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  ]);
  if([customerCount,campaignCount,approvalCount,approvedCount,recentCampaigns,periodCampaigns,recentImports,callCount,answeredCount,activeCount,providerCount,recentLaunches].some(x=>x.error))throw new Error("Could not load dealership dashboard.");
  const recent=(recentCampaigns.data??[]) as Campaign[];
+ // Per-campaign lifetime totals, constrained to the authorized recent campaign and its tenant.
+ const recentDetails=new Map(await Promise.all(recent.map(async c=>{
+  const [config,batch,link]=await Promise.all([
+   supabase.from("campaign_draft_configs").select("configuration").eq("campaign_id",c.id).eq("dealership_id",c.dealership_id).maybeSingle(),
+   supabase.from("campaign_recipient_batches").select("eligible_records").eq("campaign_id",c.id).eq("dealership_id",c.dealership_id).maybeSingle(),
+   supabase.from("voice_campaign_links").select("sarvam_campaign_id,agent_id").eq("campaign_id",c.id).eq("dealership_id",c.dealership_id).maybeSingle()
+  ]);
+  const setup=config.data?.configuration as {agent_label?:string}|null|undefined;
+  const agentId=link.data?.agent_id||setup?.agent_label||"";
+  const agent=agentId==="Conversatio-95f7d6e8-61a2"?"Kajal":agentId||"Not configured";
+  let calls:number|null=null,answered:number|null=null;
+  if(!link.error){
+   if(!link.data?.sarvam_campaign_id){calls=0;answered=0;}
+   else{
+    const [total,connected]=await Promise.all([
+     supabase.from("voice_call_records").select("id",{count:"exact",head:true}).eq("dealership_id",c.dealership_id).eq("sarvam_campaign_id",link.data.sarvam_campaign_id),
+     supabase.from("voice_call_records").select("id",{count:"exact",head:true}).eq("dealership_id",c.dealership_id).eq("sarvam_campaign_id",link.data.sarvam_campaign_id).eq("status","answered")
+    ]);
+    if(!total.error)calls=total.count;
+    if(!connected.error)answered=connected.count;
+   }
+  }
+  return [c.id,{agent:config.error&&!link.data?.agent_id?"Unavailable":agent,type:batch.data||link.data?"Outbound":"—",contacts:batch.error?null:batch.data?.eligible_records??null,calls,answerRate:calls!==null&&calls>0&&answered!==null?(100*answered/calls).toFixed(1).replace(/\.0$/,"")+"%":"—",unavailable:!!(config.error||batch.error||link.error)||calls===null||answered===null}] as const;
+ })));
  const launchMap=new Map((recentLaunches.data??[]).map(l=>[l.campaign_id,l.provider_status]));
  const display=(c:Campaign)=>campaignDisplayStatus(c.status,launchMap.get(c.id));
  const imports=(recentImports.data??[]) as ImportBatch[];
@@ -104,7 +128,8 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
    {(periodCampaigns.data??[]).length===0&&<p className="ref-chart-empty">No campaigns created in this period. Charts will update with real data.</p>}
   </section>
   <section className="ref-dashboard-panel ref-recent-campaigns"><div className="ref-panel-header"><h2><span className="ref-heading-icon">◫</span> Recent Campaigns</h2><Link href="/campaigns">View All</Link></div>
-   <div className="tablewrap"><table className="ref-campaign-table"><thead><tr><th>Campaign Name</th><th>Agent</th><th>Type</th><th>Contacts</th><th>Status</th><th>Calls</th><th>Success Rate</th><th>Actions</th></tr></thead><tbody>{recent.length?recent.map(c=><tr key={c.id}><td><strong>{c.name}</strong><small>{formatted(c.created_at)}</small></td><td>—</td><td>Planned</td><td>—</td><td><span className={"ref-campaign-status campaign-status-badge campaign-status-"+display(c).toLowerCase()}>{display(c)}</span></td><td>—</td><td>—</td><td><Link href="/campaigns" aria-label={"View campaign "+c.name}>•••</Link></td></tr>):<tr><td colSpan={8} className="ref-table-empty"><EmptyState compact kind="campaigns" title="No campaigns yet" description="Campaigns will appear here once created."/></td></tr>}</tbody></table></div>
+   <div className="tablewrap"><table className="ref-campaign-table"><thead><tr><th>Campaign Name</th><th>Agent</th><th>Type</th><th>Contacts</th><th>Status</th><th>Calls</th><th title="Answered calls divided by recorded call attempts">Answer Rate</th><th>Actions</th></tr></thead><tbody>{recent.length?recent.map(c=><tr key={c.id}><td><strong>{c.name}</strong><small>{formatted(c.created_at)}</small></td><td>{recentDetails.get(c.id)?.agent??"—"}</td><td>{recentDetails.get(c.id)?.type??"—"}</td><td>{recentDetails.get(c.id)?.contacts??"—"}</td><td><span className={"ref-campaign-status campaign-status-badge campaign-status-"+display(c).toLowerCase()}>{display(c)}</span></td><td>{recentDetails.get(c.id)?.calls??"—"}</td><td>{recentDetails.get(c.id)?.answerRate??"—"}</td><td><Link href={itUser?"/campaigns/"+c.id+"/outbound":"/campaigns?view="+encodeURIComponent(c.id)} aria-label={"View campaign "+c.name}>•••</Link></td></tr>):<tr><td colSpan={8} className="ref-table-empty"><EmptyState compact kind="campaigns" title="No campaigns yet" description="Campaigns will appear here once created."/></td></tr>}</tbody></table></div>
+   {Array.from(recentDetails.values()).some(x=>x.unavailable)&&<p role="status">Some campaign metrics are unavailable. Refresh to try again.</p>}
   </section>
  </div>
  <div className="ref-dashboard-right">
