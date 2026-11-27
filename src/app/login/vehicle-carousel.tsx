@@ -3,13 +3,14 @@
 import {useEffect,useState} from "react";
 
 const slides=[
- {file:"kushaq.webp",alt:"Škoda Kushaq"},
- {file:"seltos.webp",alt:"Kia Seltos"},
- {file:"city.webp",alt:"Honda City"},
- {file:"wolksbegn.webp",alt:"Volkswagen"},
- {file:"siyara.webp",alt:"Tata Sierra EV"},
- {file:"tata.webp",alt:"Tata Motors"},
- {file:"jcb.webp",alt:"JCB"}
+ {file:"car.jpeg",alt:"Vehicle banner 1"},
+ {file:"carrr.png",alt:"Vehicle banner 2"},
+ {file:"carrrr.png",alt:"Vehicle banner 3"},
+ {file:"portalbg (1).jpeg",alt:"Vehicle banner 4"},
+ {file:"carr.jpeg",alt:"Vehicle banner 5"},
+ {file:"carrrrrr.png",alt:"Vehicle banner 6"},
+ {file:"carrrrr.png",alt:"Vehicle banner 7"},
+ {file:"scoda.png",alt:"Vehicle banner 8"}
 ];
 
 export function VehicleCarousel(){
@@ -31,7 +32,7 @@ export function VehicleCarousel(){
   <div className="fv-vehicle-viewport">
    <div className="fv-vehicle-track" style={{transform:`translateX(-${active*100}%)`}}>
     {slides.map((slide,i)=><div key={slide.file} className="fv-vehicle-slide" aria-hidden={i!==active}>
-     <img src={`/banners/${slide.file}`} alt={slide.alt} draggable={false} decoding="async"/>
+     <img src={`/banners/${encodeURIComponent(slide.file)}`} alt={slide.alt} draggable={false} decoding="async"/>
     </div>)}
    </div>
   </div>
