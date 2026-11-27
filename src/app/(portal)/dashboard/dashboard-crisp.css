@@ -172,3 +172,51 @@
 @media(max-width:1350px){.crm-app .ref-dashboard.dashboard-reference .dashboard-hero .dashboard-welcome-art{display:none}}
 @media(min-width:1351px){.crm-app .ref-dashboard.dashboard-reference .dashboard-hero{flex-wrap:nowrap}.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy h1{white-space:nowrap;font-size:clamp(19px,1.65vw,26px)}}
 @media(max-width:600px){.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-icon{width:44px;height:44px;flex-basis:44px}}
+
+
+/* Operations Dashboard typography: replace 750/800+ headings and KPI values with bold 700.
+   Supporting text, action buttons and badges keep their existing weights. */
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy h1,
+.crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy h1 strong,
+.crm-app .ref-dashboard.dashboard-reference .ref-kpi-label,
+.crm-app .ref-dashboard.dashboard-reference .ref-kpi-value,
+.crm-app .ref-dashboard.dashboard-reference .ref-panel-header h2,
+.crm-app .ref-dashboard.dashboard-reference .ref-panel-header h2 .dashboard-title-accent,
+.crm-app .ref-dashboard.dashboard-reference .ref-campaign-table thead th {
+  font-weight:700;
+}
+/* The main campaign and activity names also follow the dashboard's bold heading standard. */
+.crm-app .ref-dashboard.dashboard-reference .ref-campaign-table tbody td strong,
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item strong {
+  font-weight:700;
+}
+
+/* Stretch Recent Activity alongside both the chart and Recent Campaigns panels,
+   rather than ending immediately after its last real event. */
+@media(min-width:1001px){
+  .crm-app .ref-dashboard.dashboard-reference .ref-dashboard-columns {
+    align-items:stretch;
+  }
+  .crm-app .ref-dashboard.dashboard-reference .ref-dashboard-right {
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    align-self:stretch;
+    min-height:0;
+  }
+  .crm-app .ref-dashboard.dashboard-reference .ref-dashboard-right > .ref-activity {
+    flex:1 1 auto;
+    align-self:stretch;
+    width:100%;
+  }
+}
+/* Once the dashboard columns stack, keep a natural-height activity panel. */
+@media(max-width:1000px){
+  .crm-app .ref-dashboard.dashboard-reference .ref-dashboard-columns {
+    align-items:start;
+  }
+  .crm-app .ref-dashboard.dashboard-reference .ref-dashboard-right > .ref-activity {
+    flex:0 0 auto;
+    height:auto;
+  }
+}
