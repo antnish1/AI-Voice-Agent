@@ -1,6 +1,6 @@
 "use client";
 import {EmptyState} from "@/components/empty-state";
-import {useMemo,useState,useEffect,useRef,type ReactNode} from "react";
+import {useMemo,useState,useEffect,useRef,useId,type ReactNode} from "react";
 import "./agents-directory.css";
 type Profile={dealership_id:string;name:string;agent_id:string;app_version:number;connection_id:string;caller_number:string;active:boolean};
 type Agent={id:string;name:string;version:string;category:string;status:"Active"|"Inactive";recommended:boolean;description:string;portrait:"woman"|"man"|"glasses"|"megaphone"|"robot";tone:string;profiles?:Profile[]};
@@ -71,13 +71,31 @@ function ConfiguredAgentDetails({agent,onClose}:{agent:Agent;onClose:()=>void}){
   </section>
  </dialog>;
 }
+function AgentArtwork({kind}:{kind:string}){
+ const id=useId().replace(/:/g,"");
+ const g=(n:string)=>"url(#"+id+n+")";
+ const robot=kind==="robot"||kind==="hero";
+ return <svg className="agent-artwork" viewBox="0 0 160 130" aria-hidden="true">
+ <defs>
+ <linearGradient id={id+"shell"} x2=".8" y2="1"><stop stopColor="#fff"/><stop offset=".45" stopColor="#e8e5ff"/><stop offset="1" stopColor="#8b82cf"/></linearGradient>
+ <linearGradient id={id+"purple"} x2=".8" y2="1"><stop stopColor="#d6b9ff"/><stop offset=".45" stopColor="#9261f4"/><stop offset="1" stopColor="#4231b8"/></linearGradient>
+ <linearGradient id={id+"blue"} x2=".8" y2="1"><stop stopColor="#b3e3ff"/><stop offset=".45" stopColor="#5598e9"/><stop offset="1" stopColor="#244a9a"/></linearGradient>
+ <linearGradient id={id+"gold"} x2=".8" y2="1"><stop stopColor="#fff3a5"/><stop offset=".5" stopColor="#ffbf32"/><stop offset="1" stopColor="#e87912"/></linearGradient>
+ <radialGradient id={id+"skin"} cx=".34" cy=".25" r=".8"><stop stopColor="#ffe6cf"/><stop offset=".7" stopColor="#f1b68b"/><stop offset="1" stopColor="#cc805d"/></radialGradient>
+ <linearGradient id={id+"hair"} x2=".8" y2="1"><stop stopColor="#9b6650"/><stop offset=".5" stopColor="#50302f"/><stop offset="1" stopColor="#251d35"/></linearGradient>
+ <linearGradient id={id+"face"} x2=".8" y2="1"><stop stopColor="#344575"/><stop offset="1" stopColor="#121a3a"/></linearGradient>
+ </defs>
+ <ellipse cx="80" cy="117" rx="55" ry="7" fill="#6651ad" opacity=".13"/>
+ {robot?<><ellipse cx="80" cy="108" rx="55" ry="13" fill={g("purple")}/><ellipse cx="80" cy="103" rx="55" ry="10" fill="#dcd4ff"/><rect x="54" y="80" width="52" height="27" rx="15" fill={g("shell")}/><rect x="27" y="19" width="106" height="72" rx="34" fill={g("shell")}/><rect x="38" y="29" width="84" height="51" rx="23" fill={g("face")}/><rect x="21" y="39" width="15" height="31" rx="7" fill={g("purple")}/><rect x="124" y="39" width="15" height="31" rx="7" fill={g("blue")}/><path d="M53 53q7-12 14 0m26 0q7-12 14 0M73 65q7 7 14 0" stroke="#6ff0ff" strokeWidth="4" fill="none" strokeLinecap="round"/><circle cx="80" cy="95" r="8" fill={g("blue")}/><path d="M80 91v7" stroke="#fff" strokeWidth="2" strokeLinecap="round"/><rect x="112" y="4" width="43" height="23" rx="11" fill={g("purple")}/><path d="M122 13v6m7-10v12m7-8v6m7-10v12" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></>:kind==="reminder"?<><rect x="23" y="27" width="105" height="82" rx="13" fill={g("purple")}/><rect x="29" y="43" width="93" height="59" rx="9" fill="#f8f6ff"/>{[44,72,100].map(x=><g key={x}><rect x={x-7} y="16" width="10" height="24" rx="5" fill={g("shell")}/><rect x={x-8} y="53" width="17" height="14" rx="4" fill={g("blue")}/><rect x={x-8} y="75" width="17" height="14" rx="4" fill={g("purple")}/></g>)}<path d="M99 98q9-7 9-19a16 16 0 0 1 32 0q0 12 9 19z" fill={g("gold")}/><ellipse cx="124" cy="99" rx="25" ry="6" fill="#f49b19"/><circle cx="124" cy="105" r="6" fill={g("gold")}/></>:kind==="promotion"?<><path d="M24 51h37l53-28v70L61 74H24z" fill={g("purple")}/><ellipse cx="113" cy="58" rx="20" ry="35" fill={g("purple")}/><ellipse cx="113" cy="58" rx="13" ry="26" fill="#44319d"/><rect x="21" y="48" width="25" height="29" rx="9" fill={g("blue")}/><path d="m45 74 12 32h16L63 74" fill={g("purple")}/><rect x="88" y="79" width="47" height="37" rx="9" fill="#e94979" transform="rotate(-12 111 97)"/><text x="111" y="105" textAnchor="middle" fill="white" fontSize="26" fontWeight="bold">%</text></>:<><path d="M25 116q4-35 52-35t52 35" fill={g("blue")}/>{kind==="woman"&&<path d="M31 94Q9 12 75 10q56 0 49 86z" fill={g("hair")}/>}<ellipse cx="77" cy="55" rx="32" ry="35" fill={g("skin")}/><path d="M44 48Q35 14 77 13q38-2 34 36Q89 35 84 29q-16 20-40 19" fill={g("hair")}/><ellipse cx="65" cy="55" rx="3.5" ry="5" fill="#332635"/><ellipse cx="89" cy="55" rx="3.5" ry="5" fill="#332635"/><path d="M67 70q10 12 20 0" fill="#9d4b52"/><path d="m61 84 16 18 17-18" fill="#fff"/>{kind!=="sales"&&<><path d="M39 52a38 38 0 0 1 76 0" stroke="#7969ca" strokeWidth="7" fill="none"/><rect x="34" y="48" width="15" height="25" rx="7" fill={g("shell")}/><rect x="106" y="48" width="15" height="25" rx="7" fill={g("blue")}/><path d="M113 72q0 12-20 12" fill="none" stroke="#4c5e9f" strokeWidth="3"/></>}{kind==="support"&&<><path d="M83 86h55l-8 30H73z" fill={g("shell")}/><circle cx="108" cy="101" r="4" fill="#fff"/></>}{kind==="sales"&&<><path d="M106 62h15l26-15v43l-26-12h-15z" fill={g("gold")}/><ellipse cx="147" cy="68" rx="9" ry="22" fill="#e78b19"/></>}</>}
+ </svg>;
+}
 function AgentCard({agent,onDetails}:{agent:Agent;onDetails:(a:Agent)=>void}){
  const inUse=!!agent.profiles&&agent.status==="Active";
  return <article className={"agent-preview-card"+(inUse?" agent-current-card":"")}>
   {inUse?<span className="agent-ribbon agent-current-ribbon">✓ Currently Used</span>:agent.recommended&&<span className="agent-ribbon">★ Recommended</span>}
   <div className="agent-card-status"><span className={agent.status==="Active"?"agent-state-active":"agent-state-inactive"}>● {agent.profiles?"Configured":"Preview"} · {agent.status}</span><span className="agent-version">{agent.version}</span></div>
-  <div className="agent-card-content"><div className={"agent-card-portrait tone-"+agent.tone}><Portrait kind={agent.portrait}/></div><div className="agent-card-copy"><h3>{agent.name}</h3><p>{agent.description}</p></div></div>
-  <div className="agent-card-actions"><button type="button" className="agent-sample-disabled" disabled title="Sample playback requires Sarvam integration"><span className="agent-sample-icon"><Icon name="play" size={11}/></span> Play Sample</button><button type="button" className="agent-detail-button" onClick={()=>onDetails(agent)}>View Details</button><button type="button" className="agent-use-disabled" disabled title={agent.profiles?"Use the saved voice configuration when creating a campaign":"Preview agent cannot be used"}>Use Agent</button></div>
+  <div className="agent-card-content"><div className={"agent-card-portrait tone-"+agent.tone}><AgentArtwork kind={agent.profiles?"woman":agent.id}/></div><div className="agent-card-copy"><h3>{agent.name}</h3><p>{agent.description}</p></div></div>
+  <div className="agent-card-actions"><button type="button" className="agent-sample-disabled" disabled title="Sample playback requires Sarvam integration"><span className="agent-sample-icon"><Icon name="play" size={11}/></span> Play Sample</button><button type="button" className="agent-detail-button" onClick={()=>onDetails(agent)}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>View Details</button><button type="button" className="agent-use-disabled" disabled title={agent.profiles?"Use the saved voice configuration when creating a campaign":"Preview agent cannot be used"}><Icon name="play" size={14}/>Use Agent</button></div>
  </article>;
 }
 function EmptyAgentArtwork(){
@@ -106,7 +124,7 @@ export function AgentsDirectory({profiles,loadError,headerAction}:{profiles:Prof
  const clear=()=>{setSearch("");setKpiFilter("all");setCategory("all");setVersion("all");};
  const selectKpi=(filter:"total"|"active"|"inactive"|"recommended")=>setKpiFilter(current=>current===filter?"all":filter);
  return <div className="agent-directory">
-  <div className="agent-page-hero"><div className="agent-hero-heading"><div className="agent-hero-icon"><Icon name="sound" size={26}/></div><div><h1>AI Voice Agents</h1></div></div>
+  <div className="agent-page-hero"><div className="agent-hero-heading"><div className="agent-hero-icon"><Icon name="sound" size={26}/></div><div><h1>AI Voice Agents</h1><p className="agent-hero-subtitle">Create, manage and deploy intelligent voice agents for customer interactions.</p></div></div><div className="agent-hero-art"><AgentArtwork kind="hero"/></div>
    {headerAction}
   </div>
   {loadError&&<p role="alert">Saved agent configurations could not be loaded.</p>}
