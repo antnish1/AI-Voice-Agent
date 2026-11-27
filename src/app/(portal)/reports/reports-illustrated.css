@@ -96,3 +96,87 @@
 .crm-app .reports-ref .reports-hero-art img{display:block;max-height:100%;width:100%;height:100%;object-fit:contain;object-position:center}
 .crm-app .reports-ref .reports-ref-kpis .reports-category-card .reports-ref-kpi-icon{background:transparent!important}
 .crm-app .reports-ref .reports-ref-kpi-icon img{display:block;object-fit:contain}
+
+
+/* Reports compact header and exact uploaded /public/reports artwork. Scoped to Reports only. */
+.crm-app .reports-ref .reports-ref-heading{
+  box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;
+  gap:14px;min-height:80px;padding:10px 16px;margin-bottom:9px;flex-wrap:nowrap;
+}
+.crm-app .reports-ref .reports-ref-heading-left{
+  display:flex;align-items:center;gap:10px;flex:0 1 auto;
+  max-width:none;min-width:180px;
+}
+.crm-app .reports-ref .reports-ref-heading h1{
+  font-size:clamp(22px,1.8vw,26px);line-height:1.15;letter-spacing:-.4px;margin:0 0 4px;
+}
+.crm-app .reports-ref .reports-ref-heading p{font-size:11px;line-height:1.25;margin:0;white-space:nowrap}
+.crm-app .reports-ref .reports-ref-heading-icon{
+  width:52px;height:52px;flex:0 0 52px;border-radius:12px;overflow:visible;
+}
+.crm-app .reports-ref .reports-ref-heading-icon img{
+  display:block;width:100%;height:100%;object-fit:contain;
+  image-rendering:auto;filter:none;
+}
+.crm-app .reports-ref .reports-hero-art{display:none!important}
+.crm-app .reports-ref .reports-ref-header-actions{
+  display:flex;align-items:center;justify-content:flex-end;
+  flex:0 1 auto;max-width:none;margin-left:auto;gap:8px;flex-wrap:wrap;
+}
+.crm-app .reports-ref .reports-ref-kpi .reports-ref-kpi-icon{
+  width:58px;height:56px;flex:0 0 58px;overflow:visible;
+}
+.crm-app .reports-ref .reports-ref-kpi-icon img{
+  display:block;width:100%;height:100%;object-fit:contain;image-rendering:auto;filter:none;
+}
+.crm-app .reports-ref .reports-customer-name img{
+  width:30px;height:30px;flex:0 0 30px;object-fit:contain;
+  border-radius:50%;background:transparent;image-rendering:auto;
+}
+.crm-app .reports-ref .reports-ref-table .reports-nowrap-cell{
+  white-space:nowrap!important;overflow-wrap:normal!important;word-break:normal!important;
+}
+.crm-app .reports-ref .reports-ref-table:has(.reports-nowrap-cell){min-width:1270px}
+.crm-app .reports-ref .reports-dealership-toolbar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.crm-app .reports-ref .reports-dealership-title{
+  margin:0;font-size:15px;font-weight:750;white-space:nowrap;color:var(--r-ink);
+}
+.crm-app .reports-ref .reports-dealership-toolbar .reports-ref-filters{margin-left:auto}
+.crm-app .reports-ref .reports-dealership-toolbar .reports-ref-search{min-width:250px}
+@media(max-width:1240px){
+  .crm-app .reports-ref .reports-ref-heading{flex-wrap:wrap}
+  .crm-app .reports-ref .reports-ref-header-actions{max-width:none}
+}
+@media(max-width:680px){
+  .crm-app .reports-ref .reports-ref-heading{min-height:0;padding:11px 12px;align-items:stretch}
+  .crm-app .reports-ref .reports-ref-heading-left{min-width:0;max-width:100%}
+  .crm-app .reports-ref .reports-ref-heading p{white-space:normal}
+  .crm-app .reports-ref .reports-ref-header-actions{width:100%;margin-left:0;justify-content:flex-end}
+  .crm-app .reports-ref .reports-dealership-toolbar .reports-ref-filters{width:100%}
+  .crm-app .reports-ref .reports-dealership-toolbar .reports-ref-search{min-width:0;width:100%}
+}
+
+
+/* Reports customer-record Call Status badge: shrink gently on hover, then return.
+   Transform-only animation leaves table geometry and semantic status colours unchanged. */
+@keyframes reports-status-badge-shrink{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(.94)}
+}
+@media (hover:hover) and (prefers-reduced-motion:no-preference){
+  .crm-app .reports-ref .reports-ref-table .reports-call-status{
+    transform-origin:center;
+    will-change:auto;
+  }
+  .crm-app .reports-ref .reports-ref-table .reports-call-status:hover{
+    animation:reports-status-badge-shrink 600ms ease-in-out 1;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .crm-app .reports-ref .reports-ref-table .reports-call-status{
+    animation:none!important;
+    transform:none!important;
+  }
+}
