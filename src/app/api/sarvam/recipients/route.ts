@@ -1,7 +1,8 @@
 import {NextResponse} from "next/server";
 import {requireMembership} from "@/lib/auth";
 import {isItSuperUser} from "@/lib/it-access";
-import {prepareRecipients} from "@/lib/sarvam/recipient-validation";
+import {enrichServiceRecipients} from "@/lib/sarvam/service-recipients";
+import {prepareRecipients,parseCSV,normalizePhone} from "@/lib/sarvam/recipient-validation";
 import {sha256} from "@/lib/sarvam/outbound-provider";
 export const runtime="nodejs";
 export async function POST(request:Request){
@@ -22,8 +23,23 @@ export async function POST(request:Request){
   let mapping:Record<string,string>;
   try{const v=JSON.parse(String(form.get("variableMapping")||"{}"));if(!v||typeof v!=="object"||Array.isArray(v))throw Error();mapping=v;}catch{return NextResponse.json({error:"Invalid agent variable mapping JSON."},{status:400});}
   const options={phoneColumn:String(form.get("phoneColumn")??""),consentColumn:String(form.get("consentColumn")??""),dncColumn:String(form.get("dncColumn")??""),variableMapping:mapping};
-  const prepared=prepareRecipients(await file.text(),options);
   if(form.get("certifyConsent")!=="yes")return NextResponse.json({error:"Confirm customer consent and DNC screening before staging."},{status:400});
+  let csv=await file.text();
+  if(form.get("serviceTemplate")==="yes"){
+   const {data:dealer,error:dealerError}=await supabase.from("dealerships").select("name").eq("id",campaign.dealership_id).single();
+   if(dealerError||!dealer)throw Error("Recipient dealership configuration unavailable.");
+   const {data:customers,error:customerError}=await supabase.from("customers").select("mobile,consent_status,do_not_call").eq("dealership_id",campaign.dealership_id);
+   if(customerError)throw Error("Recipient DNC screening unavailable.");
+   const blocked=new Set<string>();
+   for(const customer of customers??[]){
+    const number=normalizePhone(customer.mobile??"");
+    if(number&&(customer.do_not_call||!["yes","true","1","opted_in","consented","granted"].includes(String(customer.consent_status??"").toLowerCase())))blocked.add(number);
+   }
+   const result=enrichServiceRecipients(parseCSV(csv),dealer.name,blocked);
+   csv=result.csv;mapping=result.mapping;
+   options.phoneColumn="phone_number";options.consentColumn="consent";options.dncColumn="do_not_call";options.variableMapping=mapping;
+  }
+  const prepared=prepareRecipients(csv,options);
   const digest=sha256(prepared.csv);
   const objectPath=campaign.dealership_id+"/"+campaign.id+"/"+digest+".csv";
   const {error:storeError}=await supabase.storage.from("frontvox-campaign-cohorts")
