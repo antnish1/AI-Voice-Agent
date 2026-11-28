@@ -272,3 +272,30 @@
 :root .crm-app .agent-directory :is(.agent-preview-card .agent-card-actions>button.agent-detail-button,.agent-page-hero .agent-test-header-action>button):active:not(:disabled){
  background:#061F42!important;background-image:none!important;border-color:#061F42!important;color:#fff!important;
 }
+
+
+/* Voice Agents card action: navy View Details in every card, with navy hover.
+   Override later card-action declarations without changing disabled buttons or test action. */
+:root .crm-app .agent-directory .agent-card-grid .agent-preview-card .agent-card-actions > button.agent-detail-button,
+:root[data-theme="dark"] .crm-app .agent-directory .agent-card-grid .agent-preview-card .agent-card-actions > button.agent-detail-button{
+ background:#142d4e!important;
+ background-color:#142d4e!important;
+ background-image:none!important;
+ border:1px solid #142d4e!important;
+ color:#fff!important;
+ box-shadow:none!important;
+ opacity:1;
+}
+:root .crm-app .agent-directory .agent-card-grid .agent-preview-card .agent-card-actions > button.agent-detail-button:is(:hover,:focus-visible),
+:root[data-theme="dark"] .crm-app .agent-directory .agent-card-grid .agent-preview-card .agent-card-actions > button.agent-detail-button:is(:hover,:focus-visible){
+ background:#0d2039!important;
+ background-color:#0d2039!important;
+ background-image:none!important;
+ border-color:#0d2039!important;
+ color:#fff!important;
+}
+:root .crm-app .agent-directory .agent-card-grid .agent-preview-card .agent-card-actions > button.agent-detail-button svg{
+ display:block;
+ flex-shrink:0;
+ stroke:currentColor;
+}
