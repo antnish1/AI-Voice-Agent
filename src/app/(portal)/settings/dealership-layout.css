@@ -115,3 +115,34 @@
 :root .crm-app .settings-ref .settings-ref-avatar-edit{color:#c91522!important;border-color:#f5cbd0!important}
 :root .crm-app .settings-ref .settings-ref-avatar-edit:hover{background:#fff0f1!important}
 :root[data-theme="dark"] .crm-app .settings-ref .settings-ref-avatar{border-color:#512b39!important}
+
+
+/* Profile action pencil: centre the actual SVG within both edit-button boxes.
+   Keep positioning, buttons, click handlers and profile card layout unchanged. */
+:root .crm-app .settings-ref .settings-profile-heading > button.settings-profile-edit,
+:root .crm-app .settings-ref .settings-ref-avatar-wrap > button.settings-ref-avatar-edit{
+ display:grid!important;
+ place-items:center!important;
+ align-items:center!important;
+ justify-items:center!important;
+ padding:0!important;
+ line-height:1!important;
+ text-align:center!important;
+ box-sizing:border-box!important;
+}
+:root .crm-app .settings-ref .settings-profile-heading > button.settings-profile-edit{
+ width:36px!important;height:36px!important;
+ min-width:36px!important;min-height:36px!important;
+ flex:0 0 36px;
+}
+:root .crm-app .settings-ref .settings-profile-heading > button.settings-profile-edit > svg{
+ width:17px!important;height:17px!important;
+}
+:root .crm-app .settings-ref .settings-ref-avatar-wrap > button.settings-ref-avatar-edit > svg{
+ width:15px!important;height:15px!important;
+}
+:root .crm-app .settings-ref :is(.settings-profile-edit,.settings-ref-avatar-edit) > svg{
+ display:block!important;position:static!important;
+ margin:0!important;padding:0!important;
+ flex:none!important;transform:none!important;
+}
