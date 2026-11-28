@@ -8,6 +8,7 @@ export function MotionPreferenceProvider({userId,children}:{userId:string;childr
  const key="frontier:motion:"+userId;
  useEffect(()=>{const read=()=>{try{const v=localStorage.getItem(key);setValue(v==="minimal"||v==="off"?v:"premium");}catch{setValue("premium");}};read();const sync=(e:StorageEvent)=>{if(e.key===key)read();};window.addEventListener("storage",sync);return()=>window.removeEventListener("storage",sync);},[key]);
  const setPreference=(v:MotionPreference)=>{setValue(v);try{localStorage.setItem(key,v);}catch{/* device storage unavailable */}};
+ useEffect(()=>{document.documentElement.dataset.motionPreference=preference;return()=>{delete document.documentElement.dataset.motionPreference;};},[preference]);
  return <Context.Provider value={{preference,setPreference}}>{children}</Context.Provider>;
 }
 export function useMotionPreference(){return useContext(Context);}

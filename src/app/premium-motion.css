@@ -35,3 +35,28 @@
 .crm-app[data-motion-preference="off"] :is(button,a):active{transform:none!important}
 .crm-app:is([data-motion-preference="minimal"],[data-motion-preference="off"]) dialog[open]::backdrop{animation:none!important}
 @media(prefers-reduced-motion:reduce){.crm-app *, .crm-app *::before,.crm-app *::after,.fv-login *, .fv-login *::before,.fv-login *::after{animation:none!important;transition-duration:0ms!important;transition-delay:0ms!important;scroll-behavior:auto!important}.crm-app [data-motion-ready]{opacity:1!important;transform:none!important;translate:none!important}.crm-app .frontier-motion-lift:hover{transform:none!important}.fv-login .fv-kia-backdrop img{scale:1!important}}
+
+/* Portaled dialogs share the authenticated root preference. */
+@keyframes premium-toast{from{opacity:0;translate:0 -7px}to{opacity:1;translate:0 0}}
+@keyframes premium-ring{from{opacity:.55;scale:.94;rotate:-8deg}to{opacity:1;scale:1;rotate:0deg}}
+@keyframes premium-track{from{translate:-110% 0}to{translate:350% 0}}
+@keyframes premium-art{from{translate:0 4px;opacity:.8}to{translate:0 0;opacity:1}}
+.frontier-operation-progress{display:grid;gap:6px;font-size:12px;color:inherit;padding:8px 0;min-width:0}
+.frontier-operation-track{height:5px;border-radius:10px;background:#94a3b833;overflow:hidden}
+.frontier-operation-track i{display:block;height:100%;border-radius:10px;background:#52769e}
+.frontier-operation-determinate{transition:width 180ms ease}
+.frontier-operation-indeterminate{width:30%;animation:premium-track 1.4s linear infinite}
+:root[data-motion-preference="premium"] :is(.campaign-modal-overlay,.fc-action-toast){animation:premium-toast 200ms var(--premium-motion-ease) both}
+:root[data-motion-preference="premium"] :is(.campaign-modal,.fc-reference-upload-success,.fc-reference-file-copy){animation:premium-reveal 240ms var(--premium-motion-ease) both}
+:root[data-motion-preference="premium"] :is(.crm-app,.campaign-modal-overlay) :is([role="alert"],.customers-add-error,.form-error){animation:premium-toast 180ms ease both}
+:root[data-motion-preference="premium"] :is(.customers-reference,.settings-ref,.agent-card,.campaign-modal-overlay) [role="status"]:not(.frontier-operation-progress){animation:premium-toast 180ms ease both}
+.crm-app[data-motion-preference="premium"] .reports-ref-donut{animation:premium-ring 440ms var(--premium-motion-ease) both}
+.crm-app[data-motion-preference="premium"] .reports-chart-bar{transform-origin:bottom;animation:fm-bar-grow 500ms var(--premium-motion-ease) both}
+.crm-app[data-motion-preference="premium"] :is(.crm-empty-art,.customers-illustrated-empty img){animation:premium-art 380ms var(--premium-motion-ease) both}
+.crm-app[data-motion-preference="premium"] details[open]>:not(summary){animation:premium-toast 160ms ease both}
+.crm-app[data-motion-preference="premium"] :is(.reports-ref-tabs,.calllogs-tabs,.settings-ref-tabs) :is(.active,[aria-current="page"]){animation:premium-toast 180ms ease both}
+.crm-app[data-motion-preference="premium"] :is(.ref-notification,.frontier-approval-badge):hover{transition:scale 160ms ease;scale:1.07}
+.fv-login .fv-submit[aria-busy="true"]{cursor:progress}
+:root:is([data-motion-preference="minimal"],[data-motion-preference="off"]) :is(.campaign-modal-overlay,.frontier-operation-progress,.fc-action-toast) *,:root:is([data-motion-preference="minimal"],[data-motion-preference="off"]) :is(.campaign-modal-overlay,.fc-action-toast){animation:none!important;transition-duration:0ms!important}
+:root:is([data-motion-preference="minimal"],[data-motion-preference="off"]) .frontier-operation-indeterminate{width:100%;opacity:.55}
+@media(prefers-reduced-motion:reduce){:is(.campaign-modal-overlay,.frontier-operation-progress,.fc-action-toast) *, .campaign-modal-overlay,.fc-action-toast{animation:none!important;transition-duration:0ms!important}.frontier-operation-indeterminate{width:100%;opacity:.55}}

@@ -4,6 +4,7 @@ import {createPortal} from "react-dom";
 import "./campaign-popup-white.css";
 import {useRouter} from "next/navigation";
 import {createSimpleCampaign} from "./actions";
+import {OperationProgress} from "@/components/motion/operation-progress";
 import {excelToRows,makeRecipientTemplate,rowsToCsv,RECIPIENT_TEMPLATE_HEADERS} from "@/lib/campaign-excel";
 
 type Dealer={id:string;name:string;configured:boolean};
@@ -143,6 +144,7 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
      </button>
     </div>
     <input ref={uploadInputRef} id="fc-create-upload-input" className="fc-create-hidden-file" type="file" accept=".xlsx,.csv" disabled={busy||reading||!!existingDraft} onChange={e=>void chooseFile(e.target.files?.[0])}/>
+    {(reading||busy)&&<OperationProgress label={reading?"Reading and validating recipient file":"Creating campaign and securely staging recipients"}/>}
     {preview?<div className="fc-reference-upload-success"><span className="fc-reference-file-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M10 9v12M4 15h16"/></svg></span><div className="fc-reference-file-copy"><strong>{preview.filename}</strong><span>Successfully validated</span></div><button type="button" aria-label="Remove uploaded file" title={existingDraft?"Campaign draft already created":"Remove file"} disabled={busy||reading||!!existingDraft} onClick={removeUploadedFile}><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v6m4-6v6"/></svg></button></div>:
     <label htmlFor="fc-create-upload-input" className="upload-zone fc-compact-upload"><strong>{reading?"Checking file…":"Upload Excel / CSV"}</strong><small>Up to 5 MB</small></label>}
     {preview&&<div className="fc-reference-readiness">
