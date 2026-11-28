@@ -1,5 +1,6 @@
 import {EmptyState} from "@/components/empty-state";
 import Link from "next/link";
+import {agentSnapshot} from "@/lib/sarvam/voice-discovery-snapshot";
 import {campaignStatuses,campaignDisplayStatus} from "@/lib/campaign-display-status";
 import {requireMembership,canCreateCampaign} from "@/lib/auth";
 import {isItSuperUser} from "@/lib/it-access";
@@ -63,14 +64,48 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
   campaigns.push(...(data??[]) as Campaign[]);if((data??[]).length<500)break;
  }
  const formatDate=(value:string)=>new Date(value).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Kolkata"});
- const launches:{campaign_id:string;provider_status:string|null}[]=[];
+ const launches:{campaign_id:string;provider_status:string|null;state:string;sarvam_campaign_id:string|null}[]=[];
  for(let offset=0;;offset+=500){
-  let query=supabase.from("voice_campaign_launches").select("campaign_id,provider_status");
+  let query=supabase.from("voice_campaign_launches").select("campaign_id,provider_status,state,sarvam_campaign_id");
   if(scope)query=query.eq("dealership_id",scope);
   const {data,error}=await query.order("campaign_id").range(offset,offset+499);
   if(error)throw Error("Could not load campaign lifecycle status.");
   launches.push(...(data??[]));if((data??[]).length<500)break;
  }
+ type Setup={agent_label?:string;agent_version_label?:string;schedule?:{start_mode?:string;start?:string;end?:string;from?:string;to?:string}};
+ const configs=new Map<string,Setup>(),batches=new Map<string,number>(),remoteIds=new Map<string,string>();
+ const attempts=new Map<string,Set<string>>(), attempted=new Map<string,Set<string>>(), connected=new Map<string,Set<string>>(), appointments=new Map<string,Set<string>>(), callbacks=new Map<string,Set<string>>();
+ const add=(map:Map<string,Set<string>>,id:string,phone:string)=>{const set=map.get(id)??new Set<string>();set.add(phone);map.set(id,set);};
+ const yes=(v:unknown)=>v===true||(typeof v==="string"&&v.trim().toLowerCase()==="true");
+ const ownerByCampaign=new Map(campaigns.map(c=>[c.id,c.dealership_id]));
+ const launchByCampaign=new Map(launches.map(l=>[l.campaign_id,l]));
+ for(let offset=0;;offset+=500){
+  let q=supabase.from("campaign_draft_configs").select("campaign_id,dealership_id,configuration");if(scope)q=q.eq("dealership_id",scope);
+  const {data,error}=await q.order("campaign_id").range(offset,offset+499);if(error)throw Error("Could not load campaign schedules.");
+  for(const x of data??[])if(ownerByCampaign.get(x.campaign_id)===x.dealership_id)configs.set(x.campaign_id,x.configuration as Setup);
+  if((data??[]).length<500)break;
+ }
+ for(let offset=0;;offset+=500){
+  let q=supabase.from("campaign_recipient_batches").select("campaign_id,dealership_id,eligible_records");if(scope)q=q.eq("dealership_id",scope);
+  const {data,error}=await q.order("campaign_id").range(offset,offset+499);if(error)throw Error("Could not load campaign recipient counts.");
+  for(const x of data??[])if(ownerByCampaign.get(x.campaign_id)===x.dealership_id)batches.set(x.campaign_id,x.eligible_records);
+  if((data??[]).length<500)break;
+ }
+ for(let offset=0;;offset+=500){
+  let q=supabase.from("voice_campaign_links").select("campaign_id,dealership_id,sarvam_campaign_id,agent_id");if(scope)q=q.eq("dealership_id",scope);
+  const {data,error}=await q.order("id").range(offset,offset+499);if(error)throw Error("Could not load campaign references.");
+  for(const x of data??[])if(ownerByCampaign.get(x.campaign_id)===x.dealership_id){remoteIds.set(x.dealership_id+":"+x.sarvam_campaign_id,x.campaign_id);if(!configs.has(x.campaign_id))configs.set(x.campaign_id,{agent_label:x.agent_id});}
+  if((data??[]).length<500)break;
+ }
+ for(let offset=0;;offset+=500){
+  let q=supabase.from("voice_call_records").select("dealership_id,sarvam_campaign_id,dialed_number,ended_at,started_at,status,output_variables");if(scope)q=q.eq("dealership_id",scope);
+  const {data,error}=await q.order("id").range(offset,offset+499);if(error)throw Error("Could not load recorded campaign progress.");
+  for(const x of data??[]){const id=remoteIds.get(x.dealership_id+":"+x.sarvam_campaign_id);if(!id||!x.dialed_number)continue;const phone=x.dialed_number.replace(/[^0-9]/g,"");if(!phone)continue;if(x.started_at||x.ended_at)add(attempted,id,phone);if(x.ended_at)add(attempts,id,phone);if(x.status==="answered")add(connected,id,phone);const output=(x.output_variables??{}) as Record<string,unknown>;if(yes(output.appointment_requested)||output.appointment_confirmation_status==="APPOINTMENT_REQUESTED")add(appointments,id,phone);if(yes(output.callback_required)||yes(output.followup_requested))add(callbacks,id,phone);}
+  if((data??[]).length<500)break;
+ }
+ const dateTime=(value:string|null|undefined)=>{if(!value||!Number.isFinite(Date.parse(value)))return <span>—</span>;const d=new Date(value);return <time className="fc-created-datetime" dateTime={value} title="Indian Standard Time"><span>{formatDate(value)}</span><span className="fc-created-time">{d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:true,timeZone:"Asia/Kolkata"})}</span></time>;};
+ const scheduled=(day?:string,hour?:string)=>day&&hour&&/^\d{4}-\d{2}-\d{2}$/.test(day)&&/^\d{2}:\d{2}$/.test(hour)?day+"T"+hour+":00+05:30":null;
+ const istDay=(v:string)=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(v?new Date(v):new Date());
  const byCampaign=new Map((launches??[]).map(l=>[l.campaign_id,l.provider_status]));
  const display=(c:Campaign)=>campaignDisplayStatus(c.status,c.historical_read_only?"completed":byCampaign.get(c.id));
  const statusCounts=new Map(campaignStatuses.map(status=>[status,campaigns.filter(c=>display(c)===status).length]));
@@ -79,7 +114,7 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
  const statuses:readonly string[]=campaignStatuses;
  const selectedStatus=statuses.includes(status)?status:"";
  const viewId=typeof filters.view==="string"&&/^[a-f0-9-]{36}$/i.test(filters.view)?filters.view:"";
- const shown=campaigns.filter(c=>(!q||c.name.toLowerCase().includes(q.toLowerCase())||c.id.toLowerCase().includes(q.toLowerCase())||(itUser&&nameFor(c.dealership_id).toLowerCase().includes(q.toLowerCase())))&&(!selectedStatus||display(c)===selectedStatus)&&(!from||c.created_at.slice(0,10)>=from)&&(!to||c.created_at.slice(0,10)<=to));
+ const shown=campaigns.filter(c=>(!q||c.name.toLowerCase().includes(q.toLowerCase())||c.id.toLowerCase().includes(q.toLowerCase())||(itUser&&nameFor(c.dealership_id).toLowerCase().includes(q.toLowerCase())))&&(!selectedStatus||display(c)===selectedStatus)&&(!from||istDay(c.created_at)>=from)&&(!to||istDay(c.created_at)<=to));
  const permitted=canCreateCampaign(membership.role);
  const canOperate=itUser;
  const filtered=!!(q||selectedStatus||from||to||selectedDealer);
@@ -101,7 +136,7 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
      </div>
     </AutoCampaignFilters>
    </div>
-   {shown.length?<div className="fc-tablewrap"><table className={"crm-table fc-full-campaign-table"+(!itUser?" fc-dealer-campaign-table":"")}><colgroup><col/>{itUser&&<col/>}<col/><col/><col/></colgroup><thead><tr><th>Campaign</th>{itUser&&<th>Dealership</th>}<th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>{shown.map(c=><tr key={c.id}><td><strong>{c.name}</strong><div className="fc-row-id">#{c.id.slice(0,8)}</div></td>{itUser&&<td>{nameFor(c.dealership_id)}</td>}<td><span className={`status-pill campaign-status-badge campaign-status-${display(c).toLowerCase()}`}>{display(c)}</span></td><td><time className="fc-created-datetime" dateTime={c.created_at} title="Indian Standard Time"><span>{new Date(c.created_at).toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"Asia/Kolkata"})}</span><span className="fc-created-time">{new Date(c.created_at).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:true,timeZone:"Asia/Kolkata"}).toLowerCase()}</span></time></td><td>{c.historical_read_only?<div className="fc-row-actions"><Link className="fc-review-start" href="/reports"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M4 20h16M7 16v-5m5 5V5m5 11V8" strokeLinecap="round"/></svg> View Reports</Link></div>:canOperate?<div className="fc-row-actions"><Link className="fc-review-start" href={"/campaigns/"+c.id+"/outbound"}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M9 12l3 3 7-8M19 12v7H5V5h10"/></svg> Review / Start</Link></div>:<CampaignDetailsPopup name={c.name} dealership={membership.dealerships?.name??"Assigned dealership"} status={display(c)} created={formatDate(c.created_at)} approved={c.approved_at?formatDate(c.approved_at):"Not approved"} autoOpen={viewId===c.id}/>}</td></tr>)}</tbody></table><p className="fc-list-count">Showing {shown.length} of {total} campaigns</p></div>:
+   {shown.length?<div className="fc-tablewrap"><table className={"crm-table fc-full-campaign-table"+(!itUser?" fc-dealer-campaign-table":"")}><thead><tr><th>Campaign</th>{itUser&&<th>Dealership</th>}{itUser&&<th>AI Agent</th>}<th>Status</th><th>Customers</th>{!itUser&&<><th>Attempted</th><th>Connected</th><th>Pending*</th><th>Appointment Requests</th><th>Callback Requests</th></>}<th>Progress</th><th>Created At (IST)</th><th>Start Date &amp; Time</th><th>End Date &amp; Time</th><th>Actions</th></tr></thead><tbody>{shown.map(c=>{const config=configs.get(c.id),schedule=config?.schedule,launch=launchByCampaign.get(c.id),needsReview=launch?.state==="needs_reconciliation",count=batches.get(c.id),recorded=attempts.get(c.id)?.size??0,percent=count&&recorded<=count?Math.round(recorded/count*100):null,agent=agentSnapshot.find(a=>a.id===config?.agent_label)?.name??config?.agent_label;const action=needsReview?"Resolve Issue":display(c)==="Ongoing"?"View Progress":display(c)==="Complete"?"View Details":display(c)==="Hold"?"Review / Resume":display(c)==="Reject"?"View Details":"Review / Start";return <tr key={c.id}><td><strong>{c.name}</strong><div className="fc-row-id">#{c.id.slice(0,8)}</div></td>{itUser&&<td>{nameFor(c.dealership_id)}</td>}{itUser&&<td><strong>{agent??"—"}</strong><div className="fc-row-id">{config?.agent_version_label?"Version "+config.agent_version_label:"—"}</div></td>}<td><span className={needsReview?"fc-needs-review":`status-pill campaign-status-badge campaign-status-${display(c).toLowerCase()}`}>{needsReview?"Needs Review":display(c)}</span></td><td>{count??"—"}</td>{!itUser&&<><td>{attempted.get(c.id)?.size??(count!==undefined&&!launch?0:"—")}</td><td>{connected.get(c.id)?.size??(attempted.has(c.id)||count!==undefined&&!launch?0:"—")}</td><td>{count!==undefined&&attempted.has(c.id)&&attempted.get(c.id)!.size<=count?count-attempted.get(c.id)!.size:count!==undefined&&!launch?count:"—"}</td><td>{appointments.get(c.id)?.size??(attempted.has(c.id)||count!==undefined&&!launch?0:"—")}</td><td>{callbacks.get(c.id)?.size??(attempted.has(c.id)||count!==undefined&&!launch?0:"—")}</td></>}<td>{percent===null?<span>—</span>:<div className="fc-progress" title="Unique numbers with recorded ended calls / eligible recipients; not provider completion"><span>{recorded}/{count} · {percent}%</span><progress max={100} value={percent}/><small>Recorded calls</small></div>}</td><td>{dateTime(c.created_at)}</td><td>{schedule?.start_mode==="now"?<span>On confirmed launch</span>:dateTime(scheduled(schedule?.start,schedule?.from))}</td><td>{dateTime(scheduled(schedule?.end,schedule?.to))}</td><td>{c.historical_read_only?<div className="fc-row-actions"><Link className="fc-review-start" href="/reports">View Reports</Link></div>:canOperate?<div className="fc-row-actions"><Link className="fc-review-start" href={"/campaigns/"+c.id+"/outbound"}>{needsReview?"View Issue":action}</Link></div>:<CampaignDetailsPopup name={c.name} dealership={membership.dealerships?.name??"Assigned dealership"} status={display(c)} created={new Date(c.created_at).toLocaleString("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"short"})+" IST"} approved={c.approved_at?new Date(c.approved_at).toLocaleString("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"medium",timeStyle:"short"})+" IST":"Not approved"} autoOpen={viewId===c.id}/>}</td></tr>})}</tbody></table>{!itUser&&<p className="fc-list-count">* Pending = eligible records minus unique recorded attempts. Counts reflect stored call records, not live provider totals. Appointment and callback counts represent requests, not confirmed bookings.</p>}<p className="fc-list-count">Showing {shown.length} of {total} campaigns</p></div>:
    <EmptyState kind="campaigns" title={filtered?"No matching campaigns":"No campaigns yet"} description={filtered?"Try another search, status, or date range.":"Your campaigns will appear here once created."} action={filtered?<Link href="/campaigns">Clear filters</Link>:permitted?<Link href="/campaigns/new">Create Campaign</Link>:undefined}/>}
   </section>
  </div>;
