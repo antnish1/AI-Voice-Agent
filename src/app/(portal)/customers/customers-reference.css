@@ -294,3 +294,29 @@
 
 /* Preserve main removal of selection column; center customer heading and values per latest request. */
 :root .crm-app .customers-reference .customers-records-table :is(th,td):first-child{width:auto;min-width:180px;text-align:center!important}
+
+.customers-consent-tag.customer-contact-unconnected{background:#fff3da;color:#805000}.customers-consent-tag.customer-contact-unattempted{background:#eef1f5;color:#475569}
+
+.crm-app .customers-reference .customers-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:12px}
+.crm-app .customers-reference .customer-rich-card{display:flex;flex-direction:column;gap:10px;padding:15px;min-width:0;border:1px solid #dce4ed;border-radius:12px;transition:box-shadow .18s ease,transform .18s ease}
+.crm-app .customers-reference .customer-rich-card:hover{box-shadow:0 4px 14px #18345012;transform:translateY(-2px)}
+.customer-card-head{display:flex;gap:10px;align-items:center;min-width:0}
+.customer-card-identity{display:grid;gap:3px;flex:1;min-width:0;overflow-wrap:anywhere}
+.customer-card-identity small,.customer-card-vehicle small,.customer-card-line small,.customer-card-metrics small{color:#64748b;font-size:11px;font-weight:400}
+.customer-card-menu{position:relative;flex:none}
+.customer-card-menu summary{list-style:none;cursor:pointer;padding:4px 10px;font-size:23px;line-height:24px;border-radius:6px}
+.customer-card-menu summary::-webkit-details-marker{display:none}
+.customer-card-menu>div{position:absolute;right:0;top:100%;z-index:25;min-width:200px;background:#fff;border:1px solid #dce4ed;border-radius:9px;padding:5px;box-shadow:0 8px 24px #17294122}
+.crm-app .customers-reference .customer-card-menu button{display:block;text-align:left;width:100%;background:transparent!important;color:#24364e!important;border:0;padding:8px;font-size:12px;border-radius:5px;white-space:nowrap}
+.crm-app .customers-reference .customer-card-menu button:hover:not(:disabled){background:#edf2f7!important}
+.crm-app .customers-reference .customer-card-menu button:disabled{opacity:.45;cursor:not-allowed}
+.customer-card-vehicle{display:grid;gap:3px;background:#f5f7fa;border-radius:8px;padding:10px;overflow-wrap:anywhere}
+.customer-card-line{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px}
+.customer-card-line strong{text-align:right;overflow-wrap:anywhere;font-size:12px}
+.customer-card-metrics{display:grid;grid-template-columns:1fr 1.5fr;gap:8px}
+.customer-card-metrics>div{display:grid;gap:5px;padding:9px;border:1px solid #e3e9f0;border-radius:8px;min-width:0}
+.customer-card-metrics strong{font-size:12px}
+.crm-app .customers-reference .customer-card-view{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin-top:auto;background:#142d4e!important;color:white!important;border-radius:7px;padding:9px}
+@media(max-width:1050px){.crm-app .customers-reference .customers-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.crm-app .customers-reference .customers-card-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.crm-app .customers-reference .customer-rich-card{transition:none;transform:none}}
