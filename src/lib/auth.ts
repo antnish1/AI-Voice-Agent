@@ -1,4 +1,5 @@
 import "server-only";
+import {cache} from "react";
 import { redirect } from "next/navigation";
 import {cookies} from "next/headers";
 import { createClient } from "@/lib/supabase/server";
@@ -7,16 +8,16 @@ export const ROLES = ["super_admin", "dealership_manager", "crm_executive", "ser
 export type Role = typeof ROLES[number];
 export type Membership = { dealership_id: string; role: Role; dealerships: { name: string } | null };
 
-export async function requireUser() {
+export const requireUser=cache(async function requireUser() {
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) redirect("/login");
   if(user.app_metadata?.frontvox_account_state==="disabled"||user.app_metadata?.frontvox_account_state==="archived") redirect("/login");
   if(user.app_metadata?.must_change_password === true) redirect("/change-password");
   return { supabase, user };
-}
+});
 
-export async function requireMembership(dealershipId?: string) {
+export const requireMembership=cache(async function requireMembership(dealershipId?: string) {
   const { supabase, user } = await requireUser();
   const { data, error } = await supabase.from("memberships").select("dealership_id, role, dealerships(name)").eq("user_id", user.id);
   if (error) throw new Error("Unable to load dealership access.");
@@ -34,7 +35,7 @@ export async function requireMembership(dealershipId?: string) {
   }
   if (!membership) return { supabase, user, membership: null, memberships };
   return { supabase, user, membership, memberships };
-}
+});
 
 export function canPrepare(role: Role) { return role === "super_admin"; }
 export function canApprove(role: Role) { return role === "super_admin"; }
