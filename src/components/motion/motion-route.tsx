@@ -11,11 +11,11 @@ export function MotionRoute({children}:{children:ReactNode}) {
   const pathname=usePathname();
   const reduce=!usePremiumMotion();
   return <MotionConfig reducedMotion="user" transition={{duration:motionTokens.duration.standard,ease:motionTokens.ease}}>
-    <AnimatePresence initial={true} mode="wait">
+    <AnimatePresence initial={false} mode="popLayout">
       <motion.div key={pathname} className="frontier-motion-route"
         initial={reduce?false:routeVariants.initial}
         animate={reduce?{opacity:1}:routeVariants.enter}
-        exit={reduce?{opacity:1}:routeVariants.exit}
+        exit={{opacity:1,transition:{duration:0}}}
         transition={{duration:reduce?0:motionTokens.duration.route,ease:motionTokens.ease}}
       >
         <MotionEnhancements route={pathname} enabled={!reduce}/>
