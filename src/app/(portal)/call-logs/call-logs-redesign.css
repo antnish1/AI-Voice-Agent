@@ -174,21 +174,24 @@
   border-top:1px solid #e3e7ed;
 }
 
-/* Statuses are informational badges; animate subtly on hover without a pointer cursor. */
+/* Continuous strong shrink for informational call status badges; no layout shift. */
+@keyframes calllogs-status-high-shrink{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(.75)}
+}
 .crm-app .calllogs-reference .calllogs-expanded-table .calllogs-badge-shrink{
   display:inline-flex;align-items:center;justify-content:center;
-  transform:scale(1);
-  transform-origin:center;
-  transition:transform 150ms ease-out;
-  cursor:default;
+  transform-origin:center;cursor:default;
 }
-@media(hover:hover) and (prefers-reduced-motion:no-preference){
-  .crm-app .calllogs-reference .calllogs-expanded-table .calllogs-badge-shrink:hover{
-    transform:scale(.95);
+@media(prefers-reduced-motion:no-preference){
+  .crm-app .calllogs-reference .calllogs-expanded-table .calllogs-badge-shrink{
+    animation:calllogs-status-high-shrink 1.8s ease-in-out infinite;
   }
 }
 @media(prefers-reduced-motion:reduce){
-  .crm-app .calllogs-reference .calllogs-expanded-table .calllogs-badge-shrink{transition:none;transform:none!important}
+  .crm-app .calllogs-reference .calllogs-expanded-table .calllogs-badge-shrink{
+    animation:none!important;transition:none!important;transform:none!important;
+  }
 }
 :root[data-theme="dark"] .crm-app .calllogs-reference .calllogs-ref-heading,
 :root[data-theme="dark"] .crm-app .calllogs-reference .calllogs-records-card,
