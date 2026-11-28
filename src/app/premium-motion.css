@@ -76,3 +76,8 @@
  @starting-style{:root[data-motion-preference="premium"] dialog[open]::backdrop{opacity:0}}
 }
 @media(prefers-reduced-motion:reduce){:root[data-motion-preference="premium"] dialog,:root[data-motion-preference="premium"] dialog::backdrop{transition:none!important}}
+
+/* Keep native menus native; custom menus and dialog exits respect motion preference. */
+@media(prefers-reduced-motion:reduce){.premium-top-nav-indicator{transition:none!important}}
+:root[data-motion-preference="premium"] .customer-profile-portal-root .customers-modal{animation:premium-dialog 220ms var(--premium-motion-ease) both}
+:root:is([data-motion-preference="minimal"],[data-motion-preference="off"]) .customer-profile-portal-root *{animation:none!important;transition-duration:0ms!important}

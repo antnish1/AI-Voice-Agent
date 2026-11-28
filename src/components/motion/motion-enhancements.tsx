@@ -52,9 +52,9 @@ export function MotionEnhancements({route,enabled}:{route:string;enabled:boolean
       parent.querySelectorAll<HTMLElement>(elevation).forEach(el=>el.classList.add("frontier-motion-lift"));
     };
     register();
-    let frame=0;const mutation=new MutationObserver(()=>{if(!frame)frame=requestAnimationFrame(()=>{frame=0;register();});});
-    mutation.observe(parent,{childList:true,subtree:true});
-    return ()=>{observer?.disconnect();mutation.disconnect();if(frame)cancelAnimationFrame(frame);parent.querySelectorAll<HTMLElement>("[data-motion-ready]").forEach(el=>{el.dataset.motionVisible="true";});};
+    let frame=0;const changed=new Set<HTMLElement>();const mutation=new MutationObserver(records=>{for(const record of records){const node=record.target instanceof Element?record.target:record.target.parentElement;const surface=node?.closest<HTMLElement>("tbody,.customers-card-grid,.reports-ref-donut,.calllogs-donut,.ref-chart-bars");if(surface&&parent.contains(surface))changed.add(surface);}if(!frame)frame=requestAnimationFrame(()=>{frame=0;register();for(const surface of changed){if(!surface.isConnected)continue;surface.getAnimations().filter(a=>a.id==="frontier-filter-update").forEach(a=>a.cancel());const animation=surface.animate([{opacity:.82},{opacity:1}],{duration:180,easing:"ease-out"});animation.id="frontier-filter-update";}changed.clear();});});
+    mutation.observe(parent,{childList:true,subtree:true,characterData:true});
+    return ()=>{observer?.disconnect();mutation.disconnect();if(frame)cancelAnimationFrame(frame);parent.querySelectorAll("tbody,.customers-card-grid,.reports-ref-donut,.calllogs-donut,.ref-chart-bars").forEach(el=>el.getAnimations().filter(a=>a.id==="frontier-filter-update").forEach(a=>a.cancel()));parent.querySelectorAll<HTMLElement>("[data-motion-ready]").forEach(el=>{el.dataset.motionVisible="true";});};
   },[route,enabled]);
   return null;
 }
