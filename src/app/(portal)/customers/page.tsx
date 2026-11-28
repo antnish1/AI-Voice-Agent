@@ -60,6 +60,7 @@ export default async function Customers({searchParams}:{searchParams:Promise<{q?
   supabase.from("dealerships").select("name").eq("id",id).maybeSingle()
  ]);
  if(detailCalls.error||detailCallbacks.error||dealer.error)throw Error("Unable to load customer profile details.");
+ const {data:staffRemarks,error:staffRemarkError}=customerIds.length?await supabase.from("customer_staff_remarks").select("customer_id,body,created_at").eq("dealership_id",id).in("customer_id",customerIds).order("created_at",{ascending:false}).limit(500):{data:[],error:null};
  const scalar=(v:unknown)=>typeof v==="string"?v.trim().slice(0,2000):typeof v==="number"||typeof v==="boolean"?String(v):"";
  const records=customers.map(c=>{
   const history=(detailCalls.data??[]).filter(x=>x.customer_id===c.id);
@@ -70,7 +71,7 @@ export default async function Customers({searchParams}:{searchParams:Promise<{q?
   const ownCalls=calls.filter(x=>x.customer_id===c.id);
   // Contact history is independent of calling consent and suppression.
   const contactStatus=ownCalls.some(x=>x.status==="answered")?"Contacted":ownCalls.length?"Not Connected":"Not Attempted";
-  return {...c,contactStatus,source:sourceById.get(c.id)??(latest.has(c.id)?"Sarvam":"Unknown"),lastContacted:ownCalls.filter(x=>x.status==="answered").map(x=>x.started_at??"").sort().at(-1)??null,campaign:latest.get(c.id)?.sarvam_campaign_id??null,
+  return {...c,staffRemarksAvailable:!staffRemarkError,staffRemarks:(staffRemarks??[]).filter(x=>x.customer_id===c.id).slice(0,10).map(x=>({body:x.body,createdAt:x.created_at})),contactStatus,source:sourceById.get(c.id)??(latest.has(c.id)?"Sarvam":"Unknown"),lastContacted:ownCalls.filter(x=>x.status==="answered").map(x=>x.started_at??"").sort().at(-1)??null,campaign:latest.get(c.id)?.sarvam_campaign_id??null,
    dealership:dealer.data?.name??null,vehicleModel:pick("vehicle_model","Model","Vehicle Model"),registration:pick("registration_number","Reg. Number","Registration Number"),lastService:pick("last_service_date","Last ServiceDate"),serviceDue:pick("next_service_due_date","Service DueDate"),serviceType:pick("service_type","Service Type"),mileage:pick("last_reported_mileage","Last Reported Mileage"),warranty:pick("warranty_active"),address:pick("customer_address"),remarks:scalar(lastFields.customer_remarks)||scalar(lastFields.call_summary)||null,lastOutcome:scalar(lastFields.call_disposition)||last?.status||null,attempts:ownCalls.length,followup:callback?.requested_at??null,followupStatus:callback?.status??null,
    callHistory:history.slice(0,10).map(x=>({date:x.started_at,status:x.status,duration:x.duration_seconds,outcome:scalar((x.output_variables as Record<string,unknown>|null)?.call_disposition)||null}))};
  });
