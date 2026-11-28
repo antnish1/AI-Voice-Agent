@@ -764,3 +764,38 @@ dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:bl
  padding-top:0;min-height:80px;display:flex;flex-direction:column;justify-content:center;align-self:flex-start;box-sizing:border-box;
 }
 @media(max-width:700px){.crm-app .agent-directory .agent-preview-card .agent-card-copy{min-height:74px;padding-top:0}}
+
+/* Compact directory cards: natural content height and a separate badge row. */
+.crm-app .agent-directory>.agent-card-grid,
+.crm-app .agent-directory>.agent-card-grid:has(> .agent-preview-card:nth-child(4)){
+ flex:0 0 auto;align-content:start;grid-auto-rows:auto;
+}
+.crm-app .agent-directory .agent-card-grid>.agent-preview-card{
+ min-height:150px;height:auto;padding:10px 12px;gap:0;justify-content:flex-start;
+}
+.crm-app .agent-directory .agent-preview-card .agent-card-status{
+ position:static;max-width:100%;min-height:20px;margin:0 0 3px;align-items:flex-end;
+}
+.crm-app .agent-directory .agent-preview-card>.agent-current-inline,
+:root[data-theme="dark"] .crm-app .agent-directory .agent-preview-card>.agent-current-inline{
+ background:#07865d!important;border-color:#07865d!important;color:#fff!important;
+}
+.crm-app .agent-directory .agent-preview-card .agent-card-content{
+ flex:0 0 auto;min-height:84px;align-items:center;gap:9px;
+}
+.crm-app .agent-directory .agent-preview-card .agent-card-copy{
+ min-height:0;padding-top:0;align-self:center;
+}
+.crm-app .agent-directory .agent-preview-card .agent-card-actions{
+ margin-top:7px;padding-top:0;flex:0 0 auto;
+}
+.crm-app .agent-directory .agent-stat-card.agent-tone-green .agent-stat-icon{
+ color:#07865d!important;background:transparent!important;box-shadow:none!important;
+}
+.crm-app .agent-directory .agent-stat-card.agent-tone-green .agent-stat-icon img{
+ display:block;object-fit:contain;
+}
+@media(max-width:480px){
+ .crm-app .agent-directory .agent-current-card .agent-card-status{min-height:38px}
+ .crm-app .agent-directory .agent-card-grid>.agent-preview-card{min-height:146px}
+}
