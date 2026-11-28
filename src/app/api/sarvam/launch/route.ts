@@ -31,6 +31,9 @@ export async function POST(request:Request){
      setup.agent_label!==agent||setup.agent_version_label!==String(version)||
      setup.telephony_label!==connection||normalizePhone(setup.outgoing_number_label??"")!==sender)
    return NextResponse.json({error:"Agent, committed version, connection and caller number must exactly match the approved campaign draft."},{status:400});
+  const {data:global,error:globalError}=await supabase.from("global_voice_defaults").select("agent_id,app_version,connection_id,caller_number,active").eq("singleton",true).maybeSingle();
+  if(globalError||!global?.active)return NextResponse.json({error:"Global voice defaults are unavailable or inactive. Ask IT to check Voice Agent Defaults."},{status:409});
+  if(global.agent_id!==agent||global.app_version!==version||global.connection_id!==connection||normalizePhone(global.caller_number)!==sender)return NextResponse.json({error:"Voice defaults changed. Refresh the campaign configuration and review the latest version before starting."},{status:409});
   const schedule=setup.schedule;
   const approvedStart=new Date((schedule?.start??"")+"T"+(schedule?.from??"")+":00+05:30"),end=new Date((schedule?.end??"")+"T"+(schedule?.to??"")+":00+05:30");
   const start=new Date(Math.max(approvedStart.getTime(),schedule?.start_mode==="now"?Date.now()+120000:approvedStart.getTime()));

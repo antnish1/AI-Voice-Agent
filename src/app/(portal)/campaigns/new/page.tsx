@@ -13,10 +13,9 @@ export default async function NewCampaign(){
  const [{data:dealers,error},{data:profiles,error:profileError}]=await Promise.all([
   it?supabase.from("dealerships").select("id,name").order("name"):
      supabase.from("dealerships").select("id,name").eq("id",id),
-  it?supabase.from("dealership_voice_profiles").select("dealership_id,active"):
-     supabase.from("dealership_voice_profiles").select("dealership_id,active").eq("dealership_id",id)
+  supabase.from("global_voice_defaults").select("active").eq("singleton",true).maybeSingle()
  ]);
  if(error||profileError||!dealers?.length)throw Error("Could not load your dealership profile.");
- const options=dealers.map(d=>({...d,configured:profiles?.some(p=>p.dealership_id===d.id&&p.active)??false}));
+ const options=dealers.map(d=>({...d,configured:profiles?.active??false}));
  return <><Campaigns/><CampaignWizard dealerships={options} initialDealershipId={id} canOpenOutbound={it}/></>;
 }
