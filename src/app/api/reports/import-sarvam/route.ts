@@ -22,11 +22,7 @@ export async function POST(request:Request){
   const linked=await admin.from("voice_campaign_links").select("dealership_id,agent_id").eq("sarvam_campaign_id",campaign).limit(2);
   if(linked.error)return reply({error:"Campaign validation unavailable."},503);
   if(linked.data?.length){if(linked.data.length!==1||linked.data[0].dealership_id!==dealer||linked.data[0].agent_id!==agent)return reply({error:"Campaign/agent belongs to a different scope."},409);}
-  else {
-   const history=await admin.from("voice_call_records").select("dealership_id,agent_id").eq("sarvam_campaign_id",campaign).limit(501);
-   if(history.error)return reply({error:"Historical campaign validation unavailable."},503);
-   if(!history.data?.length||history.data.length>500||history.data.some(r=>r.dealership_id!==dealer||r.agent_id!==agent))return reply({error:"Campaign is not verified for this dealership. Link the campaign before importing."},409);
-  }
+  else return reply({error:"Campaign is not linked to the CRM. Create a verified campaign mapping before importing."},409);
  }
  const ids=parsed.map(r=>r.interaction);
  const existing=await admin.from("voice_call_records").select("sarvam_interaction_id").eq("dealership_id",dealer).in("sarvam_interaction_id",ids);
