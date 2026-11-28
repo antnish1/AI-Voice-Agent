@@ -320,3 +320,242 @@
 @media(max-width:1050px){.crm-app .customers-reference .customers-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.crm-app .customers-reference .customers-card-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.crm-app .customers-reference .customer-rich-card{transition:none;transform:none}}
+
+
+/* Compact Customer Details dialog only; no changes to other customer modals. */
+.crm-app .customers-reference .customers-modal.customer-profile-modal{
+  display:flex;flex-direction:column;
+  box-sizing:border-box;
+  width:min(870px,calc(100vw - 32px))!important;
+  max-width:870px!important;
+  max-height:min(85dvh,850px)!important;
+  padding:0!important;overflow:hidden!important;
+  border-radius:15px!important;
+  background:#fff;
+}
+.crm-app .customers-reference .customer-profile-modal .customer-profile-header{
+  position:relative;z-index:1;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin:0;padding:13px 16px!important;min-height:60px;
+  background:#fff;border-bottom:1px solid #e2e8f0;
+}
+.crm-app .customers-reference .customer-profile-heading{
+  display:flex;align-items:center;gap:10px;min-width:0;
+}
+.crm-app .customers-reference .customer-profile-heading-icon{
+  display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;
+  background:#fff1f2;color:#d71920;border-radius:10px;
+}
+.crm-app .customers-reference .customer-profile-heading h2{
+  margin:0;font-size:17px;font-weight:700;line-height:1.25;color:#15243b;
+}
+.crm-app .customers-reference .customer-profile-heading p{
+  margin:3px 0 0;color:#64748b;font-size:11px;line-height:1.35;
+}
+.crm-app .customers-reference .customer-profile-modal .customer-profile-close{
+  display:grid;place-items:center;flex:0 0 32px;
+  width:32px;height:32px;min-width:32px;min-height:32px;
+  padding:0!important;margin:0;border-radius:50%;
+  border:1px solid #e1e7ef;background:#f8fafc;color:#24364d;
+  font-size:22px;line-height:1;cursor:pointer;
+}
+.crm-app .customers-reference .customer-profile-modal .customer-profile-close:hover{
+  background:#fff1f2;color:#c8102e;border-color:#f7ccd1;
+}
+.crm-app .customers-reference .customer-profile-body{
+  min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;
+  padding:12px 16px 10px;
+}
+.crm-app .customers-reference .customer-profile-identity{
+  display:flex;align-items:center;gap:10px;min-width:0;
+  padding:0 0 11px;margin-bottom:11px;border-bottom:1px solid #e7ecf3;
+}
+.crm-app .customers-reference .customer-profile-avatar{
+  display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;
+  background:#fee2e2;color:#be123c;font-size:16px;font-weight:750;border-radius:50%;
+}
+.crm-app .customers-reference .customer-profile-name{
+  display:flex;flex-direction:column;gap:3px;min-width:0;flex:1 1 auto;
+}
+.crm-app .customers-reference .customer-profile-name strong{
+  font-size:13px;line-height:1.35;color:#172b48;overflow-wrap:anywhere;
+}
+.crm-app .customers-reference .customer-profile-name span{
+  color:#60728b;font-size:11px;overflow-wrap:anywhere;
+}
+.crm-app .customers-reference .customer-profile-dnc{
+  flex:none;background:#eefbf5;color:#087a54;border-radius:999px;
+  font-size:10px;font-weight:700;padding:5px 9px;white-space:nowrap;
+}
+.crm-app .customers-reference .customer-profile-dnc.is-dnc{
+  background:#fff1f2;color:#bb2432;
+}
+.crm-app .customers-reference .customer-profile-sections{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;margin:0;
+}
+.crm-app .customers-reference .customer-profile-sections>.customer-profile-group{
+  min-width:0;margin:0;padding:11px 12px;
+  border:1px solid #e2e8f0;border-radius:11px;background:#fff;
+}
+.crm-app .customers-reference .customer-profile-sections>.customer-profile-group-followup,
+.crm-app .customers-reference .customer-profile-sections>.customer-profile-history{
+  grid-column:1/-1;
+}
+.crm-app .customers-reference .customer-profile-group h3{
+  display:flex;align-items:center;gap:7px;
+  margin:0 0 8px;font-size:12px;line-height:1.35;font-weight:700;
+  color:#18365a;
+}
+.crm-app .customers-reference .customer-profile-group h3 svg{
+  color:#d71920;flex:0 0 auto;
+}
+.crm-app .customers-reference .customer-profile-group .customers-detail-list{
+  display:block;margin:0;
+}
+.crm-app .customers-reference .customer-profile-group .customers-detail-list>div{
+  display:grid;grid-template-columns:minmax(110px,41%) minmax(0,1fr);
+  align-items:start;gap:10px;min-height:27px;
+  padding:5px 0;border-bottom:1px solid #edf1f6;
+}
+.crm-app .customers-reference .customer-profile-group .customers-detail-list>div:last-child{
+  border-bottom:0;
+}
+.crm-app .customers-reference .customer-profile-group .customers-detail-list dt,
+.crm-app .customers-reference .customer-profile-group .customers-detail-list dd{
+  margin:0;font-size:11px;line-height:1.45;
+}
+.crm-app .customers-reference .customer-profile-group .customers-detail-list dt{
+  color:#66758a;font-weight:500;
+}
+.crm-app .customers-reference .customer-profile-group .customers-detail-list dd{
+  color:#27384e;font-weight:600;text-align:right;
+  overflow-wrap:anywhere;white-space:normal;min-width:0;
+}
+.crm-app .customers-reference .customer-profile-group-followup .customers-detail-list{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;
+}
+.crm-app .customers-reference .customer-profile-group-followup .customers-detail-list>div{
+  display:flex;flex-direction:column;gap:4px;
+  min-height:0;padding:8px 9px;border:0;border-radius:8px;
+  background:#f7f9fc;
+}
+.crm-app .customers-reference .customer-profile-group-followup .customers-detail-list dd{
+  text-align:left;
+}
+.crm-app .customers-reference .customer-profile-history-count{
+  font-size:10px;color:#718096;font-weight:500;margin-left:auto;
+}
+.crm-app .customers-reference .customer-profile-history .tablewrap{
+  max-height:190px;overflow:auto;border:1px solid #e7ebf1;border-radius:8px;
+}
+.crm-app .customers-reference .customer-profile-history .customers-data-table{
+  width:100%;margin:0;
+}
+.crm-app .customers-reference .customer-profile-history .customers-data-table :is(th,td){
+  padding:7px 9px;font-size:11px;line-height:1.35;
+}
+.crm-app .customers-reference .customer-profile-history .customers-data-table thead th{
+  background:#f1f3f6;
+}
+.crm-app .customers-reference .customer-profile-no-calls{
+  margin:5px 0;font-size:11px;color:#64748b;
+}
+.crm-app .customers-reference .customer-profile-data-note{
+  margin:8px 0 0;font-size:10px;line-height:1.45;
+}
+.crm-app .customers-reference .customer-profile-footer{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  flex:0 0 auto;margin:0;padding:10px 16px;
+  background:#fff;border-top:1px solid #e2e8f0;
+}
+.crm-app .customers-reference .customer-profile-call-link{
+  display:inline-flex;align-items:center;gap:7px;
+  color:#173c68;font-size:11px;font-weight:600;text-decoration:none;
+}
+.crm-app .customers-reference .customer-profile-call-link:hover{
+  color:#d71920;text-decoration:underline;
+}
+.crm-app .customers-reference .customer-profile-footer .customers-modal-done{
+  margin:0;min-width:75px;padding:8px 13px;border-radius:8px;
+  background:#142d4e;color:#fff;font-size:11px;font-weight:650;
+}
+@media(max-width:650px){
+  .crm-app .customers-reference .customers-modal.customer-profile-modal{
+    width:calc(100vw - 20px)!important;max-height:90dvh!important;
+  }
+  .crm-app .customers-reference .customer-profile-body{padding:10px}
+  .crm-app .customers-reference .customer-profile-sections{grid-template-columns:minmax(0,1fr)}
+  .crm-app .customers-reference .customer-profile-sections>.customer-profile-group{grid-column:1}
+  .crm-app .customers-reference .customer-profile-group-followup .customers-detail-list{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .crm-app .customers-reference .customer-profile-identity{flex-wrap:wrap}
+  .crm-app .customers-reference .customer-profile-dnc{margin-left:48px}
+  .crm-app .customers-reference .customer-profile-footer{
+    flex-wrap:wrap;justify-content:flex-end;padding:10px;
+  }
+  .crm-app .customers-reference .customer-profile-call-link{margin-right:auto}
+}
+@media(max-width:400px){
+  .crm-app .customers-reference .customer-profile-group-followup .customers-detail-list{grid-template-columns:1fr}
+}
+:root[data-theme="dark"] .crm-app .customers-reference .customers-modal.customer-profile-modal,
+:root[data-theme="dark"] .crm-app .customers-reference .customer-profile-modal :is(.customer-profile-header,.customer-profile-footer,.customer-profile-group){
+  background:#1a2a41;color:#eef4fc;border-color:#3c5068;
+}
+:root[data-theme="dark"] .crm-app .customers-reference .customer-profile-group .customers-detail-list dd,
+:root[data-theme="dark"] .crm-app .customers-reference .customer-profile-heading h2,
+:root[data-theme="dark"] .crm-app .customers-reference .customer-profile-name strong,
+:root[data-theme="dark"] .crm-app .customers-reference .customer-profile-group h3{color:#edf4fc}
+:root[data-theme="dark"] .crm-app .customers-reference .customer-profile-group-followup .customers-detail-list>div{
+  background:#243951;
+}
+
+
+/* Customer Details viewport layer: render outside scrollable/transform parents. */
+.crm-app.customer-profile-portal-root,
+.crm-app .customers-reference.customer-profile-portal-scope{
+  display:contents!important;
+}
+.crm-app .customers-reference.customer-profile-portal-scope{
+  isolation:auto!important;
+  padding:0!important;margin:0!important;
+  background:transparent!important;
+  border:0!important;
+}
+.crm-app .customer-profile-viewport.customers-modal-backdrop{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;height:100dvh!important;
+  box-sizing:border-box!important;
+  z-index:10000!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  margin:0!important;padding:16px!important;
+  overflow-y:auto;overscroll-behavior:contain;
+  background:rgba(19,42,69,.55);
+}
+.crm-app .customer-profile-viewport .customer-profile-modal{
+  flex:0 1 870px;min-width:0;
+  max-height:calc(100dvh - 32px)!important;
+  min-height:0;
+  margin:auto!important;
+  overflow:hidden!important;
+}
+.crm-app .customer-profile-viewport .customer-profile-modal .customer-profile-header,
+.crm-app .customer-profile-viewport .customer-profile-modal .customer-profile-footer{
+  flex-shrink:0;
+}
+.crm-app .customer-profile-viewport .customer-profile-modal .customer-profile-body{
+  flex:1 1 auto;min-height:0;overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+}
+@media(max-width:650px){
+  .crm-app .customer-profile-viewport.customers-modal-backdrop{
+    padding:10px!important;
+  }
+  .crm-app .customer-profile-viewport .customer-profile-modal{
+    max-height:calc(100dvh - 20px)!important;
+  }
+}
