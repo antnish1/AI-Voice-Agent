@@ -299,3 +299,13 @@
  flex-shrink:0;
  stroke:currentColor;
 }
+
+/* Shared notification control: icon only, without colored button surface. */
+@layer notification-button-surface {
+ :root .crm-app .frontier-notification-wrap>button.frontier-notification-button{
+  background:transparent!important;background-color:transparent!important;background-image:none!important;border-color:transparent!important;box-shadow:none!important;color:#142d4e!important;
+ }
+ :root[data-theme="dark"] .crm-app .frontier-notification-wrap>button.frontier-notification-button{color:#dbeafe!important}
+ :root .crm-app .frontier-notification-wrap>button.frontier-notification-button:focus-visible{outline:2px solid currentColor!important;outline-offset:2px}
+ :root .crm-app .frontier-notification-wrap>button.frontier-notification-button>svg{color:inherit!important;stroke:currentColor!important}
+}
