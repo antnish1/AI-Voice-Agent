@@ -275,3 +275,27 @@
  .crm-app .reports-ref .reports-ref-toolbar .reports-ref-search{max-width:none}
  .crm-app .reports-ref .reports-ref-toolbar .reports-ref-tabs{flex-wrap:nowrap;overflow-x:auto}
 }
+
+
+/* Clean white report records surfaces (light mode only); preserve status badges and dark theme. */
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-toolbar,
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-table-card,
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-table,
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-table tbody,
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-table tbody tr,
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-table tbody td{
+  background:#fff!important;background-image:none!important;
+}
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-table thead th{
+  background:#f1f3f6!important;color:#25354b;
+}
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-table tbody td{
+  border-bottom:1px solid #e2e8f0;
+}
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-table tbody tr:hover td{
+  background:#f7faff!important;
+}
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-toolbar,
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-table-card{
+  border-color:#e2e8f0;
+}
