@@ -242,3 +242,20 @@
   border-color:#40516b!important;
 }
 :root[data-theme="dark"] .crm-app .customers-reference .customers-table-header{border-bottom-color:#40516b}
+
+/* Compact customer directory and profile */
+.customer-cell-stack{display:flex;flex-direction:column;gap:3px;min-width:110px;max-width:220px}
+.customer-cell-stack small,.customer-cell-sub{display:block;color:#596678;font-size:11px;font-weight:400}
+.customer-optional-value{display:block;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.customer-columns{position:relative;font-size:12px;white-space:nowrap}
+.customer-columns summary{cursor:pointer;border:1px solid #d8e0ea;border-radius:7px;padding:8px 10px;background:white}
+.customer-columns>div{position:absolute;right:0;top:100%;z-index:30;background:white;border:1px solid #d8e0ea;border-radius:8px;padding:10px;box-shadow:0 8px 24px #17294122;min-width:185px}
+.customer-columns label{display:flex;align-items:center;gap:8px;padding:5px;color:#25364c}
+.customer-profile-modal{width:min(900px,94vw)!important;max-width:900px!important;max-height:88vh;overflow:auto}
+.customer-profile-sections{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+.customer-profile-sections>section{min-width:0;border:1px solid #e1e6ed;border-radius:9px;padding:12px}
+.customer-profile-sections>section:last-child{grid-column:1/-1}
+.customer-profile-sections h3{font-size:13px;color:#17365d;margin:0 0 8px}
+.customer-profile-sections dd{overflow-wrap:anywhere;white-space:normal}
+.customer-profile-sections .customers-detail-list{margin:0}
+@media(max-width:650px){.customer-profile-sections{grid-template-columns:1fr}.customer-profile-sections>section:last-child{grid-column:auto}}
