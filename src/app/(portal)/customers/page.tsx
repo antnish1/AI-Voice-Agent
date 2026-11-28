@@ -6,15 +6,13 @@ export default async function Customers({searchParams}:{searchParams:Promise<{q?
  const {supabase,membership}=await requireMembership();if(!membership)return null;
  const params=await searchParams;
  const query=String(params.q??"").trim().replace(/[%,()"'\\]/g,"").slice(0,80);
- const status=["unverified","verified","declined"].includes(String(params.status))?String(params.status):"all";
- const period=["7","30","90"].includes(String(params.period))?String(params.period):"all";
+ const status="all";
+ const period="all";
  const requested=Math.max(1,Math.min(100000,Number.parseInt(String(params.page??"1"),10)||1));
  const id=membership.dealership_id;
  if(canPrepare(membership.role))await reconcileMissingCampaignCustomers(supabase,id);
  const makeQuery=()=>{let q=supabase.from("customers").select("id,name,mobile,consent_status,do_not_call,created_at",{count:"exact"}).eq("dealership_id",id);
   if(query)q=q.or(`name.ilike.%${query}%,mobile.ilike.%${query}%`);
-  if(status!=="all")q=q.eq("consent_status",status);
-  if(period!=="all"){const date=new Date();date.setUTCDate(date.getUTCDate()-Number(period));q=q.gte("created_at",date.toISOString());}
   return q;
  };
  const [countResult,imports]=await Promise.all([
