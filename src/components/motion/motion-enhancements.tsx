@@ -12,28 +12,29 @@ const reveal = [
   ".page-head", ".crm-panel", ".metric-card", ".ref-quick-action",
   ".agent-card", ".agent-hero-banner", ".agent-card-grid",
   ".campaigns-ref-card", ".campaigns-stat", ".approvals-ref-card",
-  ".customers-ref-stat", ".customers-ref-card",
+  ".customers-ref-stat", ".customers-ref-card", ".customers-stat", ".customers-list-panel", ".customers-mini-card", ".unified-summary-card",
   ".appointments-stat", ".callbacks-stat", ".pickup-ref-stat",
   ".calllogs-stat", ".calllogs-chart-card", ".reports-ref-chart",
   ".reports-ref-kpi", ".reports-ref-table-card", ".settings-ref-card",
   ".settings-ref-hero", ".documents-ref-card", ".users-ref-card",
   ".ref-recent-campaigns", ".ref-activity-item",
-  ".ref-campaign-table tbody tr", ".crm-table tbody tr",
-  ".reports-ref-table tbody tr", ".customers-table tbody tr",
+  
+  
   ".agent-preview-modal", ".customers-modal", ".settings-ref-modal",
 ].join(",");
 
 const elevation = [
   ".ref-kpi-card", ".ref-dashboard-panel", ".ref-quick-action",
   ".metric-card", ".agent-card", ".crm-panel", ".calllogs-stat",
-  ".reports-ref-kpi", ".settings-ref-card", ".customers-ref-card"
+  ".reports-ref-kpi", ".settings-ref-card", ".customers-ref-card", ".customers-stat", ".unified-summary-card", ".customers-mini-card"
 ].join(",");
 
-export function MotionEnhancements({route}:{route:string}){
+export function MotionEnhancements({route,enabled}:{route:string;enabled:boolean}){
   useEffect(()=>{
     if(typeof window==="undefined")return;
     const parent=document.querySelector<HTMLElement>(".frontier-motion-route");
     if(!parent)return;
+    if(!enabled){parent.querySelectorAll<HTMLElement>("[data-motion-ready]").forEach(el=>{delete el.dataset.motionReady;delete el.dataset.motionVisible;});return;}
     const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let index=0;
     const observer=reduced||typeof IntersectionObserver==="undefined"?null:new IntersectionObserver(entries=>{
@@ -51,9 +52,9 @@ export function MotionEnhancements({route}:{route:string}){
       parent.querySelectorAll<HTMLElement>(elevation).forEach(el=>el.classList.add("frontier-motion-lift"));
     };
     register();
-    const mutation=new MutationObserver(register);
+    let frame=0;const mutation=new MutationObserver(()=>{if(!frame)frame=requestAnimationFrame(()=>{frame=0;register();});});
     mutation.observe(parent,{childList:true,subtree:true});
-    return ()=>{observer?.disconnect();mutation.disconnect();};
-  },[route]);
+    return ()=>{observer?.disconnect();mutation.disconnect();if(frame)cancelAnimationFrame(frame);parent.querySelectorAll<HTMLElement>("[data-motion-ready]").forEach(el=>{el.dataset.motionVisible="true";});};
+  },[route,enabled]);
   return null;
 }

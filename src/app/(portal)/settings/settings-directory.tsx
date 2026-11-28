@@ -4,6 +4,7 @@ import {EmptyState} from "@/components/empty-state";
 import {useRouter} from "next/navigation";
 import {createBrowserSupabase} from "@/lib/supabase/browser";
 import {SarvamConnectionCard} from "./sarvam-connection-card";
+import {MotionPreferences} from "@/components/motion/motion-preference";
 import {useNavigationLayout} from "@/components/navigation-layout-preference";
 import {ThemeSwitcher} from "@/components/theme-preference";
 
@@ -113,7 +114,7 @@ export function SettingsDirectory({userId,email,role,dealership,displayName,phon
        </label>
       </div></div><div className="frontier-theme-control frontier-appearance-theme-half"><div className="frontier-layout-title frontier-theme-title"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor" stroke="none"/></svg><h3>Theme</h3></div><ThemeSwitcher/></div>
      </section>
-     <div className="settings-ref-card-grid">
+     <div className="settings-ref-card-grid"><MotionPreferences/>
       <section className="settings-ref-card"><h3><Icon name="bell" size={18}/> Notification Preferences</h3><p>Choose how you want to receive notifications</p>{[["Campaign Status Updates","Get notified about campaign progress"],["Call Summary Reports","Receive periodic call reports"],["Approval Requests","Be notified of pending approvals"],["System Updates","Get notified about new features"]].map(([label,desc])=><div className="settings-ref-preference" key={label}><div><strong>{label}</strong><small>{desc}</small></div><span className="settings-ref-switch-disabled" title="Notification delivery is not configured" aria-label={label+" not configured"}><span/></span></div>)}<small className="settings-ref-footnote">Notification delivery and preferences are not connected yet.</small></section>
       {canManageAccount&&<SarvamConnectionCard compact/>}
       {canManageAccount&&<section className="settings-ref-card"><h3><Icon name="shield" size={18}/> Security Settings</h3><p>Keep your account secure</p><button className="settings-ref-card-action" type="button" onClick={()=>{setError("");setPasswordOpen(true);}}><Icon name="lock" size={17}/><span><strong>Change Password</strong><small>Update your password regularly</small></span><Icon name="arrow" size={15}/></button><div className="settings-ref-card-action disabled"><Icon name="key" size={17}/><span><strong>Two-Factor Authentication</strong><small>Not configured; requires secure backend setup</small></span><span className="settings-ref-switch-disabled"><span/></span></div></section>}

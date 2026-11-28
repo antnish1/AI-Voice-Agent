@@ -1,12 +1,13 @@
 "use client";
 
-import { animate, useInView, useReducedMotion } from "motion/react";
+import {usePremiumMotion} from "./motion-preference";
+import { animate, useInView } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 export function CountUp({value,className}:{value:string;className?:string}){
   const ref=useRef<HTMLElement>(null);
   const inView=useInView(ref,{once:true,amount:.3});
-  const reduce=useReducedMotion();
+  const reduce=!usePremiumMotion();
   const numeric=/^\d+(?:,\d{3})*$/.test(value);
   const target=numeric?Number(value.replaceAll(",","")):0;
   const [display,setDisplay]=useState(value);

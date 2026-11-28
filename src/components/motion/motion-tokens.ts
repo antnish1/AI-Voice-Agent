@@ -3,13 +3,13 @@
  * Interaction feedback is intentionally restrained and must never imply real activity.
  */
 export const motionTokens = {
-  duration: { press: .16, fast: .2, standard: .26, route: .34 },
+  duration: { press: .16, fast: .2, standard: .26, route: .25 },
   ease: [0.22, 1, 0.36, 1] as const,
   spring: { type: "spring" as const, stiffness: 360, damping: 32, mass: .86 },
   stagger: .045,
 };
 export const routeVariants = {
-  initial: { opacity: 0, y: 12, scale: .992, filter: "blur(3px)" },
-  enter: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" },
-  exit: { opacity: 0, y: -7, scale: 1.005, filter: "blur(2px)" },
+  initial: { opacity: 0, y: 7 },
+  enter: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -3 },
 };

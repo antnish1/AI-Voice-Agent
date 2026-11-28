@@ -1,0 +1,37 @@
+/* Global restrained motion: no changes to dimensions, permissions or business state. */
+:root{--premium-motion-ease:cubic-bezier(.22,1,.36,1)}
+.frontier-motion-route{will-change:auto}
+.frontier-motion-route [data-motion-ready="true"]{opacity:1;transform:none;transition-delay:0ms}
+.frontier-motion-route [data-motion-ready="true"][data-motion-visible="true"]{animation:premium-reveal 300ms var(--premium-motion-ease) both;animation-delay:calc(var(--motion-order,0)*20ms)}
+@keyframes premium-reveal{from{opacity:.75;translate:0 6px}to{opacity:1;translate:0 0}}
+@keyframes premium-dialog{from{opacity:.7;scale:.97}to{opacity:1;scale:1}}
+@keyframes premium-status{0%,100%{box-shadow:0 0 0 0 #16a34a00}50%{box-shadow:0 0 0 3px #16a34a33}}
+@keyframes premium-progress{from{scale:0 1}to{scale:1 1}}
+.crm-app[data-motion-preference="premium"] dialog[open]{animation:premium-dialog 220ms var(--premium-motion-ease) both}
+.crm-app[data-motion-preference="premium"] dialog[open]::backdrop{animation:fm-backdrop-in 180ms ease both}
+.crm-app[data-motion-preference="premium"] .campaign-status-ongoing{animation:premium-status 2.4s ease-in-out 3}
+.crm-app[data-motion-preference="premium"] .fc-progress-fill{transform-origin:left;animation:premium-progress 550ms var(--premium-motion-ease) both;transition:width 300ms var(--premium-motion-ease)}
+.crm-app[data-motion-preference="premium"] :is(.customers-card-grid,.customers-data-table tbody){animation:premium-reveal 200ms ease both}
+.crm-app[data-motion-preference="premium"] :is(.customers-search,.fv-input-wrap):focus-within{box-shadow:0 0 0 3px #15365b16;transition:box-shadow 160ms ease}
+.crm-app[data-motion-preference="premium"] :is(button,a).customers-export:hover,.crm-app[data-motion-preference="premium"] .customers-row-actions button:not(:disabled):hover{translate:0 -1px}
+.crm-app[data-motion-preference="premium"] :is(.frontier-motion-lift,.unified-summary-card):hover{transition:box-shadow 200ms ease,translate 200ms ease;box-shadow:0 7px 22px #15365b12!important}
+.crm-app[data-motion-preference="premium"] :is(.ref-kpi-icon,.agent-card-avatar) img{transition:transform 230ms var(--premium-motion-ease)}
+.crm-app[data-motion-preference="premium"] :is(.ref-kpi-card,.agent-card):hover :is(.ref-kpi-icon,.agent-card-avatar) img{transform:scale(1.045)}
+.fv-login .fv-signin-card{animation:premium-reveal 320ms var(--premium-motion-ease) both}
+.fv-login .fv-kia-backdrop img{animation:premium-login-image 900ms ease-out both}
+@keyframes premium-login-image{from{scale:1.018}to{scale:1}}
+.fv-login .fv-input-wrap{transition:box-shadow 160ms,border-color 160ms}
+.fv-login .fv-input-wrap:focus-within{box-shadow:0 0 0 3px #d7192018}
+.frontier-motion-settings fieldset{border:0;padding:0;margin:0;display:grid;gap:9px;min-width:0}
+.frontier-motion-option{display:flex;align-items:center;gap:10px;border:1px solid #94a3b83d;border-radius:9px;padding:10px;cursor:pointer}
+.frontier-motion-option input{accent-color:#15365b;flex:none}
+.frontier-motion-option span{display:grid;gap:3px}
+.frontier-motion-option small{font-size:11px;opacity:.8}
+.frontier-motion-option:has(input:checked){border-color:#7995b7;background:#7995b70c}
+.crm-app[data-motion-preference="minimal"] :is(.frontier-motion-route,.frontier-sidebar-nav,.frontier-page-skeleton) *,.crm-app[data-motion-preference="minimal"] :is(.frontier-motion-route,.frontier-sidebar-nav) *::before,.crm-app[data-motion-preference="minimal"] :is(.frontier-motion-route,.frontier-sidebar-nav) *::after{animation:none!important;transition-delay:0ms!important}
+.crm-app[data-motion-preference="minimal"] [data-motion-ready],.crm-app[data-motion-preference="off"] [data-motion-ready]{opacity:1!important;transform:none!important;translate:none!important}
+.crm-app[data-motion-preference="minimal"] .frontier-motion-lift:hover{transform:none!important;translate:none!important}
+.crm-app[data-motion-preference="off"] *, .crm-app[data-motion-preference="off"] *::before,.crm-app[data-motion-preference="off"] *::after{animation:none!important;transition-duration:0ms!important;transition-delay:0ms!important;scroll-behavior:auto!important}
+.crm-app[data-motion-preference="off"] :is(button,a):active{transform:none!important}
+.crm-app:is([data-motion-preference="minimal"],[data-motion-preference="off"]) dialog[open]::backdrop{animation:none!important}
+@media(prefers-reduced-motion:reduce){.crm-app *, .crm-app *::before,.crm-app *::after,.fv-login *, .fv-login *::before,.fv-login *::after{animation:none!important;transition-duration:0ms!important;transition-delay:0ms!important;scroll-behavior:auto!important}.crm-app [data-motion-ready]{opacity:1!important;transform:none!important;translate:none!important}.crm-app .frontier-motion-lift:hover{transform:none!important}.fv-login .fv-kia-backdrop img{scale:1!important}}
