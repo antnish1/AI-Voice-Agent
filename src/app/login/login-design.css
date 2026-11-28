@@ -574,3 +574,24 @@
 /* Allow short/zoomed viewports to scroll naturally instead of clipping the form. */
 .fv-login.fv-login-kia-reference{height:auto;max-height:none;overflow:visible}
 .fv-login-kia-reference .fv-kia-auth{flex-shrink:0;min-width:0}
+
+/* Compact Kia login card, retaining right alignment and original backdrop. */
+.fv-login-kia-reference .fv-kia-auth{width:min(29vw,440px);min-width:min(340px,100%)}
+.fv-login-kia-reference .fv-signin-card{padding:30px 30px 48px;border-radius:24px}
+.fv-login-kia-reference .fv-premium-brand{gap:12px;margin-bottom:24px}
+.fv-login-kia-reference .fv-premium-brand img{width:72px;height:72px}
+.fv-login-kia-reference .fv-premium-brand div{padding-left:14px}
+.fv-login-kia-reference .fv-premium-brand strong{font-size:21px}
+.fv-login-kia-reference .fv-signin-card h1{font-size:clamp(28px,2.35vw,37px);margin-bottom:8px}
+.fv-login-kia-reference .fv-signin-subtitle{font-size:14px;margin-bottom:22px}
+.fv-login-kia-reference .fv-login-form{gap:12px}
+.fv-login-kia-reference .fv-input-wrap{height:48px;min-height:48px;border-radius:12px}
+.fv-login-kia-reference .fv-input-wrap input{padding:10px 42px 10px 48px!important;font-size:14px!important}
+.fv-login.fv-login-kia-reference .fv-submit{height:48px;min-height:48px;font-size:16px;border-radius:12px;margin-top:4px}
+.fv-login-kia-reference .fv-or{margin:18px auto 12px;font-size:13px}
+.fv-login-kia-reference .fv-access-note{font-size:11px;gap:8px}
+.fv-login-kia-reference .fv-access-note svg{width:22px;height:22px;flex-shrink:0}
+.fv-login-kia-reference .fv-signin-card::before{height:82px}
+.fv-login-kia-reference .fv-signin-card::after{height:54px}
+@media(max-width:800px){.fv-login-kia-reference .fv-kia-auth{width:min(400px,100%);min-width:0}.fv-login-kia-reference .fv-signin-card{padding:26px 22px 42px}}
+@media(min-width:801px) and (max-height:650px){.fv-login-kia-reference .fv-signin-card{padding-top:20px;padding-bottom:38px}.fv-login-kia-reference .fv-premium-brand{margin-bottom:14px}.fv-login-kia-reference .fv-premium-brand img{width:60px;height:60px}.fv-login-kia-reference .fv-signin-subtitle{margin-bottom:15px}.fv-login-kia-reference .fv-signin-card::after{height:42px}}
