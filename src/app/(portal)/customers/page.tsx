@@ -68,7 +68,9 @@ export default async function Customers({searchParams}:{searchParams:Promise<{q?
   const pick=(...keys:string[])=>{for(const row of history){const fields=(row.output_variables??{}) as Record<string,unknown>;for(const key of keys){const value=scalar(fields[key]);if(value)return value;}}for(const key of keys){const value=scalar(imported[key]);if(value)return value;}return null;};
   const last=history[0],lastFields=(last?.output_variables??{}) as Record<string,unknown>;
   const ownCalls=calls.filter(x=>x.customer_id===c.id);
-  return {...c,source:sourceById.get(c.id)??(latest.has(c.id)?"Sarvam":"Unknown"),lastContacted:ownCalls.filter(x=>x.status==="answered").map(x=>x.started_at??"").sort().at(-1)??null,campaign:latest.get(c.id)?.sarvam_campaign_id??null,
+  // Contact history is independent of calling consent and suppression.
+  const contactStatus=ownCalls.some(x=>x.status==="answered")?"Contacted":ownCalls.length?"Not Connected":"Not Attempted";
+  return {...c,contactStatus,source:sourceById.get(c.id)??(latest.has(c.id)?"Sarvam":"Unknown"),lastContacted:ownCalls.filter(x=>x.status==="answered").map(x=>x.started_at??"").sort().at(-1)??null,campaign:latest.get(c.id)?.sarvam_campaign_id??null,
    dealership:dealer.data?.name??null,vehicleModel:pick("vehicle_model","Model","Vehicle Model"),registration:pick("registration_number","Reg. Number","Registration Number"),lastService:pick("last_service_date","Last ServiceDate"),serviceDue:pick("next_service_due_date","Service DueDate"),serviceType:pick("service_type","Service Type"),mileage:pick("last_reported_mileage","Last Reported Mileage"),warranty:pick("warranty_active"),address:pick("customer_address"),remarks:scalar(lastFields.customer_remarks)||scalar(lastFields.call_summary)||null,lastOutcome:scalar(lastFields.call_disposition)||last?.status||null,attempts:ownCalls.length,followup:callback?.requested_at??null,followupStatus:callback?.status??null,
    callHistory:history.slice(0,10).map(x=>({date:x.started_at,status:x.status,duration:x.duration_seconds,outcome:scalar((x.output_variables as Record<string,unknown>|null)?.call_disposition)||null}))};
  });
