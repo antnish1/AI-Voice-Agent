@@ -8,6 +8,7 @@ import {excelToRows,makeRecipientTemplate,rowsToCsv,RECIPIENT_TEMPLATE_HEADERS} 
 
 type Dealer={id:string;name:string;configured:boolean};
 type Preview={filename:string;csv:string;total:number;eligible:number;excluded:number;invalid:number;duplicate:number;sample:string[][];headers:string[];simple:boolean};
+import {LEGACY_RECIPIENT_HEADERS} from "@/lib/sarvam/recipient-template";
 const consentYes=new Set(["yes","true","1","opted_in","consented"]);
 const dncNo=new Set(["no","false","0",""]);
 const phone=(s:string)=>{const v=s.trim().replace(/[\s().-]/g,"");return /^[6-9]\d{9}$/.test(v)?"+91"+v:/^91[6-9]\d{9}$/.test(v)?"+"+v:/^\+[1-9]\d{7,14}$/.test(v)?v:null;};
@@ -50,11 +51,12 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
    if(rows.length<2||rows.length>251)throw Error("Upload 1–250 recipient rows per campaign.");
    const headers=rows[0].map(x=>x.trim());
    if(headers.some(x=>!x)||new Set(headers).size!==headers.length)throw Error("Excel headers must be unique and non-empty.");
-   const simple=headers.includes("phone_number");
-   for(const required of simple?RECIPIENT_TEMPLATE_HEADERS:["Mobile","consent","do_not_call"])if(!headers.includes(required))throw Error("Missing required column: "+required+". Download the template.");
+   const full=headers.includes("user_phone_number");
+   const simple=full||headers.includes("phone_number");
+   for(const required of simple?(full?RECIPIENT_TEMPLATE_HEADERS:LEGACY_RECIPIENT_HEADERS):["Mobile","consent","do_not_call"])if(!headers.includes(required))throw Error("Missing required column: "+required+". Download the template.");
    if(simple&&/\.xlsx$/i.test(file.name))for(const row of rows.slice(1))while(row.length<headers.length)row.push("");
    if(rows.some((r,i)=>i>0&&r.length!==headers.length))throw Error("Some rows have a different column count.");
-   const idx=headers.indexOf(simple?"phone_number":"Mobile"),ci=headers.indexOf("consent"),di=headers.indexOf("do_not_call");
+   const idx=headers.indexOf(simple?(full?"user_phone_number":"phone_number"):"Mobile"),ci=headers.indexOf("consent"),di=headers.indexOf("do_not_call");
    let eligible=0,invalid=0,duplicate=0;const seen=new Set<string>();
    for(const row of rows.slice(1)){
     const value=phone(row[idx]);if(!value){invalid++;continue;}
@@ -151,7 +153,7 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
       <div className="fc-reference-metric fc-reference-excluded"><strong>{preview.excluded}</strong><span>Excluded</span></div>
       <div className="fc-reference-metric fc-reference-invalid"><strong>{preview.invalid} / {preview.duplicate}</strong><span>Invalid / Duplicate</span></div>
      </div>
-     <div className="fc-reference-sample"><table><thead><tr><th>Mobile</th><th>Customer</th><th>Model</th><th>Reg. No.</th></tr></thead><tbody>{preview.sample.map((row,i)=>{const get=(...names:string[])=>{const index=preview.headers.findIndex(h=>names.some(n=>h.trim().toLowerCase()===n.toLowerCase()));return index<0?"—":row[index]||"—";};const mobile=get("Mobile","phone_number");return <tr key={i}><td>{mobile==="—"?"—":"••••••"+mobile.replace(/\D/g,"").slice(-4)}</td><td>{get("Customer Name","Customer","Name","customer_name")}</td><td>{get("Model","Vehicle Model","vehicle_model")}</td><td>{get("Reg. Number","Registration Number","Reg No.","Reg. No.","Vehicle Number")}</td></tr>;})}</tbody></table></div>
+     <div className="fc-reference-sample"><table><thead><tr><th>Mobile</th><th>Customer</th><th>Model</th><th>Reg. No.</th></tr></thead><tbody>{preview.sample.map((row,i)=>{const get=(...names:string[])=>{const index=preview.headers.findIndex(h=>names.some(n=>h.trim().toLowerCase()===n.toLowerCase()));return index<0?"—":row[index]||"—";};const mobile=get("Mobile","phone_number","user_phone_number");return <tr key={i}><td>{mobile==="—"?"—":"••••••"+mobile.replace(/\D/g,"").slice(-4)}</td><td>{get("Customer Name","Customer","Name","customer_name")}</td><td>{get("Model","Vehicle Model","vehicle_model")}</td><td>{get("Reg. Number","Registration Number","Reg No.","Reg. No.","Vehicle Number")}</td></tr>;})}</tbody></table></div>
     </div>}
     <label className="fc-compact-consent fc-reference-consent"><input type="checkbox" checked={consentCertified} disabled={busy} onChange={e=>setConsentCertified(e.target.checked)}/>I confirm customer consent and DNC/suppression screening.</label>
     {error&&<p role="alert" className="form-error">{error}</p>}

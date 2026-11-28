@@ -1,8 +1,6 @@
 // Browser-only XLSX template and first-sheet reader. No external Excel service or customer-data upload.
-export const RECIPIENT_TEMPLATE_HEADERS=[
- "phone_number","customer_name","vehicle_model","last_service_date","next_service_due_date",
- "service_type","service_category","last_reported_mileage","complimentary_pickup_drop_available","active_offer_description"
-] as const;
+import {RECIPIENT_TEMPLATE_HEADERS,RECIPIENT_BOOLEAN_HEADERS} from "./sarvam/recipient-template";
+export {RECIPIENT_TEMPLATE_HEADERS} from "./sarvam/recipient-template";
 const encode=(s:string)=>new TextEncoder().encode(s);
 const escapeXml=(s:string)=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");
 function crc32(data:Uint8Array):number {
@@ -33,7 +31,9 @@ export function makeRecipientTemplate():Blob {
   let col="",n=i+1;while(n){n--;col=String.fromCharCode(65+n%26)+col;n=Math.floor(n/26);}
   return '<c r="'+col+'1" t="inlineStr"><is><t>'+escapeXml(name)+'</t></is></c>';
  }).join("");
- const sheet='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"/></sheetViews><sheetData><row r="1">'+cells+'</row></sheetData></worksheet>';
+ const validationRanges=RECIPIENT_BOOLEAN_HEADERS.map(name=>{let col="",n=RECIPIENT_TEMPLATE_HEADERS.indexOf(name)+1;while(n){n--;col=String.fromCharCode(65+n%26)+col;n=Math.floor(n/26);}return col+"2:"+col+"251";}).join(" ");
+ const validations='<dataValidations count="1"><dataValidation type="list" errorStyle="stop" allowBlank="1" showDropDown="0" showErrorMessage="1" errorTitle="Invalid value" error="Select TRUE or FALSE only." sqref="'+validationRanges+'"><formula1>"TRUE,FALSE"</formula1></dataValidation></dataValidations>';
+ const sheet='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"/></sheetViews><sheetData><row r="1">'+cells+'</row></sheetData>'+validations+'</worksheet>';
  return templateZip([
   ["[Content_Types].xml",'<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'],
   ["_rels/.rels",'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
