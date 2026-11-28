@@ -109,3 +109,9 @@
 :root[data-theme="dark"] .settings-profile-edit-dialog input{background:#1b2c41;color:#e5edf7;border-color:#40516b}
 @media(max-width:1200px){.crm-app .settings-ref-admin .settings-ref-profile-content{grid-template-columns:1fr}.crm-app .settings-ref-admin .settings-ref-profile-identity{border-right:0;border-bottom:1px solid #eaf0f5;padding-bottom:12px}}
 @media(max-width:650px){.crm-app .settings-ref-admin .settings-ref-profile-form{grid-template-columns:1fr}}
+
+/* Frontier red profile avatar, for both IT and dealership settings. */
+:root .crm-app .settings-ref .settings-ref-avatar{background:linear-gradient(140deg,#ff666d 0%,#df1825 55%,#ad0c19 100%)!important;border-color:#ffe4e6!important;color:#fff!important}
+:root .crm-app .settings-ref .settings-ref-avatar-edit{color:#c91522!important;border-color:#f5cbd0!important}
+:root .crm-app .settings-ref .settings-ref-avatar-edit:hover{background:#fff0f1!important}
+:root[data-theme="dark"] .crm-app .settings-ref .settings-ref-avatar{border-color:#512b39!important}
