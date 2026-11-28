@@ -22,3 +22,38 @@
 :root[data-theme="dark"] .portal-profile-panel .portal-profile-identity-copy strong{color:#e4effa}
 @media(max-width:760px){.ref-topbar .portal-profile-panel{width:264px}}
 @media(prefers-reduced-motion:reduce){.portal-profile-layout-switch label{transition:none}}
+
+
+/* Logout feedback is visible immediately while the secure server action runs. */
+.portal-logout-overlay{
+ position:fixed;inset:0;z-index:9999;
+ display:grid;place-items:center;
+ padding:20px;background:rgba(14,30,51,.42);
+ backdrop-filter:blur(3px);
+}
+.portal-logout-progress{
+ width:min(360px,100%);box-sizing:border-box;
+ display:flex;flex-direction:column;align-items:center;text-align:center;
+ gap:9px;padding:30px 22px;border-radius:16px;
+ color:#18324e;background:#fff;border:1px solid #dbe4ee;
+ box-shadow:0 16px 54px #152b4760;
+}
+.portal-logout-progress strong{font-size:18px;line-height:1.35;font-weight:700}
+.portal-logout-progress p{font-size:12px;line-height:1.5;margin:0;color:#62758b}
+.portal-logout-spinner{
+ width:34px;height:34px;border-radius:50%;display:block;
+ border:3px solid #dbe6f2;border-top-color:#142d4e;
+ animation:portal-logout-spin .75s linear infinite;
+}
+.portal-profile-panel .portal-logout[disabled]{cursor:wait;opacity:.7}
+@keyframes portal-logout-spin{to{transform:rotate(360deg)}}
+:root[data-theme="dark"] .portal-logout-progress{
+ background:#172c43;color:#f0f7ff;border-color:#3a546e;
+}
+:root[data-theme="dark"] .portal-logout-progress p{color:#c1d3e6}
+:root[data-theme="dark"] .portal-logout-spinner{
+ border-color:#4a6079;border-top-color:#a9d8ff;
+}
+@media(prefers-reduced-motion:reduce){
+ .portal-logout-spinner{animation:none;border-top-color:#142d4e}
+}

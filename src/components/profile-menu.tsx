@@ -16,7 +16,7 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
  const [open,setOpen]=useState(false),[detailsExpanded,setDetailsExpanded]=useState(false),[passwordOpen,setPasswordOpen]=useState(false),[editOpen,setEditOpen]=useState(false);
  const [displayName,setDisplayName]=useState(initialName||email.split("@")[0]),[editName,setEditName]=useState(initialName||email.split("@")[0]);
  const [avatarPath,setAvatarPath]=useState(initialAvatarPath),[avatarUrl,setAvatarUrl]=useState("");
- const [busy,setBusy]=useState(false),[error,setError]=useState(""),[message,setMessage]=useState("");
+ const [busy,setBusy]=useState(false),[signingOut,setSigningOut]=useState(false),[error,setError]=useState(""),[message,setMessage]=useState("");
  const [password,setPassword]=useState(""),[confirm,setConfirm]=useState("");
  const wrapper=useRef<HTMLDivElement>(null),fileInput=useRef<HTMLInputElement>(null);
  useEffect(()=>{const close=(e:PointerEvent)=>{if(wrapper.current&&!wrapper.current.contains(e.target as Node)){setOpen(false);setDetailsExpanded(false);}};const escape=(e:KeyboardEvent)=>{if(e.key==="Escape"){setOpen(false);setDetailsExpanded(false);setPasswordOpen(false);setEditOpen(false);}};document.addEventListener("pointerdown",close);document.addEventListener("keydown",escape);return()=>{document.removeEventListener("pointerdown",close);document.removeEventListener("keydown",escape);};},[]);
@@ -69,8 +69,19 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
   if(err){showError(err.message);return;}
   setPassword("");setConfirm("");setPasswordOpen(false);setMessage("Password changed successfully.");
  };
+ const handleLogout=async()=>{
+  if(signingOut||busy)return;
+  setError("");setMessage("");setSigningOut(true);setOpen(true);
+  try{
+   const result=await signOut();
+   if(result?.error){setError(result.error);setSigningOut(false);}
+  }catch{
+   setError("Unable to sign out. Check your connection and try again.");
+   setSigningOut(false);
+  }
+ };
  const avatar=(className:string)=><span className={className}>{avatarUrl?<img src={avatarUrl} alt="Your profile photo" referrerPolicy="no-referrer"/>:initials}</span>;
- return <div className="portal-profile" ref={wrapper} onPointerEnter={e=>{if(e.pointerType==="mouse"&&!(passwordOpen||editOpen))setOpen(true);}} onPointerLeave={e=>{if(e.pointerType==="mouse"&&!(passwordOpen||editOpen)){setOpen(false);setDetailsExpanded(false);}}}>
+ return <div className="portal-profile" ref={wrapper} onPointerEnter={e=>{if(e.pointerType==="mouse"&&!(passwordOpen||editOpen))setOpen(true);}} onPointerLeave={e=>{if(e.pointerType==="mouse"&&!(passwordOpen||editOpen||signingOut)){setOpen(false);setDetailsExpanded(false);}}}>
   <button type="button" className="portal-profile-trigger" aria-label="Open profile menu" title="Profile and account options" aria-haspopup="menu" aria-expanded={open} onClick={()=>{setOpen(true);}} onFocus={()=>setOpen(true)}>
    {avatar("portal-profile-avatar")}
   </button>
@@ -93,8 +104,9 @@ export function ProfileMenu({userId,email,role,dealershipName,initialName,initia
      </div>
     </div>
 
-   </div><form action={signOut}><button role="menuitem" type="submit" className="portal-logout">Logout <span>↗</span></button></form></div>
+   </div><form onSubmit={e=>{e.preventDefault();void handleLogout();}}><button role="menuitem" type="submit" className="portal-logout" disabled={signingOut||busy} aria-busy={signingOut}>{signingOut?"Signing out…":"Logout"} <span aria-hidden="true">{signingOut?"":"↗"}</span></button></form></div>
   </div>}
+  {signingOut&&<div className="portal-logout-overlay" role="status" aria-live="polite" aria-label="Signing out" aria-busy="true"><div className="portal-logout-progress"><span className="portal-logout-spinner" aria-hidden="true"/><strong>Signing out…</strong><p>Please wait while we securely end your session.</p></div></div>}
   {canManageAccount&&(passwordOpen||editOpen)&&<div className="portal-account-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget){setPasswordOpen(false);setEditOpen(false);}}}><section className="portal-account-modal" role="dialog" aria-modal="true" aria-label={passwordOpen?"Reset password":"Edit profile"}>
    <div className="portal-account-modal-head"><h2>{passwordOpen?"Reset Password":"Edit user details"}</h2><button type="button" aria-label="Close" onClick={()=>{setPasswordOpen(false);setEditOpen(false);setError("");}}>×</button></div>
    {passwordOpen?<form onSubmit={e=>{e.preventDefault();void savePassword();}}><p>Choose a new password for your current FRONTIER account.</p><label>New password<input type="password" autoComplete="new-password" minLength={10} required value={password} onChange={e=>setPassword(e.target.value)} placeholder="Minimum 10 characters"/></label><label>Confirm password<input type="password" autoComplete="new-password" required value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="Re-enter new password"/></label>{error&&<p role="alert" className="portal-profile-error">{error}</p>}<div className="portal-account-modal-buttons"><button type="button" onClick={()=>setPasswordOpen(false)}>Cancel</button><button type="submit" disabled={busy}>{busy?"Saving…":"Update password"}</button></div></form>:
