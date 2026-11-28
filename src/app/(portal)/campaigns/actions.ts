@@ -17,12 +17,15 @@ export async function saveWizardDraft(input:WizardInput):Promise<{error?:string;
      !Number.isInteger(s.retry_interval_minutes)||s.retry_interval_minutes<1||s.retry_interval_minutes>10080||
      (s.start&&s.end&&s.end<s.start)||!Number.isInteger(r.total_rows)||r.total_rows<0||r.total_rows>50000||r.preview_only!==true)
      return {error:"Campaign settings are invalid."};
+  const {data:global,error:globalError}=await supabase.from("global_voice_defaults").select("agent_id,app_version,connection_id,caller_number,active").eq("singleton",true).maybeSingle();
+  if(globalError)return {error:"Global voice defaults unavailable."};
+  const current=global?.active?global:null;
   // Do not accept recipient files, personal data, or guessed Sarvam IDs in a draft config.
   const clean=(v:string)=>String(v??"").slice(0,200);
   const safe={
    description:clean(c.description).slice(0,200),
-   agent_label:clean(c.agent_label),agent_version_label:clean(c.agent_version_label),
-   telephony_label:clean(c.telephony_label),outgoing_number_label:clean(c.outgoing_number_label),
+   agent_label:current?.agent_id??"",agent_version_label:current?String(current.app_version):"",
+   telephony_label:current?.connection_id??"",outgoing_number_label:current?.caller_number??"",
    schedule:{start:clean(s.start),end:clean(s.end),days:s.days,from:clean(s.from),to:clean(s.to),cps:s.cps,max_retries:s.max_retries,retry_interval_minutes:s.retry_interval_minutes},
    recipient_preview:{filename:clean(r.filename),total_rows:r.total_rows,phone_column:clean(r.phone_column),preview_only:true},
    sarvam_connected:false,launch_enabled:false
@@ -75,10 +78,10 @@ export async function createSimpleCampaign(dealershipId:string,filename:string,t
   const date=(value:number)=>new Date(value).toISOString().slice(0,10);
   const start=date(startUtc),end=date(startUtc+7*86400000);
   const name=(dealer.name+" Service Campaign "+start).slice(0,120);
-  const profileResult=await supabase.from("dealership_voice_profiles")
+  const profileResult=await supabase.from("global_voice_defaults")
    .select("agent_id,app_version,connection_id,caller_number,active")
-   .eq("dealership_id",dealershipId).maybeSingle();
-  if(profileResult.error)return {error:"Dealership voice settings are not available. Apply the reviewed profile migration first."};
+   .eq("singleton",true).maybeSingle();
+  if(profileResult.error)return {error:"Global voice settings are not available. Apply the reviewed profile migration first."};
   const profile=profileResult.data?.active?profileResult.data:null;
   // A draft may be prepared without a verified profile. It cannot launch until\n  // IT confirms the voice agent, telephony connection, and all safeguards.
   const draft=await saveWizardDraft({dealershipId,name,period,configuration:{
@@ -102,4 +105,4 @@ export async function saveReviewSchedule(id:string,dealershipId:string,schedule:
 
 export async function setUnlaunchedCampaignState(id:string,dealershipId:string,decision:"PAUSED"|"REJECTED"){const {requireItSuperUser}=await import("@/lib/it-access");const {supabase,user}=await requireItSuperUser();if(!["PAUSED","REJECTED"].includes(decision))throw Error("Invalid action");const {data,error}=await supabase.from("campaigns").update({status:decision,approved_by:decision==="REJECTED"?user.id:null,approved_at:decision==="REJECTED"?new Date().toISOString():null}).eq("id",id).eq("dealership_id",dealershipId).in("status",["DRAFT","PENDING","PENDING_MANAGER_APPROVAL","APPROVED","PAUSED"]).select("id");if(error||!data?.length)throw Error("Campaign cannot be changed, or has already launched.");revalidatePath("/campaigns");revalidatePath("/campaigns/"+id+"/outbound");}
 
-export async function refreshCampaignVoice(id:string):Promise<{error?:string;ok?:boolean}>{try{const {requireItSuperUser}=await import("@/lib/it-access");const {supabase}=await requireItSuperUser();const {error}=await supabase.rpc("frontvox_refresh_campaign_voice",{p_campaign:id,p_missing_only:false});if(error)return {error:"Unable to refresh voice configuration. Verify that the dealership has an active profile and the campaign is not locked."};revalidatePath("/campaigns/"+id+"/outbound");return {ok:true};}catch{return {error:"Unable to refresh voice configuration."};}}
+export async function refreshCampaignVoice(id:string):Promise<{error?:string;ok?:boolean}>{try{const {requireItSuperUser}=await import("@/lib/it-access");const {supabase}=await requireItSuperUser();const {error}=await supabase.rpc("frontvox_refresh_campaign_voice",{p_campaign:id,p_missing_only:false});if(error)return {error:"Unable to refresh voice configuration. Verify that global voice defaults are active and the campaign is not locked."};revalidatePath("/campaigns/"+id+"/outbound");return {ok:true};}catch{return {error:"Unable to refresh voice configuration."};}}

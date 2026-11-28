@@ -2,9 +2,7 @@
 import {useState,useTransition} from "react";
 import {useRouter} from "next/navigation";
 import {saveVoiceProfile} from "./actions";
-type Dealership={id:string;name:string;profile?:{agent_id:string;app_version:number;connection_id:string;caller_number:string;active:boolean}|null};
-type DeploymentOption={deploymentId:string;label:string;agentId:string;version:number;connectionId:string;callerNumber:string};
-type ImportResult={ok:boolean;code:string;message:string;options?:DeploymentOption[];counts?:{total:number;scanned:number;outbound:number;active:number;verified:number}};
+type VoiceProfile={agent_id:string;app_version:number;connection_id:string;caller_number:string;active:boolean};
 
 function FieldIcon({kind}:{kind:"dealer"|"agent"|"version"|"connection"|"phone"|"settings"|"save"|"info"}) {
  const shape={
@@ -23,53 +21,23 @@ function CopyButton({value,label}:{value:string;label:string}) {
  const [copied,setCopied]=useState(false);
  return <button className="vdp-copy" type="button" disabled={!value} title={copied?"Copied":`Copy ${label}`} aria-label={`Copy ${label}`} onClick={async()=>{try{await navigator.clipboard.writeText(value);setCopied(true);}catch{setCopied(false);}}}>{copied?"✓":<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></svg>}</button>;
 }
-export function ProfileEditor({dealerships,activeDealershipId}:{dealerships:Dealership[];activeDealershipId:string}) {
+export function ProfileEditor({profile:p}:{profile:VoiceProfile|null}) {
  const router=useRouter();
- const id=activeDealershipId;
  const [busy,start]=useTransition(),[message,setMessage]=useState("");
- const dealer=dealerships.find(d=>d.id===id),p=dealer?.profile;
- const [loadingSarvam,setLoadingSarvam]=useState(false);
- const [importResult,setImportResult]=useState<ImportResult|null>(null);
- const [deploymentId,setDeploymentId]=useState("");
- async function loadSarvam(){
-  setLoadingSarvam(true);setImportResult(null);setDeploymentId("");
-  try{
-   const response=await fetch("/api/sarvam/voice-deployments?dealershipId="+encodeURIComponent(id),{method:"GET",cache:"no-store"});
-   const data:ImportResult=await response.json();
-   setImportResult(data);
-  }catch{setImportResult({ok:false,code:"NETWORK",message:"Could not contact the Frontier Voice CRM Sarvam import endpoint. Verify network access and try again."});}
-  finally{setLoadingSarvam(false);}
- }
- function applySarvam(){
-  const selected=importResult?.options?.find(x=>x.deploymentId+"|"+x.connectionId+"|"+x.callerNumber===deploymentId);
-  if(!selected)return;
-  setAgent(selected.agentId);setVersion(String(selected.version));setConnection(selected.connectionId);setCaller(selected.callerNumber);
-  setMessage(importResult?.code==="saved_defaults"?"Saved dealership defaults loaded. Live Sarvam availability is not verified by this request. No settings or calls were changed.":"Settings loaded into the form. Review current agent and phone availability before saving; no agent or calls were changed.");
- }
-
  const [agent,setAgent]=useState(p?.agent_id??""),[version,setVersion]=useState(p?String(p.app_version):""),[connection,setConnection]=useState(p?.connection_id??""),[caller,setCaller]=useState(p?.caller_number??"");
  return <section className="vdp-card" aria-labelledby="vdp-card-title">
-  <div className="vdp-card-title"><div className="vdp-gear"><FieldIcon kind="settings"/></div><h2 id="vdp-card-title">Dealership AI Calling Defaults</h2></div>
-  <p className="vdp-active-context">Editing defaults for {dealer?.name??"selected dealership"}</p>
-  {importResult&&<div className="vdp-import">
-   <div className={importResult.ok&&importResult.code!=="saved_defaults"&&importResult.options?.length?"vdp-import-ok":"vdp-import-notice"} role="status">
-    <p>{importResult.message}</p>
-    {importResult.counts&&<p>Workspace results: {importResult.counts.scanned} deployments checked · {importResult.counts.outbound} outbound-capable · {importResult.counts.verified} verified calling configurations.</p>}
-    {importResult.options?.length? <div className="vdp-import-select"><label htmlFor="vdp-select-deployment">{importResult.code==="saved_defaults"?"Saved dealership configuration":"Available calling configurations"}</label><select id="vdp-select-deployment" value={deploymentId} onChange={e=>setDeploymentId(e.target.value)}><option value="">Select an agent + phone number</option>{importResult.options.map((d,i)=><option key={d.deploymentId+"-"+i} value={d.deploymentId+"|"+d.connectionId+"|"+d.callerNumber}>{d.label} · v{d.version} · {d.callerNumber}</option>)}</select><button type="button" disabled={!deploymentId} onClick={applySarvam}>Use selected settings</button></div>:null}
-    {importResult.code==="no_deployments"||importResult.code==="no_outbound"||importResult.code==="incomplete"?<p>Open Sarvam → Build → Agents for the committed version and Deploy → Phone Numbers for the connection ID and caller number. You can complete the fields below manually without creating a deployment.</p>:null}
-   </div>
-  </div>}
+  <div className="vdp-card-title"><div className="vdp-gear"><FieldIcon kind="settings"/></div><h2 id="vdp-card-title">Global AI Calling Defaults</h2></div>
+  <p className="vdp-active-context">Applies to all dealerships and unlaunched campaigns.</p>
   <div className="vdp-fields">
-   <form id="vdp-save-form" className="vdp-form" key={id} action={form=>start(async()=>{setMessage("");const r=await saveVoiceProfile(form);setMessage(r.error??(form.get("active")==="yes"?"Saved. Calling defaults are ACTIVE for new campaign drafts. Live calling still requires separate authorization and verified telephony.":"Saved. Calling defaults are INACTIVE for new campaign drafts."));if(r.ok&&/^[6-9]\d{9}$/.test(caller.trim()))setCaller("+91"+caller.trim());})}>
-    <input type="hidden" name="dealershipId" value={id}/>
+   <form id="vdp-save-form" className="vdp-form" action={form=>start(async()=>{setMessage("");const r=await saveVoiceProfile(form);setMessage(r.error??(form.get("active")==="yes"?"Saved. Global calling defaults saved and applied to unlaunched campaigns. Live calling still requires separate authorization and verified telephony.":"Saved. Global calling defaults are inactive."));if(r.ok&&/^[6-9]\d{9}$/.test(caller.trim()))setCaller("+91"+caller.trim());})}>
     
     <label className="vdp-field vdp-agent"><span className="vdp-label"><FieldIcon kind="agent"/> Sarvam Agent ID</span><span className="vdp-control"><input name="agentId" required value={agent} placeholder="Enter Sarvam Agent ID" autoComplete="off" onChange={e=>setAgent(e.target.value)}/><CopyButton value={agent} label="agent ID"/></span></label>
     <label className="vdp-field vdp-version"><span className="vdp-label"><FieldIcon kind="version"/> Committed Agent Version</span><span className="vdp-control"><input name="version" type="text" inputMode="numeric" pattern="[1-9][0-9]*" required placeholder="Enter committed version (e.g. 57)" value={version} autoComplete="off" onChange={e=>setVersion(e.target.value.replace(/[^0-9]/g,""))}/></span></label>
     <label className="vdp-field vdp-connection"><span className="vdp-label"><FieldIcon kind="connection"/> Telephony Connection ID / Name</span><span className="vdp-control"><input name="connectionId" required value={connection} placeholder="Enter telephony connection ID / name" autoComplete="off" onChange={e=>setConnection(e.target.value)}/><CopyButton value={connection} label="connection ID"/></span></label>
     <label className="vdp-field vdp-caller"><span className="vdp-label"><FieldIcon kind="phone"/> Connected Caller Number</span><span className="vdp-control"><input name="callerNumber" type="tel" required value={caller} placeholder="Enter connected caller number" autoComplete="off" onChange={e=>setCaller(e.target.value)}/><CopyButton value={caller} label="caller number"/></span></label>
-    <div className="vdp-checkbox-info"><label className="vdp-check"><input type="checkbox" name="active" value="yes" defaultChecked={p?.active??false}/><span>Use these defaults for newly created drafts</span></label></div>
+    <div className="vdp-checkbox-info"><label className="vdp-check"><input type="checkbox" name="active" value="yes" defaultChecked={p?.active??false}/><span>Use these defaults for all dealerships</span></label></div>
     {message&&<p className={message.startsWith("Saved.")?"vdp-success":"vdp-error"} role="status">{message}</p>}
-    <div className="vdp-footer"><button type="button" className="vdp-cancel" disabled={busy||loadingSarvam} onClick={()=>router.push("/campaigns")}>Cancel</button><button type="submit" className="vdp-save" disabled={busy||loadingSarvam}><FieldIcon kind="save"/><span>{busy?"Saving…":"Save Draft Profile"}</span></button></div>
+    <div className="vdp-footer"><button type="button" className="vdp-cancel" disabled={busy} onClick={()=>router.push("/campaigns")}>Cancel</button><button type="submit" className="vdp-save" disabled={busy}><FieldIcon kind="save"/><span>{busy?"Saving…":"Save Draft Profile"}</span></button></div>
    </form>
   </div>
  </section>;

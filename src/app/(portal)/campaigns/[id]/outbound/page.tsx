@@ -27,8 +27,8 @@ export default async function OutboundPage({params}:{params:Promise<{id:string}>
   }catch{columns=[];rows=[];recordError="Unable to verify the locked recipient file. Launch is unavailable.";}
  }
  let config=configs.data?.configuration as {agent_label?:string;agent_version_label?:string;telephony_label?:string;outgoing_number_label?:string;schedule?:{start_mode?:"now"|"custom";start?:string;end?:string;days?:string[];from?:string;to?:string;cps?:number;max_retries?:number;retry_interval_minutes?:number}}|null;
- if(config&&!launches.data&&["DRAFT","PENDING","PENDING_MANAGER_APPROVAL","PAUSED","APPROVED"].includes(campaign.status)&&![config.agent_label,config.agent_version_label,config.telephony_label,config.outgoing_number_label].every(Boolean)){
-  const {data,error}=await supabase.rpc("frontvox_refresh_campaign_voice",{p_campaign:id,p_missing_only:true});
+ if(config&&!launches.data&&["DRAFT","PENDING","PENDING_MANAGER_APPROVAL","PAUSED","APPROVED"].includes(campaign.status)){
+  const {data,error}=await supabase.rpc("frontvox_refresh_campaign_voice",{p_campaign:id,p_missing_only:false});
   if(!error&&data)config=data as typeof config;
  }
  return <main className="review-reference-page">
