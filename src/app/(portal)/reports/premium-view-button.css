@@ -1,0 +1,7 @@
+/* Premium navy 3D eye action, scoped to approved view buttons. */
+.calllogs-table button.premium-navy-view,.reports-ref-table button.premium-navy-view{display:inline-grid;place-items:center;box-sizing:border-box;width:36px;height:36px;min-width:36px;min-height:36px;padding:0;vertical-align:middle;border:1px solid #c5d7ed;border-radius:10px;color:#15365b;background:linear-gradient(145deg,#f0f7ff 0%,#e4f0fd 35%,#d5e5f8 100%);box-shadow:inset 0 1px 1px #fff,0 3px 0 #a3b8d2,0 5px 9px #15365b20;cursor:pointer;transition:transform 250ms ease,box-shadow 250ms ease,background 250ms ease}
+.calllogs-table button.premium-navy-view svg,.reports-ref-table button.premium-navy-view svg{width:20px;height:20px;color:#15365b;filter:drop-shadow(0 1px 1px #15365b30);transition:transform 250ms ease}
+@media(hover:hover){.calllogs-table button.premium-navy-view:hover,.reports-ref-table button.premium-navy-view:hover{background:linear-gradient(145deg,#f0f7ff,#c7dcf5);color:#15365b;transform:translateY(-2px);box-shadow:inset 0 1px 1px #fff,0 5px 0 #a3b8d2,0 8px 12px #15365b26}.premium-navy-view:hover svg{transform:scale(1.12)}}
+.calllogs-table button.premium-navy-view:active,.reports-ref-table button.premium-navy-view:active{transform:translateY(2px);box-shadow:inset 0 1px 1px #fff,0 1px 0 #a3b8d2}
+.premium-navy-view:focus-visible{outline:2px solid #2563eb;outline-offset:4px}
+@media(prefers-reduced-motion:reduce){.calllogs-table button.premium-navy-view,.reports-ref-table button.premium-navy-view,.premium-navy-view svg{transition:none!important;transform:none!important}}
