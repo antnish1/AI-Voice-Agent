@@ -175,9 +175,9 @@
 }
 
 /* Continuous strong shrink for informational call status badges; no layout shift. */
-@keyframes calllogs-status-high-shrink{
+@keyframes calllogs-status-gentle-shrink{
   0%,100%{transform:scale(1)}
-  50%{transform:scale(.75)}
+  50%{transform:scale(.95)}
 }
 .crm-app .calllogs-reference .calllogs-expanded-table .calllogs-badge-shrink{
   display:inline-flex;align-items:center;justify-content:center;
@@ -185,7 +185,7 @@
 }
 @media(prefers-reduced-motion:no-preference){
   .crm-app .calllogs-reference .calllogs-expanded-table .calllogs-badge-shrink{
-    animation:calllogs-status-high-shrink 1.8s ease-in-out infinite;
+    animation:calllogs-status-gentle-shrink 2.4s ease-in-out infinite;
   }
 }
 @media(prefers-reduced-motion:reduce){
