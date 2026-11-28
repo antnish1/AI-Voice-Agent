@@ -165,3 +165,15 @@
 .crm-app .reports-ref .reports-ref-kpis .reports-category-card::before,.crm-app .reports-ref .reports-ref-kpis .reports-category-card::after,.crm-app .agent-directory .agent-stats-grid .agent-stat-card::before,.crm-app .agent-directory .agent-stats-grid .agent-stat-card::after{content:none!important;display:none!important}
 .crm-app .reports-ref .reports-ref-kpis .reports-category-card :is(strong,div>span),.crm-app .agent-directory .agent-stats-grid .agent-stat-card :is(strong,div>span){color:var(--summary-ink)!important}
 .crm-app .reports-ref .reports-ref-kpis .reports-category-card .reports-ref-kpi-icon,.crm-app .agent-directory .agent-stats-grid .agent-stat-card .agent-stat-icon{background:transparent!important;background-image:none!important;box-shadow:none!important}
+
+/* AI Agents only: restore white light-mode card surfaces, preserve dark theme. */
+:root:not([data-theme="dark"]) .crm-app .agent-directory .agent-stats-grid{--summary-neutral:#fff}
+:root .crm-app .agent-directory .agent-stats-grid .agent-stat-card:nth-child(n),
+:root .crm-app .agent-directory .agent-stats-grid .agent-stat-card.agent-stat-selected{border-top-color:transparent!important}
+.crm-app .agent-directory .agent-stats-grid .agent-stat-card>div>span:first-child{
+ background:transparent!important;background-image:none!important;
+}
+.crm-app .agent-directory .agent-stats-grid .agent-stat-card>div>span:first-child::before,
+.crm-app .agent-directory .agent-stats-grid .agent-stat-card>div>span:first-child::after{
+ content:""!important;display:block!important;flex:1 1 0;min-width:0;height:0;border-top:1px solid var(--kpi-top-line,var(--summary-border,#d0d5dd));pointer-events:none;
+}
