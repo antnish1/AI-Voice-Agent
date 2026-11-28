@@ -9,4 +9,13 @@ export async function signIn(form: FormData) {
  if (error) redirect("/login?error=invalid");
  redirect("/dashboard");
 }
-export async function signOut() { const supabase=await createClient(); await supabase.auth.signOut(); redirect("/login"); }
+export async function signOut():Promise<{error:string}|never> {
+ try{
+  const supabase=await createClient();
+  const {error}=await supabase.auth.signOut();
+  if(error)return {error:"Unable to sign out. Check your connection and try again."};
+ }catch{
+  return {error:"Unable to sign out. Check your connection and try again."};
+ }
+ redirect("/login");
+}
