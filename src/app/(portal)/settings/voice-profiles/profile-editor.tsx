@@ -37,7 +37,7 @@ export function ProfileEditor({profile:p}:{profile:VoiceProfile|null}) {
   setMessage("");
   const r=await saveVoiceProfile(form);
   if(!r.ok){setMessage(r.error??"Could not save voice defaults.");return;}
-  const normalizedCaller=/^[6-9]\\d{9}$/.test(caller.trim())?"+91"+caller.trim():caller;
+  const normalizedCaller=/^[6-9]\d{9}$/.test(caller.trim())?"+91"+caller.trim():caller;
   setCaller(normalizedCaller);
   setSaved({agent,version,connection,caller:normalizedCaller,active});
   setEditing(false);
