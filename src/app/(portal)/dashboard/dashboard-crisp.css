@@ -385,3 +385,34 @@
 }
 .crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-label::before,
 .crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-label::after{content:"";flex:1 1 0;min-width:0;height:0;border-top:1px solid var(--dashboard-card-line)}
+
+/* Keep campaign status immediately beside the name, not in a separate fixed track. */
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item{
+ grid-template-columns:27px minmax(0,1fr) 92px;column-gap:8px;align-items:center;
+}
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item .dashboard-activity-campaign-name{
+ display:flex;align-items:center;flex-wrap:wrap;gap:5px 9px;min-width:0;
+}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-activity-campaign-name strong{min-width:0;overflow-wrap:anywhere}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-activity-campaign-name .dashboard-activity-status{flex:none;white-space:nowrap}
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item time,
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item:not(:has(.dashboard-activity-status)) time{
+ grid-column:3;grid-row:1;justify-self:end;text-align:right;white-space:nowrap;
+}
+@container(max-width:330px){
+ .crm-app .ref-dashboard.dashboard-reference .ref-activity-item{grid-template-columns:24px minmax(0,1fr);gap:5px}
+ .crm-app .ref-dashboard.dashboard-reference .ref-activity-item time,
+ .crm-app .ref-dashboard.dashboard-reference .ref-activity-item:not(:has(.dashboard-activity-status)) time{grid-column:2;grid-row:2;justify-self:end}
+}
+@media(max-width:360px){
+ .crm-app .ref-dashboard.dashboard-reference .ref-activity-item{grid-template-columns:24px minmax(0,1fr)}
+ .crm-app .ref-dashboard.dashboard-reference .ref-activity-item time,
+ .crm-app .ref-dashboard.dashboard-reference .ref-activity-item:not(:has(.dashboard-activity-status)) time{grid-column:2;grid-row:2}
+}
+/* Solid status badges in dashboard activity and campaign table, in both themes. */
+:root .crm-app .ref-dashboard.dashboard-reference :is(.ref-campaign-table,.ref-activity-list) .campaign-status-badge.campaign-status-ongoing{
+ background:#7C3AED!important;background-image:none!important;color:#fff!important;border-color:#7C3AED!important;font-weight:600!important;opacity:1!important;
+}
+:root .crm-app .ref-dashboard.dashboard-reference :is(.ref-campaign-table,.ref-activity-list) .campaign-status-badge.campaign-status-hold{
+ background:#2563EB!important;background-image:none!important;color:#fff!important;border-color:#2563EB!important;font-weight:600!important;opacity:1!important;
+}
