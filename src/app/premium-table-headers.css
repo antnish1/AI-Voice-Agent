@@ -1,0 +1,23 @@
+/* Universal table header treatment in both light and dark themes.
+   Deliberately target column headers, not body row headers or toolbar controls. */
+:root:root .crm-app.crm-app table:is(table) thead tr > :is(th,td),
+:root:root .crm-app.crm-app table:is(table) tr > th[scope="col"],
+:root:root .crm-app.crm-app table:is(table) > tr > th:not([scope="row"]),
+:root:root .crm-app.crm-app table:is(table) > tbody > tr:first-child > th:not([scope="row"]),
+:root:root .crm-app.crm-app .appointments-empty-table-head {
+  background: #15365b !important;
+  background-image: none !important;
+  color: #fff !important;
+  border-color: #294b70 !important;
+}
+:root:root .crm-app.crm-app table:is(table) thead :is(th,td) :is(span,small,strong,label,a,svg) {
+  color: inherit !important;
+}
+:root:root .crm-app.crm-app table thead :is(th,td) input[type="checkbox"] {
+  accent-color: #fff;
+}
+
+/* Consistent column alignment: first column left, all remaining headers and values centered. */
+:root:root .crm-app.crm-app table:is(table) tr > :is(th,td):first-child { text-align:left !important; }
+:root:root .crm-app.crm-app table:is(table) tr > :is(th,td):not(:first-child) { text-align:center !important; vertical-align:middle; }
+:root:root .crm-app.crm-app table:is(table) tr > :is(th,td):not(:first-child) > :is(.fc-row-actions,.fc-created-datetime,.calllogs-customer,.customers-row-actions,.docs-row-actions) { justify-content:center !important; align-items:center !important; text-align:center !important; }
