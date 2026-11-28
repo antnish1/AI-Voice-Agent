@@ -534,3 +534,43 @@
 
 /* Single static login backdrop; no carousel, timers or transition controls. */
 .fv-login-full-background .fv-static-login-background .fv-vehicle-viewport>img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+
+/* Kia split login: static supplied photo, neutral surfaces, red accents. */
+.fv-login.fv-login-kia-split{--login-red:#D71920;--login-ink:#20242D;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);min-height:100dvh;overflow:hidden;background:#F5F6F8;color:var(--login-ink);color-scheme:light}
+.fv-kia-hero{position:relative;min-width:0;min-height:100dvh;overflow:hidden;isolation:isolate;background:#F5F6F8}
+.fv-kia-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:44% center;z-index:-2}
+.fv-kia-hero:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(250,250,250,.98) 0%,rgba(250,250,250,.94) 20%,rgba(250,250,250,.72) 39%,rgba(250,250,250,0) 66%)}
+.fv-kia-hero:after{content:"";position:absolute;right:-1px;top:0;bottom:0;width:clamp(12px,3vw,50px);background:linear-gradient(90deg,transparent,#F5F6F8);pointer-events:none}
+.fv-kia-copy{position:relative;padding:clamp(26px,5vw,76px);max-width:720px}
+.fv-kia-brand{display:flex;align-items:center;gap:15px;margin-bottom:clamp(22px,5vh,50px)}
+.fv-kia-brand img{width:68px;height:68px;object-fit:contain}
+.fv-kia-brand strong{border-left:1px solid #A1A1AA;padding-left:15px;font-size:20px;line-height:1.15;font-weight:850;color:var(--login-ink)}
+.fv-kia-overline{display:block;color:#B91C24;letter-spacing:.21em;font-weight:750;font-size:12px;margin-bottom:13px}
+.fv-kia-copy h2{font-size:clamp(28px,3.25vw,54px);line-height:1.1;letter-spacing:-.04em;max-width:590px;margin:0;font-weight:780;color:var(--login-ink)}
+.fv-kia-auth{display:flex;align-items:center;justify-content:center;min-width:0;padding:clamp(24px,4vw,65px);background:radial-gradient(ellipse at 100% 0,#fff,#F5F6F8 75%)}
+.fv-login-kia-split .fv-signin-card{display:flex;align-items:stretch;text-align:left;width:min(510px,100%);height:auto;min-height:0;max-height:none;overflow:visible;padding:clamp(26px,3.3vw,48px);background:#fff;color:var(--login-ink);border:1px solid #E0E2E6;border-radius:25px;box-shadow:0 20px 54px #20242d15;backdrop-filter:none}
+.fv-login-kia-split .fv-premium-brand{display:flex;align-items:center;justify-content:center;gap:13px}
+.fv-login-kia-split .fv-premium-brand img{width:64px;height:64px;object-fit:contain}
+.fv-login-kia-split .fv-premium-brand div{border-left:1px solid #D4D4D8;padding-left:13px;display:grid;gap:5px}
+.fv-login-kia-split .fv-premium-brand strong{font-size:14px;color:var(--login-ink);letter-spacing:.08em;font-weight:800}
+.fv-login-kia-split .fv-premium-brand span{font-size:11px;color:#B91C24;letter-spacing:.2em;font-weight:750}
+.fv-login-kia-split .fv-premium-rule{width:44px;height:3px;border-radius:4px;background:var(--login-red);margin:22px auto}
+.fv-login-kia-split .fv-signin-card h1{font-size:clamp(30px,3vw,43px);line-height:1.12;letter-spacing:-.04em;text-align:center;color:var(--login-ink);margin:0 0 9px;font-weight:800}
+.fv-login-kia-split .fv-signin-subtitle{text-align:center;color:#646B75;font-size:14px;line-height:1.5;margin:0 0 28px}
+.fv-login-kia-split .fv-login-form{gap:10px}
+.fv-login-kia-split .fv-premium-label{font-size:12px;color:#343943;font-weight:650}
+.fv-login-kia-split .fv-input-wrap{height:52px;min-height:52px;background:#F7F8F9;border:1px solid #DDE0E5;border-radius:11px;box-shadow:none;margin-bottom:8px}
+.fv-login-kia-split .fv-input-wrap:focus-within{border-color:#D71920;box-shadow:0 0 0 3px #D7192015}
+.fv-login-kia-split .fv-input-wrap input{color:#20242D!important;padding:12px 44px 12px 48px!important;font-size:14px!important;caret-color:#20242D}
+.fv-login-kia-split .fv-input-wrap input::placeholder{color:#737984}
+.fv-login-kia-split .fv-input-wrap input:-webkit-autofill{-webkit-text-fill-color:#20242D!important;box-shadow:0 0 0 1000px #F7F8F9 inset!important}
+.fv-login-kia-split .fv-input-wrap>svg{left:15px;color:#646B75;width:19px;height:19px}
+.fv-login-kia-split .fv-password-eye{color:#646B75}
+.fv-login-kia-split .fv-password-eye:hover{color:#B91C24}
+.fv-login.fv-login-kia-split .fv-submit{height:53px;background:#D71920!important;border:0;color:white;border-radius:11px;margin-top:8px;font-size:15px;font-weight:750;box-shadow:0 5px 12px #D719201A}
+.fv-login.fv-login-kia-split .fv-submit:hover:not(:disabled){background:#B91C24!important;filter:none}
+.fv-login-kia-split .fv-access-note{justify-content:flex-start;gap:9px;padding-top:18px;margin-top:22px;border-top:1px solid #E0E2E6;color:#646B75;font-size:11px;line-height:1.55}
+.fv-login-kia-split .fv-access-note svg{color:#B91C24;width:18px;height:18px}
+.fv-login-kia-split .fv-submit:focus-visible,.fv-login-kia-split .fv-password-eye:focus-visible{outline:2px solid #B91C24;outline-offset:3px}
+@media(max-width:800px){.fv-login.fv-login-kia-split{grid-template-columns:1fr;overflow:visible}.fv-kia-hero{min-height:260px}.fv-kia-copy{padding:24px}.fv-kia-brand{margin-bottom:18px}.fv-kia-brand img{width:49px;height:49px}.fv-kia-brand strong{font-size:16px}.fv-kia-copy h2{max-width:480px;font-size:clamp(26px,5vw,35px)}.fv-kia-hero:after{display:none}.fv-kia-photo{object-position:center 60%}.fv-kia-auth{padding:22px 16px 34px}.fv-login-kia-split .fv-signin-card{max-width:460px;padding:26px}}
+@media(min-width:801px) and (max-height:650px){.fv-kia-auth{padding:20px}.fv-login-kia-split .fv-signin-card{padding:23px 30px}.fv-login-kia-split .fv-premium-rule{margin:12px auto}.fv-login-kia-split .fv-signin-subtitle{margin-bottom:17px}.fv-login-kia-split .fv-access-note{margin-top:14px;padding-top:12px}}
