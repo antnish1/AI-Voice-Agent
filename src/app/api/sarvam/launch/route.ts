@@ -85,19 +85,24 @@ export async function POST(request:Request){
    return NextResponse.json({error:"Campaign creation result is uncertain. Check Sarvam and reconcile before another attempt; no automatic retries."},{status:502});
   }
   // Reserve cohort submission before calling provider so retries cannot double-enqueue calls.
-  const {error:reserveCohortError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitting",updated_at:new Date().toISOString()}).eq("campaign_id",id).eq("state","campaign_created");
-  if(reserveCohortError)return NextResponse.json({error:"Remote campaign created but cohort reservation failed. Do not retry launch."},{status:502});
+  const {data:cohortReservation,error:reserveCohortError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitting",updated_at:new Date().toISOString()}).eq("campaign_id",id).eq("state","campaign_created").select("campaign_id").maybeSingle();
+  if(reserveCohortError||!cohortReservation)return NextResponse.json({error:"Remote campaign created but cohort reservation failed. Do not retry launch."},{status:502});
   try{
    const streamed=await sarvamPost(sarvamPath("campaigns","/"+encodeURIComponent(providerId)+"/cohorts/stream"),{
     name:batch.cohort_name,users:prepared.users.map(user=>{if(batch.phone_column!=="phone_number")return user;return {...user,app_variables:{...user.app_variables,call_plus_3_date:followUpDate(istDate(start),3),call_plus_7_date:followUpDate(istDate(start),7)}};})
    });
-   if(typeof streamed.cohort_id!=="string"||!streamed.cohort_id)throw Error("Provider did not acknowledge cohort");
-   const {error:statusError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitted",provider_status:"scheduled",sarvam_cohort_id:streamed.cohort_id,updated_at:new Date().toISOString()}).eq("campaign_id",id);
+   const cohortId=typeof streamed.cohort_id==="string"?streamed.cohort_id:typeof streamed.id==="string"?streamed.id:"";
+   if(!/^[A-Za-z0-9_-]{1,200}$/.test(cohortId))throw Error("Provider did not acknowledge cohort");
+   const {error:statusError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitted",provider_status:"scheduled",sarvam_cohort_id:cohortId,updated_at:new Date().toISOString()}).eq("campaign_id",id);
    if(statusError)throw Error("Could not persist cohort state");
-   return NextResponse.json({ok:true,campaignId:providerId,cohortId:streamed.cohort_id,cohortStatus:streamed.status??"processing",message:"Sarvam accepted campaign and recipient cohort. Confirm processing status before the scheduled dialing window."});
-  }catch{
+   return NextResponse.json({ok:true,campaignId:providerId,cohortId:cohortId,cohortStatus:streamed.status??"processing",message:"Sarvam accepted campaign and recipient cohort. Confirm processing status before the scheduled dialing window."});
+  }catch(error){
+   const message=error instanceof Error?error.message:"";
+   const http=message.match(/^Sarvam rejected request \(HTTP (\d{3})\)/)?.[1];
+   const reason=http?"Sarvam rejected the upload (HTTP "+http+").":message==="Provider did not acknowledge cohort"?"Sarvam did not return a recognizable cohort ID.":message==="Could not persist cohort state"?"Sarvam acknowledged the cohort but CRM persistence failed.":"Upload response unavailable or unexpected.";
+   console.warn("Sarvam cohort submission requires reconciliation",{campaignId:id,reason});
    await supabase.from("voice_campaign_launches").update({state:"needs_reconciliation",updated_at:new Date().toISOString()}).eq("campaign_id",id);
-   return NextResponse.json({error:"Remote campaign created but cohort upload outcome is uncertain. Reconcile in Sarvam before the start time; never resend automatically."},{status:502});
+   return NextResponse.json({error:"Remote campaign created. "+reason+" Check the existing Sarvam campaign and cohort before taking further action. Do not resend automatically."},{status:502});
   }
  }catch{return NextResponse.json({error:"Campaign launch was not authorized or its configuration could not be validated."},{status:403});}
 }
