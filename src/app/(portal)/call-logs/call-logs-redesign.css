@@ -242,3 +242,29 @@
 }
 :root[data-theme="dark"] .crm-app .calllogs-reference .calllogs-ref-heading .calllogs-main-icon{background:transparent!important}
 @media(max-width:760px){.crm-app .calllogs-reference .calllogs-ref-heading .calllogs-main-icon{width:42px;height:42px;flex-basis:42px}}
+
+
+/* White Call Logs table and attached search/filters; light mode only. */
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-records-card,
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-table-top,
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-table-card,
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-expanded-table,
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-expanded-table tbody,
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-expanded-table tbody tr,
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-expanded-table tbody td,
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-table-footer{
+  background:#fff!important;background-image:none!important;
+}
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-expanded-table thead th{
+  background:#f1f3f6!important;color:#25354b;
+}
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-expanded-table tbody td{
+  border-bottom:1px solid #e2e8f0;
+}
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-expanded-table tbody tr:hover td{
+  background:#f7faff!important;
+}
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-records-card,
+:root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-table-top{
+  border-color:#e2e8f0;
+}
