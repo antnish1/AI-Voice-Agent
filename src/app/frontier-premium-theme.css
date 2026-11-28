@@ -151,3 +151,17 @@
   border-color:#1E436F!important;
   color:#fff!important;
 }
+
+/* Neutral summary filters: Reports and AI Agents only. Keep aria-pressed and keyboard focus. */
+.crm-app .reports-ref .reports-ref-kpis,.crm-app .agent-directory .agent-stats-grid{--summary-neutral:var(--crisp-canvas,#f5f6f8);--summary-border:var(--crisp-line,#d0d5dd);--summary-selected:#89929f;--summary-ink:var(--crisp-ink,#20242d)}
+:root[data-theme="dark"] .crm-app .reports-ref .reports-ref-kpis,:root[data-theme="dark"] .crm-app .agent-directory .agent-stats-grid{--summary-neutral:var(--dark-canvas,#101f37);--summary-border:var(--dark-line,#40536b);--summary-selected:#a3afbe;--summary-ink:var(--dark-ink,#edf6ff)}
+.crm-app .reports-ref .reports-ref-kpis .reports-category-card:nth-child(n),.crm-app .agent-directory .agent-stats-grid .agent-stat-card:nth-child(n),
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-kpis .reports-category-card[aria-pressed=true],:root:not([data-theme="dark"]) .crm-app .agent-directory .agent-stats-grid .agent-stat-card.agent-stat-selected,
+:root[data-theme="dark"] .crm-app .reports-ref .reports-ref-kpis .reports-category-card[aria-pressed=true],:root[data-theme="dark"] .crm-app .agent-directory .agent-stats-grid .agent-stat-card.agent-stat-selected{
+ background:var(--summary-neutral)!important;background-image:none!important;border:1px solid var(--summary-border)!important;box-shadow:none!important;color:var(--summary-ink)!important;
+}
+.crm-app .reports-ref .reports-ref-kpis .reports-category-card[aria-pressed=true][aria-pressed],.crm-app .agent-directory .agent-stats-grid .agent-stat-card.agent-stat-selected[aria-pressed=true]{border-color:var(--summary-selected)!important}
+.crm-app .reports-ref .reports-ref-kpis .reports-category-card:is(:hover,:focus-visible),.crm-app .agent-directory .agent-stats-grid .agent-stat-card:is(:hover,:focus-visible){border-color:var(--summary-selected)!important;box-shadow:none!important}
+.crm-app .reports-ref .reports-ref-kpis .reports-category-card::before,.crm-app .reports-ref .reports-ref-kpis .reports-category-card::after,.crm-app .agent-directory .agent-stats-grid .agent-stat-card::before,.crm-app .agent-directory .agent-stats-grid .agent-stat-card::after{content:none!important;display:none!important}
+.crm-app .reports-ref .reports-ref-kpis .reports-category-card :is(strong,div>span),.crm-app .agent-directory .agent-stats-grid .agent-stat-card :is(strong,div>span){color:var(--summary-ink)!important}
+.crm-app .reports-ref .reports-ref-kpis .reports-category-card .reports-ref-kpi-icon,.crm-app .agent-directory .agent-stats-grid .agent-stat-card .agent-stat-icon{background:transparent!important;background-image:none!important;box-shadow:none!important}

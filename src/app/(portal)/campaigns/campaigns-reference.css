@@ -234,3 +234,6 @@
 .crm-app .fc-campaign-page .fc-campaign-stats .fc-count-card .fc-count-icon .fc-3d-art{background:transparent!important;background-image:none!important;box-shadow:none!important}
 .crm-app .fc-campaign-page .fc-campaign-stats .fc-count-icon img{mix-blend-mode:multiply}
 :root[data-theme="dark"] .crm-app .fc-campaign-page .fc-campaign-stats .fc-count-icon img{mix-blend-mode:normal}
+
+/* Match historical report action and review/start dimensions, without changing access. */
+.crm-app .fc-campaign-page .fc-row-actions a.fc-review-start{box-sizing:border-box;min-width:124px;min-height:34px;padding:8px 12px;white-space:nowrap}
