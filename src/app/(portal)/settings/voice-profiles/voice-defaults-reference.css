@@ -234,3 +234,49 @@ linear-gradient(125deg,#e8f4ff 0%,#edf4ff 50%,#dceeff 100%);}
     grid-column:1;
   }
 }
+
+
+/* Voice Defaults full-canvas background and compact left-aligned card.
+   Use only the existing /web/defaultagent.jpeg; no separate robot overlay. */
+.crm-app .vdp-page{
+  box-sizing:border-box;
+  width:100%;
+  min-height:calc(100dvh - 120px)!important;
+  background-color:#fff;
+  background-image:url("/web/defaultagent.jpeg")!important;
+  background-size:cover!important;
+  background-position:center center!important;
+  background-repeat:no-repeat!important;
+  padding:12px 16px 32px;
+}
+.crm-app .vdp-page::before,
+.crm-app .vdp-page::after{display:none!important}
+.crm-app .vdp-page .vdp-body{
+  display:block!important;
+  width:100%;
+  max-width:none;
+  grid-template-columns:none!important;
+}
+.crm-app .vdp-page .vdp-body>.vdp-card{
+  box-sizing:border-box;
+  width:63%;
+  max-width:900px;
+  min-width:0;
+  margin:0;
+  background:#fff;
+}
+.crm-app .vdp-page .vdp-body>.vdp-visual{display:none!important}
+@media(max-width:1150px){
+  .crm-app .vdp-page .vdp-body>.vdp-card{width:72%;max-width:900px}
+}
+@media(max-width:900px){
+  .crm-app .vdp-page .vdp-body>.vdp-card{width:100%;max-width:900px}
+}
+@media(max-width:650px){
+  .crm-app .vdp-page{
+    min-height:calc(100dvh - 112px)!important;
+    padding:8px 10px 24px;
+    background-position:center top!important;
+  }
+  .crm-app .vdp-page .vdp-body>.vdp-card{width:100%;max-width:none}
+}
