@@ -1,7 +1,6 @@
 "use server";
 import {revalidatePath} from "next/cache";
 import {requireItSuperUser} from "@/lib/it-access";
-import {agentSnapshot} from "@/lib/sarvam/voice-discovery-snapshot";
 
 export async function saveVoiceProfile(form:FormData):Promise<{error?:string;ok?:boolean}>{
  try{
@@ -16,7 +15,7 @@ export async function saveVoiceProfile(form:FormData):Promise<{error?:string;ok?
   const active=form.get("active")==="yes";
   if(!/^[\da-f-]{36}$/i.test(dealershipId))return {error:"Choose a valid dealership."};
   if(!/^[A-Za-z0-9_.-]{3,200}$/.test(agentId))return {error:"Enter the real Sarvam Agent ID, not its display name."};
-  if(!Number.isInteger(version)||version<1)return {error:"Enter the committed agent version number from Sarvam; a draft version cannot be used for calling."};
+  if(!Number.isSafeInteger(version)||version<1||version>2147483647)return {error:"Enter a positive whole-number agent version from Sarvam. Only committed versions may be used for calling."};
   // The database permits display names on inactive drafts, but active profiles
   // must use a genuine connection identifier. Never treat a name as verified.
   const idPattern=/^[A-Za-z0-9_.-]{3,200}$/;
@@ -28,14 +27,8 @@ export async function saveVoiceProfile(form:FormData):Promise<{error?:string;ok?
   if(!/^\+[1-9]\d{7,14}$/.test(callerNumber))return {error:"Enter a valid connected caller number. Indian 10-digit numbers are automatically formatted as +91XXXXXXXXXX."};
   const {data:dealership,error:dealerError}=await supabase.from("dealerships").select("id").eq("id",dealershipId).maybeSingle();
   if(dealerError||!dealership)return {error:"Dealership not found."};
-  const {data:existing,error:existingError}=await supabase.from("dealership_voice_profiles").select("agent_id,app_version,connection_id,caller_number,active").eq("dealership_id",dealershipId).maybeSingle();
-  if(existingError)return {error:"Unable to verify the existing profile."};
-  const unchanged=existing?.agent_id===agentId&&existing?.app_version===version&&existing?.connection_id===connectionId&&existing?.caller_number===callerNumber;
-  if(!unchanged){
-   const known=agentSnapshot.find(a=>a.id===agentId);
-   if(known&&!known.versions.includes(version))return {error:"This version is not in the last verified committed-version catalogue. Refresh the catalogue before changing the profile."};
-   if(!known)return {error:"This agent is not in the last verified catalogue. Refresh the catalogue before changing the profile."};
-  }
+  // Draft defaults are manually configured; catalogue membership is not proof of live readiness.
+  // The launch/test routes retain their independent authorization and provider checks.
   const {error}=await supabase.from("dealership_voice_profiles").upsert({
    dealership_id:dealershipId,agent_id:agentId,app_version:version,
    connection_id:connectionId,caller_number:callerNumber,active,updated_by:user.id,
