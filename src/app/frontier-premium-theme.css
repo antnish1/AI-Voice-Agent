@@ -234,3 +234,41 @@
 :root[data-theme="dark"] .crm-app .reports-ref .reports-ref-kpis > button.reports-category-card .reports-card-selected-check{
   color:#fb7185;
 }
+
+/* First page header only: retain foreground content and remove the enclosing surface.
+   Match both themes and page-specific rules without changing record or KPI cards. */
+:root .crm-app :is(.dashboard-hero,.ref-dashboard-heading,.fc-campaign-hero,.agent-page-hero,.customers-ref-header,.calllogs-ref-heading,.reports-ref-heading,.appointments-ref-hero,.approvals-hero,.cb-heading,.pd-hero,.docs-hero,.settings-ref-hero,.it-user-heading,.vdp-header,.page-head,.crm-ops-heading):nth-child(n){
+ background:transparent!important;background-image:none!important;border:0!important;
+ border-radius:0!important;box-shadow:none!important;padding:6px 0!important;
+ min-height:0!important;overflow:visible!important;
+}
+:root .crm-app :is(.dashboard-hero,.ref-dashboard-heading,.fc-campaign-hero,.agent-page-hero,.customers-ref-header,.calllogs-ref-heading,.reports-ref-heading,.appointments-ref-hero,.approvals-hero,.cb-heading,.pd-hero,.docs-hero,.settings-ref-hero,.it-user-heading,.vdp-header,.page-head,.crm-ops-heading):nth-child(n)::before,
+:root .crm-app :is(.dashboard-hero,.ref-dashboard-heading,.fc-campaign-hero,.agent-page-hero,.customers-ref-header,.calllogs-ref-heading,.reports-ref-heading,.appointments-ref-hero,.approvals-hero,.cb-heading,.pd-hero,.docs-hero,.settings-ref-hero,.it-user-heading,.vdp-header,.page-head,.crm-ops-heading):nth-child(n)::after{
+ content:none!important;display:none!important;
+}
+:root .crm-app :is(.dashboard-hero,.fc-campaign-hero,.agent-page-hero,.settings-ref-hero,.vdp-header) :is(.fc-campaign-wave,.settings-ref-wave,.vdp-header-wave){
+ display:none!important;
+}
+:root .crm-app :is(.appointments-ref-hero .appointments-hero-banner,.pd-hero .pd-hero-banner,.cb-reference .cb-hero-banner){
+ background:transparent!important;background-image:none!important;border:0!important;
+ box-shadow:none!important;border-radius:0!important;
+}
+:root .crm-app :is(.appointments-ref-hero .appointments-hero-banner,.pd-hero .pd-hero-banner,.cb-reference .cb-hero-banner)::before,
+:root .crm-app :is(.appointments-ref-hero .appointments-hero-banner,.pd-hero .pd-hero-banner,.cb-reference .cb-hero-banner)::after{
+ content:none!important;display:none!important;
+}
+/* Agent directory actions only; the verification dialog and disabled controls are unchanged. */
+:root .crm-app .agent-directory :is(.agent-preview-card .agent-card-actions>button.agent-detail-button,.agent-page-hero .agent-test-header-action>button):nth-child(n){
+ background:#142D4E!important;background-image:none!important;border-color:#142D4E!important;
+ color:#fff!important;box-shadow:none!important;
+}
+:root .crm-app .agent-directory :is(.agent-preview-card .agent-card-actions>button.agent-detail-button,.agent-page-hero .agent-test-header-action>button):hover:not(:disabled),
+:root .crm-app .agent-directory :is(.agent-preview-card .agent-card-actions>button.agent-detail-button,.agent-page-hero .agent-test-header-action>button):focus-visible{
+ background:#1E436F!important;background-image:none!important;border-color:#1E436F!important;color:#fff!important;
+}
+:root .crm-app .agent-directory :is(.agent-preview-card .agent-card-actions>button.agent-detail-button,.agent-page-hero .agent-test-header-action>button):focus-visible{
+ outline:2px solid #5d91d0!important;outline-offset:2px;
+}
+:root .crm-app .agent-directory :is(.agent-preview-card .agent-card-actions>button.agent-detail-button,.agent-page-hero .agent-test-header-action>button):active:not(:disabled){
+ background:#061F42!important;background-image:none!important;border-color:#061F42!important;color:#fff!important;
+}
