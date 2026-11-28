@@ -1,3 +1,4 @@
+import {reconcileMissingCampaignCustomers} from "@/lib/sarvam/customer-reconciliation";
 import {requireMembership,canPrepare} from "@/lib/auth";
 import {CustomersDirectory,type CustomerRow,type ImportRow} from "./customers-directory";
 const PAGE_SIZE=12;
@@ -9,6 +10,7 @@ export default async function Customers({searchParams}:{searchParams:Promise<{q?
  const period=["7","30","90"].includes(String(params.period))?String(params.period):"all";
  const requested=Math.max(1,Math.min(100000,Number.parseInt(String(params.page??"1"),10)||1));
  const id=membership.dealership_id;
+ if(canPrepare(membership.role))await reconcileMissingCampaignCustomers(supabase,id);
  const makeQuery=()=>{let q=supabase.from("customers").select("id,name,mobile,consent_status,do_not_call,created_at",{count:"exact"}).eq("dealership_id",id);
   if(query)q=q.or(`name.ilike.%${query}%,mobile.ilike.%${query}%`);
   if(status!=="all")q=q.eq("consent_status",status);
