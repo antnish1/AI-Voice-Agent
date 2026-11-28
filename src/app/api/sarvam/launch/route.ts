@@ -13,8 +13,8 @@ export async function POST(request:Request){
   const input=await request.json();
   const id=String(input.campaignId??"");
   if(!/^[\da-f-]{36}$/i.test(id))return NextResponse.json({error:"Invalid campaign ID"},{status:400});
-  const {data:campaign,error:campaignError}=await supabase.from("campaigns").select("id,name,dealership_id,status,approved_by,approved_at").eq("id",id).maybeSingle();
-  if(campaignError||!campaign||!["DRAFT","PENDING","PENDING_MANAGER_APPROVAL","PAUSED","APPROVED"].includes(campaign.status))
+  const {data:campaign,error:campaignError}=await supabase.from("campaigns").select("id,name,dealership_id,status,approved_by,approved_at,historical_read_only").eq("id",id).maybeSingle();
+  if(campaignError||!campaign||campaign.historical_read_only||!["DRAFT","PENDING","PENDING_MANAGER_APPROVAL","PAUSED","APPROVED"].includes(campaign.status))
    return NextResponse.json({error:"A pending or held local campaign is required before launching."},{status:403});
   if(input.confirm!=="LAUNCH "+campaign.name||input.confirmedLaunch!==true)return NextResponse.json({error:"Exact campaign confirmation and explicit authorization to launch real calls are required."},{status:400});
   const [{data:batch,error:batchError},{data:config,error:configError}]=await Promise.all([
