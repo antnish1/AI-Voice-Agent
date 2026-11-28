@@ -11,7 +11,7 @@ export function MotionRoute({children}:{children:ReactNode}) {
   const pathname=usePathname();
   const reduce=!usePremiumMotion();
   return <MotionConfig reducedMotion="user" transition={{duration:motionTokens.duration.standard,ease:motionTokens.ease}}>
-    <AnimatePresence initial={false} mode="wait">
+    <AnimatePresence initial={true} mode="wait">
       <motion.div key={pathname} className="frontier-motion-route"
         initial={reduce?false:routeVariants.initial}
         animate={reduce?{opacity:1}:routeVariants.enter}

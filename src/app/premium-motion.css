@@ -60,3 +60,19 @@
 :root:is([data-motion-preference="minimal"],[data-motion-preference="off"]) :is(.campaign-modal-overlay,.frontier-operation-progress,.fc-action-toast) *,:root:is([data-motion-preference="minimal"],[data-motion-preference="off"]) :is(.campaign-modal-overlay,.fc-action-toast){animation:none!important;transition-duration:0ms!important}
 :root:is([data-motion-preference="minimal"],[data-motion-preference="off"]) .frontier-operation-indeterminate{width:100%;opacity:.55}
 @media(prefers-reduced-motion:reduce){:is(.campaign-modal-overlay,.frontier-operation-progress,.fc-action-toast) *, .campaign-modal-overlay,.fc-action-toast{animation:none!important;transition-duration:0ms!important}.frontier-operation-indeterminate{width:100%;opacity:.55}}
+
+/* Finite decorative movement; no simulated activity. */
+@keyframes premium-float{0%,100%{translate:0 0}50%{translate:0 -3px}}
+.crm-app[data-motion-preference="premium"] :is(.crm-empty-art,.customers-illustrated-empty img){animation:premium-art 380ms var(--premium-motion-ease) both,premium-float 2.2s ease-in-out .4s 2}
+.crm-app[data-motion-preference="premium"] :is(.frontier-chart-tooltip,.frontier-sidebar-tooltip,[role="tooltip"]){animation:premium-toast 140ms ease both}
+.frontier-top-nav-link{position:relative}
+.premium-top-nav-indicator{position:absolute;inset:auto 8px 0;height:2px;border-radius:3px;background:currentColor;pointer-events:none}
+@supports (transition-behavior:allow-discrete){
+ :root[data-motion-preference="premium"] dialog{transition:opacity 160ms ease,scale 160ms ease,display 160ms allow-discrete,overlay 160ms allow-discrete;opacity:0;scale:.98}
+ :root[data-motion-preference="premium"] dialog[open]{opacity:1;scale:1;animation:none}
+ @starting-style{:root[data-motion-preference="premium"] dialog[open]{opacity:0;scale:.98}}
+ :root[data-motion-preference="premium"] dialog::backdrop{transition:opacity 160ms ease,display 160ms allow-discrete,overlay 160ms allow-discrete;opacity:0}
+ :root[data-motion-preference="premium"] dialog[open]::backdrop{opacity:1;animation:none}
+ @starting-style{:root[data-motion-preference="premium"] dialog[open]::backdrop{opacity:0}}
+}
+@media(prefers-reduced-motion:reduce){:root[data-motion-preference="premium"] dialog,:root[data-motion-preference="premium"] dialog::backdrop{transition:none!important}}
