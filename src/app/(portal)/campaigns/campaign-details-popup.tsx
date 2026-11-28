@@ -7,7 +7,7 @@ export function CampaignDetailsPopup({name,dealership,status,created,autoOpen=fa
  const fields=[["Dealership",dealership,"building"],["Created",created,"calendar"]];
  const close=()=>dialog.current?.close();
  const tone="campaign-status-"+status.toLowerCase();
- return <><button type="button" className="btn-outline small fc-dealership-view" onClick={()=>dialog.current?.showModal()}>View</button>
+ return <><button type="button" className="small fc-dealership-view" onClick={()=>dialog.current?.showModal()}>View</button>
  <dialog ref={dialog} aria-label="Campaign Details" className="fc-campaign-details-dialog" onClick={e=>{if(e.target===e.currentTarget)close();}}>
  <section className="fc-details-surface">
  <header className="fc-details-heading"><span className="fc-details-emblem" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M4 11V7l9-4v18l-9-4v-6ZM13 7l6-2v14l-6-2M4 11H2v6h3l2 4"/></svg></span><div><h2>Campaign Details</h2><p>Campaign overview</p></div><button type="button" className="fc-details-close" aria-label="Close campaign details" onClick={close}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>
