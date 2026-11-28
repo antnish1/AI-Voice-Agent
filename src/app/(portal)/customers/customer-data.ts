@@ -3,9 +3,10 @@ import {requireMembership,canPrepare} from "@/lib/auth";
 import type {CustomerRow,ImportRow} from "./customers-directory";
 import {isItSuperUser} from "@/lib/it-access";
 const PAGE_SIZE=12;
-export async function loadCustomers(params:{q?:string;page?:string;campaign?:string;dealer?:string},exportAll=false){
+export async function loadCustomers(params:{q?:string;page?:string;campaign?:string;dealer?:string;summary?:string},exportAll=false){
  const {supabase,membership,user}=await requireMembership();if(!membership)return null;
  const query=String(params.q??"").trim().replace(/[%,()"'\\]/g,"").slice(0,80);
+ const summary=["active","contacted","followup"].includes(String(params.summary??""))?String(params.summary):"all";
  const status="all";
  const period="all";
  const requested=Math.max(1,Math.min(100000,Number.parseInt(String(params.page??"1"),10)||1));
@@ -35,7 +36,18 @@ export async function loadCustomers(params:{q?:string;page?:string;campaign?:str
   const batches=await readAll<{id:string}>(()=>supabase.from("customer_import_batches").select("id").eq("dealership_id",target.dealership_id).eq("filename","campaign-"+target.id+".csv").order("id"));
   for(const b of batches){const rows=await readAll<{customer_id:string|null}>(()=>supabase.from("customer_import_rows").select("customer_id").eq("dealership_id",target.dealership_id).eq("batch_id",b.id).order("id"));for(const v of rows)if(v.customer_id)campaignCustomers.add(v.customer_id);}
  }
- const matched=campaignFilter==="all"?allCustomers:allCustomers.filter(c=>campaignCustomers.has(c.id));
+ const campaignMatched=campaignFilter==="all"?allCustomers:allCustomers.filter(c=>campaignCustomers.has(c.id));
+ // Select customer-summary filters against the full scoped population before
+ // pagination, so card clicks show real matches across all customer pages.
+ let summaryIds:Set<string>|null=null;
+ if(summary==="contacted"){
+  const answered=await readAll<{customer_id:string|null}>(()=>scope(supabase.from("voice_call_records").select("customer_id")).eq("status","answered").not("customer_id","is",null).order("id"));
+  summaryIds=new Set(answered.map(x=>x.customer_id).filter((id):id is string=>!!id));
+ }else if(summary==="followup"){
+  const pendingCallbacks=await readAll<{customer_id:string|null}>(()=>scope(supabase.from("crm_callbacks").select("customer_id")).in("status",["pending","requested","scheduled"]).not("customer_id","is",null).order("id"));
+  summaryIds=new Set(pendingCallbacks.map(x=>x.customer_id).filter((id):id is string=>!!id));
+ }
+ const matched=campaignMatched.filter(c=>summary==="active"?c.consent_status==="verified"&&!c.do_not_call:summaryIds?summaryIds.has(c.id):true);
  const count=matched.length,page=Math.min(requested,Math.max(1,Math.ceil(count/PAGE_SIZE)));
  const customers=exportAll?matched:matched.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
  const customerIds=customers.map(c=>c.id);
@@ -72,5 +84,5 @@ export async function loadCustomers(params:{q?:string;page?:string;campaign?:str
    dealership:dealerNames.get(c.dealership_id)??null,vehicleModel:pick("vehicle_model","Model","Vehicle Model"),registration:pick("registration_number","Reg. Number","Registration Number"),lastService:pick("last_service_date","Last ServiceDate"),serviceDue:pick("next_service_due_date","Service DueDate"),serviceType:pick("service_type","Service Type"),mileage:pick("last_reported_mileage","Last Reported Mileage"),warranty:pick("warranty_active"),address:pick("customer_address"),remarks:scalar(lastFields.customer_remarks)||scalar(lastFields.call_summary)||null,lastOutcome:scalar(lastFields.call_disposition)||last?.status||null,attempts:ownCalls.length,followup:callback?.requested_at??null,followupStatus:callback?.status??null,
    callHistory:history.slice(0,10).map(x=>({date:x.started_at,status:x.status,duration:x.duration_seconds,outcome:scalar((x.output_variables as Record<string,unknown>|null)?.call_disposition)||null}))};
  });
- return {metrics,customers:records,count,page,pageSize:PAGE_SIZE,query,status,period,dealershipId:id,canManage:canPrepare(membership.role),imports:(imports.data??[]) as ImportRow[],campaigns,dealerships,campaignFilter,dealerFilter,it};
+ return {metrics,customers:records,count,page,pageSize:PAGE_SIZE,query,status,period,summary,dealershipId:id,canManage:canPrepare(membership.role),imports:(imports.data??[]) as ImportRow[],campaigns,dealerships,campaignFilter,dealerFilter,it};
 }
