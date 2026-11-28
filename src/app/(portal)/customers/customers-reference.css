@@ -43,7 +43,7 @@
 .crm-app .customers-reference .customers-ref-empty{padding:0!important;border:0}
 .crm-app .customers-reference .customers-card-grid:has(>.customers-illustrated-empty){display:block;padding:0}
 .crm-app .customers-reference .customers-illustrated-empty{position:relative;isolation:isolate;overflow:hidden;min-height:260px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;padding:15px 12px 25px;text-align:center;white-space:normal;background:#fff}
-.crm-app .customers-reference .customers-illustrated-empty:after{content:"";position:absolute;z-index:-1;inset:auto -12px 0;height:78px;background:radial-gradient(ellipse at 7% 100%,#dceeff 0 32%,transparent 33%),radial-gradient(ellipse at 91% 100%,#e1effe 0 35%,transparent 36%),radial-gradient(ellipse at 25% 125%,#edf5ff 0 38%,transparent 39%);pointer-events:none}
+.crm-app .customers-reference .customers-illustrated-empty:after{content:none;display:none}
 .crm-app .customers-reference .customers-illustrated-empty svg.customer-art{width:170px;height:128px;animation:customer-float 4s ease-in-out infinite;filter:drop-shadow(0 4px 4px #233e6d14)}
 .crm-app .customers-reference .customers-illustrated-empty h3{font-size:19px;font-weight:800;letter-spacing:-.35px;color:var(--customer-ink);margin:0}
 .crm-app .customers-reference .customers-illustrated-empty p{color:var(--customer-muted);font-size:12px;margin:0 0 5px}
@@ -58,7 +58,7 @@
 @media(prefers-reduced-motion:reduce){.crm-app .customers-reference *, .crm-app .customers-reference *:before{animation:none!important;transition:none!important}.crm-app .customers-reference .customers-stat:hover{transform:none}}
 :root[data-theme="dark"] .crm-app .customers-reference{--customer-ink:#edf3ff;--customer-muted:#b8c8e0;--customer-line:#40516b;background:#192638}
 :root[data-theme="dark"] .crm-app .customers-reference .customers-ref-header{background:linear-gradient(130deg,#1a2b40,#29425e)}
-:root[data-theme="dark"] .crm-app .customers-reference .customers-ref-header:before,:root[data-theme="dark"] .crm-app .customers-reference .customers-illustrated-empty:after{opacity:.12}
+:root[data-theme="dark"] .crm-app .customers-reference .customers-ref-header:before{opacity:.12}
 :root[data-theme="dark"] .crm-app .customers-reference :is(.customers-stat,.customers-list-panel,.customers-illustrated-empty,.customers-search,.customers-toolbar select,.customers-reset,.customers-button-outline,.customers-export,.customers-view-group button:not(.active),.customers-search button,.customers-data-table th){background:#23344a!important;border-color:#40516b!important;color:var(--customer-ink)!important}
 
 
@@ -559,3 +559,12 @@
     max-height:calc(100dvh - 20px)!important;
   }
 }
+
+/* Customer identity column only: stable avatar position and left-aligned name/mobile. */
+:root .crm-app .customers-reference .customers-records-table tr > :is(th,td):first-child{text-align:left!important}
+.crm-app .customers-reference .customers-records-table td:first-child .customers-name-cell{justify-content:flex-start!important;align-items:center;margin-inline:0!important;width:100%;min-width:0}
+.crm-app .customers-reference .customers-records-table td:first-child .customers-list-avatar{flex-shrink:0}
+.crm-app .customers-reference .customers-records-table td:first-child .customers-name-cell .customer-cell-stack{align-items:flex-start!important;text-align:left!important;margin-inline:0!important;width:auto;min-width:0;max-width:100%}
+.crm-app .customers-reference .customers-records-table td:first-child .customers-name-cell .customer-cell-stack :is(strong,small){text-align:left!important}
+/* Empty-state content stays centered even when the colspan cell is first. */
+:root .crm-app .customers-reference .customers-records-table tr > td.customers-ref-empty{text-align:center!important}
