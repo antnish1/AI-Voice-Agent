@@ -6,6 +6,7 @@ import {AnimatePresence,motion} from "motion/react";
 import {createPortal} from "react-dom";
 import type {FocusEvent,MouseEvent} from "react";
 import {useMotionPreference,usePremiumMotion} from "@/components/motion/motion-preference";
+import {ApprovalNotifications} from "@/components/motion/approval-notifications";
 import {MotionRoute} from "@/components/motion/motion-route";
 import {motionTokens} from "@/components/motion/motion-tokens";
 import type {Membership} from "@/lib/auth";
@@ -106,7 +107,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     <div className="ref-header-breadcrumbs"><PortalBreadcrumbs/></div>
     <div className="ref-topbar-right">
 
-     <span className="ref-notification" title="Notifications will be enabled when event ingestion is ready" aria-label="Notifications not connected">♧</span>
+     <ApprovalNotifications count={pendingApprovals} canReview={isItAdmin}/>
      <ProfileMenu userId={userId} email={userEmail} role={membership.role} dealershipName={membership.dealerships?.name??"Dealership"} initialName={displayName} initialAvatarPath={avatarPath}/>
     </div>
    </header>
