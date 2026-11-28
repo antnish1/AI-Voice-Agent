@@ -411,7 +411,7 @@
 }
 /* Solid status badges in dashboard activity and campaign table, in both themes. */
 :root .crm-app .ref-dashboard.dashboard-reference :is(.ref-campaign-table,.ref-activity-list) .campaign-status-badge.campaign-status-ongoing{
- background:#7C3AED!important;background-image:none!important;color:#fff!important;border-color:#7C3AED!important;font-weight:600!important;opacity:1!important;
+ background:#9065D6!important;background-image:none!important;color:#fff!important;border-color:#9065D6!important;font-weight:600!important;opacity:1!important;
 }
 :root .crm-app .ref-dashboard.dashboard-reference :is(.ref-campaign-table,.ref-activity-list) .campaign-status-badge.campaign-status-hold{
  background:#2563EB!important;background-image:none!important;color:#fff!important;border-color:#2563EB!important;font-weight:600!important;opacity:1!important;

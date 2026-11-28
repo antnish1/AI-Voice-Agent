@@ -1,6 +1,6 @@
 import {reconcileMissingCampaignCustomers} from "@/lib/sarvam/customer-reconciliation";
 import {requireMembership,canPrepare} from "@/lib/auth";
-import type {CustomerRow,ImportRow} from "./customers-directory";
+import type {CustomerRow} from "./customers-directory";
 import {isItSuperUser} from "@/lib/it-access";
 const PAGE_SIZE=12;
 export async function loadCustomers(params:{q?:string;page?:string;campaign?:string;dealer?:string;summary?:string},exportAll=false){
@@ -58,8 +58,6 @@ export async function loadCustomers(params:{q?:string;page?:string;campaign?:str
  const count=simplePage?sqlCount:matched.length,page=Math.min(requested,Math.max(1,Math.ceil(count/PAGE_SIZE)));
  const customers=exportAll||simplePage?matched:matched.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
  const customerIds=customers.map(c=>c.id);
- const imports=await scope(supabase.from("customer_import_batches").select("id,filename,imported_rows,matched_rows,rejected_rows,created_at")).order("created_at",{ascending:false}).limit(5);
- if(imports.error)throw Error("Unable to load import history.");
  const sourceById=new Map<string,string>();
  const importedFields=new Map<string,Record<string,unknown>>();
  const detailCalls: {data:any[]}={data:[]},detailCallbacks:{data:any[]}={data:[]};
@@ -89,5 +87,5 @@ export async function loadCustomers(params:{q?:string;page?:string;campaign?:str
    dealership:dealerNames.get(c.dealership_id)??null,vehicleModel:pick("vehicle_model","Model","Vehicle Model"),registration:pick("registration_number","Reg. Number","Registration Number"),lastService:pick("last_service_date","Last ServiceDate"),serviceDue:pick("next_service_due_date","Service DueDate"),serviceType:pick("service_type","Service Type"),mileage:pick("last_reported_mileage","Last Reported Mileage"),warranty:pick("warranty_active"),address:pick("customer_address"),remarks:scalar(lastFields.customer_remarks)||scalar(lastFields.call_summary)||null,lastOutcome:scalar(lastFields.call_disposition)||last?.status||null,attempts:ownCalls.length,followup:callback?.requested_at??null,followupStatus:callback?.status??null,
    callHistory:history.slice(0,10).map(x=>({date:x.started_at,status:x.status,duration:x.duration_seconds,outcome:scalar((x.output_variables as Record<string,unknown>|null)?.call_disposition)||null}))};
  });
- return {metrics,customers:records,count,page,pageSize:PAGE_SIZE,query,status,period,summary,dealershipId:id,canManage:canPrepare(membership.role),imports:(imports.data??[]) as ImportRow[],campaigns,dealerships,campaignFilter,dealerFilter,it};
+ return {metrics,customers:records,count,page,pageSize:PAGE_SIZE,query,status,period,summary,dealershipId:id,canManage:canPrepare(membership.role),campaigns,dealerships,campaignFilter,dealerFilter,it};
 }
