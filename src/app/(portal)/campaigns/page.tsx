@@ -39,9 +39,9 @@ function EmptyArt(){
  <g fill="#147bd7"><circle cx="77" cy="111" r="4"/><circle cx="383" cy="116" r="4"/><path d="m68 30 4 10 10 4-10 4-4 10-4-10-10-4 10-4Z" opacity=".6"/><path d="m402 27 3 7 7 3-7 3-3 7-3-7-7-3 7-3Z" opacity=".45"/></g>
  </svg>;
 }
-function CountsCard({kind,label,value}:{kind:"all"|"draft"|"pending"|"hold"|"reject";label:string;value:number}){
+function CountsCard({kind,label,value,href,selected}:{kind:"all"|"draft"|"pending"|"hold"|"reject";label:string;value:number;href:string;selected:boolean}){
  const icon=<CampaignArtwork kind={kind==="draft"?"ongoing":kind}/>;
- return <div className={`fc-count-card fc-count-${kind}`}><span className="fc-count-icon">{icon}</span><span className="fc-count-content"><span>{label}</span><strong>{value}</strong></span></div>;
+ return <Link href={href} aria-current={selected?"true":undefined} className={`fc-count-card fc-count-${kind} unified-summary-card${selected?" unified-summary-selected":""}`}><span className="fc-count-icon">{icon}</span><span className="fc-count-content"><span>{label}</span><strong>{value}</strong></span>{selected&&<span className="unified-summary-check" aria-hidden="true">✓</span>}</Link>;
 }
 function normalizeDate(input?:string){return input&&/^\d{4}-\d{2}-\d{2}$/.test(input)?input:"";}
 export default async function Campaigns({searchParams}:{searchParams?:Promise<Filters>}={}){
@@ -118,13 +118,14 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
  const permitted=canCreateCampaign(membership.role);
  const canOperate=itUser;
  const filtered=!!(q||selectedStatus||from||to||selectedDealer);
+ const summaryHref=(nextStatus:string)=>{const query=new URLSearchParams();if(selectedDealer)query.set("dealership",selectedDealer);if(q)query.set("q",q);if(from)query.set("from",from);if(to)query.set("to",to);if(nextStatus)query.set("status",nextStatus);const value=query.toString();return "/campaigns"+(value?"?"+value:"");};
  return <div className="fc-campaign-page"><CampaignActionToast/>
   <header className="fc-campaign-hero">
    <div className="fc-hero-copy"><h1><CampaignArtwork kind="hero" className="fc-campaign-hero-art"/> <span>Campaigns</span></h1></div>
    <HeaderWave/>
    <div className="fc-hero-actions">{itUser&&<Link href="/settings/voice-profiles" className="fc-voice-button"><CampaignIcon kind="voice"/> Voice Agent Defaults</Link>}{permitted&&<Link href="/campaigns/new" className="fc-primary-button"><span>＋</span> New Campaign</Link>}</div>
   </header>
-  <div className="fc-campaign-stats"><CountsCard kind="all" label="Total Campaigns" value={total}/><CountsCard kind="draft" label="Ongoing" value={drafts}/><CountsCard kind="pending" label="Pending" value={pending}/><CountsCard kind="hold" label="Hold" value={hold}/><CountsCard kind="reject" label="Rejected" value={rejected}/></div>
+  <div className="fc-campaign-stats"><CountsCard kind="all" label="Total Campaigns" value={total} href={summaryHref("")} selected={!selectedStatus}/><CountsCard kind="draft" label="Ongoing" value={drafts} href={summaryHref("Ongoing")} selected={selectedStatus==="Ongoing"}/><CountsCard kind="pending" label="Pending" value={pending} href={summaryHref("Pending")} selected={selectedStatus==="Pending"}/><CountsCard kind="hold" label="Hold" value={hold} href={summaryHref("Hold")} selected={selectedStatus==="Hold"}/><CountsCard kind="reject" label="Rejected" value={rejected} href={summaryHref("Reject")} selected={selectedStatus==="Reject"}/></div>
   <section className="fc-campaign-list" aria-label="All campaigns">
    <div className="fc-list-toolbar"><h2><span className="fc-grid-icon"><CampaignIcon kind="grid"/></span> All Campaigns</h2>
     <AutoCampaignFilters>
