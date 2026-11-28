@@ -2,9 +2,11 @@
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {useState,useEffect} from "react";
-import {AnimatePresence,motion, useReducedMotion} from "motion/react";
+import {AnimatePresence,motion} from "motion/react";
 import {createPortal} from "react-dom";
 import type {FocusEvent,MouseEvent} from "react";
+import {useMotionPreference,usePremiumMotion} from "@/components/motion/motion-preference";
+import {ApprovalNotifications} from "@/components/motion/approval-notifications";
 import {MotionRoute} from "@/components/motion/motion-route";
 import {motionTokens} from "@/components/motion/motion-tokens";
 import type {Membership} from "@/lib/auth";
@@ -28,7 +30,9 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
  const path=usePathname();
  const [navigationLayout]=useNavigationLayout(userId);
  const isTopMenu=navigationLayout==="topbar";
- const reducedMotion=useReducedMotion();
+ const {preference}=useMotionPreference();
+ const premiumMotion=usePremiumMotion();
+ const reducedMotion=!premiumMotion;
  const [narrowScreen,setNarrowScreen]=useState(false);
  useEffect(()=>{const query=window.matchMedia("(max-width:760px)");const update=()=>setNarrowScreen(query.matches);update();query.addEventListener("change",update);return ()=>query.removeEventListener("change",update);},[]);
  const [collapsed,setCollapsed]=useState(false),[mobile,setMobile]=useState(false),[campaignsExpanded,setCampaignsExpanded]=useState(false),[helpOpen,setHelpOpen]=useState(false);
@@ -45,7 +49,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
  const campaignActive=path==="/campaigns"||path.startsWith("/campaigns/")||(isItAdmin&&path==="/approvals");
  const closeMobile=()=>setMobile(false);
  useEffect(()=>{setCampaignsExpanded(campaignActive);setMobile(false);},[path,navigationLayout,campaignActive]);
- return <div className={`app crm-app reference-app ${collapsed?"nav-collapsed":""} ${mobile?"nav-open":""} ${isTopMenu?"frontier-top-layout":""}`}>
+ return <div data-motion-preference={preference} className={`app crm-app reference-app ${collapsed?"nav-collapsed":""} ${mobile?"nav-open":""} ${isTopMenu?"frontier-top-layout":""}`}>
   {!isTopMenu&&<motion.aside className="sidebar crm-sidebar ref-sidebar frontier-reference-sidebar" animate={{width:narrowScreen?224:collapsed?68:224}} transition={reducedMotion?{duration:0}:motionTokens.spring}>
    <div className="brand crm-brand ref-brand frontier-sidebar-brand" title="Frontier Voice CRM">
     {collapsed&&!narrowScreen?
@@ -103,7 +107,7 @@ export function Shell({children,membership,userEmail,userId,displayName,avatarPa
     <div className="ref-header-breadcrumbs"><PortalBreadcrumbs/></div>
     <div className="ref-topbar-right">
 
-     <span className="ref-notification" title="Notifications will be enabled when event ingestion is ready" aria-label="Notifications not connected">♧</span>
+     <ApprovalNotifications count={pendingApprovals} canReview={isItAdmin}/>
      <ProfileMenu userId={userId} email={userEmail} role={membership.role} dealershipName={membership.dealerships?.name??"Dealership"} initialName={displayName} initialAvatarPath={avatarPath}/>
     </div>
    </header>

@@ -1,10 +1,11 @@
 "use client";
-import { motion, useReducedMotion } from "motion/react";
+import {usePremiumMotion} from "./motion-preference";
+import { motion } from "motion/react";
 import { motionTokens } from "./motion-tokens";
 
 type Day={key:string;label:string;count:number};
 export function CampaignActivityChart({daily,days}:{daily:Day[];days:number}){
- const reduced=useReducedMotion();
+ const reduced=!usePremiumMotion();
  const max=Math.max(1,...daily.map(d=>d.count));
  return <div className="ref-chart-area" role="group" aria-label={"Campaigns created over "+days+" days"}>
   <div className="ref-chart-grid" aria-hidden="true"><span/><span/><span/><span/></div>

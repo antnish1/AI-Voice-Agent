@@ -3,8 +3,9 @@
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {useEffect,useState} from "react";
-import {AnimatePresence,motion,useReducedMotion} from "motion/react";
+import {AnimatePresence,motion} from "motion/react";
 import {SidebarIcon,type SidebarIconName} from "@/components/sidebar-icons";
+import {usePremiumMotion} from "@/components/motion/motion-preference";
 import {motionTokens} from "@/components/motion/motion-tokens";
 
 type Item={name:string;url:string;icon:SidebarIconName};
@@ -56,7 +57,7 @@ const menus:Record<string,Menu>={
 export function TopMenuNavigation({items,pendingApprovals,isItAdmin}:{items:Item[];pendingApprovals:number;isItAdmin:boolean}){
  const pathname=usePathname();
  const [open,setOpen]=useState<string|null>(null);
- const reduce=useReducedMotion();
+ const reduce=!usePremiumMotion();
  useEffect(()=>setOpen(null),[pathname]);
  const active=items.find(x=>x.url===open);
  const menu=open?menus[open]:undefined;
@@ -76,7 +77,7 @@ export function TopMenuNavigation({items,pendingApprovals,isItAdmin}:{items:Item
       <Link href={item.url} className="frontier-top-nav-link" aria-current={isCurrent?"page":undefined}
         aria-expanded={open===item.url} aria-haspopup="true" aria-controls="frontier-top-mega-panel"
         onClick={close}>
-       <SidebarIcon name={item.icon} size={17}/><span>{item.name}</span>
+       {isCurrent&&<motion.span className="premium-top-nav-indicator" layoutId="premium-top-nav-indicator" transition={{duration:reduce?0:.22}} aria-hidden="true"/>}<SidebarIcon name={item.icon} size={17}/><span>{item.name}</span>
        {item.url==="/approvals"&&pendingApprovals>0&&<span className="frontier-top-approval-badge">{pendingApprovals>99?"99+":pendingApprovals}</span>}
       </Link>
       <button type="button" className="frontier-top-mega-toggle"
