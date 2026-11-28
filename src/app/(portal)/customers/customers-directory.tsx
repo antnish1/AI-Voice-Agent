@@ -2,7 +2,8 @@
 import {ArtworkImage} from "@/components/artwork-image";
 import {EmptyState} from "@/components/empty-state";
 import {Pagination} from "@/components/pagination";
-import {useEffect,useMemo,useState,useTransition,useId,type ReactNode} from "react";
+import {useEffect,useMemo,useRef,useState,useTransition,useId,type ReactNode} from "react";
+import {createPortal} from "react-dom";
 import "./customers-reference.css";
 import {useRouter} from "next/navigation";
 import {createBrowserSupabase} from "@/lib/supabase/browser";
@@ -51,6 +52,7 @@ const outcomeLabel=(v:string|null|undefined)=>v?v.replace(/_/g," ").toLowerCase(
 const csvEscape=(s:string)=>'"'+s.replace(/"/g,'""')+'"';
 export function CustomersDirectory({metrics,customers,count,page,pageSize,query,status,period,canManage,dealershipId,imports}:Props){
  const router=useRouter();const [term,setTerm]=useState(query),[showUpload,setShowUpload]=useState(false),[showAdd,setShowAdd]=useState(false),[details,setDetails]=useState<CustomerRow|null>(null),[name,setName]=useState(""),[phone,setPhone]=useState(""),[error,setError]=useState(""),[success,setSuccess]=useState(""),[pending,startTransition]=useTransition(),[grid,setGrid]=useState(false);
+ const modalBodyRef=useRef<HTMLDivElement>(null);
  const [selected,setSelected]=useState<string[]>([]);
  const [optional,setOptional]=useState<string[]>(["campaign","lastContacted"]);
  const optionalColumns=[{key:"campaign",label:"Campaign"},{key:"source",label:"Source"},{key:"dealership",label:"Dealership"},{key:"lastContacted",label:"Last Contacted"},{key:"serviceDue",label:"Service Due Date"},{key:"lastService",label:"Last Service Date"},{key:"created_at",label:"Imported On"},{key:"remarks",label:"Customer Remarks"}] as const;
@@ -70,6 +72,17 @@ export function CustomersDirectory({metrics,customers,count,page,pageSize,query,
  // pathname uses the latest search and filter props from this render.
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[term,query,status,period,router]);
+ // Mount the details dialog at the document root, not inside the scrollable
+ // Customers directory (whose containing blocks can shift a fixed overlay).
+ useEffect(()=>{
+  if(!details)return;
+  const previousOverflow=document.body.style.overflow;
+  document.body.style.overflow="hidden";
+  modalBodyRef.current?.scrollTo({top:0,left:0});
+  const closeOnEscape=(event:KeyboardEvent)=>{if(event.key==="Escape")setDetails(null);};
+  document.addEventListener("keydown",closeOnEscape);
+  return ()=>{document.body.style.overflow=previousOverflow;document.removeEventListener("keydown",closeOnEscape);};
+ },[details?.id]);
  const ids=useMemo(()=>new Set(selected),[selected]);
  const toggleAll=(checked:boolean)=>setSelected(checked?customers.map(c=>c.id):[]);
  const exportRows=()=>{const rows=customers.filter(c=>!selected.length||ids.has(c.id));const csv=["Name,Phone Number,Dealership,Vehicle Model,Registration Number,Campaign,Consent Status,Do Not Call,Last Call Outcome,Call Attempts,Last Contacted,Next Follow-up,Service Due,Last Service,Remarks,Source,Created At",...rows.map(c=>[c.name,c.mobile??"",c.dealership??"",c.vehicleModel??"",c.registration??"",c.campaign??"",c.consent_status,c.do_not_call?"Yes":"No",c.lastOutcome??"",c.attempts??"",c.lastContacted??"",c.followup??"",c.serviceDue??"",c.lastService??"",c.remarks??"",c.source,c.created_at].map(v=>csvEscape(String(v))).join(","))].join("\r\n");const file=new Blob([csv],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(file);const a=document.createElement("a");a.href=url;a.download="frontier-customers-page-"+page+".csv";a.click();URL.revokeObjectURL(url);};
@@ -96,13 +109,13 @@ export function CustomersDirectory({metrics,customers,count,page,pageSize,query,
   </section>
   <details className="customers-import-history"><summary>Recent customer imports <span>({imports.length})</span></summary><div className="tablewrap"><table className="customers-data-table"><thead><tr><th>File</th><th>Imported</th><th>Matched</th><th>Rejected</th><th>Uploaded</th></tr></thead><tbody>{imports.map(x=><tr key={x.id}><td>{x.filename}</td><td>{x.imported_rows}</td><td>{x.matched_rows}</td><td>{x.rejected_rows}</td><td>{safeDate(x.created_at)}</td></tr>)}{!imports.length&&<tr><td colSpan={5}><EmptyState compact kind="documents" title="No imports recorded" description="Customer imports will appear here."/></td></tr>}</tbody></table></div></details>
   {showAdd&&<div className="customers-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setShowAdd(false);}}><section className="customers-modal" role="dialog" aria-modal="true" aria-label="Add customer"><div className="customers-modal-title"><h2>Add Customer</h2><button type="button" onClick={()=>setShowAdd(false)} aria-label="Close">×</button></div><form onSubmit={e=>{e.preventDefault();saveCustomer();}}><label>Customer Name *<input autoFocus required maxLength={150} value={name} onChange={e=>setName(e.target.value)} placeholder="Full customer name"/></label><label>Phone Number *<input required type="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+91 98765 43210"/></label><p>New customers are saved only to your dealership. Consent is unverified.</p>{error&&<p role="alert" className="customers-add-error">{error}</p>}<div className="customers-modal-buttons"><button type="button" onClick={()=>setShowAdd(false)}>Cancel</button><button type="submit" disabled={pending}>{pending?"Saving…":"Add Customer"}</button></div></form></section></div>}
-  {details&&<div className="customers-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setDetails(null);}}>
-  <section className="customers-modal customer-profile-modal" role="dialog" aria-modal="true" aria-labelledby="customer-details-title">
+  {details&&typeof document!=="undefined"&&createPortal(<div className="crm-app customer-profile-portal-root"><div className="customers-reference customer-profile-portal-scope"><div className="customers-modal-backdrop customer-profile-viewport" onMouseDown={e=>{if(e.target===e.currentTarget)setDetails(null);}}>
+  <section key={details.id} className="customers-modal customer-profile-modal" role="dialog" aria-modal="true" aria-labelledby="customer-details-title">
     <header className="customers-modal-title customer-profile-header">
       <div className="customer-profile-heading"><span className="customer-profile-heading-icon"><Icon name="users" size={19}/></span><div><h2 id="customer-details-title">Customer Details</h2><p>Customer profile · Vehicle · Call activity</p></div></div>
       <button type="button" className="customer-profile-close" onClick={()=>setDetails(null)} aria-label="Close customer details">×</button>
     </header>
-    <div className="customer-profile-body">
+    <div className="customer-profile-body" ref={modalBodyRef}>
       <div className="customer-profile-identity">
         <span className="customer-profile-avatar" aria-hidden="true">{details.name?.trim().slice(0,1).toUpperCase()||"?"}</span>
         <div className="customer-profile-name"><strong>{details.name||"—"}</strong><span>{details.mobile||"—"} · {details.dealership||"—"}</span></div>
@@ -123,6 +136,6 @@ export function CustomersDirectory({metrics,customers,count,page,pageSize,query,
     </div>
     <footer className="customer-profile-footer"><a href="/call-logs" className="customer-profile-call-link"><Icon name="eye" size={15}/>Open Call Logs for recordings and transcripts</a><button className="customers-modal-done" type="button" onClick={()=>setDetails(null)}>Close</button></footer>
   </section>
-</div>}
+</div></div></div>,document.body)}
  </div>;
 }
