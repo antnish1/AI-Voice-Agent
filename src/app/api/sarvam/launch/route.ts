@@ -72,6 +72,9 @@ export async function POST(request:Request){
    for(const [key,value] of Object.entries(user.app_variables)){
     if(allowed.has(key))variables[key]=value;
     else if(!value)continue;
+    else if(key==="vehicle_registration_number"&&allowed.has("registration_number"))variables.registration_number=value;
+    else if(key==="vehicle_registration_number"&&agent==="Conversatio-95f7d6e8-61a2"&&version<58)continue;
+    else if(key==="registration_number"&&allowed.has("vehicle_registration_number"))variables.vehicle_registration_number=value;
     else if(key==="service_due_km"&&allowed.has("next_service_due_odometer_km")&&!user.app_variables.next_service_due_odometer_km)variables.next_service_due_odometer_km=value;
     else if(batch.phone_column!=="phone_number"||!defaults[key]?.includes(value))incompatible.add(key);
    }
