@@ -326,3 +326,53 @@
 .crm-app .fc-campaign-page .fc-row-actions a.fc-review-start.fc-action-resume:focus-visible{
   background:#56429a!important;background-image:none!important;border-color:#56429a!important;color:#fff!important;
 }
+
+
+/* Action tones on the real Campaigns directory: win over global navy/dark palette
+   with explicit state attributes and high specificity, without affecting navigation. */
+:root .crm-app .fc-campaign-page .fc-full-campaign-table tbody tr td .fc-row-actions a.fc-review-start[data-action-tone="progress"]{
+ background:#078b77!important;background-color:#078b77!important;background-image:none!important;
+ border:1px solid #078b77!important;color:#fff!important;
+}
+:root .crm-app .fc-campaign-page .fc-full-campaign-table tbody tr td .fc-row-actions a.fc-review-start[data-action-tone="progress"]:is(:hover,:focus-visible){
+ background:#066e60!important;background-color:#066e60!important;background-image:none!important;
+ border-color:#066e60!important;color:#fff!important;
+}
+:root .crm-app .fc-campaign-page .fc-full-campaign-table tbody tr td .fc-row-actions a.fc-review-start[data-action-tone="issue"]{
+ background:#d9534f!important;background-color:#d9534f!important;background-image:none!important;
+ border:1px solid #d9534f!important;color:#fff!important;
+}
+:root .crm-app .fc-campaign-page .fc-full-campaign-table tbody tr td .fc-row-actions a.fc-review-start[data-action-tone="issue"]:is(:hover,:focus-visible){
+ background:#bd3d39!important;background-color:#bd3d39!important;background-image:none!important;
+ border-color:#bd3d39!important;color:#fff!important;
+}
+:root .crm-app .fc-campaign-page .fc-full-campaign-table tbody tr td .fc-row-actions a.fc-review-start[data-action-tone="resume"]{
+ background:#6d56b7!important;background-color:#6d56b7!important;background-image:none!important;
+ border:1px solid #6d56b7!important;color:#fff!important;
+}
+:root .crm-app .fc-campaign-page .fc-full-campaign-table tbody tr td .fc-row-actions a.fc-review-start[data-action-tone="resume"]:is(:hover,:focus-visible){
+ background:#56429a!important;background-color:#56429a!important;background-image:none!important;
+ border-color:#56429a!important;color:#fff!important;
+}
+
+
+/* Reference progress colour states: 0% grey, 1–99% purple, 100% green.
+   Dedicated track/fill avoids inconsistent browser-native <progress> rendering. */
+.crm-app .fc-campaign-page .fc-full-campaign-table .fc-progress .fc-progress-track{
+  box-sizing:border-box;display:block;position:relative;
+  width:100%;height:6px;margin:0;padding:0;
+  border-radius:999px;overflow:hidden;background:#f0f0f0!important;
+}
+.crm-app .fc-campaign-page .fc-full-campaign-table .fc-progress .fc-progress-fill{
+  display:block;height:100%;border-radius:999px;
+  max-width:100%;min-width:0;
+}
+.crm-app .fc-campaign-page .fc-full-campaign-table .fc-progress .fc-progress-fill.fc-progress-zero{
+  background:#c8c8c8!important;
+}
+.crm-app .fc-campaign-page .fc-full-campaign-table .fc-progress .fc-progress-fill.fc-progress-partial{
+  background:#9b64d8!important;
+}
+.crm-app .fc-campaign-page .fc-full-campaign-table .fc-progress .fc-progress-fill.fc-progress-complete{
+  background:#239461!important;
+}
