@@ -141,7 +141,7 @@ export function AgentsDirectory({provider,profiles,loadError,headerAction}:{prov
    {headerAction}
   </div>
   {loadError&&<p role="alert">Saved agent configurations could not be loaded.</p>}
-  <p role={provider.live?"status":"alert"}>{provider.message}</p>
+  {provider.live&&<p role="status">{provider.message}</p>}
   <div className="agent-stats-grid">{[
    {label:"Total Agents",filter:"total" as const,number:loadError?"—":String(actual.length),note:"Sarvam workspace agents",icon:"users",tone:"blue"},
    {label:"CRM Configured",filter:"active" as const,number:loadError?"—":String(actual.filter(a=>a.profiles?.some(p=>p.active)).length),note:"Active saved configuration",icon:"check",tone:"green"},
