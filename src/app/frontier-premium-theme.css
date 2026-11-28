@@ -190,3 +190,47 @@
 :root .crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-label{
  background:transparent!important;background-image:none!important;
 }
+
+
+/* Reports-only KPI filter selection. Overrides the old shared neutral-gray
+   filter theme without changing AI Agents, Call Logs, or KPI card geometry. */
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-kpis > button.reports-category-card:nth-child(n){
+  background:#fff!important;
+  background-color:#fff!important;
+  background-image:none!important;
+  border:1px solid #e2e8f0!important;
+  box-shadow:none!important;
+  --kpi-top-line:#e2e8f0;
+}
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-kpis > button.reports-category-card[aria-pressed="true"]:nth-child(n),
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-kpis > button.reports-category-card[aria-pressed="true"]:nth-child(n):is(:hover,:focus-visible){
+  background:#fff!important;
+  background-color:#fff!important;
+  background-image:none!important;
+  border:2px solid #d71920!important;
+  border-top-color:#d71920!important;
+  box-shadow:0 0 0 2px #d719201a,0 3px 12px #d7192014!important;
+  --kpi-top-line:#d71920;
+}
+:root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-kpis > button.reports-category-card[aria-pressed="false"]:nth-child(n):is(:hover,:focus-visible){
+  background:#fff!important;
+  border-color:#cbd5e1!important;
+  box-shadow:0 3px 10px #25446912!important;
+}
+.crm-app .reports-ref .reports-ref-kpis > button.reports-category-card{
+  position:relative;
+}
+.crm-app .reports-ref .reports-ref-kpis > button.reports-category-card .reports-card-selected-check{
+  position:absolute;right:9px;top:9px;
+  width:19px;height:19px;display:block;flex:none;
+  color:#d71920;pointer-events:none;
+}
+:root[data-theme="dark"] .crm-app .reports-ref .reports-ref-kpis > button.reports-category-card[aria-pressed="true"]:nth-child(n){
+  border:2px solid #fb7185!important;
+  border-top-color:#fb7185!important;
+  box-shadow:0 0 0 2px #fb718522!important;
+  --kpi-top-line:#fb7185;
+}
+:root[data-theme="dark"] .crm-app .reports-ref .reports-ref-kpis > button.reports-category-card .reports-card-selected-check{
+  color:#fb7185;
+}
