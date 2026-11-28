@@ -6,15 +6,19 @@ const brands=["Volkswagen","Skoda","Škoda","Honda","Kia","MG","Tata","JCB","Hyu
 export function enrichServiceRecipients(rows:string[][],dealerName:string,blocked:Set<string>){
  const input=rows[0]?.map(x=>x.trim())??[];
  const full=input.includes("user_phone_number");
- const required=full?RECIPIENT_TEMPLATE_HEADERS:LEGACY_RECIPIENT_HEADERS;
- if(rows.length<2||rows.length>251||new Set(input).size!==input.length||required.some(h=>!input.includes(h)))throw Error("Recipient CSV must contain the 27-column template (or legacy 10-column template) and 1–250 rows.");
+ const required=full?RECIPIENT_TEMPLATE_HEADERS.filter(h=>h!=="vehicle_registration_number"):LEGACY_RECIPIENT_HEADERS;
+ if(rows.length<2||rows.length>251||new Set(input).size!==input.length||required.some(h=>!input.includes(h)))throw Error("Recipient CSV must contain the service template (or legacy 10-column template) and 1–250 rows.");
  const manufacturer=brands.find(b=>new RegExp("\\b"+b+"\\b","i").test(dealerName))??"";
  const brand=/^Frontier\b/i.test(dealerName)?"Frontier":"";
  const location=brand&&manufacturer?dealerName.replace(/^Frontier\s+/i,"").replace(manufacturer,"").trim():"";
- const headers=[...SERVICE_INPUT_HEADERS,...generated,"consent","do_not_call"];
+ const headers=[...SERVICE_INPUT_HEADERS,"vehicle_registration_number",...generated,"consent","do_not_call"];
  const values=rows.slice(1).map(row=>{
   if(row.length!==input.length)throw Error("Recipient CSV row has incorrect column count.");
   const v:Record<string,string>=Object.fromEntries(RECIPIENT_TEMPLATE_HEADERS.map(h=>[h,row[input.indexOf(h)]?.trim()??""]));
+  const registrationAliases=["vehicle_registration_number","registration_number","Reg. Number","Registration Number","Reg No.","Reg. No.","Vehicle Number"];
+  const registrations=[...new Set(registrationAliases.map(h=>row[input.findIndex(x=>x.toLowerCase()===h.toLowerCase())]?.trim().toUpperCase().replace(/\s+/g,"")??"").filter(Boolean))];
+  if(registrations.length>1)throw Error("Conflicting vehicle registration columns in recipient row.");
+  v.vehicle_registration_number=registrations[0]??"";
   v.phone_number=row[input.indexOf(full?"user_phone_number":"phone_number")]?.trim()??"";
   for(const h of RECIPIENT_BOOLEAN_HEADERS){if(v[h]){const flag=v[h].trim().toUpperCase();if(["TRUE","YES","1"].includes(flag))v[h]="TRUE";else if(["FALSE","NO","0"].includes(flag))v[h]="FALSE";else throw Error("Invalid recipient column "+h+": use TRUE/FALSE, Yes/No or 1/0.");}}
   const number=normalizePhone(v.phone_number);
