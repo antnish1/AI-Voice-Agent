@@ -316,3 +316,11 @@ html:has(.crm-app),body:has(.crm-app){width:100%;height:100%;margin:0;overflow:h
 /* User Management uses the shared circular gradient heading icon. */
 .crm-app .it-user-heading .it-user-title h1{margin:0;line-height:1.2}
 .crm-app .it-user-heading .it-user-title{min-width:0}
+
+/* Approved global summary icon sizing only. Decorative waves and section icons are untouched. */
+.crm-app :is(.metric-icon,.ref-kpi-icon,.agent-stat-icon,.customers-stat-icon,.approvals-stat-icon,.calllogs-stat-icon,.appointments-metric-icon,.cb-stat-icon,.pd-metric-icon,.reports-ref-kpi-icon,.docs-stat-icon,.it-stat-icon,.fc-count-icon){
+ width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;max-width:28px!important;max-height:28px!important;flex:0 0 28px!important;padding:0!important;box-sizing:border-box;font-size:18px;
+}
+.crm-app :is(.metric-icon,.ref-kpi-icon,.agent-stat-icon,.customers-stat-icon,.approvals-stat-icon,.calllogs-stat-icon,.appointments-metric-icon,.cb-stat-icon,.pd-metric-icon,.reports-ref-kpi-icon,.docs-stat-icon,.it-stat-icon,.fc-count-icon) :is(img,svg,.fc-3d-art){
+ width:100%!important;height:100%!important;max-width:28px!important;max-height:28px!important;object-fit:contain;
+}

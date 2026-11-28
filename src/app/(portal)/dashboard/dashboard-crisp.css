@@ -331,3 +331,48 @@
 .crm-app .ref-dashboard.dashboard-reference .dashboard-hero-copy:after{
   display:none!important;
 }
+
+/* Approved dashboard: normal typography, border-centred KPI titles and pill controls. */
+.crm-app .ref-dashboard.dashboard-reference{--dashboard-card-canvas:var(--frontier-neutral,#f5f6f8);--dashboard-card-line:var(--dash-line,#cbd3df)}
+:root[data-theme="dark"] .crm-app .ref-dashboard.dashboard-reference{--dashboard-card-canvas:var(--dark-canvas,#101f37)}
+.crm-app .ref-dashboard.dashboard-reference :is(h1,h2,h3,strong,b,th,td,button,select,input,label,a,span,small,p,time){font-weight:400!important}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis{padding-top:9px;row-gap:20px;overflow:visible}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card:nth-child(n){
+ position:relative;display:grid;grid-template-columns:28px minmax(0,1fr);align-items:center;justify-content:space-between;
+ min-height:66px;gap:10px;padding:14px 15px 10px;overflow:visible;
+ background:var(--dashboard-card-canvas)!important;background-image:none!important;border:1px solid var(--dashboard-card-line);box-shadow:none!important;border-radius:11px;
+}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card:after{display:none}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-label{
+ position:absolute;top:0;left:50%;transform:translate(-50%,-50%);z-index:1;
+ margin:0;padding:0 7px;background:var(--dashboard-card-canvas);font-size:12px;line-height:1.35;text-align:center;
+ width:max-content;max-width:calc(100% - 18px);white-space:normal;overflow-wrap:anywhere;
+}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-icon{
+ width:28px;height:28px;min-width:28px;flex:0 0 28px;grid-column:1;grid-row:1;background:transparent!important;
+}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-icon img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+:root[data-theme="dark"] .crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-icon img{mix-blend-mode:normal}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-value{
+ grid-column:2;grid-row:1;justify-self:end;text-align:right;font-size:25px;line-height:1.15;margin:0;max-width:100%;overflow-wrap:anywhere;
+}
+.crm-app .ref-dashboard.dashboard-reference .ref-dashboard-panel{
+ background:var(--dashboard-card-canvas)!important;background-image:none!important;box-shadow:none!important;border-color:var(--dashboard-card-line)
+}
+.crm-app .ref-dashboard.dashboard-reference .ref-campaign-table :is(tbody,tr,td){background-color:transparent}
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item{
+ display:grid;grid-template-columns:27px minmax(0,1fr) minmax(82px,24%) 92px;column-gap:8px;align-items:center;
+}
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item .dashboard-activity-status{grid-column:3;grid-row:1;justify-self:center;text-align:center}
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item time,
+.crm-app .ref-dashboard.dashboard-reference .ref-activity-item:not(:has(.dashboard-activity-status)) time{grid-column:4;grid-row:1;justify-self:end;text-align:right;white-space:nowrap}
+.crm-app .ref-dashboard.dashboard-reference :is(.ref-create-button,.ref-panel-header>a,.campaign-period-select-wrap,.campaign-period-filter select,.campaign-period-filter button,.dashboard-period-select,.dashboard-period-custom button){
+ border-radius:9999px!important;font-weight:400!important
+}
+.crm-app .ref-dashboard.dashboard-reference .ref-panel-header>a{background:var(--dashboard-card-canvas);border-color:var(--dashboard-card-line)}
+@container(max-width:330px){
+ .crm-app .ref-dashboard.dashboard-reference .ref-activity-item{grid-template-columns:24px minmax(0,1fr) 76px;gap:5px}
+ .crm-app .ref-dashboard.dashboard-reference .ref-activity-item time,
+ .crm-app .ref-dashboard.dashboard-reference .ref-activity-item:not(:has(.dashboard-activity-status)) time{grid-column:2/-1;grid-row:2;justify-self:end}
+}
+@media(max-width:600px){.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card:nth-child(n){min-height:64px;padding:14px 10px 9px}.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-label{font-size:11px}}
