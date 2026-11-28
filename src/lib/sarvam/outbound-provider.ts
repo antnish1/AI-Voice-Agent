@@ -8,13 +8,20 @@ export function requireProviderConfig(){
  if(!key||!org||!workspace||[org,workspace].some(x=>!x||x.length>256||/[\\/\u0000-\u001f]/.test(x)))throw Error("Sarvam Production credentials or workspace IDs are unavailable.");
  return {key,base:"https://apps.sarvam.ai",org:encodeURIComponent(org),workspace:encodeURIComponent(workspace)};
 }
+export class SarvamRequestError extends Error { constructor(public status:number){super("Sarvam request failed (HTTP "+status+")");this.name="SarvamRequestError";} }
+export function friendlySarvamFailure(e:unknown){
+ if(e instanceof SarvamRequestError){const s=e.status;const reason=s===400||s===422?"Sarvam rejected the submitted settings or customer data.":s===401||s===403?"Sarvam denied access. Ask IT to check the API credentials and permissions.":s===404?"Sarvam could not find the requested resource.":s===409?"Sarvam reported a conflict with an existing operation.":s===429?"Sarvam is temporarily limiting requests.":s>=500?"Sarvam reported a server error.":"Sarvam rejected the request.";return reason+" (HTTP "+s+")";}
+ if(e instanceof Error&&(e.name==="TimeoutError"||e.name==="AbortError"))return "Sarvam did not respond in time.";
+ if(e instanceof TypeError)return "The connection to Sarvam was interrupted.";
+ return "The operation could not be confirmed.";
+}
 export async function sarvamPost(path:string,data:unknown){
  const {key,base}=requireProviderConfig();
  if(!path.startsWith("/api/")||path.includes("..")||path.startsWith("//"))throw Error("Unsafe provider path");
  const response=await fetch(base+path,{method:"POST",headers:{"X-API-Key":key,"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(data),cache:"no-store",signal:AbortSignal.timeout(20000)});
  let result:Record<string,unknown>={};
  try{const body=await response.json();if(body&&typeof body==="object"&&!Array.isArray(body))result=body;}catch{}
- if(!response.ok)throw Error("Sarvam rejected request (HTTP "+response.status+"). Check validated configuration and provider logs.");
+ if(!response.ok)throw new SarvamRequestError(response.status);
  return result;
 }
 export async function sarvamGet(path:string){
