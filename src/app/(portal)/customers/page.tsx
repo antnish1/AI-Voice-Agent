@@ -36,6 +36,20 @@ export default async function Customers({searchParams}:{searchParams:Promise<{q?
    sourceById.set(row.customer_id,source?.entry_type==="Manual"||batch?.filename==="manual-entry.csv"?"Manual":"CSV Upload");
   }
  }
- const records=customers.map(c=>({...c,source:sourceById.get(c.id)??"Unknown"}));
- return <CustomersDirectory customers={records} count={count} page={page} pageSize={PAGE_SIZE} query={query} status={status} period={period} dealershipId={id} canManage={canPrepare(membership.role)} imports={(imports.data??[]) as ImportRow[]}/>;
+ const calls:{customer_id:string|null;started_at:string|null;status:string;sarvam_campaign_id:string|null}[]=[];
+ for(let offset=0;;offset+=500){
+  const {data,error}=await supabase.from("voice_call_records").select("customer_id,started_at,status,sarvam_campaign_id").eq("dealership_id",id).not("customer_id","is",null).order("id").range(offset,offset+499);
+  if(error)throw Error("Unable to load customer call history.");
+  calls.push(...(data??[]));if((data??[]).length<500)break;
+ }
+ const latest=new Map<string,typeof calls[number]>();
+ for(const call of calls){if(!call.customer_id)continue;const old=latest.get(call.customer_id);if(!old||(call.started_at??"")>(old.started_at??""))latest.set(call.customer_id,call);}
+ const [active,callbacks,total]=await Promise.all([
+  supabase.from("customers").select("id",{head:true,count:"exact"}).eq("dealership_id",id).eq("consent_status","verified").eq("do_not_call",false),
+  supabase.from("crm_callbacks").select("customer_id").eq("dealership_id",id).in("status",["pending","requested","scheduled"]).not("customer_id","is",null),
+  supabase.from("customers").select("id",{head:true,count:"exact"}).eq("dealership_id",id)
+ ]);
+ const metrics={total:total.error?null:total.count??0,active:active.error?null:active.count??0,contacted:new Set(calls.filter(c=>c.status==="answered").map(c=>c.customer_id)).size,followup:callbacks.error?null:new Set((callbacks.data??[]).map(c=>c.customer_id)).size};
+ const records=customers.map(c=>({...c,source:sourceById.get(c.id)??(latest.has(c.id)?"Sarvam":"Unknown"),lastContacted:calls.filter(x=>x.customer_id===c.id&&x.status==="answered").map(x=>x.started_at??"").sort().at(-1)??null,campaign:latest.get(c.id)?.sarvam_campaign_id??null}));
+ return <CustomersDirectory metrics={metrics} customers={records} count={count} page={page} pageSize={PAGE_SIZE} query={query} status={status} period={period} dealershipId={id} canManage={canPrepare(membership.role)} imports={(imports.data??[]) as ImportRow[]}/>;
 }
