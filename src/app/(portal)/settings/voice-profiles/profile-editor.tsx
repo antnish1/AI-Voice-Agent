@@ -44,27 +44,12 @@ export function ProfileEditor({dealerships,activeDealershipId}:{dealerships:Deal
  function applySarvam(){
   const selected=importResult?.options?.find(x=>x.deploymentId+"|"+x.connectionId+"|"+x.callerNumber===deploymentId);
   if(!selected)return;
-  setLiveVersions(null);setVersionNotice("");setAgent(selected.agentId);setVersion(String(selected.version));setConnection(selected.connectionId);setCaller(selected.callerNumber);
+  setAgent(selected.agentId);setVersion(String(selected.version));setConnection(selected.connectionId);setCaller(selected.callerNumber);
   setMessage(importResult?.code==="saved_defaults"?"Saved dealership defaults loaded. Live Sarvam availability is not verified by this request. No settings or calls were changed.":"Settings loaded into the form. Review current agent and phone availability before saving; no agent or calls were changed.");
  }
 
  const [agent,setAgent]=useState(p?.agent_id??""),[version,setVersion]=useState(p?String(p.app_version):""),[connection,setConnection]=useState(p?.connection_id??""),[caller,setCaller]=useState(p?.caller_number??"");
- const [versionBusy,setVersionBusy]=useState(false);
- const [liveVersions,setLiveVersions]=useState<{agentId:string;versions:number[]}|null>(null);
- const [versionNotice,setVersionNotice]=useState("");
- const availableVersions=liveVersions?.agentId===agent?liveVersions.versions:(agentSnapshot.find(a=>a.id===agent)?.versions??[]);
- async function refreshVersions(){
-  if(!agent||versionBusy)return;
-  setVersionBusy(true);setVersionNotice("");setLiveVersions(null);
-  try{
-   const response=await fetch("/api/sarvam/agent-versions?agentId="+encodeURIComponent(agent),{cache:"no-store"});
-   const data=await response.json();
-   if(!response.ok||!data.ok||data.agentId!==agent||data.source!=="sarvam_live"||!Array.isArray(data.versions))throw Error(data.message??"Live version lookup failed.");
-   setLiveVersions({agentId:agent,versions:data.versions});
-   setVersionNotice(data.versions.length?"Latest committed version: V"+data.versions[0]+". Select a version and save to apply.":"No committed versions found.");
-  }catch(e){setVersionNotice(e instanceof Error?e.message:"Live version lookup failed.");}
-  finally{setVersionBusy(false);}
- }
+ const availableVersions=agentSnapshot.find(a=>a.id===agent)?.versions??[];
  return <section className="vdp-card" aria-labelledby="vdp-card-title">
   <div className="vdp-card-title"><div className="vdp-gear"><FieldIcon kind="settings"/></div><h2 id="vdp-card-title">Dealership AI Calling Defaults</h2></div>
   <p className="vdp-active-context">Editing defaults for {dealer?.name??"selected dealership"}</p>
@@ -72,7 +57,7 @@ export function ProfileEditor({dealerships,activeDealershipId}:{dealerships:Deal
    <div className={importResult.ok&&importResult.code!=="saved_defaults"&&importResult.options?.length?"vdp-import-ok":"vdp-import-notice"} role="status">
     <p>{importResult.message}</p>
     {importResult.counts&&<p>Workspace results: {importResult.counts.scanned} deployments checked · {importResult.counts.outbound} outbound-capable · {importResult.counts.verified} verified calling configurations.</p>}
-    {importResult.options?.length? <div className="vdp-import-select"><label htmlFor="vdp-select-deployment">{importResult.code==="saved_defaults"?"Saved dealership configuration":"Available calling configurations"}</label><select id="vdp-select-deployment" value={deploymentId} onChange={e=>setDeploymentId(e.target.value)}><option value="">Select an agent + phone number</option>{importResult.options.map((d,i)=><option key={d.deploymentId+"-"+i} value={d.deploymentId+"|"+d.connectionId+"|"+d.callerNumber}>{d.label} · v{d.version} · {d.callerNumber}</option>)}</select><button type="button" disabled={!deploymentId||versionBusy} onClick={applySarvam}>Use selected settings</button></div>:null}
+    {importResult.options?.length? <div className="vdp-import-select"><label htmlFor="vdp-select-deployment">{importResult.code==="saved_defaults"?"Saved dealership configuration":"Available calling configurations"}</label><select id="vdp-select-deployment" value={deploymentId} onChange={e=>setDeploymentId(e.target.value)}><option value="">Select an agent + phone number</option>{importResult.options.map((d,i)=><option key={d.deploymentId+"-"+i} value={d.deploymentId+"|"+d.connectionId+"|"+d.callerNumber}>{d.label} · v{d.version} · {d.callerNumber}</option>)}</select><button type="button" disabled={!deploymentId} onClick={applySarvam}>Use selected settings</button></div>:null}
     {importResult.code==="no_deployments"||importResult.code==="no_outbound"||importResult.code==="incomplete"?<p>Open Sarvam → Build → Agents for the committed version and Deploy → Phone Numbers for the connection ID and caller number. You can complete the fields below manually without creating a deployment.</p>:null}
    </div>
   </div>}
@@ -80,13 +65,13 @@ export function ProfileEditor({dealerships,activeDealershipId}:{dealerships:Deal
    <form id="vdp-save-form" className="vdp-form" key={id} action={form=>start(async()=>{setMessage("");const r=await saveVoiceProfile(form);setMessage(r.error??(form.get("active")==="yes"?"Saved. Calling defaults are ACTIVE for new campaign drafts. Live calling still requires separate authorization and verified telephony.":"Saved. Calling defaults are INACTIVE for new campaign drafts."));if(r.ok&&/^[6-9]\d{9}$/.test(caller.trim()))setCaller("+91"+caller.trim());})}>
     <input type="hidden" name="dealershipId" value={id}/>
     
-    <label className="vdp-field vdp-agent"><span className="vdp-label"><FieldIcon kind="agent"/> Sarvam Agent ID</span><span className="vdp-control"><select name="agentId" required value={agent} disabled={versionBusy} onChange={e=>{setLiveVersions(null);setVersionNotice("");setAgent(e.target.value);setVersion("");}}><option value="">Select agent</option>{agent&&!agentSnapshot.some(a=>a.id===agent)&&<option value={agent}>{agent} (saved/imported)</option>}{agentSnapshot.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select><CopyButton value={agent} label="agent ID"/></span></label>
-    <label className="vdp-field vdp-version"><span className="vdp-label"><FieldIcon kind="version"/> Committed Agent Version</span><span className="vdp-control"><input name="version" type="text" inputMode="numeric" pattern="[1-9][0-9]*" required list="vdp-committed-versions" placeholder="Search or enter version (e.g. 58)" value={version} disabled={versionBusy} autoComplete="off" onChange={e=>setVersion(e.target.value.replace(/[^0-9]/g,""))}/><datalist id="vdp-committed-versions">{availableVersions.filter(v=>!version||String(v).includes(version)).map(v=><option key={v} value={String(v)}>Version {v}</option>)}</datalist></span>{version&&!availableVersions.includes(Number(version))&&<small role="status">Manual version entered. The committed version will be verified when saving.</small>}<button type="button" className="vdp-import-btn" disabled={!agent||versionBusy||busy||loadingSarvam} onClick={()=>void refreshVersions()}>{versionBusy?"Fetching…":"Fetch Latest Version"}</button>{versionNotice&&<span role="status" className={liveVersions?.agentId===agent?"vdp-success":"vdp-error"}>{versionNotice}</span>}</label>
+    <label className="vdp-field vdp-agent"><span className="vdp-label"><FieldIcon kind="agent"/> Sarvam Agent ID</span><span className="vdp-control"><select name="agentId" required value={agent} onChange={e=>{setAgent(e.target.value);setVersion("");}}><option value="">Select agent</option>{agent&&!agentSnapshot.some(a=>a.id===agent)&&<option value={agent}>{agent} (saved/imported)</option>}{agentSnapshot.map(a=><option key={a.id} value={a.id}>{a.name}</option>)}</select><CopyButton value={agent} label="agent ID"/></span></label>
+    <label className="vdp-field vdp-version"><span className="vdp-label"><FieldIcon kind="version"/> Committed Agent Version</span><span className="vdp-control"><input name="version" type="text" inputMode="numeric" pattern="[1-9][0-9]*" required list="vdp-committed-versions" placeholder="Search or enter version (e.g. 58)" value={version} autoComplete="off" onChange={e=>setVersion(e.target.value.replace(/[^0-9]/g,""))}/><datalist id="vdp-committed-versions">{availableVersions.filter(v=>!version||String(v).includes(version)).map(v=><option key={v} value={String(v)}>Version {v}</option>)}</datalist></span>{version&&!availableVersions.includes(Number(version))&&<small role="status">Manual version entered. Saving requires a version in the last verified catalogue.</small>}</label>
     <label className="vdp-field vdp-connection"><span className="vdp-label"><FieldIcon kind="connection"/> Telephony Connection ID / Name</span><span className="vdp-control"><select name="connectionId" required value={connection} onChange={e=>{setConnection(e.target.value);setCaller("");}}><option value="">Select connection</option>{Array.from(new Set([connection,...dealerships.flatMap(d=>d.profile?[d.profile.connection_id]:[]),...(importResult?.options??[]).map(o=>o.connectionId)].filter(Boolean))).map(v=><option key={v} value={v}>{v}</option>)}</select><CopyButton value={connection} label="connection ID"/></span></label>
     <label className="vdp-field vdp-caller"><span className="vdp-label"><FieldIcon kind="phone"/> Connected Caller Number</span><span className="vdp-control"><select name="callerNumber" required value={caller} onChange={e=>setCaller(e.target.value)}><option value="">Select caller number</option>{Array.from(new Set([caller,...dealerships.flatMap(d=>d.profile?.connection_id===connection?[d.profile.caller_number]:[]),...(importResult?.options??[]).filter(o=>o.connectionId===connection).map(o=>o.callerNumber)].filter(Boolean))).map(v=><option key={v} value={v}>{v}</option>)}</select><CopyButton value={caller} label="caller number"/></span></label>
-    <div className="vdp-checkbox-info"><label className="vdp-check"><input type="checkbox" name="active" value="yes" defaultChecked={p?.active??false}/><span>Use these defaults for newly created drafts</span></label></div>
+    <div className="vdp-checkbox-info"><label className="vdp-check"><input type="checkbox" name="active" value="yes" defaultChecked={p?.active??false}/><span>Use these verified defaults for newly created drafts</span></label></div>
     {message&&<p className={message.startsWith("Saved.")?"vdp-success":"vdp-error"} role="status">{message}</p>}
-    <div className="vdp-footer"><button type="button" className="vdp-cancel" disabled={busy||loadingSarvam||versionBusy} onClick={()=>router.push("/campaigns")}>Cancel</button><button type="submit" className="vdp-save" disabled={busy||loadingSarvam||versionBusy}><FieldIcon kind="save"/><span>{busy?"Saving…":"Save Draft Profile"}</span></button></div>
+    <div className="vdp-footer"><button type="button" className="vdp-cancel" disabled={busy||loadingSarvam} onClick={()=>router.push("/campaigns")}>Cancel</button><button type="submit" className="vdp-save" disabled={busy||loadingSarvam}><FieldIcon kind="save"/><span>{busy?"Saving…":"Save Draft Profile"}</span></button></div>
    </form>
   </div>
  </section>;
