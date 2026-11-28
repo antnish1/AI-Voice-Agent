@@ -208,8 +208,8 @@
   background-color:#fff!important;
   background-image:none!important;
   border:2px solid #d71920!important;
-  border-top-color:#d71920!important;
-  box-shadow:0 0 0 2px #d719201a,0 3px 12px #d7192014!important;
+  border-top-color:transparent!important;
+  box-shadow:0 3px 12px #d7192014!important;
   --kpi-top-line:#d71920;
 }
 :root:not([data-theme="dark"]) .crm-app .reports-ref .reports-ref-kpis > button.reports-category-card[aria-pressed="false"]:nth-child(n):is(:hover,:focus-visible){
@@ -227,8 +227,8 @@
 }
 :root[data-theme="dark"] .crm-app .reports-ref .reports-ref-kpis > button.reports-category-card[aria-pressed="true"]:nth-child(n){
   border:2px solid #fb7185!important;
-  border-top-color:#fb7185!important;
-  box-shadow:0 0 0 2px #fb718522!important;
+  border-top-color:transparent!important;
+  box-shadow:none!important;
   --kpi-top-line:#fb7185;
 }
 :root[data-theme="dark"] .crm-app .reports-ref .reports-ref-kpis > button.reports-category-card .reports-card-selected-check{
