@@ -2,12 +2,12 @@ import {signIn} from "./actions";
 import {PasswordField} from "./password-field";
 import {SignInButton} from "./sign-in-button";
 import "./login-design.css";
-import {VehicleCarousel} from "./vehicle-carousel";
+
 
 export default async function Login({searchParams}:{searchParams:Promise<{error?:string}>}){
  const {error}=await searchParams;
  return <main className="fv-login fv-login-full-background fv-login-left-card fv-login-premium">
-  <VehicleCarousel/>
+  <div className="fv-vehicle-background fv-static-login-background" aria-hidden="true"><div className="fv-vehicle-viewport"><img src="/banners/LOGINPAGE.jpeg" alt="" draggable={false} fetchPriority="high"/></div></div>
   <section className="fv-left fv-left-login-layout" aria-label="Sign in to Frontier Voice CRM">
    <div className="fv-signin-card">
     <div className="fv-premium-brand"><img src="/autoreach-logo.png" alt="" width={64} height={64}/><div><strong>FRONTIER GROUP</strong><span>VOICE CRM</span></div></div>
