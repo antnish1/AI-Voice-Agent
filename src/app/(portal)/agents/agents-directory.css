@@ -753,3 +753,14 @@ dialog.configured-agent-dialog::backdrop{background:#183f5b65;backdrop-filter:bl
     padding:9px 10px;
   }
 }
+
+/* Independent top-left badge; portrait dimensions and top anchor stay unchanged. */
+.crm-app .agent-directory .agent-preview-card > .agent-current-inline{
+ position:absolute;top:10px;left:12px;right:auto;z-index:3;display:inline-flex;align-items:center;justify-content:center;
+ padding:4px 9px;margin:0;border:1px solid #cbdcf5;border-radius:999px;background:#e7f0ff;color:#154c94;font-size:9px;font-weight:600;line-height:1.2;white-space:nowrap;pointer-events:none;
+}
+:root[data-theme="dark"] .crm-app .agent-directory .agent-preview-card > .agent-current-inline{background:#253f64;border-color:#365a86;color:#bed7ff}
+.crm-app .agent-directory .agent-preview-card .agent-card-copy{
+ padding-top:0;min-height:80px;display:flex;flex-direction:column;justify-content:center;align-self:flex-start;box-sizing:border-box;
+}
+@media(max-width:700px){.crm-app .agent-directory .agent-preview-card .agent-card-copy{min-height:74px;padding-top:0}}
