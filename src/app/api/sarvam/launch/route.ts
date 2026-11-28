@@ -63,11 +63,11 @@ export async function POST(request:Request){
   if(prepared.eligible!==batch.eligible_records||prepared.excluded!==0)
    return NextResponse.json({error:"Recipient counts do not match the locked approved cohort."},{status:409});
   const schema=agentCohortSchemas[agent]?.[version];
-  if(!schema)return NextResponse.json({error:"The selected agent version has no verified recipient schema. Ask IT to synchronize its committed Sarvam configuration before launch. No remote campaign was created."},{status:409});
+  // Manual versions are submitted to Sarvam unchanged; only known schemas receive local compatibility filtering.
   if(!/^[A-Za-z0-9_ -]{1,50}$/.test(batch.cohort_name))return NextResponse.json({error:"Cohort name must contain 1–50 letters, numbers, spaces, underscores or hyphens."},{status:400});
-  const allowed=new Set(schema),incompatible=new Set<string>();
+  const allowed=new Set(schema??[]),incompatible=new Set<string>();
   const defaults:Record<string,string[]>={time_due_verified:["FALSE"],authorized_contact_for_crm:["TRUE"],free_expiry_wording_approved:["FALSE"],service_schedule_verified:["FALSE"],free_service_eligible:["FALSE"],free_service_terms_verified:["FALSE"],warranty_terms_verified:["FALSE"],warranty_active:["FALSE"]};
-  const cohortUsers=prepared.users.map(user=>{
+  const cohortUsers=schema?prepared.users.map(user=>{
    const variables:Record<string,string>={};
    for(const [key,value] of Object.entries(user.app_variables)){
     if(allowed.has(key))variables[key]=value;
@@ -80,7 +80,7 @@ export async function POST(request:Request){
     if(allowed.has("call_plus_7_date"))variables.call_plus_7_date=followUpDate(istDate(start),7);
    }
    return {...user,app_variables:variables};
-  });
+  }):prepared.users;
   if(incompatible.size)return NextResponse.json({error:"Selected agent version does not support these populated fields: "+[...incompatible].sort().join(", ")+". Review the approved mapping or choose a compatible committed version. No remote campaign was created."},{status:400});
   const launchBody={
    name:campaign.name,description:"Approved Frontier Voice CRM campaign",app_config:{
@@ -106,7 +106,7 @@ export async function POST(request:Request){
    if(linkError)throw Error("Could not map remote campaign for signed webhooks");
   }catch(e){
    await supabase.from("voice_campaign_launches").update({state:"needs_reconciliation",updated_at:new Date().toISOString()}).eq("campaign_id",id);
-   return NextResponse.json({error:"Campaign creation could not be confirmed. "+friendlySarvamFailure(e)+" Check the campaign in Sarvam before trying again.",reconciliationRequired:true},{status:502});
+   return NextResponse.json({error:"Campaign creation could not be confirmed for the selected agent version "+version+". "+friendlySarvamFailure(e)+" Check the campaign in Sarvam before trying again.",reconciliationRequired:true},{status:502});
   }
   // Reserve cohort submission before calling provider so retries cannot double-enqueue calls.
   const {data:cohortReservation,error:reserveCohortError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitting",updated_at:new Date().toISOString()}).eq("campaign_id",id).eq("state","campaign_created").select("campaign_id").maybeSingle();

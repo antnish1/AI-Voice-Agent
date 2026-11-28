@@ -1,4 +1,4 @@
-// Verified committed variable names only, 2026-11-28. Unknown versions fail closed.
+// Verified committed variable names only, 2026-11-28. Unknown versions use the approved recipient mapping and provider validation.
 export const agentCohortSchemas:Record<string,Record<number,string[]>>={
  "Conversatio-95f7d6e8-61a2": {
   "28": [
