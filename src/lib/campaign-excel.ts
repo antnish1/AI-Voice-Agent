@@ -1,8 +1,6 @@
 // Browser-only XLSX template and first-sheet reader. No external Excel service or customer-data upload.
-export const RECIPIENT_TEMPLATE_HEADERS=[
- "phone_number","customer_name","vehicle_model","last_service_date","next_service_due_date",
- "service_type","service_category","last_reported_mileage","complimentary_pickup_drop_available","active_offer_description"
-] as const;
+import {RECIPIENT_TEMPLATE_HEADERS} from "./sarvam/recipient-template";
+export {RECIPIENT_TEMPLATE_HEADERS} from "./sarvam/recipient-template";
 const encode=(s:string)=>new TextEncoder().encode(s);
 const escapeXml=(s:string)=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");
 function crc32(data:Uint8Array):number {
