@@ -1,3 +1,4 @@
+import {createClient} from "@supabase/supabase-js";
 import {NextResponse} from "next/server";
 import {requireMembership} from "@/lib/auth";
 import {isItSuperUser} from "@/lib/it-access";
@@ -56,6 +57,12 @@ export async function POST(request:Request){
    eligible_records:prepared.eligible,uploaded_by:user.id
   },{onConflict:"campaign_id"});
   if(dbError)return NextResponse.json({error:"Could not lock the staged cohort. Check the campaign and migration."},{status:409});
+  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if(!url||!key)return NextResponse.json({error:"Customer synchronization is not configured."},{status:503});
+  const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
+  const customerRows=prepared.users.map(u=>({mobile:u.user_phone_number,name:u.app_variables.customer_name??"",source_fields:{entry_type:"Campaign",...Object.fromEntries(Object.entries(u.app_variables).filter(([k])=>["customer_name","vehicle_model","registration_number","service_type","last_service_date","next_service_due_date","last_reported_mileage","customer_address","warranty_active"].includes(k)).map(([k,v])=>[k,v.slice(0,200)]))}}));
+  const {error:syncError}=await admin.rpc("sync_verified_campaign_customers",{p_campaign:campaign.id,p_dealership:campaign.dealership_id,p_rows:customerRows});
+  if(syncError)return NextResponse.json({error:"Customer synchronization failed. The campaign remains a draft; retry the upload before launching."},{status:503});
   const {data:finalized,error:finalizeError}=await supabase.from("campaigns").update({status:"PENDING"}).eq("id",campaignId).eq("dealership_id",campaign.dealership_id).eq("status","DRAFT").select("id");
   if(finalizeError||!finalized?.length)return NextResponse.json({error:"Recipient file staged but campaign could not be marked pending."},{status:409});
   return NextResponse.json({ok:true,eligible:prepared.eligible,excluded:prepared.excluded,sha256:digest,staged:true},{headers:{"Cache-Control":"no-store"}});

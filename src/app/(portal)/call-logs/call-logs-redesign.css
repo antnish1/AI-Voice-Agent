@@ -256,7 +256,7 @@
   background:#fff!important;background-image:none!important;
 }
 :root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-expanded-table thead th{
-  background:#f1f3f6!important;color:#25354b;
+  background:#15365b!important;color:#fff;
 }
 :root:not([data-theme="dark"]) .crm-app .calllogs-reference .calllogs-expanded-table tbody td{
   border-bottom:1px solid #e2e8f0;
