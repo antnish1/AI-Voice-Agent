@@ -1,6 +1,6 @@
 import {NextResponse} from "next/server";
 import {requireItSuperUser} from "@/lib/it-access";
-import {callingEnabled,sha256,sarvamPost,sarvamPath} from "@/lib/sarvam/outbound-provider";
+import {callingEnabled,sha256,sarvamPost,sarvamPath,friendlySarvamFailure} from "@/lib/sarvam/outbound-provider";
 import {followUpDate} from "@/lib/sarvam/service-recipients";
 import {normalizePhone,prepareRecipients} from "@/lib/sarvam/recipient-validation";
 export const runtime="nodejs";
@@ -80,24 +80,25 @@ export async function POST(request:Request){
    if(updatedError)throw Error("Could not save remote campaign ID");
    const {error:linkError}=await supabase.from("voice_campaign_links").insert({campaign_id:id,dealership_id:campaign.dealership_id,sarvam_campaign_id:providerId,agent_id:agent});
    if(linkError)throw Error("Could not map remote campaign for signed webhooks");
-  }catch{
+  }catch(e){
    await supabase.from("voice_campaign_launches").update({state:"needs_reconciliation",updated_at:new Date().toISOString()}).eq("campaign_id",id);
-   return NextResponse.json({error:"Campaign creation result is uncertain. Check Sarvam and reconcile before another attempt; no automatic retries."},{status:502});
+   return NextResponse.json({error:"Campaign creation could not be confirmed. "+friendlySarvamFailure(e)+" Check the campaign in Sarvam before trying again.",reconciliationRequired:true},{status:502});
   }
   // Reserve cohort submission before calling provider so retries cannot double-enqueue calls.
   const {error:reserveCohortError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitting",updated_at:new Date().toISOString()}).eq("campaign_id",id).eq("state","campaign_created");
-  if(reserveCohortError)return NextResponse.json({error:"Remote campaign created but cohort reservation failed. Do not retry launch."},{status:502});
+  if(reserveCohortError)return NextResponse.json({error:"Campaign created in Sarvam, but CRM could not prepare the customer list for upload. Check the campaign in Sarvam before trying again.",reconciliationRequired:true},{status:502});
   try{
    const streamed=await sarvamPost(sarvamPath("campaigns","/"+encodeURIComponent(providerId)+"/cohorts/stream"),{
     name:batch.cohort_name,users:prepared.users.map(user=>{if(batch.phone_column!=="phone_number")return user;return {...user,app_variables:{...user.app_variables,call_plus_3_date:followUpDate(istDate(start),3),call_plus_7_date:followUpDate(istDate(start),7)}};})
    });
-   if(typeof streamed.cohort_id!=="string"||!streamed.cohort_id)throw Error("Provider did not acknowledge cohort");
-   const {error:statusError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitted",provider_status:"scheduled",sarvam_cohort_id:streamed.cohort_id,updated_at:new Date().toISOString()}).eq("campaign_id",id);
+   const cohortId=typeof streamed.cohort_id==="string"?streamed.cohort_id:typeof streamed.id==="string"?streamed.id:"";
+   if(!cohortId)throw Error("Provider did not acknowledge cohort");
+   const {error:statusError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitted",provider_status:"scheduled",sarvam_cohort_id:cohortId,updated_at:new Date().toISOString()}).eq("campaign_id",id);
    if(statusError)throw Error("Could not persist cohort state");
-   return NextResponse.json({ok:true,campaignId:providerId,cohortId:streamed.cohort_id,cohortStatus:streamed.status??"processing",message:"Sarvam accepted campaign and recipient cohort. Confirm processing status before the scheduled dialing window."});
+   return NextResponse.json({ok:true,campaignId:providerId,cohortId:cohortId,cohortStatus:streamed.status??"processing",message:"Sarvam accepted campaign and recipient cohort. Confirm processing status before the scheduled dialing window."});
   }catch{
    await supabase.from("voice_campaign_launches").update({state:"needs_reconciliation",updated_at:new Date().toISOString()}).eq("campaign_id",id);
-   return NextResponse.json({error:"Remote campaign created but cohort upload outcome is uncertain. Reconcile in Sarvam before the start time; never resend automatically."},{status:502});
+   return NextResponse.json({error:"Campaign created in Sarvam, but customer upload could not be confirmed. "+(e instanceof Error&&e.message==="Provider did not acknowledge cohort"?"Sarvam did not return a customer-list ID.":e instanceof Error&&e.message==="Could not persist cohort state"?"Sarvam accepted the list, but CRM could not save its reference.":friendlySarvamFailure(e))+" Check Sarvam before retrying to avoid duplicate calls.",reconciliationRequired:true},{status:502});
   }
  }catch{return NextResponse.json({error:"Campaign launch was not authorized or its configuration could not be validated."},{status:403});}
 }
