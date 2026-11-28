@@ -58,6 +58,27 @@ export async function POST(request:Request){
   const prepared=prepareRecipients(csv,{phoneColumn:batch.phone_column,consentColumn:batch.consent_column,dncColumn:batch.dnc_column,variableMapping:batch.variable_mapping??{}});
   if(prepared.eligible!==batch.eligible_records||prepared.excluded!==0)
    return NextResponse.json({error:"Recipient counts do not match the locked approved cohort."},{status:409});
+  // Verified immutable Kajal v39 contract. Do not pass newer template-only fields to this version.
+  // Unknown nonempty data must be reviewed instead of silently discarded.
+  const v39=agent==="Conversatio-95f7d6e8-61a2"&&version===39;
+  const v39Variables=new Set(["call_summary","last_service_date","next_service_due_date","registration_number","vehicle_model","callback_phone","last_followup_date","last_followup_remarks","last_reported_mileage","service_type","advisor_followup_required","appointment_preferred_date","appointment_preferred_time","call_disposition","callback_preferred_datetime","callback_required","contact_correction_required","current_mileage","customer_remarks","do_not_call","customer_name","next_service_due_odometer_km","original_call_date","phone_number","registration_spoken_english","agent_name","appointment_confirmation_status","appointment_customer_remarks","appointment_requested","appointment_special_instructions","appointment_time_window","appointment_workshop","dealership_brand","dealership_location","pickup_drop_required","vehicle_manufacturer","appointment_offered","current_mileage_confirmed","customer_identity_confirmed","followup_preferred_datetime","followup_requested","permission_to_speak","script_completion_status","script_deviation_reason","service_due_condition","service_purpose_explained","service_schedule_verified","active_offer_description","active_offer_discount","active_offer_eligibility","active_offer_name","active_offer_terms","active_offer_valid_until","appointment_conversion_attempted","appointment_conversion_result","next_sales_followup_action","offer_customer_interested","offer_name_presented","offer_presented","reason_not_converted","sales_objection_type","sales_pitch_delivered","complaint_billing_dispute_reported","complaint_category","complaint_description","complaint_manager_callback_requested","complaint_previous_interaction","complaint_previous_manager_name","complaint_reported","complaint_parts_issue_reported","complaint_resolution_status","complaint_service_delay_reported","drop_address","drop_address_confirmed","drop_same_as_pickup","pickup_address","pickup_address_confirmed","pickup_drop_request_status","pickup_landmark","pickup_preferred_date","pickup_preferred_time","pickup_required","drop_landmark","pickup_drop_offered","pickup_drop_requested","spoken_vehicle_model","customer_address","spoken_service_type","customer_verification_phrase","time_of_day_greeting","complimentary_pickup_drop_available","dealership_local_datetime","free_service_eligible","free_service_expiry_date","free_service_expiry_km","free_service_terms_verified","service_category","warranty_active","warranty_terms_verified","workshop_booking_rules","appointment_proposed_date","free_service_expiry_warning_communicated"]);
+  const v39Defaults:Record<string,string[]>={service_due_km:[""],call_plus_3_date:[""],call_plus_7_date:[""],time_due_verified:["","FALSE"],approved_price_range:[""],authorized_contact_for_crm:["","TRUE","FALSE"],free_expiry_wording_approved:["","FALSE"]};
+  if(!/^[A-Za-z0-9_ -]{1,50}$/.test(batch.cohort_name))return NextResponse.json({error:"Cohort name must contain 1–50 letters, numbers, spaces, underscores or hyphens."},{status:400});
+  const incompatible=new Set<string>();
+  const cohortUsers=prepared.users.map(user=>{
+   if(v39){
+    const app_variables:Record<string,string>={};
+    for(const [key,value] of Object.entries(user.app_variables)){
+     if(v39Variables.has(key))app_variables[key]=value;
+     else if(key==="service_due_km"&&value&&!user.app_variables.next_service_due_odometer_km)app_variables.next_service_due_odometer_km=value;
+     else if(!v39Defaults[key]?.includes(value))incompatible.add(key);
+    }
+    return {...user,app_variables};
+   }
+   if(batch.phone_column!=="phone_number")return user;
+   return {...user,app_variables:{...user.app_variables,call_plus_3_date:followUpDate(istDate(start),3),call_plus_7_date:followUpDate(istDate(start),7)}};
+  });
+  if(incompatible.size)return NextResponse.json({error:"Selected Kajal V39 does not support these populated fields: "+[...incompatible].sort().join(", ")+". Review the approved mapping or choose a compatible committed version before launching."},{status:400});
   const launchBody={
    name:campaign.name,description:"Approved Frontier Voice CRM campaign",app_config:{
     app_id:agent,app_version:version,app_type:"agent",attempts_per_second:1,
@@ -89,7 +110,7 @@ export async function POST(request:Request){
   if(reserveCohortError||!cohortReservation)return NextResponse.json({error:"Campaign created in Sarvam, but CRM could not prepare the customer list for upload. Check the campaign in Sarvam before trying again.",reconciliationRequired:true},{status:502});
   try{
    const streamed=await sarvamPost(sarvamPath("campaigns","/"+encodeURIComponent(providerId)+"/cohorts/stream"),{
-    name:batch.cohort_name,users:prepared.users.map(user=>{if(batch.phone_column!=="phone_number")return user;return {...user,app_variables:{...user.app_variables,call_plus_3_date:followUpDate(istDate(start),3),call_plus_7_date:followUpDate(istDate(start),7)}};})
+    name:batch.cohort_name,users:cohortUsers
    });
    const cohortId=typeof streamed.cohort_id==="string"?streamed.cohort_id:typeof streamed.id==="string"?streamed.id:"";
    if(!/^[A-Za-z0-9_-]{1,200}$/.test(cohortId))throw Error("Provider did not acknowledge cohort");
