@@ -283,3 +283,11 @@
 .crm-app .customers-reference .customers-table-header .customers-table-actions select{flex:0 0 155px;width:155px;min-width:155px;max-width:155px}
 .crm-app .customers-reference .customers-table-header .customers-export{flex:none}
 @media(max-width:1200px){.crm-app .customers-reference .customers-table-header .customers-search{flex-basis:230px;width:230px;min-width:230px;max-width:230px}.crm-app .customers-reference .customers-table-header .customers-table-actions select{flex-basis:135px;width:135px;min-width:135px;max-width:135px}}
+
+/* Center each customer list cell and its complete content under its own heading. */
+:root .crm-app .customers-reference .customers-data-table tr > :is(th,td){text-align:center!important;vertical-align:middle!important}
+.crm-app .customers-reference .customers-data-table .customers-name-cell{justify-content:center;align-items:center;margin-inline:auto;width:fit-content;max-width:100%;min-width:0}
+.crm-app .customers-reference .customers-data-table .customer-cell-stack{align-items:center;text-align:center;margin-inline:auto;min-width:0;max-width:100%;width:fit-content}
+.crm-app .customers-reference .customers-data-table .customers-name-cell .customer-cell-stack{margin-inline:0}
+.crm-app .customers-reference .customers-data-table .customers-row-actions{justify-content:center;align-items:center;margin-inline:auto}
+.crm-app .customers-reference .customers-data-table .customer-cell-stack :is(strong,small){text-align:center;white-space:normal;overflow-wrap:anywhere}
