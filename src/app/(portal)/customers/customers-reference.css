@@ -291,3 +291,6 @@
 .crm-app .customers-reference .customers-data-table .customers-name-cell .customer-cell-stack{margin-inline:0}
 .crm-app .customers-reference .customers-data-table .customers-row-actions{justify-content:center;align-items:center;margin-inline:auto}
 .crm-app .customers-reference .customers-data-table .customer-cell-stack :is(strong,small){text-align:center;white-space:normal;overflow-wrap:anywhere}
+
+/* Preserve main removal of selection column; center customer heading and values per latest request. */
+:root .crm-app .customers-reference .customers-records-table :is(th,td):first-child{width:auto;min-width:180px;text-align:center!important}
