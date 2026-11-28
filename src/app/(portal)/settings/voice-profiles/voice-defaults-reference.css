@@ -174,3 +174,63 @@ linear-gradient(125deg,#e8f4ff 0%,#edf4ff 50%,#dceeff 100%);}
 :root[data-theme="dark"] .crm-app .vdp-page{background-color:var(--dark-canvas,#101f37)}
 @media(max-width:900px){.crm-app .vdp-page .vdp-visual{height:220px}.crm-app .vdp-page .vdp-visual .vdp-robot{height:100%;width:auto;max-width:100%}}
 @media(max-width:650px){.crm-app .vdp-page{padding:8px}.crm-app .vdp-page .vdp-heading{gap:10px}.crm-app .vdp-page .vdp-heading h1{font-size:22px}.crm-app .vdp-page .vdp-brand-icon{width:52px;height:52px}.crm-app .vdp-page .vdp-brand-icon svg{width:38px;height:38px}.crm-app .vdp-page .vdp-card{padding:12px}.crm-app .vdp-page .vdp-card-title h2{font-size:16px}.crm-app .vdp-page .vdp-card-title .vdp-gear{width:40px;height:40px}.crm-app .vdp-page .vdp-fields{row-gap:12px}.crm-app .vdp-page .vdp-footer{gap:8px}}
+
+
+/* Voice Agent Defaults — use the existing checked-in background image and
+   align the four existing fields without touching the robot artwork or form logic. */
+.crm-app .vdp-page{
+  background-image:url("/web/defaultagent.jpeg")!important;
+  background-position:center center!important;
+  background-size:cover!important;
+  background-repeat:no-repeat!important;
+}
+.crm-app .vdp-page::before,
+.crm-app .vdp-page::after{display:none!important}
+.crm-app .vdp-page .vdp-fields{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  column-gap:20px;
+  row-gap:18px;
+  align-items:start;
+}
+.crm-app .vdp-page .vdp-fields::before{display:none!important}
+.crm-app .vdp-page .vdp-fields .vdp-agent{grid-column:1;grid-row:1}
+.crm-app .vdp-page .vdp-fields .vdp-version{grid-column:2;grid-row:1}
+.crm-app .vdp-page .vdp-fields .vdp-connection{grid-column:1;grid-row:2}
+.crm-app .vdp-page .vdp-fields .vdp-caller{grid-column:2;grid-row:2}
+.crm-app .vdp-page .vdp-fields .vdp-checkbox-info{
+  grid-column:1/-1;grid-row:3;
+  justify-content:flex-start;align-items:flex-start;
+  padding:2px 0 0;
+}
+.crm-app .vdp-page .vdp-fields .vdp-field{
+  display:flex;flex-direction:column;gap:7px;min-width:0;
+}
+.crm-app .vdp-page .vdp-fields .vdp-label{
+  display:flex;align-items:center;gap:7px;
+  min-height:19px;margin:0;
+}
+.crm-app .vdp-page .vdp-fields .vdp-control{
+  width:100%;max-width:100%;min-width:0;
+  box-sizing:border-box;height:46px;min-height:46px;
+}
+.crm-app .vdp-page .vdp-fields .vdp-control :is(select,input){
+  min-width:0;width:100%;height:44px;min-height:44px;
+}
+.crm-app .vdp-page .vdp-fields .vdp-footer{
+  grid-column:1/-1;grid-row:auto;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  width:100%;
+}
+@media(max-width:650px){
+  .crm-app .vdp-page{background-position:center top!important}
+  .crm-app .vdp-page .vdp-fields{
+    grid-template-columns:minmax(0,1fr);row-gap:14px;
+  }
+  .crm-app .vdp-page .vdp-fields :is(.vdp-agent,.vdp-version,.vdp-connection,.vdp-caller,.vdp-checkbox-info){
+    grid-column:1;grid-row:auto;
+  }
+  .crm-app .vdp-page .vdp-fields .vdp-footer{
+    grid-column:1;
+  }
+}
