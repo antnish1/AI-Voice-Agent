@@ -16,7 +16,7 @@ export function enrichServiceRecipients(rows:string[][],dealerName:string,blocke
   if(row.length!==input.length)throw Error("Recipient CSV row has incorrect column count.");
   const v:Record<string,string>=Object.fromEntries(RECIPIENT_TEMPLATE_HEADERS.map(h=>[h,row[input.indexOf(h)]?.trim()??""]));
   v.phone_number=row[input.indexOf(full?"user_phone_number":"phone_number")]?.trim()??"";
-  for(const h of RECIPIENT_BOOLEAN_HEADERS){if(v[h]){const flag=v[h].toUpperCase();if(flag!=="TRUE"&&flag!=="FALSE")throw Error("Invalid recipient column "+h+": select TRUE or FALSE only.");v[h]=flag;}}
+  for(const h of RECIPIENT_BOOLEAN_HEADERS){if(v[h]){const flag=v[h].trim().toUpperCase();if(["TRUE","YES","1"].includes(flag))v[h]="TRUE";else if(["FALSE","NO","0"].includes(flag))v[h]="FALSE";else throw Error("Invalid recipient column "+h+": use TRUE/FALSE, Yes/No or 1/0.");}}
   const number=normalizePhone(v.phone_number);
   const allowed=!!number&&!blocked.has(number);
   const fields:Record<string,string>={...v,dealership_brand:brand,vehicle_manufacturer:manufacturer,dealership_location:location,service_schedule_verified:"FALSE",free_service_eligible:"FALSE",free_service_expiry_date:"",free_service_terms_verified:"FALSE",warranty_terms_verified:"FALSE",customer_address:"",service_due_km:"",warranty_active:"FALSE",time_due_verified:"FALSE",authorized_contact_for_crm:allowed?"TRUE":"FALSE",free_expiry_wording_approved:"FALSE",approved_price_range:"",call_plus_3_date:"",call_plus_7_date:"",consent:allowed?"TRUE":"FALSE",do_not_call:allowed?"FALSE":"TRUE"};
