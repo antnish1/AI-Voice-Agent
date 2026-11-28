@@ -271,7 +271,7 @@
 
 /* Eight-column dealership directory only; retain the expanded IT table. */
 .crm-app .fc-campaign-page .fc-full-campaign-table.fc-dealer-campaign-table{min-width:880px;width:100%;table-layout:auto!important}
-.crm-app .fc-campaign-page .fc-dealer-campaign-table th:first-child{width:23%}
+.crm-app .fc-campaign-page .fc-dealer-campaign-table th:first-child{width:14%}
 .crm-app .fc-campaign-page .fc-dealer-campaign-table th:last-child{width:1%;white-space:nowrap}
 :root .crm-app .fc-campaign-page .fc-dealer-campaign-table button.fc-dealership-view{background:#142D4E!important;background-image:none!important;color:#fff!important;border-color:#142D4E!important;min-width:64px;min-height:34px}
 :root .crm-app .fc-campaign-page .fc-dealer-campaign-table button.fc-dealership-view:is(:hover,:focus-visible):not(:disabled){background:#1E436F!important;border-color:#1E436F!important;color:#fff!important}
@@ -376,3 +376,8 @@
 .crm-app .fc-campaign-page .fc-full-campaign-table .fc-progress .fc-progress-fill.fc-progress-complete{
   background:#239461!important;
 }
+
+/* Compact campaign column in both dealership and IT campaign lists. */
+.crm-app .fc-campaign-page .fc-full-campaign-table:not(.fc-dealer-campaign-table) th:first-child{width:14%}
+.crm-app .fc-campaign-page .fc-full-campaign-table tr>td:first-child{overflow-wrap:anywhere}
+.crm-app .fc-campaign-page .fc-dealer-campaign-table th:nth-child(2){width:9%}

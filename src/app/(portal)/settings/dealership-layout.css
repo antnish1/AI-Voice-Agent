@@ -91,3 +91,27 @@
 @container (min-width:1040px){.settings-ref .frontier-appearance-layout-half{gap:clamp(16px,2cqw,32px);flex-wrap:wrap}.settings-ref .frontier-appearance-theme-half{justify-content:flex-start;gap:clamp(16px,2cqw,32px)}.settings-ref .frontier-theme-title h3{font-size:clamp(13px,1.15cqw,16px)}}
 @container (max-width:780px){.settings-ref .frontier-appearance-layout-half,.settings-ref .frontier-appearance-theme-half{gap:12px}}
 @media(max-width:760px){.settings-ref .frontier-appearance-theme-half{padding-left:0;gap:16px}}
+
+/* IT profile summary: same three-column layout as dealership, editing in a compact modal. */
+.crm-app .settings-ref-admin .settings-ref-profile-content{grid-template-columns:minmax(210px,.65fr) minmax(0,1.5fr);gap:20px}
+.crm-app .settings-ref-admin .settings-ref-profile-form{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:end}
+.crm-app .settings-ref-admin .settings-ref-profile-form input[readonly]{cursor:default}
+.settings-profile-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.settings-profile-edit{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;border:1px solid #c5d7ed;background:#e5edf7;color:#15365b;cursor:pointer}
+.settings-profile-edit:hover{background:#d5e5f8}
+.settings-profile-edit-dialog{margin:auto;border:1px solid #dce4f0;max-height:85dvh;overflow:auto;color:#18283f}
+.settings-profile-edit-dialog::backdrop{background:#14243a73;backdrop-filter:blur(2px)}
+.settings-profile-edit-dialog .settings-ref-modal-buttons button{flex:1}
+.settings-profile-edit-dialog .settings-ref-modal-buttons button[type=submit]{background:#15365b;color:white;border-radius:8px}
+.settings-profile-edit-dialog input[readonly]{background:#f1f4f8;cursor:default}
+:root[data-theme="dark"] .settings-profile-edit-dialog{background:#23344a;color:#e5edf7;border-color:#40516b}
+:root[data-theme="dark"] .settings-profile-edit-dialog :is(h2,label){color:#e5edf7}
+:root[data-theme="dark"] .settings-profile-edit-dialog input{background:#1b2c41;color:#e5edf7;border-color:#40516b}
+@media(max-width:1200px){.crm-app .settings-ref-admin .settings-ref-profile-content{grid-template-columns:1fr}.crm-app .settings-ref-admin .settings-ref-profile-identity{border-right:0;border-bottom:1px solid #eaf0f5;padding-bottom:12px}}
+@media(max-width:650px){.crm-app .settings-ref-admin .settings-ref-profile-form{grid-template-columns:1fr}}
+
+/* Frontier red profile avatar, for both IT and dealership settings. */
+:root .crm-app .settings-ref .settings-ref-avatar{background:linear-gradient(140deg,#ff666d 0%,#df1825 55%,#ad0c19 100%)!important;border-color:#ffe4e6!important;color:#fff!important}
+:root .crm-app .settings-ref .settings-ref-avatar-edit{color:#c91522!important;border-color:#f5cbd0!important}
+:root .crm-app .settings-ref .settings-ref-avatar-edit:hover{background:#fff0f1!important}
+:root[data-theme="dark"] .crm-app .settings-ref .settings-ref-avatar{border-color:#512b39!important}

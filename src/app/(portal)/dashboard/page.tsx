@@ -31,7 +31,7 @@ export default async function Dashboard({searchParams}:{searchParams:Promise<{da
  const lower=from?new Date(from+"T00:00:00+05:30").toISOString():"";
  const upper=to?new Date(Date.parse(to+"T00:00:00+05:30")+86400000).toISOString():"";
  const scoped=<T extends {gte:(column:string,value:string)=>T;lt:(column:string,value:string)=>T}>(q:T,column="created_at"):T=>{if(invalid)return q.gte(column,"9999-01-01T00:00:00Z");if(lower)q=q.gte(column,lower);if(upper)q=q.lt(column,upper);return q;};
- const chartPeriod=["all","today","mtd","custom"].includes(params.chartPeriod??"")?params.chartPeriod!:"all";
+ const chartPeriod=["all","today","mtd","custom"].includes(params.chartPeriod??"")?params.chartPeriod!:"mtd";
  const chartCustomValid=valid(params.chartFrom)&&valid(params.chartTo)&&params.chartFrom<=params.chartTo&&params.chartTo<=today;
  const ownFrom=chartPeriod==="today"?today:chartPeriod==="mtd"?today.slice(0,7)+"-01":chartPeriod==="custom"&&chartCustomValid?params.chartFrom!:"";
  const ownTo=chartPeriod==="custom"&&chartCustomValid?params.chartTo!:today;
