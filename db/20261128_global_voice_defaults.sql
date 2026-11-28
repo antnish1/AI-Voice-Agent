@@ -54,9 +54,10 @@ begin
 end $$;
 drop trigger if exists apply_global_voice_defaults on public.campaign_draft_configs;
 create trigger apply_global_voice_defaults before insert or update on public.campaign_draft_configs for each row execute function private_global_voice.apply_draft_defaults();
-create or replace function private_global_voice.refresh_unlaunched() returns trigger language plpgsql set search_path='' as $$
+create or replace function private_global_voice.refresh_unlaunched() returns trigger language plpgsql security definer set search_path='' as $$
 declare c record;
 begin
+ if auth.uid() is distinct from '5bd78ada-44f5-4045-a9fb-75c9dad69893'::uuid or not exists(select 1 from auth.users where id=auth.uid() and lower(email)='it@insureit.in' and coalesce(raw_app_meta_data->>'frontvox_account_state','active')='active' and (banned_until is null or banned_until<=now())) or not exists(select 1 from public.memberships where user_id=auth.uid() and role='super_admin') then raise exception 'Not authorized';end if;
  for c in select id from public.campaigns where not historical_read_only and status in ('DRAFT','PENDING','PENDING_MANAGER_APPROVAL','PAUSED','APPROVED') and not exists(select 1 from public.voice_campaign_launches l where l.campaign_id=campaigns.id) order by id for update loop
  if not exists(select 1 from public.voice_campaign_launches where campaign_id=c.id) then
  update public.campaign_draft_configs set configuration=configuration where campaign_id=c.id;
@@ -64,6 +65,7 @@ begin
  end loop;
  return new;
 end $$;
+revoke all on function private_global_voice.refresh_unlaunched() from public,anon,authenticated;
 drop trigger if exists refresh_global_voice_drafts on public.global_voice_defaults;
 create trigger refresh_global_voice_drafts after insert or update on public.global_voice_defaults for each row execute function private_global_voice.refresh_unlaunched();
 -- Initial recovery only; never modify previously reserved or launched campaigns.
