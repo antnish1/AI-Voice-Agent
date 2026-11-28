@@ -324,3 +324,43 @@ html:has(.crm-app),body:has(.crm-app){width:100%;height:100%;margin:0;overflow:h
 .crm-app :is(.metric-icon,.ref-kpi-icon,.agent-stat-icon,.customers-stat-icon,.approvals-stat-icon,.calllogs-stat-icon,.appointments-metric-icon,.cb-stat-icon,.pd-metric-icon,.reports-ref-kpi-icon,.docs-stat-icon,.it-stat-icon,.fc-count-icon) :is(img,svg,.fc-3d-art){
  width:100%!important;height:100%!important;max-width:28px!important;max-height:28px!important;object-fit:contain;
 }
+
+/* Shared KPI geometry only. No card or page background declarations. */
+.crm-app :is(.customers-stats,.agent-stats-grid,.reports-ref-kpis,.calllogs-stats,.approvals-stats,.docs-stats,.fc-campaign-stats,.it-user-stats,.crm-ops-stats){row-gap:20px!important;padding-top:10px!important;overflow:visible!important}
+.crm-app :is(.customers-stats>.customers-stat,.agent-stats-grid>.agent-stat-card,.reports-ref-kpis>.reports-ref-kpi,.calllogs-stats>.calllogs-stat,.approvals-stats>.approvals-stat,.docs-stats>.docs-stat,.fc-campaign-stats>.fc-count-card,.it-user-stats>article,.crm-ops-stats>div){
+ position:relative!important;display:grid!important;grid-template-columns:28px minmax(0,1fr)!important;align-items:center!important;gap:4px 10px!important;
+ min-height:66px!important;padding:15px 12px 9px!important;overflow:visible!important;box-sizing:border-box;
+ border-top-color:transparent!important;
+ --kpi-top-line:var(--crisp-line,#cbd2dc);
+}
+.crm-app :is(.customers-stat,.agent-stat-card,.reports-ref-kpi,.calllogs-stat,.approvals-stat,.docs-stat)>div,.crm-app .fc-count-card>.fc-count-content{display:contents!important}
+.crm-app :is(.customers-stat,.agent-stat-card,.reports-ref-kpi,.calllogs-stat,.approvals-stat,.docs-stat)>div>span:first-child,.crm-app .fc-count-card>.fc-count-content>span:first-child,.crm-app .it-user-stats>article>span,.crm-app .crm-ops-stats>div>span{
+ position:absolute!important;inset:auto 8px auto 8px!important;top:-1px!important;transform:translateY(-50%)!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;
+ width:auto!important;max-width:none!important;margin:0!important;padding:0!important;background:transparent!important;background-image:none!important;
+ font-size:12px!important;font-weight:400!important;line-height:1.25!important;text-align:center!important;white-space:nowrap!important;z-index:2;
+}
+.crm-app :is(.customers-stat::before,.agent-stat-card::before,.reports-ref-kpi::before,.calllogs-stat::before,.approvals-stat::before,.docs-stat)>div>span:first-child::before,.crm-app .fc-count-card>.fc-count-content>span:first-child::before,.crm-app .it-user-stats>article>span::before,.crm-app .crm-ops-stats>div>span::before,
+.crm-app :is(.customers-stat::after,.agent-stat-card::after,.reports-ref-kpi::after,.calllogs-stat::after,.approvals-stat::after,.docs-stat)>div>span:first-child::after,.crm-app .fc-count-card>.fc-count-content>span:first-child::after,.crm-app .it-user-stats>article>span::after,.crm-app .crm-ops-stats>div>span::after{content:""!important;display:block!important;flex:1 1 0;min-width:0;height:0;border-top:1px solid var(--kpi-top-line);pointer-events:none}
+.crm-app :is(.customers-stats>.customers-stat,.agent-stats-grid>.agent-stat-card,.reports-ref-kpis>.reports-ref-kpi,.calllogs-stats>.calllogs-stat,.approvals-stats>.approvals-stat,.docs-stats>.docs-stat,.fc-campaign-stats>.fc-count-card,.it-user-stats>article,.crm-ops-stats>div) :is(.customers-stat-icon,.agent-stat-icon,.reports-ref-kpi-icon,.calllogs-stat-icon,.approvals-stat-icon,.docs-stat-icon,.fc-count-icon,.it-stat-icon){grid-column:1!important;grid-row:1!important;align-self:center!important;justify-self:start!important}
+.crm-app :is(.customers-stat,.agent-stat-card,.reports-ref-kpi,.calllogs-stat,.approvals-stat,.docs-stat)>div>strong,.crm-app .fc-count-card>.fc-count-content>strong,.crm-app .it-user-stats>article>strong,.crm-app .crm-ops-stats>div>strong{
+ grid-column:2!important;grid-row:1!important;justify-self:end!important;align-self:center!important;text-align:right!important;font-weight:400!important;font-size:24px!important;line-height:1.15!important;margin:0!important;max-width:100%;overflow-wrap:anywhere
+}
+.crm-app :is(.customers-stat,.agent-stat-card,.reports-ref-kpi,.calllogs-stat,.approvals-stat,.docs-stat)>div>small{grid-column:1/-1!important;grid-row:2!important;text-align:right!important;justify-self:end!important;font-weight:400!important;white-space:normal!important;margin:0!important}
+.crm-app :is(.approvals-stat,.docs-stat)>svg[aria-hidden=true]{display:none}
+.crm-app .fc-campaign-page .fc-campaign-stats,.crm-app .it-user-stats{gap:14px 10px!important;padding-inline:8px!important}
+.crm-app .fc-campaign-page .fc-campaign-stats>.fc-count-card,.crm-app .it-user-stats>article{
+ border:1px solid var(--crisp-line,#cbd2dc)!important;border-top-color:transparent!important;border-radius:10px!important
+}
+.crm-app .crm-ops-stats>div{grid-template-columns:1fr!important}
+.crm-app .crm-ops-stats>div>strong{grid-column:1!important}
+.crm-app .it-user-stats>article:last-child>strong{font-size:18px!important}
+:root[data-theme="dark"] .crm-app :is(.customers-stats>.customers-stat,.agent-stats-grid>.agent-stat-card,.reports-ref-kpis>.reports-ref-kpi,.calllogs-stats>.calllogs-stat,.approvals-stats>.approvals-stat,.docs-stats>.docs-stat,.fc-campaign-stats>.fc-count-card,.it-user-stats>article,.crm-ops-stats>div){--kpi-top-line:var(--dark-line,#40536b)}
+/* Keep a neutral selected outline on Reports/Agents, and existing selected color on Call Logs. */
+.crm-app :is(.reports-ref-kpis>.reports-category-card[aria-pressed=true],.agent-stats-grid>.agent-stat-selected){--kpi-top-line:var(--summary-selected,#89929f);border-top-color:transparent!important}
+.crm-app .calllogs-stats>.calllogs-category-card[aria-pressed=true]{--kpi-top-line:var(--crisp-accent,#b91c24);border-top-color:transparent!important}
+@media(max-width:600px){
+ .crm-app :is(.customers-stat,.agent-stat-card,.reports-ref-kpi,.calllogs-stat,.approvals-stat,.docs-stat)>div>span:first-child,.crm-app .fc-count-card>.fc-count-content>span:first-child,.crm-app .it-user-stats>article>span,.crm-app .crm-ops-stats>div>span{font-size:10px!important;gap:4px!important;white-space:normal!important}
+ .crm-app :is(.customers-stats>.customers-stat,.agent-stats-grid>.agent-stat-card,.reports-ref-kpis>.reports-ref-kpi,.calllogs-stats>.calllogs-stat,.approvals-stats>.approvals-stat,.docs-stats>.docs-stat,.fc-campaign-stats>.fc-count-card,.it-user-stats>article,.crm-ops-stats>div){padding-inline:8px!important;min-height:62px!important}
+ .crm-app :is(.customers-stat,.agent-stat-card,.reports-ref-kpi,.calllogs-stat,.approvals-stat,.docs-stat)>div>strong,.crm-app .fc-count-card>.fc-count-content>strong,.crm-app .it-user-stats>article>strong,.crm-app .crm-ops-stats>div>strong{font-size:20px!important}
+}

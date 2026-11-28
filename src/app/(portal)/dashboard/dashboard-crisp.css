@@ -377,3 +377,11 @@
  .crm-app .ref-dashboard.dashboard-reference .ref-activity-item:not(:has(.dashboard-activity-status)) time{grid-column:2/-1;grid-row:2;justify-self:end}
 }
 @media(max-width:600px){.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card:nth-child(n){min-height:64px;padding:14px 10px 9px}.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-label{font-size:11px}}
+
+/* Transparent border heading: split the actual top stroke rather than painting a label patch. */
+.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card:nth-child(n){border-top-color:transparent!important}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-label{
+ left:8px;right:8px;top:-1px;transform:translateY(-50%);width:auto;max-width:none;padding:0;background:transparent!important;background-image:none!important;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-label::before,
+.crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-label::after{content:"";flex:1 1 0;min-width:0;height:0;border-top:1px solid var(--dashboard-card-line)}
