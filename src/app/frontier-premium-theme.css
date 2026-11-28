@@ -165,3 +165,28 @@
 .crm-app .reports-ref .reports-ref-kpis .reports-category-card::before,.crm-app .reports-ref .reports-ref-kpis .reports-category-card::after,.crm-app .agent-directory .agent-stats-grid .agent-stat-card::before,.crm-app .agent-directory .agent-stats-grid .agent-stat-card::after{content:none!important;display:none!important}
 .crm-app .reports-ref .reports-ref-kpis .reports-category-card :is(strong,div>span),.crm-app .agent-directory .agent-stats-grid .agent-stat-card :is(strong,div>span){color:var(--summary-ink)!important}
 .crm-app .reports-ref .reports-ref-kpis .reports-category-card .reports-ref-kpi-icon,.crm-app .agent-directory .agent-stats-grid .agent-stat-card .agent-stat-icon{background:transparent!important;background-image:none!important;box-shadow:none!important}
+
+/* AI Agents only: restore white light-mode card surfaces, preserve dark theme. */
+:root:not([data-theme="dark"]) .crm-app .agent-directory .agent-stats-grid{--summary-neutral:#fff}
+/* Final shared border rule: specificity covers theme, selected, hover and page-level rules.
+   Only the top stroke is removed; existing card backgrounds and side borders stay intact. */
+:root .crm-app :is(.customers-reference .customers-stats>.customers-stat,.agent-directory .agent-stats-grid>.agent-stat-card,.reports-ref .reports-ref-kpis>.reports-ref-kpi,.calllogs-reference .calllogs-stats>.calllogs-stat,.calllogs-stats>.calllogs-stat,.approvals-stats>.approvals-stat,.docs-stats>.docs-stat,.fc-campaign-page .fc-campaign-stats>.fc-count-card,.it-user-stats>article,.crm-ops-stats>div,.ref-dashboard.dashboard-reference .dashboard-separated-kpis>.ref-kpi-card):nth-child(n):is(:hover,:focus-visible,:not(:hover)){
+ border-top-color:transparent!important;
+}
+:root .crm-app :is(.agent-directory .agent-stats-grid>.agent-stat-card[aria-pressed=true],.reports-ref .reports-ref-kpis>.reports-category-card[aria-pressed=true],.calllogs-stats>.calllogs-category-card[aria-pressed=true]):nth-child(n):is(:hover,:focus-visible,:not(:hover)){
+ border-top-color:transparent!important;
+}
+/* Selected Call Logs used a surrounding shadow in dark mode; keep the left accent only. */
+:root[data-theme="dark"] .crm-app .calllogs-stats>.calllogs-category-card[aria-pressed=true]{box-shadow:inset 3px 0 0 #43c6cc!important;--kpi-top-line:#43c6cc}
+:root:not([data-theme="dark"]) .crm-app .calllogs-stats>.calllogs-category-card[aria-pressed=true]{--kpi-top-line:var(--frontier-red,#d71920)}
+:root[data-theme="dark"] .crm-app .customers-reference .customers-stats>.customers-stat{--kpi-top-line:#40516b}
+.crm-app :is(.agent-directory .agent-stats-grid>.agent-stat-card,.reports-ref .reports-ref-kpis>.reports-ref-kpi){--kpi-top-line:var(--summary-border,#d0d5dd)}
+.crm-app :is(.agent-directory .agent-stats-grid>.agent-stat-card,.reports-ref .reports-ref-kpis>.reports-ref-kpi):is([aria-pressed=true],:hover,:focus-visible){--kpi-top-line:var(--summary-selected,#89929f)}
+/* No color patch behind any KPI heading. */
+:root .crm-app :is(.customers-stat,.agent-stat-card,.reports-ref-kpi,.calllogs-stat,.approvals-stat,.docs-stat)>div>span:first-child,
+:root .crm-app .fc-count-card>.fc-count-content>span:first-child,
+:root .crm-app .it-user-stats>article>span,
+:root .crm-app .crm-ops-stats>div>span,
+:root .crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card .ref-kpi-label{
+ background:transparent!important;background-image:none!important;
+}

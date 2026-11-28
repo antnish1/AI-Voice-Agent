@@ -104,7 +104,7 @@ export default async function Campaigns({searchParams}:{searchParams?:Promise<Fi
   if((data??[]).length<500)break;
  }
  const dateTime=(value:string|null|undefined)=>{if(!value||!Number.isFinite(Date.parse(value)))return <span>—</span>;const d=new Date(value);return <time className="fc-created-datetime" dateTime={value} title="Indian Standard Time"><span>{formatDate(value)}</span><span className="fc-created-time">{d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:true,timeZone:"Asia/Kolkata"})}</span></time>;};
- const scheduled=(day?:string,hour?:string)=>day&&hour&&/^\\d{4}-\\d{2}-\\d{2}$/.test(day)&&/^\\d{2}:\\d{2}$/.test(hour)?day+"T"+hour+":00+05:30":null;
+ const scheduled=(day?:string,hour?:string)=>day&&hour&&/^\d{4}-\d{2}-\d{2}$/.test(day)&&/^\d{2}:\d{2}$/.test(hour)?day+"T"+hour+":00+05:30":null;
  const istDay=(v:string)=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(v?new Date(v):new Date());
  const byCampaign=new Map((launches??[]).map(l=>[l.campaign_id,l.provider_status]));
  const display=(c:Campaign)=>campaignDisplayStatus(c.status,c.historical_read_only?"completed":byCampaign.get(c.id));

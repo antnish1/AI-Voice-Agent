@@ -103,8 +103,8 @@ function AgentCard({agent,onDetails}:{agent:Agent;onDetails:(a:Agent)=>void}){
  const inUse=!!agent.profiles?.some(p=>p.active);
  const artwork=agentPortraitArtwork(agent.name);
  return <article className={"agent-preview-card"+(inUse?" agent-current-card":"")}>
-  <div className="agent-card-status"><span className={"agent-provider-badge "+(agent.provider?.deployed?"agent-provider-deployed":/fail|error/i.test(agent.provider?.status??"")?"agent-provider-failed":"agent-provider-draft")}>● {agent.provider?.status??agent.status} · {agent.provider?.deployed?"Deployed":"Not deployed"}</span>{inUse&&<span className="agent-current-inline">✓ Currently Used</span>}{agent.recommended&&<span className="agent-ribbon">★ Recommended</span>}</div>
-  <div className="agent-card-content"><div className={"agent-card-portrait tone-"+agent.tone}><ArtworkImage key={agent.id} name={artwork.name} fallback={<AgentArtwork kind={artwork.fallback}/>}/></div><div className="agent-card-copy"><div className="agent-card-title-row"><h3>{agent.name}</h3><span className="agent-version">{agent.version}</span></div><p>{agent.description}</p></div></div>
+  <div className="agent-card-status"><span className={"agent-provider-badge "+(agent.provider?.deployed?"agent-provider-deployed":/fail|error/i.test(agent.provider?.status??"")?"agent-provider-failed":"agent-provider-draft")}>● {agent.provider?.status??agent.status} · {agent.provider?.deployed?"Deployed":"Not deployed"}</span>{agent.recommended&&<span className="agent-ribbon">★ Recommended</span>}</div>
+  {inUse&&<span className="agent-current-inline">✓ Currently Used</span>}<div className="agent-card-content"><div className={"agent-card-portrait tone-"+agent.tone}><ArtworkImage key={agent.id} name={artwork.name} fallback={<AgentArtwork kind={artwork.fallback}/>}/></div><div className="agent-card-copy"><div className="agent-card-title-row"><h3>{agent.name}</h3><span className="agent-version">{agent.version}</span></div><p>{agent.description}</p></div></div>
   <div className="agent-card-actions"><button type="button" className="agent-sample-disabled" disabled title="Sample playback requires Sarvam integration"><span className="agent-sample-icon"><Icon name="play" size={11}/></span> Play Sample</button><button type="button" className="agent-detail-button" onClick={()=>onDetails(agent)}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>View Details</button><button type="button" className="agent-use-disabled" disabled title={"Use a verified saved dealership configuration to create a campaign"}><Icon name="play" size={14}/>Use Agent</button></div>
  </article>;
 }
@@ -141,7 +141,7 @@ export function AgentsDirectory({provider,profiles,loadError,headerAction}:{prov
    {headerAction}
   </div>
   {loadError&&<p role="alert">Saved agent configurations could not be loaded.</p>}
-  <p role={provider.live?"status":"alert"}>{provider.message}</p>
+  {provider.live&&<p role="status">{provider.message}</p>}
   <div className="agent-stats-grid">{[
    {label:"Total Agents",filter:"total" as const,number:loadError?"—":String(actual.length),note:"Sarvam workspace agents",icon:"users",tone:"blue"},
    {label:"CRM Configured",filter:"active" as const,number:loadError?"—":String(actual.filter(a=>a.profiles?.some(p=>p.active)).length),note:"Active saved configuration",icon:"check",tone:"green"},
