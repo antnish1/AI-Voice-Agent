@@ -1,0 +1,33 @@
+/* Shared semantic record actions; never alter handlers or disabled attributes. */
+@layer record-action-design {
+ .crm-app :is(.it-row-actions ,.customers-row-actions ,.docs-row-actions) > button ,.crm-app .calllogs-table button.calllogs-view-icon ,.crm-app .reports-ref-table button.premium-navy-view ,.crm-app .reports-ref-table button[title='Export current campaign draft'] ,.crm-app .ref-campaign-table td:last-child > a{box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;padding:0!important;border-radius:8px!important;vertical-align:middle;box-shadow:none!important}
+ .crm-app :is(.it-row-actions,.customers-row-actions,.docs-row-actions,.approvals-row-actions){display:flex!important;align-items:center!important;justify-content:center!important;gap:5px!important}
+ .crm-app :is(.it-row-actions,.customers-row-actions,.docs-row-actions) > button svg,.crm-app :is(.calllogs-table,.reports-ref-table) button:is(.premium-navy-view,.calllogs-view-icon,[title='Export current campaign draft']) svg{width:17px!important;height:17px!important;flex-shrink:0}
+ .crm-app :is(.it-row-actions,.customers-row-actions,.docs-row-actions)>button,
+ .crm-app .calllogs-table button.calllogs-view-icon,
+ .crm-app .reports-ref-table button.premium-navy-view,
+ .crm-app .reports-ref-table button[title='Export current campaign draft'],
+ .crm-app .reports-ref-table button[aria-label='View test call details'],
+ .crm-app .ref-campaign-table td:last-child>a,
+ .crm-app .approvals-table button:is(.approvals-approve,.approvals-reject,.approvals-details-button),
+ .crm-app .crm-ops-table td:last-child>button,
+ .crm-app .agent-card-actions .agent-detail-button,
+ .crm-app .docs-grid article button,
+ .crm-app .it-user-list button[title^='IT Super User only']{
+ --action-fg:#142d4e;--action-bg:#e8eef6;--action-hover:#d3e0ef;
+ background:var(--action-bg)!important;background-image:none!important;color:var(--action-fg)!important;border:1px solid transparent!important;box-shadow:none!important;border-radius:8px!important;
+ }
+ .crm-app :is(.it-row-actions,.customers-row-actions,.docs-row-actions)>button:is([title^='Edit'],[aria-label^='Edit'],[title^='Download']),
+ .crm-app .reports-ref-table button[title='Export current campaign draft'],.crm-app .crm-ops-table td:last-child>button,.crm-app .docs-grid article button:nth-child(2){--action-fg:#2563eb;--action-bg:#eaf2ff;--action-hover:#d6e6ff}
+ .crm-app .it-row-actions>button[title^='Disable']{--action-fg:#95600b;--action-bg:#fff1d5;--action-hover:#ffe3ab}
+ .crm-app .it-row-actions>button[title^='Enable'],.crm-app .approvals-table button.approvals-approve{--action-fg:#087a54;--action-bg:#dcf5e8;--action-hover:#bcebd3}
+ .crm-app :is(.it-row-actions,.customers-row-actions,.docs-row-actions)>button:is(.delete,.it-delete-icon,[title^='Delete']),.crm-app .approvals-table button.approvals-reject{--action-fg:#d71920;--action-bg:#fde8e9;--action-hover:#fbcdd0}
+ .crm-app .it-user-list button[title^='IT Super User only']{--action-fg:#7840b7;--action-bg:#f0e6fa;--action-hover:#e5d3f7}
+ .crm-app :is(.it-row-actions,.customers-row-actions,.docs-row-actions,.approvals-row-actions,.agent-card-actions) button[title],.crm-app :is(.calllogs-table,.reports-ref-table,.approvals-table,.crm-ops-table) td button,.crm-app .ref-campaign-table td:last-child>a,.crm-app .agent-card-actions .agent-detail-button,.crm-app .docs-grid article button,.crm-app .it-user-list button[title^='IT Super User only']{transition:background-color .16s ease,color .16s ease}
+ .crm-app :is(.it-row-actions,.customers-row-actions,.docs-row-actions)>button:not(:disabled):hover,.crm-app :is(.calllogs-table,.reports-ref-table) button:is(.calllogs-view-icon,.premium-navy-view,[title='Export current campaign draft'],[aria-label='View test call details']):not(:disabled):hover,.crm-app .approvals-table button:is(.approvals-approve,.approvals-reject,.approvals-details-button):not(:disabled):hover,.crm-app .crm-ops-table td:last-child>button:not(:disabled):hover,.crm-app .agent-card-actions .agent-detail-button:hover,.crm-app .docs-grid article button:hover,.crm-app .it-user-list button[title^='IT Super User only']:not(:disabled):hover,.crm-app .ref-campaign-table td:last-child>a:hover{background-color:var(--action-hover)!important}
+ .crm-app :is(.it-row-actions,.customers-row-actions,.docs-row-actions) button:disabled{opacity:.42!important;cursor:not-allowed!important}
+ .crm-app :is(.it-row-actions,.customers-row-actions,.docs-row-actions,.calllogs-table,.reports-ref-table) button svg{color:inherit!important}
+ .crm-app .it-user-single .it-create-user-form>label :is(input,select),.crm-app .it-user-single .it-create-user-form>button[type='submit']{height:41px!important;min-height:41px!important;box-sizing:border-box!important}
+ .crm-app .it-user-single .it-create-user-form>button[type='submit']{max-height:41px!important;padding:0 12px!important;align-self:end!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:0!important}
+ @media(prefers-reduced-motion:reduce){.crm-app :is(.it-row-actions,.customers-row-actions,.docs-row-actions,.approvals-row-actions) button{transition:none!important}}
+}
