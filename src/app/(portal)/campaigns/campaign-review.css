@@ -74,3 +74,12 @@
 .review-start-actions .review-confirm-hold{background:#f8c928;color:#342604;border-color:#e3b315}.review-start-actions .review-confirm-reject{background:#dc2626;color:white;border-color:#dc2626}.review-start-actions .review-confirm-hold:hover:not(:disabled){background:#eab308}.review-start-actions .review-confirm-reject:hover:not(:disabled){background:#b91c1c}
 
 .crm-app .review-dialog:not(.review-schedule-dialog){box-sizing:border-box;max-width:calc(100vw - 32px);overflow-x:hidden}.crm-app .review-dialog:not(.review-schedule-dialog)>.crm-panel{width:100%;min-width:0;box-sizing:border-box;overflow-wrap:anywhere}.crm-app .review-start-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.crm-app .review-voice-panel .review-value{min-width:0}.crm-app .review-voice-panel .panel-title{flex-wrap:wrap;gap:8px}
+
+/* Review-only dimensional artwork and subtle Pending motion. */
+.crm-app .campaign-review .review-title-row h1{display:flex;align-items:center;gap:9px}
+.crm-app .campaign-review .review-artwork{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:0 0 30px;vertical-align:middle;background:transparent;overflow:visible}
+.crm-app .campaign-review .review-details .review-artwork,.crm-app .campaign-review .review-title-row .review-artwork{width:36px;height:36px;flex-basis:36px}
+.crm-app .campaign-review .review-artwork :is(img,svg){display:block;width:100%;height:100%;object-fit:contain}
+@keyframes review-pending-gentle-shrink{0%,100%{transform:scale(1)}50%{transform:scale(.95)}}
+@media(prefers-reduced-motion:no-preference){.crm-app .campaign-review .review-title-row .campaign-status-pending{transform-origin:center;animation:review-pending-gentle-shrink 2.4s ease-in-out infinite}}
+@media(prefers-reduced-motion:reduce){.crm-app .campaign-review .review-title-row .campaign-status-pending{animation:none!important;transform:none!important}}

@@ -319,16 +319,16 @@ html:has(.crm-app),body:has(.crm-app){width:100%;height:100%;margin:0;overflow:h
 
 /* Approved global summary icon sizing only. Decorative waves and section icons are untouched. */
 .crm-app :is(.metric-icon,.ref-kpi-icon,.agent-stat-icon,.customers-stat-icon,.approvals-stat-icon,.calllogs-stat-icon,.appointments-metric-icon,.cb-stat-icon,.pd-metric-icon,.reports-ref-kpi-icon,.docs-stat-icon,.it-stat-icon,.fc-count-icon){
- width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;max-width:28px!important;max-height:28px!important;flex:0 0 28px!important;padding:0!important;box-sizing:border-box;font-size:18px;
+ width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;max-width:40px!important;max-height:40px!important;flex:0 0 40px!important;padding:0!important;box-sizing:border-box;font-size:18px;
 }
 .crm-app :is(.metric-icon,.ref-kpi-icon,.agent-stat-icon,.customers-stat-icon,.approvals-stat-icon,.calllogs-stat-icon,.appointments-metric-icon,.cb-stat-icon,.pd-metric-icon,.reports-ref-kpi-icon,.docs-stat-icon,.it-stat-icon,.fc-count-icon) :is(img,svg,.fc-3d-art){
- width:100%!important;height:100%!important;max-width:28px!important;max-height:28px!important;object-fit:contain;
+ width:100%!important;height:100%!important;max-width:40px!important;max-height:40px!important;object-fit:contain;
 }
 
 /* Shared KPI geometry only. No card or page background declarations. */
 .crm-app :is(.customers-stats,.agent-stats-grid,.reports-ref-kpis,.calllogs-stats,.approvals-stats,.docs-stats,.fc-campaign-stats,.it-user-stats,.crm-ops-stats){row-gap:20px!important;padding-top:10px!important;overflow:visible!important}
 .crm-app :is(.customers-stats>.customers-stat,.agent-stats-grid>.agent-stat-card,.reports-ref-kpis>.reports-ref-kpi,.calllogs-stats>.calllogs-stat,.approvals-stats>.approvals-stat,.docs-stats>.docs-stat,.fc-campaign-stats>.fc-count-card,.it-user-stats>article,.crm-ops-stats>div){
- position:relative!important;display:grid!important;grid-template-columns:28px minmax(0,1fr)!important;align-items:center!important;gap:4px 10px!important;
+ position:relative!important;display:grid!important;grid-template-columns:40px minmax(0,1fr)!important;align-items:center!important;gap:4px 10px!important;
  min-height:66px!important;padding:15px 12px 9px!important;overflow:visible!important;box-sizing:border-box;
  border-top-color:transparent!important;
  --kpi-top-line:var(--crisp-line,#cbd2dc);
@@ -364,3 +364,7 @@ html:has(.crm-app),body:has(.crm-app){width:100%;height:100%;margin:0;overflow:h
  .crm-app :is(.customers-stats>.customers-stat,.agent-stats-grid>.agent-stat-card,.reports-ref-kpis>.reports-ref-kpi,.calllogs-stats>.calllogs-stat,.approvals-stats>.approvals-stat,.docs-stats>.docs-stat,.fc-campaign-stats>.fc-count-card,.it-user-stats>article,.crm-ops-stats>div){padding-inline:8px!important;min-height:62px!important}
  .crm-app :is(.customers-stat,.agent-stat-card,.reports-ref-kpi,.calllogs-stat,.approvals-stat,.docs-stat)>div>strong,.crm-app .fc-count-card>.fc-count-content>strong,.crm-app .it-user-stats>article>strong,.crm-app .crm-ops-stats>div>strong{font-size:20px!important}
 }
+
+/* Match the larger summary artwork without changing card colors or title borders. */
+.crm-app :is(.metric-icon,.ref-kpi-icon,.agent-stat-icon,.customers-stat-icon,.approvals-stat-icon,.calllogs-stat-icon,.appointments-metric-icon,.cb-stat-icon,.pd-metric-icon,.reports-ref-kpi-icon,.docs-stat-icon,.it-stat-icon,.fc-count-icon){font-size:24px}
+.crm-app .it-user-stats>article>.it-stat-icon{grid-row:1!important;grid-column:1!important}
