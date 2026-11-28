@@ -85,18 +85,19 @@ export async function POST(request:Request){
    return NextResponse.json({error:"Campaign creation could not be confirmed. "+friendlySarvamFailure(e)+" Check the campaign in Sarvam before trying again.",reconciliationRequired:true},{status:502});
   }
   // Reserve cohort submission before calling provider so retries cannot double-enqueue calls.
-  const {error:reserveCohortError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitting",updated_at:new Date().toISOString()}).eq("campaign_id",id).eq("state","campaign_created");
-  if(reserveCohortError)return NextResponse.json({error:"Campaign created in Sarvam, but CRM could not prepare the customer list for upload. Check the campaign in Sarvam before trying again.",reconciliationRequired:true},{status:502});
+  const {data:cohortReservation,error:reserveCohortError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitting",updated_at:new Date().toISOString()}).eq("campaign_id",id).eq("state","campaign_created").select("campaign_id").maybeSingle();
+  if(reserveCohortError||!cohortReservation)return NextResponse.json({error:"Campaign created in Sarvam, but CRM could not prepare the customer list for upload. Check the campaign in Sarvam before trying again.",reconciliationRequired:true},{status:502});
   try{
    const streamed=await sarvamPost(sarvamPath("campaigns","/"+encodeURIComponent(providerId)+"/cohorts/stream"),{
     name:batch.cohort_name,users:prepared.users.map(user=>{if(batch.phone_column!=="phone_number")return user;return {...user,app_variables:{...user.app_variables,call_plus_3_date:followUpDate(istDate(start),3),call_plus_7_date:followUpDate(istDate(start),7)}};})
    });
    const cohortId=typeof streamed.cohort_id==="string"?streamed.cohort_id:typeof streamed.id==="string"?streamed.id:"";
-   if(!cohortId)throw Error("Provider did not acknowledge cohort");
+   if(!/^[A-Za-z0-9_-]{1,200}$/.test(cohortId))throw Error("Provider did not acknowledge cohort");
    const {error:statusError}=await supabase.from("voice_campaign_launches").update({state:"cohort_submitted",provider_status:"scheduled",sarvam_cohort_id:cohortId,updated_at:new Date().toISOString()}).eq("campaign_id",id);
    if(statusError)throw Error("Could not persist cohort state");
    return NextResponse.json({ok:true,campaignId:providerId,cohortId:cohortId,cohortStatus:streamed.status??"processing",message:"Sarvam accepted campaign and recipient cohort. Confirm processing status before the scheduled dialing window."});
-  }catch{
+  }catch(e){
+   console.warn("Sarvam cohort submission requires reconciliation",{campaignId:id,reason:friendlySarvamFailure(e)});
    await supabase.from("voice_campaign_launches").update({state:"needs_reconciliation",updated_at:new Date().toISOString()}).eq("campaign_id",id);
    return NextResponse.json({error:"Campaign created in Sarvam, but customer upload could not be confirmed. "+(e instanceof Error&&e.message==="Provider did not acknowledge cohort"?"Sarvam did not return a customer-list ID.":e instanceof Error&&e.message==="Could not persist cohort state"?"Sarvam accepted the list, but CRM could not save its reference.":friendlySarvamFailure(e))+" Check Sarvam before retrying to avoid duplicate calls.",reconciliationRequired:true},{status:502});
   }

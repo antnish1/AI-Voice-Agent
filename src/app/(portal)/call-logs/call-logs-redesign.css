@@ -227,3 +227,15 @@
     width:100%;min-width:0;
   }
 }
+
+/* Header artwork is independent of the theme's monochrome icon colours. */
+.crm-app .calllogs-reference .calllogs-ref-heading .calllogs-main-icon{
+ width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;
+ background:transparent!important;background-image:none!important;box-shadow:none!important;
+ border:0;border-radius:0;overflow:visible;color:#142d4e!important;
+}
+.crm-app .calllogs-reference .calllogs-ref-heading .calllogs-main-icon img{
+ display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;
+}
+:root[data-theme="dark"] .crm-app .calllogs-reference .calllogs-ref-heading .calllogs-main-icon{background:transparent!important}
+@media(max-width:760px){.crm-app .calllogs-reference .calllogs-ref-heading .calllogs-main-icon{width:42px;height:42px;flex-basis:42px}}
