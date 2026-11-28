@@ -333,8 +333,9 @@
 }
 
 /* Approved dashboard: normal typography, border-centred KPI titles and pill controls. */
-.crm-app .ref-dashboard.dashboard-reference{--dashboard-card-canvas:var(--frontier-neutral,#f5f6f8);--dashboard-card-line:var(--dash-line,#cbd3df)}
-:root[data-theme="dark"] .crm-app .ref-dashboard.dashboard-reference{--dashboard-card-canvas:var(--dark-canvas,#101f37)}
+/* Restore white dashboard cards from before PR #193; preserve its geometry and typography. */
+.crm-app .ref-dashboard.dashboard-reference{--dashboard-card-canvas:#fff;--dashboard-card-line:var(--dash-line,#cbd3df)}
+:root[data-theme="dark"] .crm-app .ref-dashboard.dashboard-reference{--dashboard-card-canvas:#14243a}
 .crm-app .ref-dashboard.dashboard-reference :is(h1,h2,h3,strong,b,th,td,button,select,input,label,a,span,small,p,time){font-weight:400!important}
 .crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis{padding-top:9px;row-gap:20px;overflow:visible}
 .crm-app .ref-dashboard.dashboard-reference .dashboard-separated-kpis .ref-kpi-card:nth-child(n){
