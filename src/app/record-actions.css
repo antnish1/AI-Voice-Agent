@@ -29,5 +29,28 @@
  .crm-app :is(.it-row-actions,.customers-row-actions,.docs-row-actions,.calllogs-table,.reports-ref-table) button svg{color:inherit!important}
  .crm-app .it-user-single .it-create-user-form>label :is(input,select),.crm-app .it-user-single .it-create-user-form>button[type='submit']{height:41px!important;min-height:41px!important;box-sizing:border-box!important}
  .crm-app .it-user-single .it-create-user-form>button[type='submit']{max-height:41px!important;padding:0 12px!important;align-self:end!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:0!important}
+ /* AI Voice Agents View Details: override the generic record-action surface
+    INSIDE this important CSS layer; unlayered !important rules cannot win. */
+ :root .crm-app .agent-directory .agent-card-grid .agent-preview-card .agent-card-actions > button.agent-detail-button{
+   --action-bg:#142d4e;
+   --action-fg:#fff;
+   --action-hover:#0d2039;
+   background:#142d4e!important;
+   background-color:#142d4e!important;
+   background-image:none!important;
+   border:1px solid #142d4e!important;
+   color:#fff!important;
+ }
+ :root .crm-app .agent-directory .agent-card-grid .agent-preview-card .agent-card-actions > button.agent-detail-button:is(:hover,:focus-visible){
+   background:#0d2039!important;
+   background-color:#0d2039!important;
+   background-image:none!important;
+   border-color:#0d2039!important;
+   color:#fff!important;
+ }
+ :root .crm-app .agent-directory .agent-card-grid .agent-preview-card .agent-card-actions > button.agent-detail-button svg{
+   color:inherit!important;
+   stroke:currentColor!important;
+ }
  @media(prefers-reduced-motion:reduce){.crm-app :is(.it-row-actions,.customers-row-actions,.docs-row-actions,.approvals-row-actions) button{transition:none!important}}
 }
