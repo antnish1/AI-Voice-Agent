@@ -450,3 +450,51 @@
 :root[data-theme="dark"] .crm-app .customers-reference .customer-profile-group-followup .customers-detail-list>div{
   background:#243951;
 }
+
+
+/* Customer Details viewport layer: render outside scrollable/transform parents. */
+.crm-app.customer-profile-portal-root,
+.crm-app .customers-reference.customer-profile-portal-scope{
+  display:contents!important;
+}
+.crm-app .customers-reference.customer-profile-portal-scope{
+  isolation:auto!important;
+  padding:0!important;margin:0!important;
+  background:transparent!important;
+  border:0!important;
+}
+.crm-app .customer-profile-viewport.customers-modal-backdrop{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;height:100dvh!important;
+  box-sizing:border-box!important;
+  z-index:10000!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  margin:0!important;padding:16px!important;
+  overflow-y:auto;overscroll-behavior:contain;
+  background:rgba(19,42,69,.55);
+}
+.crm-app .customer-profile-viewport .customer-profile-modal{
+  flex:0 1 870px;min-width:0;
+  max-height:calc(100dvh - 32px)!important;
+  min-height:0;
+  margin:auto!important;
+  overflow:hidden!important;
+}
+.crm-app .customer-profile-viewport .customer-profile-modal .customer-profile-header,
+.crm-app .customer-profile-viewport .customer-profile-modal .customer-profile-footer{
+  flex-shrink:0;
+}
+.crm-app .customer-profile-viewport .customer-profile-modal .customer-profile-body{
+  flex:1 1 auto;min-height:0;overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+}
+@media(max-width:650px){
+  .crm-app .customer-profile-viewport.customers-modal-backdrop{
+    padding:10px!important;
+  }
+  .crm-app .customer-profile-viewport .customer-profile-modal{
+    max-height:calc(100dvh - 20px)!important;
+  }
+}
