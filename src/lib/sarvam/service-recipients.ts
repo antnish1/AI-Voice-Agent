@@ -1,5 +1,5 @@
 import {normalizePhone} from "./recipient-validation";
-import {RECIPIENT_TEMPLATE_HEADERS,LEGACY_RECIPIENT_HEADERS} from "./recipient-template";
+import {RECIPIENT_TEMPLATE_HEADERS,LEGACY_RECIPIENT_HEADERS,RECIPIENT_BOOLEAN_HEADERS} from "./recipient-template";
 export const SERVICE_INPUT_HEADERS=LEGACY_RECIPIENT_HEADERS;
 const generated=["dealership_brand","vehicle_manufacturer","dealership_location","service_schedule_verified","free_service_eligible","free_service_expiry_date","free_service_terms_verified","warranty_terms_verified","customer_address","service_due_km","warranty_active","time_due_verified","authorized_contact_for_crm","free_expiry_wording_approved","approved_price_range","call_plus_3_date","call_plus_7_date"];
 const brands=["Volkswagen","Skoda","Škoda","Honda","Kia","MG","Tata","JCB","Hyundai","Mahindra","Toyota","Maruti Suzuki"];
@@ -16,6 +16,7 @@ export function enrichServiceRecipients(rows:string[][],dealerName:string,blocke
   if(row.length!==input.length)throw Error("Recipient CSV row has incorrect column count.");
   const v:Record<string,string>=Object.fromEntries(RECIPIENT_TEMPLATE_HEADERS.map(h=>[h,row[input.indexOf(h)]?.trim()??""]));
   v.phone_number=row[input.indexOf(full?"user_phone_number":"phone_number")]?.trim()??"";
+  for(const h of RECIPIENT_BOOLEAN_HEADERS){if(v[h]){const flag=v[h].toUpperCase();if(flag!=="TRUE"&&flag!=="FALSE")throw Error("Invalid recipient column "+h+": select TRUE or FALSE only.");v[h]=flag;}}
   const number=normalizePhone(v.phone_number);
   const allowed=!!number&&!blocked.has(number);
   const fields:Record<string,string>={...v,dealership_brand:brand,vehicle_manufacturer:manufacturer,dealership_location:location,service_schedule_verified:"FALSE",free_service_eligible:"FALSE",free_service_expiry_date:"",free_service_terms_verified:"FALSE",warranty_terms_verified:"FALSE",customer_address:"",service_due_km:"",warranty_active:"FALSE",time_due_verified:"FALSE",authorized_contact_for_crm:allowed?"TRUE":"FALSE",free_expiry_wording_approved:"FALSE",approved_price_range:"",call_plus_3_date:"",call_plus_7_date:"",consent:allowed?"TRUE":"FALSE",do_not_call:allowed?"FALSE":"TRUE"};
