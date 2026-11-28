@@ -169,3 +169,7 @@ Historical linking must verify existing dealership, campaign and agent ownership
 
 ## Campaign status colour standard
 - Use displayed lifecycle status (not raw database status) to choose pill colours across campaign lists, dashboard, details, review and creation confirmation: Pending amber, Ongoing purple, Complete green, Reject red, Hold blue. Match dashboard campaign activity icons. Keep call outcome palette separate. Do not change lifecycle semantics for a visual update.
+
+
+## Manual voice defaults (2026-11-28)
+User approved manual entry of agent ID, committed version number, telephony connection ID/name and caller number. Draft profile saving must not depend on the static discovery catalogue. Do not label manual defaults provider-verified; retain IT/dealership authorization, field validation and independent live-call/launch safeguards. No agent publication, real calls, merge or deployment without separate approval.
