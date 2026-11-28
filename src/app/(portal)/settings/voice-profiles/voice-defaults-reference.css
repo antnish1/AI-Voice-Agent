@@ -280,3 +280,55 @@ linear-gradient(125deg,#e8f4ff 0%,#edf4ff 50%,#dceeff 100%);}
   }
   .crm-app .vdp-page .vdp-body>.vdp-card{width:100%;max-width:none}
 }
+
+
+/* Voice Defaults: view-only until top-right pencil enables editing. */
+.crm-app .vdp-page .vdp-card .vdp-card-title{
+  display:flex;align-items:center;gap:12px;
+}
+.crm-app .vdp-page .vdp-card-title .vdp-edit-toggle{
+  display:grid!important;place-items:center!important;
+  flex:0 0 36px;width:36px;height:36px;
+  min-width:36px;min-height:36px;box-sizing:border-box;
+  margin-left:auto;padding:0!important;
+  border-radius:9px;border:1px solid #c5d7ed;
+  background:#e5edf7;color:#15365b;cursor:pointer;
+}
+.crm-app .vdp-page .vdp-card-title .vdp-edit-toggle svg{
+  display:block;width:17px;height:17px;margin:0;
+}
+.crm-app .vdp-page .vdp-card-title .vdp-edit-toggle:hover:not(:disabled){
+  background:#d5e5f8;border-color:#93b4dd;
+}
+.crm-app .vdp-page .vdp-card-title .vdp-edit-toggle[aria-pressed="true"]{
+  background:#fff0f1;border-color:#f2aeb5;color:#c8102e;
+}
+.crm-app .vdp-page .vdp-card-title .vdp-edit-toggle:focus-visible{
+  outline:2px solid #142d4e;outline-offset:2px;
+}
+.crm-app .vdp-page .vdp-form[data-editing="false"] .vdp-control{
+  background:#f6f8fb!important;
+}
+.crm-app .vdp-page .vdp-form[data-editing="false"] .vdp-control input[readonly]{
+  cursor:default;color:#445269;
+  background:transparent!important;
+}
+.crm-app .vdp-page .vdp-form[data-editing="false"] .vdp-check input:disabled{
+  cursor:not-allowed;
+}
+.crm-app .vdp-page .vdp-form .vdp-footer .vdp-save:disabled{
+  opacity:.48!important;
+  cursor:not-allowed!important;
+  filter:grayscale(.15)!important;
+  box-shadow:none!important;
+  transform:none!important;
+}
+:root[data-theme="dark"] .crm-app .vdp-page .vdp-card-title .vdp-edit-toggle{
+  background:#263d56;color:#e5edf7;border-color:#496680;
+}
+:root[data-theme="dark"] .crm-app .vdp-page .vdp-form[data-editing="false"] .vdp-control{
+  background:#24354b!important;
+}
+:root[data-theme="dark"] .crm-app .vdp-page .vdp-form[data-editing="false"] .vdp-control input[readonly]{
+  color:#e2e9f4;
+}
