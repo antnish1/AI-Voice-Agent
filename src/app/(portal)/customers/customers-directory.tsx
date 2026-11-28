@@ -62,7 +62,7 @@ export function CustomersDirectory({metrics,customers,count,page,pageSize,query,
  const pages=Math.max(1,Math.ceil(count/pageSize));
  const from=count===0?0:(page-1)*pageSize+1,to=Math.min(page*pageSize,count);
  const pathname=(params:{page?:number;query?:string;status?:string;period?:string;campaign?:string;dealer?:string;summary?:string})=>{const p=new URLSearchParams();const searchValue=params.query??query;const pg=params.page??1;if(searchValue)p.set("q",searchValue);const campaign=params.campaign??campaignFilter,dealer=params.dealer??dealerFilter;if(campaign!=="all")p.set("campaign",campaign);if(dealer!=="all")p.set("dealer",dealer);const sum=params.summary??summary;if(sum!=="all")p.set("summary",sum);if(pg>1)p.set("page",String(pg));return "/customers"+(p.size?"?"+p.toString():"");};
- const navigate=(params:{page?:number;query?:string;status?:string;period?:string;campaign?:string;dealer?:string})=>{router.push(pathname(params));};
+ const navigate=(params:{page?:number;query?:string;status?:string;period?:string;campaign?:string;dealer?:string;summary?:string})=>{router.push(pathname(params));};
  // Update customer search automatically with a short debounce while retaining filters.
  useEffect(()=>{
   if(term.trim()===query)return;
