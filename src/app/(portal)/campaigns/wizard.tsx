@@ -54,7 +54,7 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
    if(headers.some(x=>!x)||new Set(headers).size!==headers.length)throw Error("Excel headers must be unique and non-empty.");
    const full=headers.includes("user_phone_number");
    const simple=full||headers.includes("phone_number");
-   for(const required of simple?(full?RECIPIENT_TEMPLATE_HEADERS:LEGACY_RECIPIENT_HEADERS):["Mobile","consent","do_not_call"])if(!headers.includes(required))throw Error("Missing required column: "+required+". Download the template.");
+   for(const required of simple?(full?RECIPIENT_TEMPLATE_HEADERS.filter(h=>h!=="vehicle_registration_number"):LEGACY_RECIPIENT_HEADERS):["Mobile","consent","do_not_call"])if(!headers.includes(required))throw Error("Missing required column: "+required+". Download the template.");
    if(simple&&/\.xlsx$/i.test(file.name))for(const row of rows.slice(1))while(row.length<headers.length)row.push("");
    if(rows.some((r,i)=>i>0&&r.length!==headers.length))throw Error("Some rows have a different column count.");
    const idx=headers.indexOf(simple?(full?"user_phone_number":"phone_number"):"Mobile"),ci=headers.indexOf("consent"),di=headers.indexOf("do_not_call");
@@ -88,7 +88,9 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
    form.set("cohortName","Service Reminders");form.set("phoneColumn",preview.simple?"phone_number":"Mobile");
    if(preview.simple)form.set("serviceTemplate","yes");
    form.set("consentColumn","consent");form.set("dncColumn","do_not_call");
-   form.set("variableMapping","{}");form.set("certifyConsent","yes");
+   const registrationColumn=preview.headers.find(h=>["vehicle_registration_number","registration_number","reg. number","registration number","reg no.","reg. no.","vehicle number"].includes(h.toLowerCase()));
+   const nameColumn=preview.headers.find(h=>["customer_name","customer name","customer","name"].includes(h.toLowerCase()));
+   form.set("variableMapping",JSON.stringify({...(!preview.simple&&registrationColumn?{vehicle_registration_number:registrationColumn}:{}),...(!preview.simple&&nameColumn?{customer_name:nameColumn}:{})}));form.set("certifyConsent","yes");
    try{
     const response=await fetch("/api/sarvam/recipients",{method:"POST",body:form,cache:"no-store"});
     const data=await response.json();
@@ -155,7 +157,7 @@ export function CampaignWizard({dealerships,initialDealershipId,canOpenOutbound}
       <div className="fc-reference-metric fc-reference-excluded"><strong>{preview.excluded}</strong><span>Excluded</span></div>
       <div className="fc-reference-metric fc-reference-invalid"><strong>{preview.invalid} / {preview.duplicate}</strong><span>Invalid / Duplicate</span></div>
      </div>
-     <div className="fc-reference-sample"><table><thead><tr><th>Mobile</th><th>Customer</th><th>Model</th><th>Reg. No.</th></tr></thead><tbody>{preview.sample.map((row,i)=>{const get=(...names:string[])=>{const index=preview.headers.findIndex(h=>names.some(n=>h.trim().toLowerCase()===n.toLowerCase()));return index<0?"—":row[index]||"—";};const mobile=get("Mobile","phone_number","user_phone_number");return <tr key={i}><td>{mobile==="—"?"—":"••••••"+mobile.replace(/\D/g,"").slice(-4)}</td><td>{get("Customer Name","Customer","Name","customer_name")}</td><td>{get("Model","Vehicle Model","vehicle_model")}</td><td>{get("Reg. Number","Registration Number","Reg No.","Reg. No.","Vehicle Number")}</td></tr>;})}</tbody></table></div>
+     <div className="fc-reference-sample"><table><thead><tr><th>Mobile</th><th>Customer</th><th>Model</th><th>Reg. No.</th></tr></thead><tbody>{preview.sample.map((row,i)=>{const get=(...names:string[])=>{const index=preview.headers.findIndex(h=>names.some(n=>h.trim().toLowerCase()===n.toLowerCase()));return index<0?"—":row[index]||"—";};const mobile=get("Mobile","phone_number","user_phone_number");return <tr key={i}><td>{mobile==="—"?"—":"••••••"+mobile.replace(/\D/g,"").slice(-4)}</td><td>{get("Customer Name","Customer","Name","customer_name")}</td><td>{get("Model","Vehicle Model","vehicle_model")}</td><td>{get("vehicle_registration_number","registration_number","Reg. Number","Registration Number","Reg No.","Reg. No.","Vehicle Number")}</td></tr>;})}</tbody></table></div>
     </div>}
     <label className="fc-compact-consent fc-reference-consent"><input type="checkbox" checked={consentCertified} disabled={busy} onChange={e=>setConsentCertified(e.target.checked)}/>I confirm customer consent and DNC/suppression screening.</label>
     {error&&<p role="alert" className="form-error">{error}</p>}
