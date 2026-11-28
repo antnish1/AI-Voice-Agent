@@ -6,18 +6,18 @@ import "./login-design.css";
 
 export default async function Login({searchParams}:{searchParams:Promise<{error?:string}>}){
  const {error}=await searchParams;
- return <main className="fv-login fv-login-full-background fv-login-left-card fv-login-premium">
-  <div className="fv-vehicle-background fv-static-login-background" aria-hidden="true"><div className="fv-vehicle-viewport"><img src="/banners/LOGINPAGE.jpeg" alt="" draggable={false} fetchPriority="high"/></div></div>
-  <section className="fv-left fv-left-login-layout" aria-label="Sign in to Frontier Voice CRM">
+ return <main className="fv-login fv-login-kia-split">
+  <aside className="fv-kia-hero" aria-label="Frontier Voice CRM"><img className="fv-kia-photo" src="/banners/LOGINPAGE.jpeg" alt="" draggable={false} fetchPriority="high"/><div className="fv-kia-copy"><div className="fv-kia-brand"><img src="/autoreach-logo.png" alt="" width={70} height={70}/><strong>FRONTIER<br/>GROUP</strong></div><span className="fv-kia-overline">FRONTIER VOICE CRM</span><h2>Smarter customer conversations for modern dealerships.</h2></div></aside>
+  <section className="fv-kia-auth" aria-label="Sign in to Frontier Voice CRM">
    <div className="fv-signin-card">
     <div className="fv-premium-brand"><img src="/autoreach-logo.png" alt="" width={64} height={64}/><div><strong>FRONTIER GROUP</strong><span>VOICE CRM</span></div></div>
     <div className="fv-premium-rule" aria-hidden="true"/>
-    <h1>Welcome back.</h1>
-    <p className="fv-signin-subtitle">Secure access to your dealership workspace.</p>
+    <h1>Welcome Back</h1>
+    <p className="fv-signin-subtitle">Sign in to your Frontier Voice CRM account.</p>
     {error&&<p className="fv-error" role="alert">Unable to sign in. Check your email and password.</p>}
     <form action={signIn} className="fv-login-form">
      <label className="fv-premium-label" htmlFor="fv-email">Email Address</label>
-     <div className="fv-input-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" fill="currentColor"/><path d="m4 8 8 6 8-6" fill="none" stroke="#dfe9fa" strokeWidth="1.8" strokeLinejoin="round"/></svg><input id="fv-email" name="email" type="email" placeholder="Email Address" autoComplete="username" required/></div>
+     <div className="fv-input-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" fill="currentColor"/><path d="m4 8 8 6 8-6" fill="none" stroke="#ffffff" strokeWidth="1.8" strokeLinejoin="round"/></svg><input id="fv-email" name="email" type="email" placeholder="Email Address" autoComplete="username" required/></div>
      <label className="fv-premium-label" htmlFor="fv-password">Password</label>
      <PasswordField/>
      <SignInButton/>
